@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Syne } from 'next/font/google'
 import './globals.css'
+import { Analytics } from "@vercel/analytics/next"
 import { AuthProvider } from '@/hooks/useAuth'
 
 const syne = Syne({ subsets: ['latin'], variable: '--font-syne' })
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${syne.variable} font-syne bg-bg text-white antialiased`}>
         <AuthProvider>
           {children}
+          <Analytics />
         </AuthProvider>
       </body>
     </html>
