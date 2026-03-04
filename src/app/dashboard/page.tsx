@@ -32,7 +32,7 @@ export default function DashboardPage() {
   const filtered = activeCategory === 'All' ? questions : questions.filter(q => q.cat === activeCategory)
 
   async function handleMastered(id: number, val: boolean) {
-    if (!progress) return
+    if (!user || !progress) return
     if (val && !progress.isPro && progress.masteredIds.length >= FREE_LIMIT) {
       setPaywallReason(`Free plan is limited to ${FREE_LIMIT} mastered questions. Upgrade to track all!`)
       setShowPaywall(true)
@@ -43,7 +43,8 @@ export default function DashboardPage() {
   }
 
   async function handleBookmark(id: number, val: boolean) {
-    if (!progress?.isPro) {
+    if (!user || !progress) return
+    if (!progress.isPro) {
       setPaywallReason('Bookmarks are a Pro feature. Upgrade to save questions for quick review.')
       setShowPaywall(true)
       return
