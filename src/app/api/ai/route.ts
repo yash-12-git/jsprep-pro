@@ -99,6 +99,35 @@ Rules:
 Start the interview now with your first question.`
         break
 
+      case 'debugcheck':
+        systemPrompt = `You are a strict JavaScript code reviewer checking if a developer correctly fixed a buggy snippet.
+
+ORIGINAL BROKEN CODE:
+${context.brokenCode}
+
+THE BUG: ${context.bugDescription}
+
+REFERENCE FIX:
+${context.fixedCode}
+
+DEVELOPER'S SUBMITTED FIX:
+${context.userFix}
+
+Evaluate and respond ONLY with this JSON (no markdown, no extra text):
+{
+  "correct": <true or false>,
+  "score": <1-10>,
+  "verdict": "<one line summary>",
+  "whatTheyGotRight": "<what they fixed correctly, or 'Nothing' if totally wrong>",
+  "remainingIssues": "<bugs still present, or 'None' if fully correct>",
+  "betterApproach": "<cleaner solution if theirs works but is suboptimal, or null>",
+  "hint": "<nudge toward fix if wrong, without giving it away>",
+  "explanation": "<2-3 sentences on the core bug and correct fix>"
+}
+
+Accept alternative correct solutions. A fix is correct if it solves the core bug even if different from the reference.`
+        break
+
       default:
         return NextResponse.json({ error: 'Invalid type' }, { status: 400 })
     }
@@ -107,8 +136,6 @@ Start the interview now with your first question.`
     let text = ''
 
     if (USE_GROQ) {
-      console.log("grok used", process.env.GROQ_API_KEY);
-      
       // Groq (free) — OpenAI-compatible API
       const groqMessages = [
         { role: 'system', content: systemPrompt },

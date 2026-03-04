@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
-import { Zap, BookOpen, BarChart2, Brain, LogOut, Mic, Map, FileDown, ChevronDown } from 'lucide-react'
+import { Zap, BookOpen, BarChart2, Brain, LogOut, Mic, Map, FileDown, ChevronDown, Bug, Code2 } from 'lucide-react'
 import clsx from 'clsx'
 import { useState, useRef, useEffect } from 'react'
 
@@ -23,6 +23,8 @@ export default function Navbar() {
 
   const mainLinks = [
     { href: '/dashboard', label: 'Questions', icon: BookOpen },
+    { href: '/output-quiz', label: 'Output Quiz', icon: Code2, pro: false },
+    { href: '/debug-lab', label: 'Debug Lab', icon: Bug, pro: false },
     { href: '/quiz', label: 'Quiz', icon: Brain, pro: true },
     { href: '/analytics', label: 'Analytics', icon: BarChart2, pro: true },
   ]
@@ -44,7 +46,7 @@ export default function Navbar() {
         </Link>
 
         {user && (
-          <div className="flex items-center gap-1 overflow-x-auto" style={{scrollbarWidth:'none'}}>
+          <div className="flex items-center gap-1" style={{scrollbarWidth:'none'}}>
             {mainLinks.map(({ href, label, icon: Icon, pro }) => (
               <Link key={href} href={href}
                 className={clsx('flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all whitespace-nowrap flex-shrink-0',

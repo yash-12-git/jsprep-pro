@@ -100,7 +100,7 @@ export default function DashboardPage() {
             {[
               { href: '/mock-interview', icon: '🎤', label: 'Mock Interview', color: 'border-accent/30 hover:border-accent/60' },
               { href: '/study-plan', icon: '🧠', label: 'AI Study Plan', color: 'border-accent2/30 hover:border-accent2/60' },
-              { href: '/cheatsheet', icon: '📄', label: 'Cheat Sheet', color: 'border-accent3/30 hover:border-accent3/60' },
+              { href: '/cheat-sheet', icon: '📄', label: 'Cheat Sheet', color: 'border-accent3/30 hover:border-accent3/60' },
             ].map(({ href, icon, label, color }) => (
               <button key={href} onClick={() => router.push(href)}
                 className={'bg-card border rounded-xl p-3 text-center transition-all ' + color}>

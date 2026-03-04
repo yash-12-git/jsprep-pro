@@ -1,5 +1,5 @@
 import {
-  doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, increment, serverTimestamp, collection, getDocs
+  doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, increment, serverTimestamp
 } from 'firebase/firestore'
 import { db } from './firebase'
 
@@ -14,6 +14,10 @@ export interface UserProgress {
   totalSessions: number
   quizScores: { date: string; score: number; total: number }[]
   joinedAt: string
+  solvedOutputIds: number[]      // ids of correctly answered output questions
+  revealedOutputIds: number[]    // ids that were revealed (partial credit)
+  solvedDebugIds: number[]       // ids of correctly AI-checked debug questions
+  revealedDebugIds: number[]     // ids that were revealed
 }
 
 const DEFAULT_PROGRESS: Omit<UserProgress, 'uid'> = {
@@ -25,6 +29,10 @@ const DEFAULT_PROGRESS: Omit<UserProgress, 'uid'> = {
   totalSessions: 0,
   quizScores: [],
   joinedAt: new Date().toISOString(),
+  solvedOutputIds: [],
+  revealedOutputIds: [],
+  solvedDebugIds: [],
+  revealedDebugIds: [],
 }
 
 export async function getUserProgress(uid: string): Promise<UserProgress> {
@@ -35,7 +43,13 @@ export async function getUserProgress(uid: string): Promise<UserProgress> {
     await setDoc(ref, data)
     return data
   }
-  return snap.data() as UserProgress
+  // Merge defaults for any missing fields (handles old accounts)
+  const data = snap.data() as UserProgress
+  return {
+    ...DEFAULT_PROGRESS,
+    ...data,
+    uid,
+  }
 }
 
 export async function markMastered(uid: string, questionId: number, mastered: boolean) {
@@ -58,6 +72,34 @@ export async function saveQuizScore(uid: string, score: number, total: number) {
   await updateDoc(ref, {
     quizScores: arrayUnion(entry),
     totalSessions: increment(1),
+  })
+}
+
+export async function markOutputSolved(uid: string, questionId: number) {
+  const ref = doc(db, 'users', uid)
+  await updateDoc(ref, {
+    solvedOutputIds: arrayUnion(questionId),
+  })
+}
+
+export async function markOutputRevealed(uid: string, questionId: number) {
+  const ref = doc(db, 'users', uid)
+  await updateDoc(ref, {
+    revealedOutputIds: arrayUnion(questionId),
+  })
+}
+
+export async function markDebugSolved(uid: string, questionId: number) {
+  const ref = doc(db, 'users', uid)
+  await updateDoc(ref, {
+    solvedDebugIds: arrayUnion(questionId),
+  })
+}
+
+export async function markDebugRevealed(uid: string, questionId: number) {
+  const ref = doc(db, 'users', uid)
+  await updateDoc(ref, {
+    revealedDebugIds: arrayUnion(questionId),
   })
 }
 
