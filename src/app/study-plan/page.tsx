@@ -59,12 +59,12 @@ export default function StudyPlanPage() {
           type: 'studyplan',
           messages: [{ role: 'user', content: 'Generate my study plan.' }],
           context: {
-            masteredIds: progress.masteredIds,
-            quizScores: progress.quizScores,
+            masteredIds: progress?.masteredIds,
+            quizScores: progress?.quizScores,
             weakCategories,
             strongCategories,
             interviewDate: interviewDate || null,
-            streakDays: progress.streakDays,
+            streakDays: progress?.streakDays,
           }
         })
       })
