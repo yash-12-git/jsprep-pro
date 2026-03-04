@@ -125,7 +125,7 @@ export default function HomePage() {
         </div>
 
         <div className="text-center text-muted text-sm">
-          © 2024 JSPrep Pro · Built for frontend developers
+          © 2026 JSPrep Pro · Built for frontend developers
         </div>
       </div>
     </main>

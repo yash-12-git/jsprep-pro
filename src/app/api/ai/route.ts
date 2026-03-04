@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages'
-const MODEL = 'claude-sonnet-4-20250514'
+const USE_GROQ = !!process.env.GROQ_API_KEY
+const GROQ_API = 'https://api.groq.com/openai/v1/chat/completions'
+const GROQ_MODEL = 'llama-3.3-70b-versatile'
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -101,32 +103,37 @@ Start the interview now with your first question.`
         return NextResponse.json({ error: 'Invalid type' }, { status: 400 })
     }
 
-    const response = await fetch(ANTHROPIC_API, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages: userMessages,
-      }),
-    })
 
-    if (!response.ok) {
-      const err = await response.text()
-      console.error('Anthropic API error:', err)
-      return NextResponse.json({ error: 'AI service error' }, { status: 500 })
+    let text = ''
+
+    if (USE_GROQ) {
+      console.log("grok used", process.env.GROQ_API_KEY);
+      
+      // Groq (free) — OpenAI-compatible API
+      const groqMessages = [
+        { role: 'system', content: systemPrompt },
+        ...userMessages.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content }))
+      ]
+      const response = await fetch(GROQ_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({ model: GROQ_MODEL, messages: groqMessages, max_tokens: 1024 }),
+      })
+      if (!response.ok) {
+        const err = await response.text()
+        console.error('Groq error:', response.status, err)
+        return NextResponse.json({ error: 'AI service error', detail: err }, { status: 500 })
+      }
+      const data = await response.json()
+      text = data.choices?.[0]?.message?.content || ''
     }
 
-    const data = await response.json()
-    const text = data.content?.[0]?.text || ''
     return NextResponse.json({ text })
   } catch (err) {
     console.error('AI route error:', err)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal error', detail: String(err) }, { status: 500 })
   }
 }
