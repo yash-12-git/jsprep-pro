@@ -15,6 +15,15 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType)
 
+function applyExpiryCheck(p: UserProgress): UserProgress {
+  // If Pro has a set expiry date and it's in the past, downgrade client-side
+  if (p.isPro && p.proExpiresAt) {
+    const expired = new Date(p.proExpiresAt) < new Date()
+    if (expired) return { ...p, isPro: false }
+  }
+  return p
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [progress, setProgress] = useState<UserProgress | null>(null)
@@ -22,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function loadProgress(u: User) {
     const p = await getUserProgress(u.uid)
-    setProgress(p)
+    setProgress(applyExpiryCheck(p))
     await updateStreak(u.uid)
   }
 
@@ -47,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function refreshProgress() {
     if (user) {
       const p = await getUserProgress(user.uid)
-      setProgress(p)
+      setProgress(applyExpiryCheck(p))
     }
   }
 

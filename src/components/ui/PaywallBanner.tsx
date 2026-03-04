@@ -35,7 +35,7 @@ export default function PaywallBanner({ onClose, reason }: Props) {
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: Number(process.env.NEXT_PUBLIC_PRO_PRICE_PAISE || 19900),
+        amount: Number(process.env.NEXT_PUBLIC_PRO_PRICE_PAISE || 9900),
         currency: 'INR',
         name: 'JSPrep Pro',
         description: 'Monthly Pro Subscription',
@@ -82,7 +82,7 @@ export default function PaywallBanner({ onClose, reason }: Props) {
         </p>
 
         <ul className="space-y-2 mb-7">
-          {['Unlimited mastery tracking', 'Bookmarks for quick review', 'Timed quiz / flashcard mode', 'Progress analytics & charts', 'Daily streak tracking'].map(f => (
+          {['Unlimited mastery tracking', 'Bookmarks for quick review', 'Timed quiz / flashcard mode', 'Progress analytics & charts', 'Daily streak tracking', 'AI tools & tutor support'].map(f => (
             <li key={f} className="flex items-center gap-2 text-sm text-white">
               <span className="text-accent3">✓</span> {f}
             </li>
@@ -97,7 +97,7 @@ export default function PaywallBanner({ onClose, reason }: Props) {
           {loading ? 'Loading...' : (
             <>
               <Zap size={16} />
-              Upgrade for ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}/mo
+              Upgrade for ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 99}/mo
             </>
           )}
         </button>

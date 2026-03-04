@@ -14,6 +14,10 @@ export interface UserProgress {
   totalSessions: number
   quizScores: { date: string; score: number; total: number }[]
   joinedAt: string
+  proActivatedAt?: string
+  proExpiresAt?: string | null
+  subscriptionStatus?: string
+  lastRenewedAt?: string
   solvedOutputIds: number[]      // ids of correctly answered output questions
   revealedOutputIds: number[]    // ids that were revealed (partial credit)
   solvedDebugIds: number[]       // ids of correctly AI-checked debug questions
