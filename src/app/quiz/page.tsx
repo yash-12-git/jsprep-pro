@@ -71,6 +71,7 @@ export default function QuizPage() {
 
   function handleAnswer(correct: boolean) {
     const newScores = [...scores, correct]
+    if(!user) return;
     setScores(newScores)
     if (current + 1 >= quizQuestions.length) {
       const total = quizQuestions.length
