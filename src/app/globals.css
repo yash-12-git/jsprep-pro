@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-syne: 'Syne', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  min-height: 100vh;
+}
+
+/* Code blocks */
+pre {
+  background: #0d0d14;
+  border: 1px solid #2a2a3a;
+  border-radius: 10px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  margin: 14px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #b0b0d0;
+}
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+
+.tip {
+  background: rgba(124, 106, 247, 0.08);
+  border-left: 3px solid #7c6af7;
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  margin-top: 14px;
+  font-size: 13px;
+  color: #9a8cf7;
+}
+
+.answer p { color: #c8c8d8; font-size: 14px; line-height: 1.8; margin-bottom: 12px; }
+.answer ul { padding-left: 20px; margin-bottom: 12px; }
+.answer li { color: #c8c8d8; font-size: 14px; line-height: 1.8; margin-bottom: 4px; }
+.answer strong { color: #e8e8f0; }
+.answer code { background: rgba(124,106,247,0.15); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #111118; }
+::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #7c6af7; }
+
+@layer utilities {
+  .font-syne { font-family: var(--font-syne), sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+}
