@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { activatePro } from '@/lib/userProgress'
 import { Zap, X } from 'lucide-react'
+import { proFeatures } from '@/data/proBenefits'
 
 declare global {
   interface Window {
@@ -82,7 +83,7 @@ export default function PaywallBanner({ onClose, reason }: Props) {
         </p>
 
         <ul className="space-y-2 mb-7">
-          {['Unlimited mastery tracking', 'Bookmarks for quick review', 'Timed quiz / flashcard mode', 'Progress analytics & charts', 'Daily streak tracking', 'AI tools & tutor support'].map(f => (
+          {proFeatures.map(f => (
             <li key={f} className="flex items-center gap-2 text-sm text-white">
               <span className="text-accent3">✓</span> {f}
             </li>

@@ -6,6 +6,7 @@ import {
   Zap, BookOpen, Brain, BarChart2, Flame, Star, ArrowRight, CheckCircle,
   Code2, Bug, Mic, Target, FileText, Sparkles
 } from 'lucide-react'
+import { proFeatures } from '@/data/proBenefits'
 
 export default function HomePage() {
   const { user, loading } = useAuth()
@@ -48,23 +49,6 @@ export default function HomePage() {
     { icon: FileText, title: 'Cheat Sheet', desc: 'Auto-generates a printable PDF of all your mastered concepts for last-minute review.', color: 'text-accent3' },
   ]
 
-  const proFeatures = [
-    'Everything in Free',
-    'All 40 output questions',
-    'All 20 debug challenges',
-    'Unlimited mastery tracking',
-    'Bookmarks + cloud sync',
-    'Timed quiz / flashcard mode',
-    'AI Tutor on every question',
-    'AI Answer Evaluator',
-    'AI Code Checker (Debug Lab)',
-    'AI Mock Interviewer',
-    'AI Study Plan generator',
-    'Cheat Sheet PDF generator',
-    'Full progress analytics',
-    'Daily streak tracking',
-    'All future content',
-  ]
 
   return (
     <main className="relative min-h-screen overflow-hidden">
