@@ -6,7 +6,7 @@ A full-stack Next.js SaaS app for JS interview preparation with Firebase Auth, F
 - **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
 - **Auth**: Firebase Authentication (Google Sign-In)
 - **Database**: Firestore (per-user progress, bookmarks, quiz scores, streaks)
-- **Payments**: Razorpay (subscription, ₹199/month)
+- **Payments**: Razorpay (subscription, ₹99/month)
 - **Deployment**: Vercel (recommended)
 
 ## Features
@@ -121,22 +121,28 @@ For production, use **Firebase Admin SDK** in the webhook to update Firestore se
 
 ```
 src/
+├── styles/
+│   ├── tokens.ts          ← All design tokens (colors, breakpoints, radii)
+│   └── shared.ts          ← Reusable atoms used across pages
+│
 ├── app/
-│   ├── page.tsx           # Landing page
-│   ├── auth/page.tsx      # Google sign-in
-│   ├── dashboard/page.tsx # Questions + progress tracking
-│   ├── quiz/page.tsx      # Flashcard quiz mode (Pro)
-│   ├── analytics/page.tsx # Progress charts (Pro)
-│   └── api/razorpay/
-│       └── webhook/       # Payment verification
-├── components/
-│   ├── layout/Navbar.tsx
-│   └── ui/PaywallBanner.tsx
-├── hooks/useAuth.tsx       # Auth context
-├── lib/
-│   ├── firebase.ts         # Firebase config
-│   └── userProgress.ts     # Firestore helpers
-└── data/questions.ts       # All 21 questions
+│   ├── page.tsx + page.styles.ts       ← Homepage
+│   ├── auth/page.tsx + styles.ts
+│   ├── dashboard/page.tsx + styles.ts
+│   ├── quiz/page.tsx + styles.ts
+│   ├── analytics/page.tsx + styles.ts
+│   ├── output-quiz/page.tsx + styles.ts
+│   ├── debug-lab/page.tsx + styles.ts
+│   ├── mock-interview/page.tsx + styles.ts
+│   ├── study-plan/page.tsx + styles.ts
+│   └── cheatsheet/page.tsx + styles.ts
+│
+└── components/
+    ├── layout/Navbar.tsx + Navbar.styles.ts
+    └── ui/
+        ├── PaywallBanner.tsx + styles.ts
+        ├── AIChat.tsx + styles.ts
+        └── AnswerEvaluator.tsx + styles.ts
 ```
 
 ---
