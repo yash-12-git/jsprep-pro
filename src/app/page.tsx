@@ -16,7 +16,7 @@ export default function HomePage() {
     { n: '81+', l: 'Questions' },
     { n: '3', l: 'Modes' },
     { n: '6', l: 'AI Tools' },
-    { n: '₹199', l: 'Pro/mo' },
+    { n: `${process.env.NEXT_PUBLIC_PRO_PRICE}`, l: 'Pro/mo' },
   ]
 
   const modes = [
@@ -209,7 +209,7 @@ export default function HomePage() {
               <div css={S.popularBadge}>POPULAR</div>
               <div css={[S.planName, { color: C.accent }]}>Pro</div>
               <div css={S.planPrice}>
-                ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}
+                ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 99}
                 <span css={S.planPriceNote}> /month</span>
               </div>
               <p css={S.planTagline}>Less than a coffee. Cancel anytime.</p>

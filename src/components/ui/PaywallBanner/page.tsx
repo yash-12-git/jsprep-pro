@@ -58,7 +58,7 @@ export default function PaywallBanner({ onClose, reason }: Props) {
           ))}
         </ul>
         <button css={S.upgradeBtn} onClick={handleUpgrade} disabled={loading}>
-          {loading ? 'Loading...' : <><Zap size={16} /> Upgrade for ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}/mo</>}
+          {loading ? 'Loading...' : <><Zap size={16} /> Upgrade for ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 99}/mo</>}
         </button>
         <p css={S.legal}>Secure payment via Razorpay · Cancel anytime</p>
       </div>
