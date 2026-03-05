@@ -74,7 +74,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
-
         {/* Site-wide structured data */}
         <script
           type="application/ld+json"
@@ -82,6 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
 
         {/* PWA / App meta */}
+        <meta name="google-site-verification" content="r18YNnAL_LCvcldYAr8VTKNLHmjVWkRWsOyFEkm4owM" />
         <meta name="application-name" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-title" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
