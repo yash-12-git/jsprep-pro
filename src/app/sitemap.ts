@@ -12,7 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE.domain}/javascript-interview-questions`,  lastModified: now, changeFrequency: 'weekly',  priority: 0.95 },
     { url: `${SITE.domain}/javascript-interview-cheatsheet`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${SITE.domain}/blog`,                            lastModified: now, changeFrequency: 'weekly',  priority: 0.85 },
-    { url: `${SITE.domain}/auth`,                            lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
   ]
 
   // Category question pages

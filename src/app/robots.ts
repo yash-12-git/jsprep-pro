@@ -15,6 +15,7 @@ export default function robots(): MetadataRoute.Robots {
           '/mock-interview',
           '/study-plan',
           '/api/',
+          '/auth',
         ],
       },
       {
@@ -26,7 +27,7 @@ export default function robots(): MetadataRoute.Robots {
           '/questions/',
           '/blog/',
         ],
-        disallow: ['/admin', '/api/'],
+        disallow: ['/admin', '/api/', '/auth'],
       },
     ],
     sitemap: `${SITE.domain}/sitemap.xml`,
