@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { questions } from '@/data/questions'
 import Navbar from '@/components/layout/Navbar'
-import PaywallBanner from '@/components/ui/PaywallBanner'
+import PaywallBanner from '@/components/ui/PaywallBanner/page'
 import { FileDown, Printer, Lock, Sparkles } from 'lucide-react'
 
 export default function CheatSheetPage() {

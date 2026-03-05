@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -7,8 +8,8 @@ import {
   Zap, BookOpen, BarChart2, Brain, LogOut, Mic, Map,
   FileDown, ChevronDown, Code2, Bug, Menu, X
 } from 'lucide-react'
-import clsx from 'clsx'
 import { useState, useRef, useEffect } from 'react'
+import * as S from './styles'
 
 export default function Navbar() {
   const { user, progress, logout } = useAuth()
@@ -17,16 +18,16 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
-  // Close dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setAiMenuOpen(false)
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setAiMenuOpen(false)
+      }
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  // Close mobile menu on route change
   useEffect(() => { setMobileOpen(false) }, [path])
 
   const mainLinks = [
@@ -40,59 +41,63 @@ export default function Navbar() {
   const aiLinks = [
     { href: '/mock-interview', label: 'Mock Interview', icon: Mic, desc: 'AI interviewer' },
     { href: '/study-plan', label: 'Study Plan', icon: Map, desc: 'Weak spot detection' },
-    { href: '/cheat-sheet', label: 'Cheat Sheet', icon: FileDown, desc: 'Printable PDF' },
+    { href: '/cheatsheet', label: 'Cheat Sheet', icon: FileDown, desc: 'Printable PDF' },
   ]
 
   const isAiActive = aiLinks.some(l => path === l.href)
 
   return (
     <>
-      <nav className="sticky top-0 z-50 border-b border-border bg-bg/90 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-2">
+      <nav css={S.nav}>
+        <div css={S.navInner}>
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-base flex-shrink-0">
-            <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center text-xs font-black text-white">JS</div>
-            <span className="hidden sm:inline font-black">Prep<span className="text-accent">Pro</span></span>
+          <Link href="/" css={S.logoLink}>
+            <div css={S.logoBadge}>JS</div>
+            <span css={S.logoText}>
+              Prep<span css={S.logoAccent}>Pro</span>
+            </span>
           </Link>
 
-          {/* Desktop nav — hidden on mobile */}
           {user && (
-            <div className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
+            <div css={S.desktopLinks}>
               {mainLinks.map(({ href, label, icon: Icon, pro }) => (
-                <Link key={href} href={href}
-                  className={clsx(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap',
-                    path === href ? 'bg-accent/20 text-accent' : 'text-muted hover:text-white hover:bg-surface'
-                  )}>
-                  <Icon size={13} />{label}
-                  {pro && !progress?.isPro && <span className="text-[8px] bg-accent2/20 text-accent2 px-1 rounded font-bold">PRO</span>}
+                <Link
+                  key={href}
+                  href={href}
+                  css={[S.navLink, path === href && S.navLinkActive]}
+                >
+                  <Icon size={13} />
+                  {label}
+                  {pro && !progress?.isPro && <span css={S.proBadge}>PRO</span>}
                 </Link>
               ))}
 
-              {/* AI Tools dropdown */}
-              <div className="relative" ref={menuRef}>
-                <button onClick={() => setAiMenuOpen(v => !v)}
-                  className={clsx(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all',
-                    isAiActive ? 'bg-purple-500/20 text-purple-400' : 'text-muted hover:text-white hover:bg-surface'
-                  )}>
-                  <Zap size={13} />AI Tools
-                  {!progress?.isPro && <span className="text-[8px] bg-accent2/20 text-accent2 px-1 rounded font-bold">PRO</span>}
-                  <ChevronDown size={11} className={clsx('transition-transform', aiMenuOpen && 'rotate-180')} />
+              <div css={S.aiDropdownWrapper} ref={menuRef}>
+                <button
+                  css={[S.aiDropdownTrigger, isAiActive && S.navLinkAiActive]}
+                  onClick={() => setAiMenuOpen(v => !v)}
+                >
+                  <Zap size={13} />
+                  AI Tools
+                  {!progress?.isPro && <span css={S.proBadge}>PRO</span>}
+                  <ChevronDown size={11} css={S.chevron(aiMenuOpen)} />
                 </button>
 
                 {aiMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-52 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50">
+                  <div css={S.aiDropdownMenu}>
                     {aiLinks.map(({ href, label, icon: Icon, desc }) => (
-                      <Link key={href} href={href} onClick={() => setAiMenuOpen(false)}
-                        className={clsx('flex items-start gap-3 px-4 py-3 hover:bg-surface transition-colors', path === href && 'bg-surface')}>
-                        <div className="w-7 h-7 bg-purple-500/15 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Icon size={13} className="text-purple-400" />
+                      <Link
+                        key={href}
+                        href={href}
+                        css={[S.aiDropdownItem, path === href && S.aiDropdownItemActive]}
+                        onClick={() => setAiMenuOpen(false)}
+                      >
+                        <div css={S.aiIconBadge}>
+                          <Icon size={13} color="#a78bfa" />
                         </div>
                         <div>
-                          <div className="text-sm font-bold">{label}</div>
-                          <div className="text-xs text-muted">{desc}</div>
+                          <div css={S.aiDropdownLabel}>{label}</div>
+                          <div css={S.aiDropdownDesc}>{desc}</div>
                         </div>
                       </Link>
                     ))}
@@ -102,86 +107,79 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Right side */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div css={S.rightSide}>
             {user ? (
               <>
                 {progress?.isPro && (
-                  <div className="hidden sm:flex items-center gap-1 bg-accent/15 border border-accent/30 px-2 py-0.5 rounded-full">
-                    <Zap size={11} className="text-accent" />
-                    <span className="text-accent text-[10px] font-bold">PRO</span>
+                  <div css={S.proPill}>
+                    <Zap size={11} color="#7c6af7" />
+                    <span css={S.proPillText}>PRO</span>
                   </div>
                 )}
                 {progress && (
-                  <div className="hidden sm:flex items-center gap-1 bg-surface border border-border px-2 py-0.5 rounded-full">
-                    <span className="text-sm">🔥</span>
-                    <span className="text-[10px] font-bold">{progress.streakDays}d</span>
+                  <div css={S.streakPill}>
+                    <span>🔥</span>
+                    <span css={S.streakText}>{progress.streakDays}d</span>
                   </div>
                 )}
                 {user.photoURL && (
-                  <Image src={user.photoURL} alt="" width={28} height={28} className="rounded-full flex-shrink-0" />
+                  <Image src={user.photoURL} alt="" width={28} height={28} css={S.avatar} />
                 )}
-                {/* Mobile hamburger */}
-                <button onClick={() => setMobileOpen(v => !v)}
-                  className="md:hidden p-1.5 rounded-lg text-muted hover:text-white transition-colors">
+                <button css={S.hamburgerBtn} onClick={() => setMobileOpen(v => !v)}>
                   {mobileOpen ? <X size={18} /> : <Menu size={18} />}
                 </button>
-                {/* Desktop logout */}
-                <button onClick={logout}
-                  className="hidden md:flex p-1.5 rounded-lg text-muted hover:text-danger transition-colors" title="Sign out">
+                <button css={S.logoutBtn} onClick={logout} title="Sign out">
                   <LogOut size={15} />
                 </button>
               </>
             ) : (
-              <Link href="/auth"
-                className="bg-accent hover:bg-accent/90 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors">
-                Sign in
-              </Link>
+              <Link href="/auth" css={S.signInBtn}>Sign in</Link>
             )}
           </div>
+
         </div>
       </nav>
 
-      {/* Mobile slide-down menu */}
       {user && mobileOpen && (
-        <div className="md:hidden fixed inset-x-0 top-14 z-40 bg-bg/95 backdrop-blur-xl border-b border-border shadow-2xl">
-          <div className="max-w-lg mx-auto px-4 py-4 flex flex-col gap-1">
+        <div css={S.mobileMenu}>
+          <div css={S.mobileMenuInner}>
             {mainLinks.map(({ href, label, icon: Icon, pro }) => (
-              <Link key={href} href={href}
-                className={clsx(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all',
-                  path === href ? 'bg-accent/20 text-accent' : 'text-muted hover:text-white hover:bg-surface'
-                )}>
-                <Icon size={16} className="flex-shrink-0" />
+              <Link
+                key={href}
+                href={href}
+                css={[S.mobileNavLink, path === href && S.mobileNavLinkActive]}
+              >
+                <Icon size={16} />
                 {label}
-                {pro && !progress?.isPro && <span className="text-[9px] bg-accent2/20 text-accent2 px-1.5 py-0.5 rounded font-bold ml-auto">PRO</span>}
+                {pro && !progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
               </Link>
             ))}
 
-            <div className="border-t border-border my-2" />
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted px-4 mb-1">AI Tools</p>
+            <hr css={S.mobileDivider} />
+            <p css={S.mobileSectionLabel}>AI Tools</p>
 
             {aiLinks.map(({ href, label, icon: Icon, desc }) => (
-              <Link key={href} href={href}
-                className={clsx(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all',
-                  path === href ? 'bg-purple-500/20 text-purple-400' : 'text-muted hover:text-white hover:bg-surface'
-                )}>
-                <div className="w-7 h-7 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Icon size={14} className="text-purple-400" />
+              <Link
+                key={href}
+                href={href}
+                css={[S.mobileNavLink, path === href && S.mobileNavLinkAiActive]}
+              >
+                <div css={S.mobileAiItemIcon}>
+                  <Icon size={14} color="#a78bfa" />
                 </div>
-                <div>
-                  <div>{label}</div>
-                  <div className="text-[11px] text-muted font-normal">{desc}</div>
+                <div css={S.mobileNavItemContent}>
+                  <span>{label}</span>
+                  <span css={S.mobileNavItemDesc}>{desc}</span>
                 </div>
-                {!progress?.isPro && <span className="text-[9px] bg-accent2/20 text-accent2 px-1.5 py-0.5 rounded font-bold ml-auto">PRO</span>}
+                {!progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
               </Link>
             ))}
 
-            <div className="border-t border-border my-2" />
-            <button onClick={() => { logout(); setMobileOpen(false) }}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-muted hover:text-danger transition-colors">
-              <LogOut size={16} /> Sign out
+            <hr css={S.mobileDivider} />
+
+            <button css={S.mobileLogoutBtn} onClick={() => { logout(); setMobileOpen(false) }}>
+              <LogOut size={16} />
+              Sign out
             </button>
           </div>
         </div>

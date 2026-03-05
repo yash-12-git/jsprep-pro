@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -5,15 +6,14 @@ import { useAuth } from '@/hooks/useAuth'
 import { saveQuizScore } from '@/lib/userProgress'
 import { questions } from '@/data/questions'
 import Navbar from '@/components/layout/Navbar'
-import PaywallBanner from '@/components/ui/PaywallBanner'
-import { ChevronRight, RotateCcw, Trophy } from 'lucide-react'
-import clsx from 'clsx'
+import PaywallBanner from '@/components/ui/PaywallBanner/page'
+import { RotateCcw, Trophy, ChevronRight } from 'lucide-react'
+import * as S from './styles'
+import * as Shared from '@/styles/shared'
+import { C } from '@/styles/tokens'
 
 type Phase = 'setup' | 'quiz' | 'result'
-
-function shuffle<T>(arr: T[]): T[] {
-  return [...arr].sort(() => Math.random() - 0.5)
-}
+function shuffle<T>(arr: T[]): T[] { return [...arr].sort(() => Math.random() - 0.5) }
 
 export default function QuizPage() {
   const { user, progress, loading } = useAuth()
@@ -27,10 +27,7 @@ export default function QuizPage() {
   const [timeLeft, setTimeLeft] = useState(0)
   const [timerActive, setTimerActive] = useState(false)
 
-  useEffect(() => {
-    if (!loading && !user) router.push('/auth')
-  }, [user, loading, router])
-
+  useEffect(() => { if (!loading && !user) router.push('/auth') }, [user, loading, router])
   useEffect(() => {
     if (!timerActive) return
     if (timeLeft <= 0) { handleReveal(); return }
@@ -38,51 +35,26 @@ export default function QuizPage() {
     return () => clearTimeout(t)
   }, [timeLeft, timerActive])
 
-  if (loading || !user || !progress) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-    </div>
-  }
-
-  if (!progress.isPro) {
-    return (
-      <>
-        <Navbar />
-        <PaywallBanner reason="Quiz mode is a Pro feature. Upgrade to test yourself with timed flashcards!" />
-      </>
-    )
-  }
+  if (loading || !user || !progress) return <div css={Shared.spinner}><div css={Shared.spinnerDot} /></div>
+  if (!progress.isPro) return <><Navbar /><PaywallBanner reason="Quiz mode is a Pro feature. Upgrade to test yourself with timed flashcards!" /></>
 
   function startQuiz() {
-    const qs = shuffle(questions).slice(0, count)
-    setQuizQuestions(qs)
-    setCurrent(0)
-    setScores([])
-    setRevealed(false)
-    setTimeLeft(30)
-    setTimerActive(true)
-    setPhase('quiz')
+    setQuizQuestions(shuffle(questions).slice(0, count))
+    setCurrent(0); setScores([]); setRevealed(false)
+    setTimeLeft(30); setTimerActive(true); setPhase('quiz')
   }
 
-  function handleReveal() {
-    setTimerActive(false)
-    setRevealed(true)
-  }
+  function handleReveal() { setTimerActive(false); setRevealed(true) }
 
   function handleAnswer(correct: boolean) {
     if (!user) return
     const newScores = [...scores, correct]
     setScores(newScores)
     if (current + 1 >= quizQuestions.length) {
-      const total = quizQuestions.length
-      const score = newScores.filter(Boolean).length
-      saveQuizScore(user.uid, score, total)
+      saveQuizScore(user.uid, newScores.filter(Boolean).length, quizQuestions.length)
       setPhase('result')
     } else {
-      setCurrent(c => c + 1)
-      setRevealed(false)
-      setTimeLeft(30)
-      setTimerActive(true)
+      setCurrent(c => c + 1); setRevealed(false); setTimeLeft(30); setTimerActive(true)
     }
   }
 
@@ -92,119 +64,94 @@ export default function QuizPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-2xl mx-auto px-4 py-10">
+      <div css={Shared.pageWrapper}>
 
-        {/* Setup */}
         {phase === 'setup' && (
-          <div className="text-center">
-            <h1 className="text-3xl font-black mb-2">Quiz Mode</h1>
-            <p className="text-muted mb-10">Test yourself with timed flashcards. Each question gives you 30 seconds to think before revealing the answer.</p>
-            <div className="bg-card border border-border rounded-2xl p-8 mb-8">
-              <p className="text-sm text-muted mb-4 font-semibold">How many questions?</p>
-              <div className="flex justify-center gap-3">
+          <div css={{ textAlign: 'center' }}>
+            <h1 css={{ fontSize: '1.875rem', fontWeight: 900, marginBottom: '0.5rem' }}>Quiz Mode</h1>
+            <p css={{ color: C.muted, marginBottom: '2.5rem' }}>Test yourself with timed flashcards. 30 seconds per question.</p>
+            <div css={[Shared.card, { padding: '2rem', marginBottom: '2rem' }]}>
+              <p css={{ fontSize: '0.875rem', color: C.muted, marginBottom: '1rem', fontWeight: 600 }}>How many questions?</p>
+              <div css={{ display: 'flex', justifyContent: 'center', gap: '0.75rem' }}>
                 {[5, 10, 15, 21].map(n => (
-                  <button
-                    key={n}
-                    onClick={() => setCount(n)}
-                    className={clsx('w-14 h-14 rounded-xl font-black text-lg border-2 transition-all', count === n ? 'bg-accent border-accent text-white' : 'border-border text-muted hover:border-accent/50')}
-                  >
+                  <button key={n} onClick={() => setCount(n)} css={{
+                    width: '3.5rem', height: '3.5rem', borderRadius: '0.75rem', fontWeight: 900, fontSize: '1.125rem',
+                    border: `2px solid ${count === n ? C.accent : C.border}`,
+                    background: count === n ? C.accent : 'transparent',
+                    color: count === n ? 'white' : C.muted, cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}>
                     {n}
                   </button>
                 ))}
               </div>
             </div>
-            <button
-              onClick={startQuiz}
-              className="bg-accent hover:bg-accent/90 text-white font-black px-12 py-4 rounded-xl text-lg transition-colors"
-            >
+            <button css={Shared.primaryBtn(C.accent)} onClick={startQuiz} style={{ padding: '1rem', fontSize: '1rem' }}>
               Start Quiz
             </button>
           </div>
         )}
 
-        {/* Quiz */}
         {phase === 'quiz' && (
           <div>
-            {/* Progress */}
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-muted text-sm font-semibold">{current + 1} / {quizQuestions.length}</span>
-              <div className={clsx('font-mono font-black text-2xl tabular-nums', timeLeft <= 10 ? 'text-danger' : 'text-accent3')}>
-                {String(timeLeft).padStart(2, '0')}s
+            <div css={S.header}>
+              <span css={S.questionCounter}>{current + 1} / {quizQuestions.length}</span>
+              <div css={S.timerBox}>
+                <span css={S.timerText(timeLeft <= 10)}>{String(timeLeft).padStart(2, '0')}s</span>
               </div>
             </div>
-            <div className="h-1.5 bg-surface rounded-full mb-8 overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-accent to-accent3 rounded-full transition-all" style={{ width: `${((current) / quizQuestions.length) * 100}%` }} />
+            <div css={[Shared.progressBarTrack, { marginBottom: '2rem' }]}>
+              <div css={Shared.progressBarFill((current / quizQuestions.length) * 100)} />
             </div>
 
-            {/* Card */}
-            <div className="bg-card border-2 border-border rounded-2xl p-8 mb-6 min-h-[180px]">
-              <div className="flex items-start gap-3 mb-4">
-                <span className="font-mono text-xs text-accent bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-md">{quizQuestions[current].cat}</span>
+            <div css={[Shared.card, { padding: '2rem', marginBottom: '1.5rem', minHeight: '11rem', border: `2px solid ${C.border}` }]}>
+              <div css={{ marginBottom: '1rem' }}>
+                <span css={Shared.diffBadge('medium')}>{quizQuestions[current].cat}</span>
               </div>
-              <p className="text-xl font-bold leading-snug">{quizQuestions[current].q}</p>
+              <p css={S.questionText}>{quizQuestions[current].q}</p>
               {!revealed && quizQuestions[current].hint && (
-                <p className="text-muted text-sm mt-4 italic">💡 {quizQuestions[current].hint}</p>
+                <p css={{ color: C.muted, fontSize: '0.875rem', marginTop: '1rem', fontStyle: 'italic' }}>
+                  💡 {quizQuestions[current].hint}
+                </p>
               )}
             </div>
 
             {!revealed ? (
-              <button
-                onClick={handleReveal}
-                className="w-full bg-surface border border-border hover:border-accent/50 text-white font-bold py-4 rounded-xl transition-all"
-              >
+              <button css={[Shared.ghostBtn, { width: '100%', padding: '1rem' }]} onClick={handleReveal}>
                 Reveal Answer
               </button>
             ) : (
               <div>
-                <div className="bg-card border border-border rounded-2xl p-6 mb-5 answer" dangerouslySetInnerHTML={{ __html: quizQuestions[current].answer }} />
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => handleAnswer(false)}
-                    className="py-3.5 rounded-xl font-bold border-2 border-danger/40 text-danger hover:bg-danger/10 transition-colors"
-                  >
-                    ✗ Didn't know
-                  </button>
-                  <button
-                    onClick={() => handleAnswer(true)}
-                    className="py-3.5 rounded-xl font-bold border-2 border-accent3/40 text-accent3 hover:bg-accent3/10 transition-colors"
-                  >
-                    ✓ Got it!
-                  </button>
+                <div css={[Shared.card, { padding: '1.5rem', marginBottom: '1.25rem' }]}
+                  dangerouslySetInnerHTML={{ __html: quizQuestions[current].answer }} />
+                <div css={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  <button css={S.option('wrong')} onClick={() => handleAnswer(false)}>✗ Didn't know</button>
+                  <button css={S.option('correct')} onClick={() => handleAnswer(true)}>✓ Got it!</button>
                 </div>
               </div>
             )}
           </div>
         )}
 
-        {/* Result */}
         {phase === 'result' && (
-          <div className="text-center">
-            <Trophy size={48} className="text-accent2 mx-auto mb-4" />
-            <h2 className="text-3xl font-black mb-2">Quiz Complete!</h2>
-            <p className="text-muted mb-8">Here's how you did</p>
-            <div className="bg-card border border-border rounded-2xl p-8 mb-8">
-              <div className="text-6xl font-black text-accent mb-2">{pct}%</div>
-              <div className="text-muted mb-6">{finalScore} out of {quizQuestions.length} correct</div>
-              <div className="flex justify-center gap-1">
-                {scores.map((s, i) => (
-                  <div key={i} className={clsx('w-3 h-8 rounded-full', s ? 'bg-accent3' : 'bg-danger/50')} />
-                ))}
-              </div>
+          <div css={S.resultsCard}>
+            <Trophy size={48} color={C.accent2} css={{ margin: '0 auto 1rem' }} />
+            <h2 css={{ fontSize: '1.875rem', fontWeight: 900, marginBottom: '0.5rem' }}>Quiz Complete!</h2>
+            <p css={{ color: C.muted, marginBottom: '2rem' }}>Here's how you did</p>
+            <div css={S.bigScore}>{pct}%</div>
+            <p css={S.resultLabel}>{finalScore} out of {quizQuestions.length} correct</p>
+            <div css={{ display: 'flex', justifyContent: 'center', gap: '0.25rem', marginBottom: '2rem' }}>
+              {scores.map((s, i) => (
+                <div key={i} css={{ width: '0.75rem', height: '2rem', borderRadius: '9999px', background: s ? C.accent3 : `${C.danger}80` }} />
+              ))}
             </div>
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={() => setPhase('setup')}
-                className="flex items-center gap-2 bg-accent hover:bg-accent/90 text-white font-bold px-6 py-3 rounded-xl transition-colors"
-              >
-                <RotateCcw size={16} />
-                Try Again
+            <div css={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button css={Shared.primaryBtn(C.accent)} style={{ width: 'auto', padding: '0.75rem 1.5rem' }}
+                onClick={() => setPhase('setup')}>
+                <RotateCcw size={15} /> Try Again
               </button>
-              <button
-                onClick={() => router.push('/analytics')}
-                className="flex items-center gap-2 border border-border text-white font-bold px-6 py-3 rounded-xl hover:border-accent/50 transition-colors"
-              >
-                View Analytics
-                <ChevronRight size={16} />
+              <button css={Shared.ghostBtn} onClick={() => router.push('/analytics')}>
+                View Analytics <ChevronRight size={15} />
               </button>
             </div>
           </div>

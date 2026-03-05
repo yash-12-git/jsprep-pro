@@ -1,154 +1,119 @@
+/** @jsxImportSource @emotion/react */
 'use client'
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { questions } from '@/data/questions'
 import Navbar from '@/components/layout/Navbar'
-import PaywallBanner from '@/components/ui/PaywallBanner'
-import { ChevronLeft, Printer, Download } from 'lucide-react'
+import PaywallBanner from '@/components/ui/PaywallBanner/page'
+import { ChevronLeft, Printer } from 'lucide-react'
+import * as S from './styles'
+import * as Shared from '@/styles/shared'
+import { C } from '@/styles/tokens'
 
 export default function CheatSheetPage() {
   const { user, progress, loading } = useAuth()
   const router = useRouter()
-  const printRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => { if (!loading && !user) router.push('/auth') }, [user, loading, router])
 
-  if (loading || !user || !progress) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
-
-  if (!progress.isPro) return (
-    <>
-      <Navbar />
-      <PaywallBanner reason="Cheat Sheet Generator is a Pro feature. Upgrade to generate your personalized PDF!" />
-    </>
-  )
+  if (loading || !user || !progress) return <div css={Shared.spinner}><div css={Shared.spinnerDot} /></div>
+  if (!progress.isPro) return <><Navbar /><PaywallBanner reason="Cheat Sheet Generator is a Pro feature. Upgrade to generate your personalized PDF!" /></>
 
   const masteredQuestions = questions.filter(q => progress.masteredIds.includes(q.id))
 
-  function handlePrint() {
-    window.print()
-  }
+  if (masteredQuestions.length === 0) return (
+    <>
+      <Navbar />
+      <div css={[Shared.pageWrapper, { textAlign: 'center', paddingTop: '4rem' }]}>
+        <div css={{ fontSize: '3rem', marginBottom: '1rem' }}>📄</div>
+        <h2 css={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.75rem' }}>No mastered questions yet</h2>
+        <p css={{ color: C.muted, marginBottom: '1.5rem' }}>Mark questions as mastered in the dashboard — your cheat sheet will auto-generate from them.</p>
+        <button css={Shared.primaryBtn(C.accent)} style={{ width: 'auto', padding: '0.75rem 1.5rem', margin: '0 auto' }}
+          onClick={() => router.push('/dashboard')}>
+          Go to Dashboard
+        </button>
+      </div>
+    </>
+  )
 
-  if (masteredQuestions.length === 0) {
-    return (
-      <>
-        <Navbar />
-        <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-          <div className="text-5xl mb-4">📄</div>
-          <h2 className="text-2xl font-black mb-3">No mastered questions yet</h2>
-          <p className="text-muted mb-6">Go mark some questions as mastered in the dashboard first — your cheat sheet will auto-generate from them.</p>
-          <button onClick={() => router.push('/dashboard')}
-            className="bg-accent hover:bg-accent/90 text-white font-bold px-6 py-3 rounded-xl transition-colors">
-            Go to Dashboard
-          </button>
-        </div>
-      </>
-    )
-  }
-
-  // Group by category
   const byCategory: Record<string, typeof masteredQuestions> = {}
-  masteredQuestions.forEach(q => {
-    if (!byCategory[q.cat]) byCategory[q.cat] = []
-    byCategory[q.cat].push(q)
-  })
+  masteredQuestions.forEach(q => { if (!byCategory[q.cat]) byCategory[q.cat] = []; byCategory[q.cat].push(q) })
 
   return (
     <>
-      {/* Screen nav - hidden on print */}
       <div className="print:hidden">
         <Navbar />
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <button onClick={() => router.push('/dashboard')}
-              className="flex items-center gap-1 text-muted text-sm hover:text-white transition-colors">
+        <div css={[Shared.pageWrapperWide, { paddingBottom: '1rem' }]}>
+          <div css={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <button css={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: C.muted, fontSize: '0.875rem', background: 'none', border: 'none', cursor: 'pointer' }}
+              onClick={() => router.push('/dashboard')}>
               <ChevronLeft size={16} /> Back
             </button>
-            <div className="flex gap-3">
-              <button onClick={handlePrint}
-                className="flex items-center gap-2 bg-accent hover:bg-accent/90 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm">
-                <Printer size={15} /> Print / Save PDF
-              </button>
-            </div>
+            <button css={S.printBtn} onClick={() => window.print()}>
+              <Printer size={15} /> Print / Save PDF
+            </button>
           </div>
-          <div className="bg-card border border-border rounded-xl p-4 mb-6 flex items-center gap-3">
-            <span className="text-2xl">💡</span>
+          <div css={Shared.infoBox(C.accent)}>
+            <span css={{ fontSize: '1.5rem' }}>💡</span>
             <div>
-              <p className="text-sm font-bold">Your personalized cheat sheet</p>
-              <p className="text-xs text-muted">Shows only your {masteredQuestions.length} mastered questions. Click "Print / Save PDF" → choose "Save as PDF" in the print dialog.</p>
+              <p css={{ fontSize: '0.875rem', fontWeight: 700 }}>Your personalized cheat sheet</p>
+              <p css={{ fontSize: '0.75rem', color: C.muted }}>Shows your {masteredQuestions.length} mastered questions. Click "Print / Save PDF" → choose "Save as PDF".</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Printable cheat sheet */}
-      <div ref={printRef} className="max-w-4xl mx-auto px-4 pb-10 print:px-0 print:py-0 print:max-w-none">
+      <div css={Shared.pageWrapperWide}>
         <style>{`
           @media print {
             @page { size: A4; margin: 15mm; }
             body { background: white !important; color: black !important; }
             .print\\:hidden { display: none !important; }
-            pre { background: #f5f5f5 !important; border: 1px solid #ddd !important; color: #333 !important; font-size: 11px !important; }
-            code { font-size: 11px !important; }
-            .answer p, .answer li { color: #333 !important; font-size: 12px !important; }
-            .answer strong { color: #000 !important; }
-            .tip { background: #f0eeff !important; border-left: 3px solid #7c6af7 !important; color: #444 !important; }
           }
         `}</style>
 
-        {/* Header */}
-        <div className="mb-8 pb-4 border-b-2 border-accent print:border-gray-300">
-          <div className="flex items-center justify-between">
+        <div css={{ marginBottom: '2rem', paddingBottom: '1rem', borderBottom: `2px solid ${C.accent}` }}>
+          <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <h1 className="text-3xl font-black print:text-black">JavaScript Interview</h1>
-              <h2 className="text-xl font-bold text-accent print:text-purple-700">Cheat Sheet</h2>
+              <h1 css={{ fontSize: '1.875rem', fontWeight: 900 }}>JavaScript Interview</h1>
+              <h2 css={{ fontSize: '1.25rem', fontWeight: 700, color: C.accent }}>Cheat Sheet</h2>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-muted print:text-gray-500">{user.displayName}</p>
-              <p className="text-xs text-muted print:text-gray-400">{masteredQuestions.length} mastered concepts</p>
-              <p className="text-xs text-muted print:text-gray-400">{new Date().toLocaleDateString()}</p>
+            <div css={{ textAlign: 'right' }}>
+              <p css={{ fontSize: '0.875rem', color: C.muted }}>{user.displayName}</p>
+              <p css={{ fontSize: '0.75rem', color: C.muted }}>{masteredQuestions.length} mastered concepts</p>
+              <p css={{ fontSize: '0.75rem', color: C.muted }}>{new Date().toLocaleDateString()}</p>
             </div>
           </div>
         </div>
 
-        {/* Mastery overview */}
-        <div className="grid grid-cols-4 gap-3 mb-8 print:gap-2">
+        <div css={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem', marginBottom: '2rem' }}>
           {Object.entries(byCategory).map(([cat, qs]) => (
-            <div key={cat} className="bg-card border border-border rounded-xl p-3 print:bg-gray-50 print:border-gray-200">
-              <div className="text-lg font-black text-accent print:text-purple-700">{qs.length}</div>
-              <div className="text-[10px] text-muted print:text-gray-500 leading-tight">{cat}</div>
+            <div key={cat} css={[Shared.card, { padding: '0.75rem' }]}>
+              <div css={{ fontSize: '1.25rem', fontWeight: 900, color: C.accent }}>{qs.length}</div>
+              <div css={{ fontSize: '0.625rem', color: C.muted, lineHeight: 1.4 }}>{cat}</div>
             </div>
           ))}
         </div>
 
-        {/* Questions by category */}
         {Object.entries(byCategory).map(([cat, qs]) => (
-          <div key={cat} className="mb-8 print:mb-6">
-            <div className="flex items-center gap-3 mb-4 pb-2 border-b border-border print:border-gray-300">
-              <h3 className="text-lg font-black text-accent print:text-purple-700">{cat}</h3>
-              <span className="text-xs text-muted print:text-gray-400">{qs.length} question{qs.length > 1 ? 's' : ''}</span>
-            </div>
+          <div key={cat} css={S.categorySection}>
+            <h3 css={S.categoryTitle}>{cat}</h3>
             {qs.map((q, i) => (
-              <div key={q.id} className={'mb-6 print:mb-4 ' + (i < qs.length - 1 ? 'pb-6 border-b border-border/50 print:border-gray-200' : '')}>
-                <div className="flex items-start gap-3 mb-3">
-                  <span className="font-mono text-xs text-accent bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-md flex-shrink-0 print:bg-purple-50 print:border-purple-200 print:text-purple-700">
+              <div key={q.id} css={[S.questionItem, i < qs.length - 1 ? { marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: `1px solid ${C.border}` } : {}]}>
+                <div css={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <span css={{ fontFamily: 'monospace', fontSize: '0.75rem', color: C.accent, background: `${C.accent}1a`, border: `1px solid ${C.accent}33`, padding: '0.125rem 0.5rem', borderRadius: '0.375rem', flexShrink: 0 }}>
                     Q{String(q.id + 1).padStart(2, '0')}
                   </span>
-                  <p className="font-bold text-sm text-white print:text-black">{q.q}</p>
+                  <p css={S.questionText}>{q.q}</p>
                 </div>
-                <div className="ml-10 answer text-sm" dangerouslySetInnerHTML={{ __html: q.answer }} />
+                <div css={[S.answerText, { marginLeft: '2.5rem' }]} dangerouslySetInnerHTML={{ __html: q.answer }} />
               </div>
             ))}
           </div>
         ))}
 
-        {/* Footer */}
-        <div className="mt-10 pt-4 border-t border-border print:border-gray-300 text-center">
-          <p className="text-xs text-muted print:text-gray-400">Generated by JSPrep Pro · jsprep-pro.vercel.app · Good luck! 🚀</p>
+        <div css={{ marginTop: '2.5rem', paddingTop: '1rem', borderTop: `1px solid ${C.border}`, textAlign: 'center' }}>
+          <p css={{ fontSize: '0.75rem', color: C.muted }}>Generated by JSPrep Pro · jsprep-pro.vercel.app · Good luck! 🚀</p>
         </div>
       </div>
     </>
