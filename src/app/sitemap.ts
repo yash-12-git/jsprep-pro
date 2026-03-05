@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 import { CATEGORIES } from '@/data/questions'
 import { BLOG_POSTS } from '@/data/seo/blogPosts'
 import { catToSlug, SITE } from '@/lib/seo/seo'
+import { TOPICS } from '@/data/seo/topics'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date().toISOString()
@@ -30,5 +31,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }))
 
-  return [...staticPages, ...categoryPages, ...blogPages]
+  // Topic page 
+  const topicPages = TOPICS.map(t => ({
+  url: `${SITE.domain}/${t.slug}`,
+  lastModified: new Date(),
+  changeFrequency: "weekly",
+  priority: 0.9
+}))
+
+  return [...staticPages, ...categoryPages, ...blogPages, ...topicPages]
 }
