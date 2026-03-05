@@ -1,22 +1,21 @@
 /** @jsxImportSource @emotion/react */
 'use client'
 import Link from 'next/link'
-import { useAuth } from '@/hooks/useAuth'
 import { useState } from 'react'
 import { Zap, BookOpen, Brain, ArrowRight, CheckCircle, Code2, Bug, Mic, Target, FileText, Sparkles } from 'lucide-react'
 import * as S from './page.styles'
 import * as Shared from '@/styles/shared'
 import { C } from '@/styles/tokens'
+import { proFeatures } from '@/data/proBenefits'
 
 export default function HomePage() {
-  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState(0)
 
   const stats = [
     { n: '81+', l: 'Questions' },
     { n: '3', l: 'Modes' },
     { n: '6', l: 'AI Tools' },
-    { n: `${process.env.NEXT_PUBLIC_PRO_PRICE}`, l: 'Pro/mo' },
+    { n: `₹${process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY ?? 99}`, l: 'Pro/mo' },
   ]
 
   const modes = [
@@ -47,14 +46,6 @@ export default function HomePage() {
     { icon: Mic, title: 'Mock Interviewer', desc: 'Full back-and-forth with an AI senior engineer. Probes, follow-ups, honest feedback.', color: C.purple },
     { icon: Brain, title: 'Study Plan', desc: 'Analyzes your weak spots, generates a personalized day-by-day prep roadmap.', color: C.orange },
     { icon: FileText, title: 'Cheat Sheet PDF', desc: 'Printable PDF of all your mastered concepts. Perfect for last-minute review.', color: C.accent3 },
-  ]
-
-  const proFeatures = [
-    'Everything in Free', 'All 40 output questions', 'All 20 debug challenges',
-    'Unlimited mastery tracking', 'Bookmarks + cloud sync', 'Timed quiz / flashcard mode',
-    'AI Tutor on every question', 'AI Answer Evaluator', 'AI Code Checker',
-    'AI Mock Interviewer', 'AI Study Plan generator', 'Cheat Sheet PDF generator',
-    'Full progress analytics', 'Daily streak tracking', 'All future content',
   ]
 
   return (
