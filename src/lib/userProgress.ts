@@ -52,8 +52,7 @@ export async function getUserProgress(uid: string): Promise<UserProgress> {
   return {
     ...DEFAULT_PROGRESS,
     ...data,
-    uid,
-    isPro: true
+    uid
   }
 }
 
