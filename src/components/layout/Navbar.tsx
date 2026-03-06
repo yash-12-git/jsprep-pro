@@ -36,6 +36,9 @@ export default function Navbar() {
     { href: '/debug-lab', label: 'Debug', icon: Bug },
     { href: '/quiz', label: 'Quiz', icon: Brain, pro: true },
     { href: '/analytics', label: 'Analytics', icon: BarChart2, pro: true },
+    { href: '/topics', label:  'Topics', icon: Map, pro: false },
+    { href: '/blogs', label: 'Blogs', icon: Map, pro: false },
+    
   ]
 
   const aiLinks = [
