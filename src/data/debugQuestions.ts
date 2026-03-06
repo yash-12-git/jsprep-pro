@@ -739,4 +739,802 @@ console.log(sorted); // [1, 1, 3, 4, 5] ✓`,
     explanation: 'Always copy before sorting: [...arr].sort() or arr.slice().sort(). ES2023 adds toSorted() as an immutable alternative built-in.',
     keyInsight: 'sort() mutates in place. Always [...arr].sort() to avoid mutation. toSorted() is the new immutable version (ES2023).'
   },
+
+  // ─── ASYNC BUGS ──────────────────────────────────────────────────────────
+  {
+    id: 1100, cat: 'Async Bugs', difficulty: 'medium',
+    title: 'Not handling fetch HTTP errors',
+    tags: ['fetch', 'response-ok', 'error-handling'],
+    description: 'This function always logs the data even on 404s or 500s. It should throw on non-OK responses. Fix it.',
+    brokenCode: `async function getUser(id) {
+  try {
+    const res = await fetch(\`/api/users/\${id}\`);
+    const data = await res.json();
+    console.log('Got user:', data);
+    return data;
+  } catch (err) {
+    console.error('Network error:', err);
+    return null;
+  }
+}`,
+    bugDescription: 'fetch() only rejects on network failure. HTTP 404/500 responses are "successful" — res.json() returns the error body and the catch never runs.',
+    fixedCode: `async function getUser(id) {
+  try {
+    const res = await fetch(\`/api/users/\${id}\`);
+    if (!res.ok) {
+      throw new Error(\`HTTP \${res.status}: \${res.statusText}\`);
+    }
+    const data = await res.json();
+    console.log('Got user:', data);
+    return data;
+  } catch (err) {
+    console.error('Request failed:', err);
+    return null;
+  }
+}`,
+    explanation: 'Always check res.ok after fetch. It\'s false for 4xx and 5xx responses. Throw a meaningful error so the catch block handles all failures — network AND HTTP errors.',
+    keyInsight: 'fetch() resolves for ANY HTTP response. Only network failures (no connection, DNS fail) cause rejection. Always check res.ok.'
+  },
+  {
+    id: 1101, cat: 'Async Bugs', difficulty: 'hard',
+    title: 'Async iterator not properly cleaned up',
+    tags: ['async-generator', 'return', 'cleanup'],
+    description: 'This paginator leaks an open request if the consumer breaks early. Fix it to handle early termination.',
+    brokenCode: `async function* paginate(url) {
+  let page = 1;
+  while (true) {
+    const res = await fetch(\`\${url}?page=\${page++}\`);
+    const { items, hasMore } = await res.json();
+    for (const item of items) yield item;
+    if (!hasMore) return;
+  }
+}
+
+// Consumer breaks early
+async function getFirst5(url) {
+  const results = [];
+  for await (const item of paginate(url)) {
+    results.push(item);
+    if (results.length === 5) break; // early break — generator may not clean up
+  }
+  return results;
+}`,
+    bugDescription: 'When for...of breaks early, the generator\'s return() method is called. Without try/finally, in-flight fetches or open connections aren\'t cancelled.',
+    fixedCode: `async function* paginate(url) {
+  const controller = new AbortController();
+  let page = 1;
+
+  try {
+    while (true) {
+      const res = await fetch(\`\${url}?page=\${page++}\`, {
+        signal: controller.signal
+      });
+      const { items, hasMore } = await res.json();
+      for (const item of items) yield item;
+      if (!hasMore) return;
+    }
+  } finally {
+    // Runs on break, return, or throw — cancels in-flight request
+    controller.abort();
+    console.log('Paginator cleaned up');
+  }
+}`,
+    explanation: 'When for...of breaks early, the generator\'s return() is called, which runs the finally block. Using AbortController with the signal allows cancellation of in-flight fetch requests.',
+    keyInsight: 'try/finally in generators is the cleanup mechanism. Always pair long-running async generators with finally to close connections, cancel requests, or release resources.'
+  },
+  {
+    id: 1102, cat: 'Async Bugs', difficulty: 'medium',
+    title: 'setInterval accumulates — not cleared on re-render',
+    tags: ['setinterval', 'memory-leak', 'cleanup'],
+    description: 'Every time startPolling() is called, a new interval is created but old ones are never cleared. Fix the leak.',
+    brokenCode: `class DataPoller {
+  constructor(url) {
+    this.url = url;
+    this.data = null;
+  }
+
+  startPolling(interval = 1000) {
+    setInterval(async () => {
+      const res = await fetch(this.url);
+      this.data = await res.json();
+      console.log('Updated:', this.data);
+    }, interval);
+  }
+
+  stopPolling() {
+    // ??? — no way to stop it
+  }
+}
+
+const poller = new DataPoller('/api/status');
+poller.startPolling(); // interval #1
+poller.startPolling(); // interval #2 — #1 still running!`,
+    bugDescription: 'setInterval returns an ID needed for clearInterval. Without storing it, you can never cancel the interval. Each startPolling() call piles up another interval.',
+    fixedCode: `class DataPoller {
+  constructor(url) {
+    this.url = url;
+    this.data = null;
+    this._intervalId = null;
+  }
+
+  startPolling(interval = 1000) {
+    this.stopPolling(); // clear any existing interval first
+    this._intervalId = setInterval(async () => {
+      const res = await fetch(this.url);
+      this.data = await res.json();
+      console.log('Updated:', this.data);
+    }, interval);
+  }
+
+  stopPolling() {
+    if (this._intervalId !== null) {
+      clearInterval(this._intervalId);
+      this._intervalId = null;
+    }
+  }
+}`,
+    explanation: 'Store the interval ID and clear it before creating a new one. stopPolling() uses the stored ID to call clearInterval. Guards with !== null for safety.',
+    keyInsight: 'Every setInterval must have a corresponding clearInterval. Always store the ID. Clear before re-creating to avoid accumulating intervals.'
+  },
+
+  // ─── CLOSURE TRAPS ───────────────────────────────────────────────────────
+  {
+    id: 1103, cat: 'Closure Traps', difficulty: 'medium',
+    title: 'Generator losing this context',
+    tags: ['generator', 'this', 'method'],
+    description: 'The generator method loses its class instance as "this". Fix it.',
+    brokenCode: `class NumberRange {
+  constructor(start, end) {
+    this.start = start;
+    this.end = end;
+  }
+
+  *[Symbol.iterator]() {
+    for (let i = this.start; i <= this.end; i++) {
+      yield i;
+    }
+  }
+}
+
+const range = new NumberRange(1, 5);
+const iter = range[Symbol.iterator];  // extracted — no object
+const standalone = iter.bind(range);  // attempting to bind
+
+// Calling as method works:
+console.log([...range].join(', '));
+
+// But this fails:
+try {
+  iter(); // called without 'range' as this
+} catch(e) {
+  console.log(e.constructor.name);
+}`,
+    bugDescription: 'Generator methods lose "this" when extracted. iter() is called without the range object, so this.start and this.end are undefined.',
+    fixedCode: `class NumberRange {
+  constructor(start, end) {
+    this.start = start;
+    this.end = end;
+  }
+
+  *[Symbol.iterator]() {
+    // Capture this in the outer scope for safety
+    const { start, end } = this;
+    for (let i = start; i <= end; i++) {
+      yield i;
+    }
+  }
+}
+
+// ✅ Correct usage: iterate through the object, not the extracted method
+const range = new NumberRange(1, 5);
+console.log([...range].join(', ')); // 1, 2, 3, 4, 5
+
+// If you need to pass the iterator around:
+const boundIter = range[Symbol.iterator].bind(range);
+// or: () => range[Symbol.iterator]()`,
+    explanation: 'Generator methods have the same "this" rules as regular methods. Destructuring {start, end} from this early makes the generator body independent of this binding.',
+    keyInsight: 'Generator methods lose "this" when extracted from their object. Destructure needed properties at the start of the generator to avoid this dependency.'
+  },
+  {
+    id: 1104, cat: 'Closure Traps', difficulty: 'hard',
+    title: 'Default parameter function creates new closure each call',
+    tags: ['default-params', 'closure', 'identity'],
+    description: 'The cache check never hits because the default callback is a new function reference every call. Fix it.',
+    brokenCode: `const cache = new WeakMap();
+
+function process(data, transform = (x) => x * 2) {
+  if (cache.has(transform)) {
+    console.log('cache hit');
+    return cache.get(transform)(data);
+  }
+  console.log('cache miss');
+  cache.set(transform, transform);
+  return transform(data);
+}
+
+process(5); // cache miss
+process(5); // cache miss again — different transform reference!
+process(5); // always miss`,
+    bugDescription: 'Default parameter (x) => x * 2 creates a NEW function object every time process() is called without a transform. Each call has a unique reference — WeakMap never finds it.',
+    fixedCode: `// Define the default OUTSIDE the function — same reference always
+const defaultTransform = (x) => x * 2;
+const cache = new WeakMap();
+
+function process(data, transform = defaultTransform) {
+  if (cache.has(transform)) {
+    console.log('cache hit');
+    return cache.get(transform)(data);
+  }
+  console.log('cache miss');
+  cache.set(transform, transform);
+  return transform(data);
+}
+
+process(5); // cache miss
+process(5); // cache hit — same defaultTransform reference
+process(5, x => x * 3); // cache miss (new function provided)`,
+    explanation: 'Default parameter expressions are evaluated fresh on each call — each evaluation creates a new function object with a new reference. Moving the default outside ensures a stable reference across calls.',
+    keyInsight: 'Default parameter expressions are re-evaluated on every call. If identity (===) matters (for caching, WeakMap keys, memoization), define constants outside the function.'
+  },
+  {
+    id: 1105, cat: 'Closure Traps', difficulty: 'medium',
+    title: 'Incorrect mutable default object in parameter',
+    tags: ['default-params', 'mutation', 'reference'],
+    description: 'Adding to the default tags array affects ALL subsequent calls without a tags argument. Fix it.',
+    brokenCode: `// Anti-pattern inherited from Python thinking
+const DEFAULT_CONFIG = { tags: [] };
+
+function createPost(title, config = DEFAULT_CONFIG) {
+  config.tags.push('auto-tagged');
+  return { title, ...config };
+}
+
+const p1 = createPost('Hello');
+const p2 = createPost('World');
+
+console.log(p1.tags);
+console.log(p2.tags);`,
+    bugDescription: 'DEFAULT_CONFIG is a shared mutable object. config.tags.push() mutates the shared tags array. p2 inherits all mutations from p1\'s call.',
+    fixedCode: `function createPost(title, config = {}) {
+  // Create a new config by merging defaults with provided config
+  const finalConfig = {
+    tags: [],
+    category: 'uncategorized',
+    ...config,
+    tags: [...(config.tags || [])] // shallow copy of tags array
+  };
+  finalConfig.tags.push('auto-tagged');
+  return { title, ...finalConfig };
+}
+
+// Or even simpler with destructuring defaults:
+function createPost(title, { tags = [], category = 'uncategorized' } = {}) {
+  return { title, tags: [...tags, 'auto-tagged'], category };
+}`,
+    explanation: 'Using a shared mutable object as a default value causes state to accumulate across calls. Use {} as the default and create fresh arrays/objects inside the function using spread.',
+    keyInsight: 'Never use mutable objects/arrays as default parameter values if you mutate them. The default is evaluated once and shared — use {} and create new objects inside.'
+  },
+
+  // ─── EVENT LOOP TRAPS ────────────────────────────────────────────────────
+  {
+    id: 1106, cat: 'Event Loop Traps', difficulty: 'hard',
+    title: 'Generator function called synchronously inside Promise',
+    tags: ['generator', 'promise', 'async-iteration'],
+    description: 'This tries to use a generator as if it were async but the results are Promises, not values. Fix it.',
+    brokenCode: `function* fetchUsers(ids) {
+  for (const id of ids) {
+    yield fetch(\`/api/users/\${id}\`).then(r => r.json());
+    // ^^^ yields a Promise, not the resolved value
+  }
+}
+
+async function getAll(ids) {
+  const users = [];
+  for (const result of fetchUsers(ids)) {
+    users.push(result); // result is a Promise, not a user!
+  }
+  return users; // array of Promises ❌
+}`,
+    bugDescription: 'Regular generators can\'t await — yield hands back whatever you give it, including unresolved Promises. The consumer receives Promises, not user data.',
+    fixedCode: `// Fix 1: async generator (use for await...of)
+async function* fetchUsers(ids) {
+  for (const id of ids) {
+    const user = await fetch(\`/api/users/\${id}\`).then(r => r.json());
+    yield user; // yield resolved value
+  }
+}
+
+async function getAll(ids) {
+  const users = [];
+  for await (const user of fetchUsers(ids)) {
+    users.push(user); // ✅ actual user objects
+  }
+  return users;
+}
+
+// Fix 2: parallel (faster)
+async function getAllParallel(ids) {
+  return Promise.all(ids.map(id =>
+    fetch(\`/api/users/\${id}\`).then(r => r.json())
+  ));
+}`,
+    explanation: 'Regular generators are synchronous. To yield resolved async values, you need an async generator (async function*), consumed with for await...of.',
+    keyInsight: 'Regular generator + async work = yields Promises. Async generator = yields resolved values. Always use async function* with for await...of for async iteration.'
+  },
+  {
+    id: 1107, cat: 'Event Loop Traps', difficulty: 'medium',
+    title: 'Mixing microtasks and DOM updates',
+    tags: ['microtask', 'dom', 'rendering', 'settimeout'],
+    description: '"Loading..." never visually appears — the DOM update and heavy work both happen before the browser can paint. Fix it.',
+    brokenCode: `async function processData(data) {
+  statusEl.textContent = 'Loading...'; // DOM write
+
+  // Immediately await a microtask — still blocks render!
+  await Promise.resolve();
+
+  const result = heavyComputation(data); // blocks for 2 seconds
+  statusEl.textContent = 'Done: ' + result;
+}`,
+    bugDescription: 'Promise.resolve() is a microtask — it runs before the browser has a chance to render. The repaint is still blocked by the heavy computation that runs right after.',
+    fixedCode: `async function processData(data) {
+  statusEl.textContent = 'Loading...';
+
+  // setTimeout(0) = macrotask — yields to the browser's render phase
+  await new Promise(resolve => setTimeout(resolve, 0));
+
+  // Now the browser has had a chance to paint "Loading..."
+  const result = heavyComputation(data);
+  statusEl.textContent = 'Done: ' + result;
+}
+
+// Even better: use requestAnimationFrame to align with render
+async function processDataRaf(data) {
+  statusEl.textContent = 'Loading...';
+  await new Promise(resolve => requestAnimationFrame(resolve));
+  const result = heavyComputation(data);
+  statusEl.textContent = 'Done: ' + result;
+}`,
+    explanation: 'Microtasks (Promise.resolve) run before the browser paint. To yield for rendering, use setTimeout(0) which is a macrotask — the browser gets a render frame between macrotasks.',
+    keyInsight: 'To yield to the browser render phase, use setTimeout(0) or requestAnimationFrame — NOT Promise.resolve(). Microtasks drain before any painting occurs.'
+  },
+
+  // ─── FIX THE CODE ────────────────────────────────────────────────────────
+  {
+    id: 1108, cat: 'Fix the Code', difficulty: 'medium',
+    title: 'Proxy trap modifies original object directly',
+    tags: ['proxy', 'reflect', 'trap'],
+    description: 'The validation proxy directly modifies the target instead of using Reflect, breaking getters and prototype methods. Fix it.',
+    brokenCode: `function createValidated(obj, schema) {
+  return new Proxy(obj, {
+    set(target, prop, value) {
+      if (schema[prop] && typeof value !== schema[prop]) {
+        throw new TypeError(\`\${prop} must be \${schema[prop]}\`);
+      }
+      target[prop] = value; // directly writing — misses setters!
+      return true;
+    },
+    get(target, prop) {
+      return target[prop]; // directly reading — misses getters!
+    }
+  });
+}
+
+class User {
+  get displayName() { return 'User: ' + this._name; }
+  set name(v) { this._name = v.trim(); }
+}
+
+const u = new User();
+const validated = createValidated(u, { _name: 'string' });
+validated.name = '  Alice  '; // setter should trim — but doesn't!`,
+    bugDescription: 'target[prop] = value bypasses setter methods on the prototype. target[prop] for get bypasses getter methods. Always use Reflect inside Proxy traps.',
+    fixedCode: `function createValidated(obj, schema) {
+  return new Proxy(obj, {
+    set(target, prop, value, receiver) {
+      if (schema[prop] && typeof value !== schema[prop]) {
+        throw new TypeError(\`\${prop} must be \${schema[prop]}\`);
+      }
+      // Reflect.set correctly handles prototype setters and receiver
+      return Reflect.set(target, prop, value, receiver);
+    },
+    get(target, prop, receiver) {
+      // Reflect.get correctly handles prototype getters and receiver
+      return Reflect.get(target, prop, receiver);
+    }
+  });
+}
+
+const u = new User();
+const validated = createValidated(u, { _name: 'string' });
+validated.name = '  Alice  '; // setter trims: _name = 'Alice' ✓
+console.log(validated.displayName); // 'User: Alice' ✓`,
+    explanation: 'Reflect methods are designed to work correctly with prototype chains, getters/setters, and the receiver (this). Using target[prop] directly bypasses the prototype.',
+    keyInsight: 'Always use Reflect.get/set/has/deleteProperty inside Proxy traps. They handle the receiver correctly, making getters and setters work as expected.'
+  },
+  {
+    id: 1109, cat: 'Fix the Code', difficulty: 'hard',
+    title: 'WeakMap key stored as primitive — cannot be set',
+    tags: ['weakmap', 'primitive', 'key'],
+    description: 'The per-user cache uses user IDs (numbers) as WeakMap keys, which throws. Fix the data structure choice.',
+    brokenCode: `const userCache = new WeakMap();
+
+function cacheUserData(userId, data) {
+  // userId is a number — WeakMap keys must be objects!
+  userCache.set(userId, data); // TypeError!
+  return data;
+}
+
+function getUserData(userId) {
+  return userCache.get(userId);
+}
+
+cacheUserData(42, { name: 'Alice' });`,
+    bugDescription: 'WeakMap only accepts objects (or registered symbols) as keys. Primitives like numbers, strings, booleans throw TypeError.',
+    fixedCode: `// Option 1: Use a regular Map (if userId is a primitive)
+const userCache = new Map();
+
+function cacheUserData(userId, data) {
+  userCache.set(userId, data); // ✅ Map accepts any key type
+  return data;
+}
+
+// Option 2: Use WeakMap keyed by the user OBJECT (not its ID)
+const userObjCache = new WeakMap();
+
+function cacheUser(userObj, computedData) {
+  userObjCache.set(userObj, computedData); // userObj is an object ✓
+  return computedData;
+}
+
+// Option 3: If you need number IDs and auto-cleanup, wrap in an object
+const keyRegistry = new Map(); // id → wrapper object
+function getKey(id) {
+  if (!keyRegistry.has(id)) keyRegistry.set(id, { id });
+  return keyRegistry.get(id);
+}
+const cache = new WeakMap();
+cache.set(getKey(42), { name: 'Alice' });`,
+    explanation: 'WeakMap requires object keys so it can hold weak references (GC can collect them). Primitives are not GC\'d — they don\'t need weak references. Use Map for primitive keys.',
+    keyInsight: 'WeakMap keys must be objects. For primitive keys (string, number), use a regular Map. Use WeakMap when the key is an object and you want automatic cleanup when the object is GC\'d.'
+  },
+  {
+    id: 1110, cat: 'Fix the Code', difficulty: 'medium',
+    title: 'Custom error loses stack trace',
+    tags: ['custom-error', 'extends', 'stack-trace'],
+    description: 'The custom error\'s stack trace points to the Error constructor, not the throw site. Fix the class.',
+    brokenCode: `class AppError {
+  constructor(message, code) {
+    this.message = message;
+    this.code = code;
+    this.name = 'AppError';
+    // NOT extending Error — no stack trace, no instanceof Error!
+  }
+}
+
+try {
+  throw new AppError('Something broke', 500);
+} catch (e) {
+  console.log(e instanceof Error);  // false!
+  console.log(e.stack);             // undefined!
+  console.log(e.name);              // 'AppError'
+}`,
+    bugDescription: 'AppError doesn\'t extend Error, so it has no stack property, fails instanceof Error checks, and won\'t be caught by catch clauses that check instanceof Error.',
+    fixedCode: `class AppError extends Error {
+  constructor(message, code) {
+    super(message);              // ✅ sets .message and .stack
+    this.name = 'AppError';      // ✅ override default 'Error'
+    this.code = code;
+
+    // V8-specific: captures stack from HERE not from Error constructor
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, AppError);
+    }
+  }
+}
+
+// Specific subtypes
+class NotFoundError extends AppError {
+  constructor(resource) {
+    super(\`\${resource} not found\`, 404);
+    this.name = 'NotFoundError';
+  }
+}
+
+try {
+  throw new NotFoundError('User');
+} catch (e) {
+  console.log(e instanceof Error);     // true ✓
+  console.log(e instanceof AppError);  // true ✓
+  console.log(e.name);                 // 'NotFoundError'
+  console.log(e.message);              // 'User not found'
+  console.log(typeof e.stack);         // 'string' ✓
+}`,
+    explanation: 'Always extend Error for custom errors. super(message) sets .message and .stack. Set this.name manually because it defaults to "Error". Error.captureStackTrace makes the stack start at the throw site.',
+    keyInsight: 'Custom errors MUST extend Error to: get a stack trace, work with instanceof Error, integrate with error monitoring tools, and behave as real errors in try/catch.'
+  },
+  {
+    id: 1111, cat: "What's Wrong?", difficulty: 'medium',
+    title: 'Spread only shallow-copies nested arrays',
+    tags: ['spread', 'shallow-copy', 'mutation', 'nested'],
+    description: 'Sorting a copy of the matrix also sorts the original rows. What\'s wrong and how do you fix it?',
+    brokenCode: `function sortMatrixRows(matrix) {
+  const copy = [...matrix]; // copy of the outer array
+  copy.forEach(row => row.sort((a, b) => a - b));
+  return copy;
+}
+
+const grid = [[3,1,2],[6,4,5],[9,7,8]];
+const sorted = sortMatrixRows(grid);
+
+console.log(sorted[0]); // [1, 2, 3] ✓
+console.log(grid[0]);   // [1, 2, 3] — MUTATED! Expected [3, 1, 2]`,
+    bugDescription: '[...matrix] creates a new outer array but the inner row arrays are the SAME references. Sorting a row sorts the original row in grid.',
+    fixedCode: `function sortMatrixRows(matrix) {
+  // Deep copy: spread outer array AND each inner row
+  return matrix.map(row => [...row].sort((a, b) => a - b));
+}
+
+// Alternative: use structuredClone for any depth
+function sortMatrixRowsDeep(matrix) {
+  const copy = structuredClone(matrix);
+  copy.forEach(row => row.sort((a, b) => a - b));
+  return copy;
+}
+
+const grid = [[3,1,2],[6,4,5],[9,7,8]];
+const sorted = sortMatrixRows(grid);
+
+console.log(sorted[0]); // [1, 2, 3] ✓
+console.log(grid[0]);   // [3, 1, 2] ✓ unchanged`,
+    explanation: 'Spread is shallow — inner arrays are not copied, just their references. Sort mutates in place, affecting the original. Copy each row individually with [...row] or use structuredClone().',
+    keyInsight: 'Spread creates a shallow copy of the TOP-LEVEL container. Nested arrays/objects are still shared references. Deep copy nested structures before mutating them.'
+  },
+  {
+    id: 1112, cat: "What's Wrong?", difficulty: 'hard',
+    title: 'Symbol.iterator not returning a fresh iterator',
+    tags: ['iterator', 'reusable', 'symbol-iterator'],
+    description: 'The iterable can only be iterated once. The second for...of produces nothing. Fix it.',
+    brokenCode: `const myIterable = {
+  data: [1, 2, 3, 4, 5],
+  index: 0, // shared state — BUG!
+  [Symbol.iterator]() {
+    return {
+      next: () => {
+        if (this.index < this.data.length) {
+          return { value: this.data[this.index++], done: false };
+        }
+        return { value: undefined, done: true };
+      }
+    };
+  }
+};
+
+for (const n of myIterable) console.log(n); // 1 2 3 4 5
+for (const n of myIterable) console.log(n); // nothing! index is already 5`,
+    bugDescription: 'index is stored on the iterable itself — shared across all iterations. After first loop finishes, index = 5. Second loop starts with index = 5 — immediately returns done.',
+    fixedCode: `const myIterable = {
+  data: [1, 2, 3, 4, 5],
+  [Symbol.iterator]() {
+    let index = 0; // fresh state per call — captured in closure
+    const data = this.data;
+    return {
+      next() {
+        if (index < data.length) {
+          return { value: data[index++], done: false };
+        }
+        return { value: undefined, done: true };
+      }
+    };
+  }
+};
+
+for (const n of myIterable) console.log(n); // 1 2 3 4 5
+for (const n of myIterable) console.log(n); // 1 2 3 4 5 ✓`,
+    explanation: 'Each call to [Symbol.iterator]() must return a FRESH iterator with its own state. Storing index on the iterable object makes all iterations share state. Closure keeps index local per iterator.',
+    keyInsight: 'An iterable is reusable; an iterator is single-use. [Symbol.iterator]() must create a new state (closure or object) each time — never shared state on the iterable itself.'
+  },
+  {
+    id: 1113, cat: 'Fix the Code', difficulty: 'hard',
+    title: 'Async generator — missing error forwarding',
+    tags: ['async-generator', 'throw', 'error-handling'],
+    description: 'Errors thrown into the generator via .throw() are not handled. The generator abruptly stops and caller gets unhandled. Fix it.',
+    brokenCode: `async function* dataStream() {
+  for (let i = 1; i <= 5; i++) {
+    await new Promise(r => setTimeout(r, 100));
+    yield i;
+  }
+}
+
+async function consume() {
+  const gen = dataStream();
+  console.log((await gen.next()).value); // 1
+  console.log((await gen.next()).value); // 2
+
+  // Simulate error from consumer side:
+  await gen.throw(new Error('Consumer cancelled'));
+  // Generator has no try/catch — error propagates to consume()
+  // No cleanup happens in the generator
+}`,
+    bugDescription: 'When gen.throw() is called, the error appears inside the generator at the yield point. Without try/finally in the generator, no cleanup runs.',
+    fixedCode: `async function* dataStream() {
+  try {
+    for (let i = 1; i <= 5; i++) {
+      await new Promise(r => setTimeout(r, 100));
+      yield i;
+    }
+  } catch (err) {
+    console.log('Generator caught:', err.message);
+    // Handle gracefully, or rethrow
+  } finally {
+    console.log('Generator cleaning up resources');
+    // Always runs: close DB connections, unsubscribe, etc.
+  }
+}
+
+async function consume() {
+  const gen = dataStream();
+  console.log((await gen.next()).value); // 1
+  console.log((await gen.next()).value); // 2
+
+  // throw() sends error into generator at the current yield
+  await gen.throw(new Error('Consumer cancelled'));
+}`,
+    explanation: 'gen.throw(err) sends an error into the generator at its current suspension point. try/catch inside the generator catches it. try/finally ensures cleanup whether the error is caught or not.',
+    keyInsight: 'Generators can receive errors via .throw(). Always wrap async generator bodies in try/finally to ensure cleanup when errors are thrown in from outside.'
+  },
+  {
+    id: 1114, cat: "What's Wrong?", difficulty: 'medium',
+    title: 'RegExp stateful lastIndex trap with global flag',
+    tags: ['regex', 'lastindex', 'global-flag', 'stateful'],
+    description: 'This validator alternately returns true and false for the SAME string. What\'s wrong?',
+    brokenCode: `const emailRegex = /^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$/gi;
+
+function isValidEmail(email) {
+  return emailRegex.test(email);
+}
+
+console.log(isValidEmail('user@example.com')); // true
+console.log(isValidEmail('user@example.com')); // false?!
+console.log(isValidEmail('user@example.com')); // true again`,
+    bugDescription: 'With the g (global) flag, RegExp.test() advances lastIndex after each match. Next call starts from that position — not from 0 — causing it to "fail" and reset lastIndex to 0.',
+    fixedCode: `// Fix 1: Remove global flag (not needed for simple test)
+const emailRegex = /^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$/i;
+
+function isValidEmail(email) {
+  return emailRegex.test(email);
+}
+
+// Fix 2: Reset lastIndex before each call
+const emailRegexG = /^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$/gi;
+function isValidEmailSafe(email) {
+  emailRegexG.lastIndex = 0; // reset before use
+  return emailRegexG.test(email);
+}
+
+// Fix 3: Create a new regex each call (safest, slight perf cost)
+function isValidEmailNew(email) {
+  return /^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$/i.test(email);
+}
+
+console.log(isValidEmail('user@example.com')); // true
+console.log(isValidEmail('user@example.com')); // true ✓`,
+    explanation: 'The global (g) flag makes regex stateful via lastIndex. After a successful test(), lastIndex = end of match. Next test() starts there — fails at end of string — resets lastIndex to 0. Alternating true/false.',
+    keyInsight: 'Never use the g flag on a shared regex unless using exec() in a loop. For test() and match() with simple checks, omit g or reset lastIndex = 0 before each call.'
+  },
+  {
+    id: 1115, cat: "What's Wrong?", difficulty: 'hard',
+    title: 'Service worker not updating — old cache version',
+    tags: ['service-worker', 'cache', 'versioning'],
+    description: 'After deploying new assets, users still see the old version. The service worker never updates its cache. Fix the caching strategy.',
+    brokenCode: `// sw.js
+const CACHE_NAME = 'my-cache'; // never changes!
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache =>
+      cache.addAll(['/index.html', '/app.js', '/styles.css'])
+    )
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(cached =>
+      cached || fetch(event.request)
+    )
+  );
+});
+// No activate handler — old caches never cleaned up!`,
+    bugDescription: 'CACHE_NAME never changes so the install event finds the existing cache — no update. No activate handler means old service workers keep serving stale assets.',
+    fixedCode: `// sw.js
+const VERSION = 'v2'; // increment on each deploy!
+const CACHE_NAME = \`my-cache-\${VERSION}\`;
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache =>
+      cache.addAll(['/index.html', '/app.js', '/styles.css'])
+    ).then(() => self.skipWaiting()) // activate immediately
+  );
+});
+
+// Delete old caches on activation
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => keys.filter(key => key !== CACHE_NAME))
+      .then(oldKeys => Promise.all(oldKeys.map(key => caches.delete(key))))
+      .then(() => self.clients.claim()) // take control of open pages
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(cached => cached || fetch(event.request))
+  );
+});`,
+    explanation: 'Version the cache name — new SW gets a new cache. activate handler deletes old caches. skipWaiting + clients.claim ensure the new SW takes over immediately.',
+    keyInsight: 'Service worker caching: version your cache name, clean old caches in activate, call skipWaiting() in install and clients.claim() in activate for immediate takeover.'
+  },
+  {
+    id: 1116, cat: 'Fix the Code', difficulty: 'medium',
+    title: 'Shadow DOM styles leaking via CSS custom properties',
+    tags: ['shadow-dom', 'css-variables', 'encapsulation'],
+    description: 'The component author wants to prevent ALL external styling, but CSS custom properties (variables) still leak through. Document the correct approach.',
+    brokenCode: `class ThemedCard extends HTMLElement {
+  constructor() {
+    super();
+    const shadow = this.attachShadow({ mode: 'closed' });
+    shadow.innerHTML = \`
+      <style>
+        /* Tries to isolate styles */
+        .card {
+          background: var(--card-bg, white); /* CSS var leaks through! */
+          color: var(--card-text, black);
+          padding: 16px;
+        }
+      </style>
+      <div class="card"><slot></slot></div>
+    \`;
+  }
+}
+
+// External page sets these — they WILL affect the component
+// despite 'closed' shadow root!
+// :root { --card-bg: red; --card-text: yellow; }`,
+    bugDescription: 'Shadow DOM blocks regular CSS selectors and class names. But CSS custom properties (variables) inherit through shadow boundaries by design — they\'re meant to be the theming API.',
+    fixedCode: `class ThemedCard extends HTMLElement {
+  constructor() {
+    super();
+    const shadow = this.attachShadow({ mode: 'closed' });
+    shadow.innerHTML = \`
+      <style>
+        /* Documented theming API — CSS vars are intentional leak points */
+        :host {
+          /* Define defaults for your theming API */
+          --card-bg: white;
+          --card-text: black;
+          --card-padding: 16px;
+        }
+
+        .card {
+          /* Use the vars — consumers can override these via :root or :host */
+          background: var(--card-bg);
+          color: var(--card-text);
+          padding: var(--card-padding);
+          /* Hard-coded styles that consumers CANNOT change: */
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+      </style>
+      <div class="card"><slot></slot></div>
+    \`;
+  }
+}
+// Usage: --card-bg is your documented theming hook
+// Structural styles (radius, shadow) are truly encapsulated`,
+    explanation: 'CSS custom properties inherit through shadow boundaries — this is intentional. Use this as your theming API: document which variables you support. Hard-code structural styles that consumers shouldn\'t touch.',
+    keyInsight: 'Shadow DOM encapsulates regular CSS but CSS custom properties inherit through. This is by design — custom properties ARE the theming API for web components. Embrace this, don\'t fight it.'
+  },
 ]

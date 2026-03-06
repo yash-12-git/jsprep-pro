@@ -99,7 +99,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* {modes.map((m, i) => activeTab === i && (
+          {modes.map((m, i) => activeTab === i && (
             <div key={i} css={S.tabContent}>
               <div css={S.tabContentInner}>
                 <div css={S.tabIconBox(m.iconBg)} style={{ borderColor: m.iconBorder }}>
@@ -121,7 +121,7 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-          ))} */}
+          ))}
         </div>
 
         {/* ── AI FEATURES ──────────────────────────────── */}

@@ -8,6 +8,7 @@ import { C, RADIUS, BP } from '@/styles/tokens'
 import MarkdownEditor from '@/components/md/MarkdownEditor'
 import MarkdownRenderer from '@/components/md/MarkdownRenderer'
 import type { Question, QuestionInput, QuestionType, Difficulty, Track, QuestionStatus } from '@/types/question'
+import { CATEGORIES } from '@/data/questions'
 
 export type FormMode = 'create' | 'edit'
 
@@ -314,6 +315,8 @@ export default function QuestionForm({ mode, initial = {}, onSubmit, onDelete }:
 
   const isOutputOrDebug = form.type === 'output' || form.type === 'debug'
 
+  const categories = CATEGORIES.map(c => <option key={c} value={c}>{c.toLowerCase()}</option>)
+
   return (
     <form onSubmit={handleSubmit} css={S.wrap}>
       {success && (
@@ -361,11 +364,9 @@ export default function QuestionForm({ mode, initial = {}, onSubmit, onDelete }:
       <div css={S.row}>
         <div>
           <label css={S.label}>Category <span css={S.required}>*</span></label>
-          <input
-            css={S.input} value={form.category}
-            onChange={e => set('category', e.target.value)}
-            placeholder="e.g. Closures, Event Loop, Promises"
-          />
+          <select css={S.select} value={form.category} onChange={e => set('category', e.target.value)}>
+            {categories}
+          </select>
         </div>
         <div>
           <label css={S.label}>Slug (URL)</label>

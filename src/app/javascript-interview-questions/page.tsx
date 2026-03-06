@@ -6,11 +6,11 @@ import { questions, CATEGORIES } from '@/data/questions'
 // ─── Static metadata (server component) ──────────────────────────────────────
 
 export const metadata: Metadata = pageMeta({
-  title: '150+ JavaScript Interview Questions With Answers (2025)',
+  title: '150+ JavaScript Interview Questions With Answers (2026)',
   description: 'The most complete list of JavaScript interview questions with detailed answers, code examples, and explanations. Covers closures, event loop, promises, async/await, prototypes, and more.',
   path: '/javascript-interview-questions',
   keywords: [
-    'javascript interview questions 2025',
+    'javascript interview questions 2026',
     'js interview questions and answers',
     'javascript interview questions for experienced',
     'top javascript interview questions',
