@@ -11,8 +11,7 @@
 
 import {
   collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc,
-  query, where, orderBy, limit, startAfter, QueryDocumentSnapshot,
-  serverTimestamp, increment, writeBatch, DocumentData,
+  query, where, orderBy, limit, startAfter, QueryDocumentSnapshot, increment, writeBatch, DocumentData,
   type QueryConstraint,
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
@@ -68,10 +67,16 @@ export async function getQuestions(opts: GetQuestionsOptions = {}): Promise<GetQ
   if (afterDoc) constraints.push(startAfter(afterDoc))
 
   const q = query(collection(db, QUESTIONS_COL), ...constraints)
+  console.log(q, "line70");
+  
   const snap = await getDocs(q)
-
+  console.log(snap, "line73");
+  
   const hasMore = snap.docs.length > pageSize
   const docs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs
+
+  console.log(docs[0]?.data(), "line78");
+  
 
   return {
     questions: docs.map(d => ({ id: d.id, ...d.data() }) as Question),

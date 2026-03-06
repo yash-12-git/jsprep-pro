@@ -12,7 +12,7 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState(0)
 
   const stats = [
-    { n: '81+', l: 'Questions' },
+    { n: '100+', l: 'Questions' },
     { n: '3', l: 'Modes' },
     { n: '6', l: 'AI Tools' },
     { n: `₹${process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY ?? 99}`, l: 'Pro/mo' },
@@ -64,7 +64,7 @@ export default function HomePage() {
             The Only JS Interview <span css={S.heroAccent}>Prep You Need</span>
           </h1>
           <p css={S.heroDesc}>
-            81+ questions across 3 modes — theory, output prediction, and debugging. With 6 AI features.
+            100+ questions across 3 modes — theory, output prediction, and debugging. With 6 AI features.
           </p>
           <p css={S.heroSubDesc}>Not just MCQs. The closest thing to a real interview.</p>
           <div css={S.heroCtas}>
@@ -99,7 +99,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          {modes.map((m, i) => activeTab === i && (
+          {/* {modes.map((m, i) => activeTab === i && (
             <div key={i} css={S.tabContent}>
               <div css={S.tabContentInner}>
                 <div css={S.tabIconBox(m.iconBg)} style={{ borderColor: m.iconBorder }}>
@@ -121,7 +121,7 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-          ))}
+          ))} */}
         </div>
 
         {/* ── AI FEATURES ──────────────────────────────── */}

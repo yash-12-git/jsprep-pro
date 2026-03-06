@@ -5,6 +5,7 @@
  * Change the site name once, updates everywhere.
  */
 
+import { proFeatures } from '@/data/proBenefits'
 import type { Metadata } from 'next'
 
 export const SITE = {
@@ -159,7 +160,7 @@ export function softwareSchema(): string {
     url: SITE.domain,
     offers: [
       { '@type': 'Offer', price: '0', priceCurrency: 'INR', name: 'Free Plan' },
-      { '@type': 'Offer', price: '199', priceCurrency: 'INR', name: 'Pro Plan', billingDuration: 'P1M' },
+      { '@type': 'Offer', price: '99', priceCurrency: 'INR', name: 'Pro Plan', billingDuration: 'P1M' },
     ],
     aggregateRating: {
       '@type': 'AggregateRating',
@@ -167,14 +168,7 @@ export function softwareSchema(): string {
       reviewCount: '247',
       bestRating: '5',
     },
-    featureList: [
-      '150+ JavaScript interview questions',
-      'AI-powered mock interviews',
-      'Output prediction challenges',
-      'Debug lab exercises',
-      'Personalized study plans',
-      'Progress tracking',
-    ],
+    featureList: proFeatures,
   })
 }
 
