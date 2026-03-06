@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   },
   verification: {
     // Add these once you verify in Google Search Console + Bing Webmaster Tools
-    // google: 'your-google-verification-code',
+    google: 'r18YNnAL_LCvcldYAr8VTKNLHmjVWkRWsOyFEkm4owM',
     // other: { 'msvalidate.01': 'your-bing-code' },
   },
   alternates: {

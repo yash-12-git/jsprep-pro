@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getDocs, collection, query, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { deleteQuestion, publishQuestion, archiveQuestion } from '@/lib/questions'
+import { deleteQuestion } from '@/lib/questions'
 import type { Question } from '@/types/question'
 import { css } from '@emotion/react'
 import { C, RADIUS } from '@/styles/tokens'
-import { PlusCircle, Edit2, Trash2, Eye, EyeOff } from 'lucide-react'
+import { PlusCircle, Edit2, Trash2 } from 'lucide-react'
 
 export default function AdminQuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([])
