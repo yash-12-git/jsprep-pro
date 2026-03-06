@@ -460,3 +460,96 @@ export const mobileLogoutBtn = css`
     color: ${C.danger};
   }
 `;
+
+// ─── Learn dropdown ───────────────────────────────────────────────────────────
+
+export const learnDropdownWrapper = css`
+  position: relative;
+`;
+
+export const learnDropdownTrigger = css`
+  display: flex;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: ${C.muted};
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    color: white;
+    background: rgba(255,255,255,0.06);
+  }
+`;
+
+export const learnDropdownMenu = css`
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 13rem;
+  background: #13131c;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 0.875rem;
+  padding: 0.5rem;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  z-index: 100;
+`;
+
+export const learnDropdownItem = css`
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  transition: background 0.12s ease, color 0.12s ease;
+
+  &:hover {
+    background: rgba(255,255,255,0.06);
+    color: white;
+  }
+`;
+
+export const learnDropdownItemActive = css`
+  background: rgba(124,106,247,0.12);
+  color: #c4b5fd;
+`;
+
+export const learnIconBadge = css`
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: 0.4375rem;
+  background: rgba(124,106,247,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`;
+
+export const learnDropdownLabel = css`
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: inherit;
+  display: block;
+`;
+
+export const learnDropdownDesc = css`
+  font-size: 0.6875rem;
+  color: rgba(255,255,255,0.35);
+  display: block;
+  margin-top: 1px;
+`;
+
+export const learnNavLinkActive = css`
+  color: #6af7c0;
+  background: rgba(106,247,192,0.08);
+`;

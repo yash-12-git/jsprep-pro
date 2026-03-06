@@ -10,7 +10,7 @@ import type { Metadata } from 'next'
 
 export const SITE = {
   name:        'JSPrep Pro',
-  domain:      'https://jsprep-pro.vercel.app',
+  domain:      'https://jsprep.pro',
   twitterHandle: '@jspreppro',
   description: 'The most comprehensive JavaScript interview preparation platform. 150+ questions, AI tutor, mock interviews, and output prediction challenges.',
 }

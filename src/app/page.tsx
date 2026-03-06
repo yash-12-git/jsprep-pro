@@ -185,7 +185,7 @@ export default function HomePage() {
               <div css={S.planPrice}>₹0</div>
               <p css={S.planTagline}>Forever free, no card needed</p>
               <ul css={S.featureList}>
-                {['All 21 theory questions', 'First 5 output questions', 'First 5 debug challenges', 'Mark up to 5 as mastered', 'Google sign-in'].map(f => (
+                {['All theory questions', 'Free Blogs', 'Interview Topics', 'First 5 output questions', 'First 5 debug challenges', 'Mark up to 5 as mastered', 'Google sign-in'].map(f => (
                   <li key={f} css={S.featureItem}>
                     <CheckCircle size={13} color={C.accent3} style={{ flexShrink: 0, marginTop: 2 }} />
                     <span css={{ color: C.muted, fontSize: '0.875rem' }}>{f}</span>

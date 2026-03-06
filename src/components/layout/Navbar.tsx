@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import {
   Zap, BookOpen, BarChart2, Brain, LogOut, Mic, Map,
-  FileDown, ChevronDown, Code2, Bug, Menu, X
+  FileDown, ChevronDown, Code2, Bug, Menu, X, Newspaper, Layers
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import * as S from './styles'
@@ -15,13 +15,18 @@ export default function Navbar() {
   const { user, progress, logout } = useAuth()
   const path = usePathname()
   const [aiMenuOpen, setAiMenuOpen] = useState(false)
+  const [learnMenuOpen, setLearnMenuOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const learnRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setAiMenuOpen(false)
+      }
+      if (learnRef.current && !learnRef.current.contains(e.target as Node)) {
+        setLearnMenuOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -36,9 +41,6 @@ export default function Navbar() {
     { href: '/debug-lab', label: 'Debug', icon: Bug },
     { href: '/quiz', label: 'Quiz', icon: Brain, pro: true },
     { href: '/analytics', label: 'Analytics', icon: BarChart2, pro: true },
-    { href: '/topics', label:  'Topics', icon: Map, pro: false },
-    { href: '/blog', label: 'Blogs', icon: Map, pro: false },
-    
   ]
 
   const aiLinks = [
@@ -47,7 +49,12 @@ export default function Navbar() {
     { href: '/cheatsheet', label: 'Cheat Sheet', icon: FileDown, desc: 'Printable PDF' },
   ]
 
-  const isAiActive = aiLinks.some(l => path === l.href)
+  const learnLinks = [
+    { href: '/topics', label: 'Interview Topics', icon: Layers, desc: '36 concept pages' },
+    { href: '/blog',   label: 'Blog',             icon: Newspaper, desc: 'Deep dives & guides' },
+  ]
+
+  const isLearnActive = learnLinks.some(l => path.startsWith(l.href))
 
   return (
     <>
@@ -60,6 +67,39 @@ export default function Navbar() {
               Prep<span css={S.logoAccent}>Pro</span>
             </span>
           </Link>
+
+          {/* Learn dropdown — always visible, no auth required */}
+          <div css={S.learnDropdownWrapper} ref={learnRef}>
+            <button
+              css={[S.learnDropdownTrigger, isLearnActive && S.learnNavLinkActive]}
+              onClick={() => setLearnMenuOpen(v => !v)}
+            >
+              <Layers size={13} />
+              Learn
+              <ChevronDown size={11} css={S.chevron(learnMenuOpen)} />
+            </button>
+
+            {learnMenuOpen && (
+              <div css={S.learnDropdownMenu}>
+                {learnLinks.map(({ href, label, icon: Icon, desc }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    css={[S.learnDropdownItem, path.startsWith(href) && S.learnDropdownItemActive]}
+                    onClick={() => setLearnMenuOpen(false)}
+                  >
+                    <div css={S.learnIconBadge}>
+                      <Icon size={13} color="#6af7c0" />
+                    </div>
+                    <div>
+                      <div css={S.learnDropdownLabel}>{label}</div>
+                      <div css={S.learnDropdownDesc}>{desc}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
 
           {user && (
             <div css={S.desktopLinks}>
@@ -77,7 +117,7 @@ export default function Navbar() {
 
               <div css={S.aiDropdownWrapper} ref={menuRef}>
                 <button
-                  css={[S.aiDropdownTrigger, isAiActive && S.navLinkAiActive]}
+                  css={[S.aiDropdownTrigger, aiMenuOpen && S.navLinkAiActive]}
                   onClick={() => setAiMenuOpen(v => !v)}
                 >
                   <Zap size={13} />
@@ -107,6 +147,7 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
+
             </div>
           )}
 
@@ -155,6 +196,25 @@ export default function Navbar() {
                 <Icon size={16} />
                 {label}
                 {pro && !progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
+              </Link>
+            ))}
+
+            <hr css={S.mobileDivider} />
+            <p css={S.mobileSectionLabel}>Learn</p>
+
+            {learnLinks.map(({ href, label, icon: Icon, desc }) => (
+              <Link
+                key={href}
+                href={href}
+                css={[S.mobileNavLink, path.startsWith(href) && S.learnNavLinkActive]}
+              >
+                <div css={S.mobileAiItemIcon}>
+                  <Icon size={14} color="#6af7c0" />
+                </div>
+                <div css={S.mobileNavItemContent}>
+                  <span>{label}</span>
+                  <span css={S.mobileNavItemDesc}>{desc}</span>
+                </div>
               </Link>
             ))}
 

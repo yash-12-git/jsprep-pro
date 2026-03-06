@@ -12,6 +12,7 @@ import { BookmarkIcon, CheckCircle, ChevronDown, Lock, Sparkles, Target } from '
 import * as S from './styles'
 import * as Shared from '@/styles/shared'
 import { C } from '@/styles/tokens'
+import LearnSection from './components/Learnsection'
 
 type ActivePanel = 'chat' | 'eval' | null
 const FREE_MASTER_LIMIT = 5
@@ -127,6 +128,9 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+
+        {/* ── Learn: Topics + Blog entry point ── */}
+        <LearnSection />
 
         <div css={Shared.categoryScroll}>
           {['All', ...categories].map(cat => (
