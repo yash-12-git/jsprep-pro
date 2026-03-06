@@ -1,5 +1,6 @@
 import {
-  doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, increment, serverTimestamp
+  doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove,
+  increment, serverTimestamp, collection, query, orderBy, limit, getDocs
 } from 'firebase/firestore'
 import { db } from './firebase'
 
@@ -18,10 +19,18 @@ export interface UserProgress {
   proExpiresAt?: string | null
   subscriptionStatus?: string
   lastRenewedAt?: string
-  solvedOutputIds: number[]      // ids of correctly answered output questions
-  revealedOutputIds: number[]    // ids that were revealed (partial credit)
-  solvedDebugIds: number[]       // ids of correctly AI-checked debug questions
-  revealedDebugIds: number[]     // ids that were revealed
+  // Output quiz progress
+  solvedOutputIds: number[]
+  revealedOutputIds: number[]
+  // Debug lab progress
+  solvedDebugIds: number[]
+  revealedDebugIds: number[]
+  // XP system — for leaderboard
+  xp: number                // all-time XP
+  weeklyXp: number          // resets each Monday
+  weeklyXpResetDate: string // ISO date of last Monday reset
+  displayName?: string      // cached for leaderboard display
+  photoURL?: string         // cached for leaderboard display
 }
 
 const DEFAULT_PROGRESS: Omit<UserProgress, 'uid'> = {
@@ -37,6 +46,9 @@ const DEFAULT_PROGRESS: Omit<UserProgress, 'uid'> = {
   revealedOutputIds: [],
   solvedDebugIds: [],
   revealedDebugIds: [],
+  xp: 0,
+  weeklyXp: 0,
+  weeklyXpResetDate: '',
 }
 
 export async function getUserProgress(uid: string): Promise<UserProgress> {
@@ -52,7 +64,7 @@ export async function getUserProgress(uid: string): Promise<UserProgress> {
   return {
     ...DEFAULT_PROGRESS,
     ...data,
-    uid
+    uid,
   }
 }
 
@@ -126,4 +138,122 @@ export async function updateStreak(uid: string) {
 export async function activatePro(uid: string, subscriptionId: string) {
   const ref = doc(db, 'users', uid)
   await updateDoc(ref, { isPro: true, razorpaySubscriptionId: subscriptionId })
+}
+
+// ─── XP System ────────────────────────────────────────────────────────────────
+
+export const XP = {
+  MASTER_QUESTION:   10,
+  SOLVE_OUTPUT:       8,
+  SOLVE_DEBUG:        8,
+  QUIZ_CORRECT:       5,
+  STREAK_BONUS:       3,  // per day of streak, added on login
+} as const
+
+function getMondayISO(): string {
+  const d = new Date()
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+  d.setDate(diff)
+  d.setHours(0, 0, 0, 0)
+  return d.toISOString().slice(0, 10)
+}
+
+async function awardXP(uid: string, points: number, displayName?: string, photoURL?: string) {
+  const ref = doc(db, 'users', uid)
+  const thisMonday = getMondayISO()
+
+  const snap = await getDoc(ref)
+  if (!snap.exists()) return
+  const data = snap.data() as UserProgress
+
+  // Reset weekly XP if it's a new week
+  const needsReset = (data.weeklyXpResetDate ?? '') < thisMonday
+
+  const updates: Record<string, unknown> = {
+    xp: increment(points),
+    weeklyXpResetDate: thisMonday,
+  }
+
+  if (needsReset) {
+    updates.weeklyXp = points
+  } else {
+    updates.weeklyXp = increment(points)
+  }
+
+  // Cache display info for leaderboard (update if provided)
+  if (displayName) updates.displayName = displayName
+  if (photoURL) updates.photoURL = photoURL
+
+  await updateDoc(ref, updates)
+}
+
+// Wrapper functions that award XP alongside existing actions
+
+export async function markMasteredWithXP(
+  uid: string, questionId: number, mastered: boolean,
+  displayName?: string, photoURL?: string
+) {
+  const ref = doc(db, 'users', uid)
+  await updateDoc(ref, {
+    masteredIds: mastered ? arrayUnion(questionId) : arrayRemove(questionId),
+  })
+  if (mastered) await awardXP(uid, XP.MASTER_QUESTION, displayName, photoURL)
+}
+
+export async function markOutputSolvedWithXP(
+  uid: string, questionId: number,
+  displayName?: string, photoURL?: string
+) {
+  const ref = doc(db, 'users', uid)
+  await updateDoc(ref, { solvedOutputIds: arrayUnion(questionId) })
+  await awardXP(uid, XP.SOLVE_OUTPUT, displayName, photoURL)
+}
+
+export async function markDebugSolvedWithXP(
+  uid: string, questionId: number,
+  displayName?: string, photoURL?: string
+) {
+  const ref = doc(db, 'users', uid)
+  await updateDoc(ref, { solvedDebugIds: arrayUnion(questionId) })
+  await awardXP(uid, XP.SOLVE_DEBUG, displayName, photoURL)
+}
+
+// ─── Leaderboard ──────────────────────────────────────────────────────────────
+
+export interface LeaderboardEntry {
+  uid: string
+  displayName: string
+  photoURL?: string
+  weeklyXp: number
+  xp: number
+  streakDays: number
+  masteredCount: number
+  isPro: boolean
+}
+
+export async function getWeeklyLeaderboard(topN = 10): Promise<LeaderboardEntry[]> {
+  try {
+    const usersRef = collection(db, 'users')
+    const q = query(usersRef, orderBy('weeklyXp', 'desc'), limit(topN))
+    const snap = await getDocs(q)
+
+    return snap.docs
+      .map(d => {
+        const data = d.data() as UserProgress
+        return {
+          uid: data.uid,
+          displayName: data.displayName ?? 'Anonymous',
+          photoURL: data.photoURL,
+          weeklyXp: data.weeklyXp ?? 0,
+          xp: data.xp ?? 0,
+          streakDays: data.streakDays ?? 0,
+          masteredCount: (data.masteredIds ?? []).length,
+          isPro: data.isPro ?? false,
+        }
+      })
+      .filter(e => e.weeklyXp > 0) // only show users who've done something this week
+  } catch {
+    return []
+  }
 }

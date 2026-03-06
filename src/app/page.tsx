@@ -12,7 +12,7 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState(0)
 
   const stats = [
-    { n: '100+', l: 'Questions' },
+    { n: '150+', l: 'Questions' },
     { n: '3', l: 'Modes' },
     { n: '6', l: 'AI Tools' },
     { n: `₹${process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY ?? 99}`, l: 'Pro/mo' },
@@ -21,19 +21,19 @@ export default function HomePage() {
   const modes = [
     {
       icon: BookOpen, color: C.accent, iconBg: `${C.accent}1a`, iconBorder: `${C.accent}33`,
-      label: '📖 Theory', count: '21 questions', countBg: `${C.accent}1a`, countColor: C.accent,
+      label: '📖 Theory', count: '90+ questions', countBg: `${C.accent}1a`, countColor: C.accent,
       desc: 'Deep-dive explanations of closures, async, prototypes and event loop with hints, code examples, and AI follow-up.',
       features: ['Detailed answers + code', 'Category filters', 'Mark as mastered', 'Bookmark for review'],
     },
     {
       icon: Code2, color: C.accent2, iconBg: `${C.accent2}1a`, iconBorder: `${C.accent2}33`,
-      label: '💻 Output Quiz', count: '40 questions', countBg: `${C.accent2}1a`, countColor: C.accent2,
+      label: '💻 Output Quiz', count: '40+ questions', countBg: `${C.accent2}1a`, countColor: C.accent2,
       desc: 'Read real JS snippets — predict the exact output. Event loop traps, closure bugs, type coercion weirdness.',
       features: ['Event loop & Promises', 'Closure traps', 'Type coercion', 'Hoisting surprises'],
     },
     {
       icon: Bug, color: C.danger, iconBg: `${C.danger}1a`, iconBorder: `${C.danger}33`,
-      label: '🐛 Debug Lab', count: '20 challenges', countBg: `${C.danger}1a`, countColor: C.danger,
+      label: '🐛 Debug Lab', count: '20+ challenges', countBg: `${C.danger}1a`, countColor: C.danger,
       desc: 'Find and fix real bugs in broken code. AI checks your solution, scores it 1–10, explains what you missed.',
       features: ['Async bugs', 'Closure traps', 'React stale closures', 'AI-powered checking'],
     },
