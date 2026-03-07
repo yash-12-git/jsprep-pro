@@ -11,7 +11,8 @@
 
 import {
   collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc,
-  query, where, orderBy, limit, startAfter, QueryDocumentSnapshot, increment, writeBatch, DocumentData,
+  query, where, orderBy, limit, startAfter, QueryDocumentSnapshot,
+  serverTimestamp, increment, writeBatch, DocumentData,
   type QueryConstraint,
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
@@ -26,6 +27,40 @@ export async function getQuestion(id: string): Promise<Question | null> {
   const snap = await getDoc(doc(db, QUESTIONS_COL, id))
   if (!snap.exists()) return null
   return { id: snap.id, ...snap.data() } as Question
+}
+
+/** Fetch a question by its slug field (used by /q/[slug]/page.tsx) */
+export async function getQuestionBySlug(slug: string): Promise<Question | null> {
+  const q = query(
+    collection(db, QUESTIONS_COL),
+    where('slug', '==', slug),
+    where('status', '==', 'published'),
+  )
+  const snap = await getDocs(q)
+  if (snap.empty) return null
+  const d = snap.docs[0]
+  return { id: d.id, ...d.data() } as Question
+}
+
+/** All published slugs — for generateStaticParams on /q/[slug] */
+export async function getPublishedQuestionSlugs(): Promise<string[]> {
+  const snap = await getDocs(
+    query(collection(db, QUESTIONS_COL), where('status', '==', 'published'))
+  )
+  return snap.docs.map(d => (d.data() as Question).slug).filter(Boolean)
+}
+
+/** All distinct published categories — replaces static CATEGORIES array */
+export async function getPublishedCategories(): Promise<string[]> {
+  const snap = await getDocs(
+    query(collection(db, QUESTIONS_COL), where('status', '==', 'published'))
+  )
+  const cats = new Set<string>()
+  snap.docs.forEach(d => {
+    const cat = (d.data() as Question).category
+    if (cat) cats.add(cat)
+  })
+  return Array.from(cats).sort()
 }
 
 export interface GetQuestionsOptions {
@@ -68,9 +103,9 @@ export async function getQuestions(opts: GetQuestionsOptions = {}): Promise<GetQ
 
   const q = query(collection(db, QUESTIONS_COL), ...constraints)
   const snap = await getDocs(q)
+
   const hasMore = snap.docs.length > pageSize
   const docs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs
-  
 
   return {
     questions: docs.map(d => ({ id: d.id, ...d.data() }) as Question),
@@ -79,7 +114,6 @@ export async function getQuestions(opts: GetQuestionsOptions = {}): Promise<GetQ
   }
 }
 
-/** Lightweight list for the question picker (slug + title only) */
 export async function getQuestionList(type?: QuestionType, track?: Track): Promise<Pick<Question, 'id' | 'slug' | 'title' | 'category' | 'difficulty' | 'isPro' | 'order'>[]> {
   const constraints: QueryConstraint[] = [where('status', '==', 'published'), orderBy('order', 'asc')]
   if (type)  constraints.push(where('type', '==', type))

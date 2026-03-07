@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { pageMeta, faqSchema, breadcrumbSchema, catToSlug, SITE } from '@/lib/seo/seo'
-import { questions, CATEGORIES } from '@/data/questions'
+import { pageMeta, faqSchema, breadcrumbSchema, catToSlug } from '@/lib/seo/seo'
+import { getQuestionBySlug, getPublishedQuestionSlugs, getPublishedCategories, getQuestions } from '@/lib/questions'
 import InlineEvaluator from '@/components/ui/InlineEvaluater'
 
 interface Props { params: { slug: string } }
@@ -17,36 +17,36 @@ function toSlug(text: string): string {
     .slice(0, 80)
 }
 
-function findBySlug(slug: string) {
-  return questions.find(q => toSlug(q.q) === slug) ?? null
+const DIFF_META: Record<string, { label: string; color: string; bg: string }> = {
+  beginner: { label: 'Beginner', color: '#6af7c0', bg: 'rgba(106,247,192,0.1)' },
+  core:     { label: 'Core',     color: '#6af7c0', bg: 'rgba(106,247,192,0.1)' },
+  advanced: { label: 'Advanced', color: '#f7c76a', bg: 'rgba(247,199,106,0.1)' },
+  expert:   { label: 'Expert',   color: '#f76a6a', bg: 'rgba(247,106,106,0.1)' },
 }
 
-const DIFF_META: Record<string, { label: string; color: string; bg: string }> = {
-  core:   { label: 'Core',     color: '#6af7c0', bg: 'rgba(106,247,192,0.1)' },
-  mid:    { label: 'Mid-Level', color: '#f7c76a', bg: 'rgba(247,199,106,0.1)' },
-  adv:    { label: 'Advanced', color: '#f76a6a', bg: 'rgba(247,106,106,0.1)' },
-}
+export const revalidate = 3600
 
 // ─── Static generation ────────────────────────────────────────────────────────
 
-export function generateStaticParams() {
-  return questions.map(q => ({ slug: toSlug(q.q) }))
+export async function generateStaticParams() {
+  const slugs = await getPublishedQuestionSlugs().catch(() => [] as string[])
+  return slugs.map(slug => ({ slug }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const q = findBySlug(params.slug)
+  const q = await getQuestionBySlug(params.slug)
   if (!q) return {}
 
-  const diff = q.tags.includes('adv') ? 'Advanced' : q.tags.includes('mid') ? 'Mid-Level' : 'Core'
+  const diff = DIFF_META[q.difficulty]?.label ?? 'Core'
 
   return pageMeta({
-    title: `${q.q} — JavaScript Interview Question`,
-    description: `${diff} JavaScript interview question: ${q.q} — Detailed answer with code examples, common mistakes, and interview tips. Part of the ${q.cat} category.`,
+    title: `${q.title} — JavaScript Interview Question`,
+    description: `${diff} JavaScript interview question: ${q.title} — Detailed answer with code examples, common mistakes, and interview tips. Part of the ${q.category} category.`,
     path: `/q/${params.slug}`,
     keywords: [
-      q.q.toLowerCase(),
-      `${q.cat.toLowerCase()} javascript interview`,
-      `javascript interview ${q.cat.toLowerCase()}`,
+      q.title.toLowerCase(),
+      `${q.category.toLowerCase()} javascript interview`,
+      `javascript interview ${q.category.toLowerCase()}`,
       'javascript interview question',
       `${params.slug.replace(/-/g, ' ')}`,
     ],
@@ -55,25 +55,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function QuestionPage({ params }: Props) {
-  const question = findBySlug(params.slug)
+export default async function QuestionPage({ params }: Props) {
+  const question = await getQuestionBySlug(params.slug)
   if (!question) notFound()
 
-  const diff = question.tags.includes('adv') ? 'adv' : question.tags.includes('mid') ? 'mid' : 'core'
-  const dm = DIFF_META[diff]
-  const catSlug = catToSlug(question.cat)
+  const dm = DIFF_META[question.difficulty] ?? DIFF_META.core
+  const catSlug = catToSlug(question.category)
 
   // Related questions: same category, excluding current
-  const related = questions
-    .filter(q => q.cat === question.cat && q.id !== question.id)
-    .slice(0, 4)
+  const { questions: allCatQs } = await getQuestions({
+    filters: { status: 'published', type: 'theory', category: question.category },
+    pageSize: 10,
+  })
+  const related = allCatQs.filter(q => q.id !== question.id).slice(0, 4)
 
   // All categories for bottom nav
-  const allCats = CATEGORIES.slice(0, 6)
+  const categories = await getPublishedCategories()
 
   const jsonLd = faqSchema([{
-    question: question.q,
-    answer: question.answer.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 500),
+    question: question.title,
+    answer: (question.answer ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 500),
   }])
 
   return (
@@ -82,8 +83,8 @@ export default function QuestionPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbSchema([
         { name: 'Home', path: '/' },
         { name: 'JS Interview Questions', path: '/javascript-interview-questions' },
-        { name: question.cat, path: `/questions/${catSlug}` },
-        { name: question.q.slice(0, 40) + '…', path: `/q/${params.slug}` },
+        { name: question.category, path: `/questions/${catSlug}` },
+        { name: question.title.slice(0, 40) + '…', path: `/q/${params.slug}` },
       ])}} />
 
       <div style={{ maxWidth: '50rem', margin: '0 auto', padding: '2.5rem 1.25rem 5rem', color: '#c8c8d8' }}>
@@ -94,9 +95,9 @@ export default function QuestionPage({ params }: Props) {
           <span>›</span>
           <Link href="/javascript-interview-questions" style={{ color: '#7c6af7', textDecoration: 'none' }}>Interview Questions</Link>
           <span>›</span>
-          <Link href={`/questions/${catSlug}`} style={{ color: '#7c6af7', textDecoration: 'none' }}>{question.cat}</Link>
+          <Link href={`/questions/${catSlug}`} style={{ color: '#7c6af7', textDecoration: 'none' }}>{question.category}</Link>
           <span>›</span>
-          <span style={{ color: 'rgba(255,255,255,0.5)' }}>{question.q.slice(0, 45)}…</span>
+          <span style={{ color: 'rgba(255,255,255,0.5)' }}>{question.title.slice(0, 45)}…</span>
         </nav>
 
         {/* ── Question header ── */}
@@ -115,7 +116,7 @@ export default function QuestionPage({ params }: Props) {
               background: 'rgba(124,106,247,0.1)', padding: '3px 10px',
               borderRadius: 20, border: '1px solid rgba(124,106,247,0.2)',
             }}>
-              {question.cat}
+              {question.category}
             </span>
             <span style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.3)', marginLeft: 'auto' }}>
               JavaScript Interview Question
@@ -128,7 +129,7 @@ export default function QuestionPage({ params }: Props) {
             lineHeight: 1.3, marginBottom: '1rem',
             letterSpacing: '-0.02em',
           }}>
-            {question.q}
+            {question.title}
           </h1>
 
           {question.hint && (
@@ -161,15 +162,15 @@ export default function QuestionPage({ params }: Props) {
 
           <div
             className="answer-body"
-            dangerouslySetInnerHTML={{ __html: question.answer }}
+            dangerouslySetInnerHTML={{ __html: question.answer ?? '' }}
             style={{ lineHeight: 1.75, fontSize: '0.9375rem' }}
           />
         </section>
 
         {/* ── Inline AI Evaluator ── */}
         <InlineEvaluator
-          question={question.q}
-          idealAnswer={question.answer.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()}
+          question={question.title}
+          idealAnswer={(question.answer ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()}
           label="Can you explain this out loud?"
         />
 
@@ -177,16 +178,15 @@ export default function QuestionPage({ params }: Props) {
         {related.length > 0 && (
           <section style={{ marginBottom: '3rem' }}>
             <h2 style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'white', marginBottom: '0.875rem' }}>
-              More {question.cat} Questions
+              More {question.category} Questions
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {related.map(r => {
-                const rd = r.tags.includes('adv') ? 'adv' : r.tags.includes('mid') ? 'mid' : 'core'
-                const rdm = DIFF_META[rd]
+                const rdm = DIFF_META[r.difficulty] ?? DIFF_META.core
                 return (
                   <Link
                     key={r.id}
-                    href={`/q/${toSlug(r.q)}`}
+                    href={`/q/${r.slug}`}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '0.75rem',
                       padding: '0.875rem 1rem',
@@ -206,7 +206,7 @@ export default function QuestionPage({ params }: Props) {
                       {rdm.label}
                     </span>
                     <span style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.75)', flex: 1 }}>
-                      {r.q}
+                      {r.title}
                     </span>
                     <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.875rem', flexShrink: 0 }}>→</span>
                   </Link>
@@ -222,15 +222,15 @@ export default function QuestionPage({ params }: Props) {
             Browse by Category
           </h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {CATEGORIES.map(cat => (
+            {categories.map(cat => (
               <Link
                 key={cat}
                 href={`/questions/${catToSlug(cat)}`}
                 style={{
                   padding: '0.4rem 0.875rem',
-                  background: cat === question.cat ? 'rgba(124,106,247,0.15)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${cat === question.cat ? 'rgba(124,106,247,0.35)' : 'rgba(255,255,255,0.07)'}`,
-                  color: cat === question.cat ? '#c4b5fd' : 'rgba(255,255,255,0.5)',
+                  background: cat === question.category ? 'rgba(124,106,247,0.15)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${cat === question.category ? 'rgba(124,106,247,0.35)' : 'rgba(255,255,255,0.07)'}`,
+                  color: cat === question.category ? '#c4b5fd' : 'rgba(255,255,255,0.5)',
                   borderRadius: 20,
                   fontSize: '0.8rem',
                   fontWeight: 600,

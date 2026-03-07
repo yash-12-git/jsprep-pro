@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { pageMeta, faqSchema, breadcrumbSchema, catToSlug, KEYWORDS, SITE } from '@/lib/seo/seo'
-import { questions, CATEGORIES } from '@/data/questions'
+import { getQuestions, getPublishedCategories } from '@/lib/questions'
+import type { Question } from '@/types/question'
 
 // ─── Static metadata (server component) ──────────────────────────────────────
 
 export const metadata: Metadata = pageMeta({
-  title: '150+ JavaScript Interview Questions With Answers (2026)',
+  title: '150+ JavaScript Interview Questions With Answers (2025)',
   description: 'The most complete list of JavaScript interview questions with detailed answers, code examples, and explanations. Covers closures, event loop, promises, async/await, prototypes, and more.',
   path: '/javascript-interview-questions',
   keywords: [
-    'javascript interview questions 2026',
+    'javascript interview questions 2025',
     'js interview questions and answers',
     'javascript interview questions for experienced',
     'top javascript interview questions',
@@ -27,16 +28,21 @@ function stripHtml(html: string): string {
 
 // ─── Page component ───────────────────────────────────────────────────────────
 
-export default function JavaScriptInterviewQuestionsPage() {
-  const questionsByCategory = CATEGORIES.map(cat => ({
+export const revalidate = 3600
+
+export default async function JavaScriptInterviewQuestionsPage() {
+  const { questions: allQuestions } = await getQuestions({ filters: { status: 'published', type: 'theory' }, pageSize: 500 })
+  const categories = await getPublishedCategories()
+
+  const questionsByCategory = categories.map(cat => ({
     cat,
     slug: catToSlug(cat),
-    questions: questions.filter(q => q.cat === cat),
+    questions: allQuestions.filter(q => q.category === cat),
   }))
 
-  const faqItems = questions.slice(0, 20).map(q => ({
-    question: q.q,
-    answer: stripHtml(q.answer),
+  const faqItems = allQuestions.slice(0, 20).map(q => ({
+    question: q.title,
+    answer: stripHtml(q.answer ?? ''),
   }))
 
   return (
@@ -75,8 +81,8 @@ export default function JavaScriptInterviewQuestionsPage() {
             the event loop, closures, promises, prototypes, and modern ES2023+ features.
           </p>
           <p style={{ fontSize: '0.9375rem', color: 'rgba(255,255,255,0.55)', marginBottom: '1.5rem' }}>
-            ✅ {questions.length} questions &nbsp;·&nbsp;
-            ✅ {CATEGORIES.length} categories &nbsp;·&nbsp;
+            ✅ {allQuestions.length} questions &nbsp;·&nbsp;
+            ✅ {categories.length} categories &nbsp;·&nbsp;
             ✅ Code examples in every answer &nbsp;·&nbsp;
             ✅ Updated 2025
           </p>
@@ -168,10 +174,10 @@ export default function JavaScriptInterviewQuestionsPage() {
                   <h3
                     itemProp="name"
                     style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'white', marginBottom: '1rem', lineHeight: 1.4 }}
-                    id={`q-${q.id}`}
+                    id={`q-${q.id ?? q.slug}`}
                   >
-                    <span style={{ color: '#7c6af7', marginRight: '0.5rem', fontSize: '0.875rem' }}>Q{q.id + 1}.</span>
-                    {q.q}
+                    <span style={{ color: '#7c6af7', marginRight: '0.5rem', fontSize: '0.875rem' }}></span>
+                    {q.title}
                   </h3>
 
                   {q.hint && (
@@ -187,7 +193,7 @@ export default function JavaScriptInterviewQuestionsPage() {
                   >
                     <div
                       itemProp="text"
-                      dangerouslySetInnerHTML={{ __html: q.answer }}
+                      dangerouslySetInnerHTML={{ __html: q.answer ?? '' }}
                       style={{ lineHeight: 1.8, fontSize: '0.9375rem' }}
                     />
                   </div>

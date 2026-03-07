@@ -3,12 +3,12 @@
 import { css } from '@emotion/react'
 import { useState, useEffect } from 'react'
 import { CheckCircle, Flame, ChevronDown, ChevronUp, Loader2, Target } from 'lucide-react'
-import { questions } from '@/data/questions'
+import { getQuestions } from '@/lib/questions'
+import type { Question } from '@/types/question'
 import { C, RADIUS } from '@/styles/tokens'
 
 // ─── Deterministic daily pick ─────────────────────────────────────────────────
 function getDayIndex() { return Math.floor(Date.now() / 86400000) }
-function getTodayQuestion() { return questions[getDayIndex() % questions.length] }
 function getTodayKey() { return `qotd_done_${getDayIndex()}` }
 function formatDate() {
   return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -196,22 +196,30 @@ const DIFF: Record<string, { color: string; bg: string; label: string }> = {
 interface Props { isPro: boolean }
 
 export default function QuestionOfTheDay({ isPro }: Props) {
-  const q   = getTodayQuestion()
   const key = getTodayKey()
+  const [q, setQ] = useState<Question | null>(null)
 
-  const [done, setDone]           = useState(false)
+  const [done, setDone]             = useState(false)
   const [answerOpen, setAnswerOpen] = useState(false)
-  const [evalOpen, setEvalOpen]   = useState(false)
+  const [evalOpen, setEvalOpen]     = useState(false)
   const [userAnswer, setUserAnswer] = useState('')
-  const [loading, setLoading]     = useState(false)
-  const [result, setResult]       = useState<EvalResult | null>(null)
+  const [loading, setLoading]       = useState(false)
+  const [result, setResult]         = useState<EvalResult | null>(null)
   const [showBetter, setShowBetter] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined') setDone(localStorage.getItem(key) === '1')
+    // Fetch all published theory questions, pick deterministically by day
+    getQuestions({ filters: { status: 'published', type: 'theory' }, pageSize: 200 })
+      .then(({ questions: all }) => {
+        if (all.length) setQ(all[getDayIndex() % all.length])
+      })
+      .catch(() => {})
   }, [key])
 
   function markDone() { localStorage.setItem(key, '1'); setDone(true) }
+
+  if (!q) return null  // loading, show nothing
 
   async function evaluate() {
     if (!userAnswer.trim() || loading) return
@@ -223,8 +231,8 @@ export default function QuestionOfTheDay({ isPro }: Props) {
           type: 'evaluate',
           messages: [{ role: 'user', content: userAnswer }],
           context: {
-            question: q.q,
-            idealAnswer: q.answer.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim(),
+            question: q?.title,
+            idealAnswer: (q?.answer ?? "").replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim(),
           },
         }),
       })
@@ -239,7 +247,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
     }
   }
 
-  const diffKey = q.tags.includes('adv') ? 'adv' : q.tags.includes('mid') ? 'mid' : 'core'
+  const diffKey = q.difficulty === 'advanced' || q.difficulty === 'expert' ? 'adv' : q.difficulty === 'core' ? 'mid' : 'core'
   const dm = DIFF[diffKey]
 
   return (
@@ -255,9 +263,9 @@ export default function QuestionOfTheDay({ isPro }: Props) {
 
       {/* ── Question ── */}
       <div css={qWrap}>
-        <p css={qText}>{q.q}</p>
+        <p css={qText}>{q.title}</p>
         <span css={diffBadge(dm.color, dm.bg)}>{dm.label}</span>
-        <span css={catBadge}>{q.cat}</span>
+        <span css={catBadge}>{q.category}</span>
       </div>
 
       {/* ── Action bar ── */}
@@ -376,7 +384,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
       {answerOpen && (
         <div css={answerSection}>
           {q.hint && <div css={hintBox}>💡 {q.hint}</div>}
-          <div css={answerBody} dangerouslySetInnerHTML={{ __html: q.answer }} />
+          <div css={answerBody} dangerouslySetInnerHTML={{ __html: q.answer ?? '' }} />
         </div>
       )}
 

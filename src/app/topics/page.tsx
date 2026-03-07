@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { pageMeta, breadcrumbSchema } from '@/lib/seo/seo'
-import { TOPICS } from '@/data/seo/topics'
+import { getPublishedTopics } from '@/lib/topics'
+import type { Topic } from '@/types/topic'
+
+export const revalidate = 3600
 
 export const metadata: Metadata = pageMeta({
   title: 'JavaScript Interview Topics — Practice by Concept | JSPrep Pro',
@@ -41,19 +44,20 @@ const CATEGORY_ORDER = [
   'Error Handling', 'Browser APIs',
 ]
 
-function groupTopics() {
-  const groups: Record<string, typeof TOPICS> = {}
+function groupTopics(topics: Topic[]) {
+  const groups: Record<string, Topic[]> = {}
   for (const cat of CATEGORY_ORDER) groups[cat] = []
-  for (const topic of TOPICS) {
+  for (const topic of topics) {
     if (groups[topic.category]) groups[topic.category].push(topic)
     else groups[topic.category] = [topic]
   }
   return groups
 }
 
-export default function TopicsPage() {
-  const groups = groupTopics()
-  const totalTopics = TOPICS.length
+export default async function TopicsPage() {
+  const topics = await getPublishedTopics()
+  const groups = groupTopics(topics)
+  const totalTopics = topics.length
 
   return (
     <>

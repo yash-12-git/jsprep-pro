@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { pageMeta, breadcrumbSchema } from '@/lib/seo/seo'
-import { BLOG_POSTS } from '@/data/seo/blogPosts'
+import { getPublishedBlogPosts } from '@/lib/blogPosts'
+
+export const revalidate = 3600
 
 export const metadata: Metadata = pageMeta({
   title: 'JavaScript Interview Blog — Tips, Guides & Practice',
@@ -10,7 +12,9 @@ export const metadata: Metadata = pageMeta({
   keywords: ['javascript interview blog', 'javascript tutorials', 'js interview tips'],
 })
 
-export default function BlogIndexPage() {
+export default async function BlogIndexPage() {
+  const posts = await getPublishedBlogPosts()
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbSchema([
@@ -40,7 +44,7 @@ export default function BlogIndexPage() {
         </header>
 
         <main style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {BLOG_POSTS.map(post => (
+          {posts.map(post => (
             <article key={post.slug}
               style={{ background: '#111118', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '1rem', padding: '1.5rem', transition: 'border-color 0.15s' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.625rem', flexWrap: 'wrap' }}>
@@ -64,7 +68,6 @@ export default function BlogIndexPage() {
           ))}
         </main>
 
-        {/* Newsletter-style CTA */}
         <section style={{ marginTop: '3rem', background: 'rgba(124,106,247,0.08)', border: '1px solid rgba(124,106,247,0.2)', borderRadius: '1.25rem', padding: '2rem', textAlign: 'center' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'white', marginBottom: '0.5rem' }}>
             Practice What You Learn

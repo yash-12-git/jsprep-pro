@@ -8,7 +8,7 @@ import { getDocs, collection, query, where } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 import { C, RADIUS } from '@/styles/tokens'
-import { PlusCircle, BookOpen, TrendingUp, Users, Eye, CheckCircle2, List } from 'lucide-react'
+import { PlusCircle, BookOpen, TrendingUp, Users, Eye, CheckCircle2, List, Layers, Newspaper, RefreshCw } from 'lucide-react'
 
 const S = {
   heading: css`font-size: 1.5rem; font-weight: 900; margin-bottom: 0.375rem;`,
@@ -80,34 +80,51 @@ interface Stats {
   theory: number
   output: number
   debug: number
+  topics: number
+  blogPosts: number
 }
 
 export default function AdminPage() {
   const { user } = useAuth()
-  const [stats, setStats] = useState<Stats>({ total: 0, published: 0, draft: 0, theory: 0, output: 0, debug: 0 })
+  const [stats, setStats] = useState<Stats>({ total: 0, published: 0, draft: 0, theory: 0, output: 0, debug: 0, topics: 0, blogPosts: 0 })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    console.log("admin page load");
-    
     async function load() {
-      try {
-        const snap = await getDocs(collection(db, 'questions'))
-                console.log(snap, "line95");
-        const docs = snap.docs.map(d => d.data())
-        
-        setStats({
-          total:     docs.length,
-          published: docs.filter(d => d.status === 'published').length,
-          draft:     docs.filter(d => d.status === 'draft').length,
-          theory:    docs.filter(d => d.type === 'theory').length,
-          output:    docs.filter(d => d.type === 'output').length,
-          debug:     docs.filter(d => d.type === 'debug').length,
-        })
-      } catch (err) {
-  console.error("Firestore load error:", err)
-}
-      finally { setLoading(false) }
+      setLoading(true)
+
+      // Load each collection independently — one missing/denied collection
+      // should never zero out the others.
+      const safeCount = async (col: string, filters?: Record<string, string>) => {
+        try {
+          const constraints = filters
+            ? Object.entries(filters).map(([k, v]) => where(k, '==', v))
+            : []
+          const snap = await getDocs(
+            constraints.length
+              ? query(collection(db, col), ...constraints)
+              : collection(db, col)
+          )
+          return snap.docs.length
+        } catch (e: any) {
+          console.warn(`[admin stats] ${col}:`, e.message)
+          return -1 // -1 = failed to load (shown as "—" in UI)
+        }
+      }
+
+      const [total, published, draft, theory, output, debug, topics, blogPosts] = await Promise.all([
+        safeCount('questions'),
+        safeCount('questions', { status: 'published' }),
+        safeCount('questions', { status: 'draft' }),
+        safeCount('questions', { type: 'theory' }),
+        safeCount('questions', { type: 'output' }),
+        safeCount('questions', { type: 'debug' }),
+        safeCount('topics'),
+        safeCount('blog_posts'),
+      ])
+
+      setStats({ total, published, draft, theory, output, debug, topics, blogPosts })
+      setLoading(false)
     }
     load()
   }, [])
@@ -122,12 +139,12 @@ export default function AdminPage() {
         {[
           { label: 'Total Questions', value: stats.total,     icon: BookOpen,     color: C.accent },
           { label: 'Published',       value: stats.published, icon: CheckCircle2, color: C.accent3 },
-          { label: 'Drafts',          value: stats.draft,     icon: Eye,          color: C.accent2 },
-          { label: 'Theory',          value: stats.theory,    icon: TrendingUp,   color: C.purple },
+          { label: 'Topics',          value: stats.topics,    icon: Layers,       color: C.purple },
+          { label: 'Blog Posts',      value: stats.blogPosts, icon: Newspaper,    color: C.accent2 },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} css={S.statCard}>
             <div css={S.statIcon(color)}><Icon size={15} color={color} /></div>
-            <div css={S.statValue(color)}>{loading ? '—' : value}</div>
+            <div css={S.statValue(color)}>{loading ? '…' : value < 0 ? '—' : value}</div>
             <div css={S.statLabel}>{label}</div>
           </div>
         ))}
@@ -139,17 +156,32 @@ export default function AdminPage() {
         <Link href="/admin/questions/new" css={S.actionCard(C.accent)}>
           <PlusCircle size={20} color={C.accent} />
           <div css={S.actionTitle}>Add Question</div>
-          <div css={S.actionDesc}>Create a new theory, output, or debug question</div>
+          <div css={S.actionDesc}>Create a theory, output, or debug question</div>
         </Link>
-        <Link href="/admin/questions" css={S.actionCard(C.accent2)}>
-          <List size={20} color={C.accent2} />
-          <div css={S.actionTitle}>Manage Questions</div>
-          <div css={S.actionDesc}>Edit, delete, publish, or archive questions</div>
+        <Link href="/admin/topics" css={S.actionCard(C.purple)}>
+          <Layers size={20} color={C.purple} />
+          <div css={S.actionTitle}>Manage Topics</div>
+          <div css={S.actionDesc}>Edit topic pages, cheat sheets, interview tips</div>
         </Link>
-        <Link href="/admin/seed" css={S.actionCard(C.accent3)}>
-          <Users size={20} color={C.accent3} />
-          <div css={S.actionTitle}>Seed / Import</div>
-          <div css={S.actionDesc}>Migrate existing .ts questions to Firestore</div>
+        <Link href="/admin/blog" css={S.actionCard(C.accent2)}>
+          <Newspaper size={20} color={C.accent2} />
+          <div css={S.actionTitle}>Manage Blog</div>
+          <div css={S.actionDesc}>Write posts, link them to topic pages</div>
+        </Link>
+        <Link href="/admin/migrate" css={S.actionCard(C.accent3)}>
+          <RefreshCw size={20} color={C.accent3} />
+          <div css={S.actionTitle}>Migrate Content</div>
+          <div css={S.actionDesc}>Import static .ts topics + blog posts to Firestore</div>
+        </Link>
+        <Link href="/admin/questions" css={S.actionCard(C.muted)}>
+          <List size={20} color={C.muted} />
+          <div css={S.actionTitle}>All Questions</div>
+          <div css={S.actionDesc}>Edit, delete, publish, archive questions</div>
+        </Link>
+        <Link href="/admin/seed" css={S.actionCard('rgba(255,255,255,0.2)')}>
+          <Users size={20} color="rgba(255,255,255,0.4)" />
+          <div css={S.actionTitle}>Seed Questions</div>
+          <div css={S.actionDesc}>Migrate question .ts files to Firestore</div>
         </Link>
       </div>
 
@@ -163,7 +195,7 @@ export default function AdminPage() {
           { label: 'Coding',  value: 0,            color: C.purple },
         ].map(({ label, value, color }) => (
           <div key={label} css={S.statCard}>
-            <div css={S.statValue(color)}>{loading ? '—' : value}</div>
+            <div css={S.statValue(color)}>{loading ? '…' : value < 0 ? '—' : value}</div>
             <div css={S.statLabel}>{label}</div>
           </div>
         ))}

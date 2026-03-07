@@ -4,15 +4,17 @@ import { css } from '@emotion/react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
-import { TOPICS } from '@/data/seo/topics'
+import { getPublishedTopics } from '@/lib/topics'
+import type { Topic } from '@/types/topic'
 import Navbar from '@/components/layout/Navbar'
+import PaywallBanner from '@/components/ui/PaywallBanner/page'
 import { ChevronLeft, ChevronDown, ChevronUp, Printer, Target, Lightbulb, BookOpen } from 'lucide-react'
 import * as Shared from '@/styles/shared'
 import { C, RADIUS } from '@/styles/tokens'
 
 // ─── Group topics by category ─────────────────────────────────────────────────
-type CategoryMap = Record<string, typeof TOPICS>
-function groupByCategory(topics: typeof TOPICS): CategoryMap {
+type CategoryMap = Record<string, Topic[]>
+function groupByCategory(topics: Topic[]): CategoryMap {
   return topics.reduce<CategoryMap>((acc, t) => {
     if (!acc[t.category]) acc[t.category] = []
     acc[t.category].push(t)
@@ -173,6 +175,8 @@ export default function CheatSheetPage() {
   const { user, progress, loading } = useAuth()
   const router = useRouter()
 
+  const [topics, setTopics] = useState<Topic[]>([])
+  const [topicsLoading, setTopicsLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState('All')
   const [openTopics, setOpenTopics] = useState<Set<string>>(new Set())
 
@@ -180,7 +184,16 @@ export default function CheatSheetPage() {
     if (!loading && !user) router.push('/auth')
   }, [user, loading, router])
 
-  if (loading || !user || !progress) return (
+  useEffect(() => {
+  async function load() {
+    const data = await getPublishedTopics()
+    setTopics(data)
+    setTopicsLoading(false)
+  }
+  load()
+}, [])
+
+  if (loading || !user || !progress || topicsLoading) return (
     <div css={Shared.spinner}><div css={Shared.spinnerDot} /></div>
   )
 
@@ -204,10 +217,10 @@ export default function CheatSheetPage() {
   )
 
   // Categories for filter
-  const allCategories = [...new Set(TOPICS.map(t => t.category))]
+  const allCategories = [...new Set(topics.map(t => t.category))]
   const filtered = activeFilter === 'All'
-    ? TOPICS
-    : TOPICS.filter(t => t.category === activeFilter)
+    ? topics
+    : topics.filter(t => t.category === activeFilter)
 
   const grouped = groupByCategory(filtered)
 
@@ -219,7 +232,7 @@ export default function CheatSheetPage() {
     })
   }
 
-  function expandAll() { setOpenTopics(new Set(filtered.map(t => t.slug))) }
+  function expandAll() { setOpenTopics(new Set(filtered.map((t: Topic) => t.slug))) }
   function collapseAll() { setOpenTopics(new Set()) }
 
   const totalTopics = filtered.length

@@ -1,10 +1,8 @@
 import { MetadataRoute } from 'next'
-import { CATEGORIES, questions } from '@/data/questions'
-import { BLOG_POSTS } from '@/data/seo/blogPosts'
+import { getPublishedBlogPosts, getBlogPostSlugs } from '@/lib/blogPosts'
+import { getTopicSlugs } from '@/lib/topics'
+import { getPublishedQuestionSlugs, getPublishedCategories } from '@/lib/questions'
 import { catToSlug, SITE } from '@/lib/seo/seo'
-import { TOPICS } from '@/data/seo/topics'
-
-// ─── Slug helper (must match /q/[slug]/page.tsx) ──────────────────────────────
 
 function toSlug(text: string): string {
   return text
@@ -14,10 +12,16 @@ function toSlug(text: string): string {
     .slice(0, 80)
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date().toISOString()
 
-  // ── Static pages ──────────────────────────────────────────────────────────
+  const [topicSlugs, blogPosts, questionSlugs, categories] = await Promise.all([
+    getTopicSlugs().catch(() => [] as string[]),
+    getPublishedBlogPosts().catch(() => []),
+    getPublishedQuestionSlugs().catch(() => [] as string[]),
+    getPublishedCategories().catch(() => [] as string[]),
+  ])
+
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE.domain,                                       lastModified: now, changeFrequency: 'weekly',  priority: 1.0  },
     { url: `${SITE.domain}/javascript-interview-questions`,   lastModified: now, changeFrequency: 'weekly',  priority: 0.95 },
@@ -28,35 +32,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE.domain}/debug-lab`,                        lastModified: now, changeFrequency: 'weekly',  priority: 0.8  },
   ]
 
-  // ── Topic pages — strong "interview questions" intent, high priority ───────
-  const topicPages: MetadataRoute.Sitemap = TOPICS.map(t => ({
-    url: `${SITE.domain}/${t.slug}`,
+  const topicPages: MetadataRoute.Sitemap = topicSlugs.map(slug => ({
+    url: `${SITE.domain}/${slug}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.9,
   }))
 
-  // ── Category question hubs ─────────────────────────────────────────────────
-  const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map(cat => ({
+  const categoryPages: MetadataRoute.Sitemap = categories.map(cat => ({
     url: `${SITE.domain}/questions/${catToSlug(cat)}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.85,
   }))
 
-  // ── Individual question pages — long-tail SEO goldmine ────────────────────
-  // Each question gets its own URL: /q/what-is-hoisting-in-javascript
-  const questionPages: MetadataRoute.Sitemap = questions.map(q => ({
-    url: `${SITE.domain}/q/${toSlug(q.q)}`,
+  const questionPages: MetadataRoute.Sitemap = questionSlugs.map(slug => ({
+    url: `${SITE.domain}/q/${slug}`,
     lastModified: now,
     changeFrequency: 'monthly' as const,
     priority: 0.75,
   }))
 
-  // ── Blog posts ─────────────────────────────────────────────────────────────
-  const blogPages: MetadataRoute.Sitemap = BLOG_POSTS.map(post => ({
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map(post => ({
     url: `${SITE.domain}/blog/${post.slug}`,
-    lastModified: new Date(post.modifiedAt).toISOString(),
+    lastModified: new Date(post.modifiedAt ?? post.publishedAt ?? now).toISOString(),
     changeFrequency: 'monthly' as const,
     priority: 0.8,
   }))

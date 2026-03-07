@@ -1,29 +1,27 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Layers, Newspaper, ArrowRight, BookOpen, Clock, Zap } from 'lucide-react'
-import { TOPICS } from '@/data/seo/topics'
-import { BLOG_POSTS } from '@/data/seo/blogPosts'
+import { Layers, Newspaper, ArrowRight, Clock } from 'lucide-react'
+import { getPublishedTopics } from '@/lib/topics'
+import { getPublishedBlogPosts } from '@/lib/blogPosts'
+import type { Topic } from '@/types/topic'
+import type { BlogPost } from '@/types/blogPost'
+
+const FEATURED_SLUGS = [
+  'javascript-closure-interview-questions',
+  'javascript-hoisting-interview-questions',
+  'javascript-event-loop-interview-questions',
+  'javascript-prototype-interview-questions',
+  'javascript-this-keyword-interview-questions',
+  'javascript-promise-interview-questions',
+]
 
 const C = {
   card: '#111118',
   border: 'rgba(255,255,255,0.07)',
   muted: 'rgba(255,255,255,0.4)',
 }
-
-// Pick a curated subset to show — most beginner-friendly first
-const FEATURED_TOPICS = TOPICS.filter(t =>
-  ['javascript-closure-interview-questions',
-   'javascript-hoisting-interview-questions',
-   'javascript-event-loop-interview-questions',
-   'javascript-prototype-interview-questions',
-   'javascript-this-keyword-interview-questions',
-   'javascript-promise-interview-questions',
-  ].includes(t.slug)
-).slice(0, 4)
-
-// Latest 3 blog posts
-const FEATURED_POSTS = BLOG_POSTS.slice(0, 3)
 
 const DIFF_COLOR: Record<string, string> = {
   Beginner: '#4ade80',
@@ -225,6 +223,21 @@ const arrowStyle = css`
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function LearnSection() {
+  const [featuredTopics, setFeaturedTopics] = useState<Topic[]>([])
+  const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([])
+
+  useEffect(() => {
+    getPublishedTopics().then(all => {
+      const featured = all
+        .filter(t => FEATURED_SLUGS.includes(t.slug))
+        .slice(0, 4)
+      setFeaturedTopics(featured)
+    }).catch(() => {})
+
+    getPublishedBlogPosts().then(all => {
+      setFeaturedPosts(all.slice(0, 3))
+    }).catch(() => {})
+  }, [])
   return (
     <div>
       {/* ── Interview Topics ── */}
@@ -240,7 +253,7 @@ export default function LearnSection() {
         </div>
 
         <div css={topicsGrid}>
-          {FEATURED_TOPICS.map(topic => {
+          {featuredTopics.map(topic => {
             const color = DIFF_COLOR[topic.difficulty] ?? '#fbbf24'
             const shortTitle = topic.title
               .replace('JavaScript ', '')
@@ -281,7 +294,7 @@ export default function LearnSection() {
         </div>
 
         <div css={blogList}>
-          {FEATURED_POSTS.map(post => (
+          {featuredPosts.map(post => (
             <Link key={post.slug} href={`/blog/${post.slug}`} css={blogCard}>
               <div css={blogAccentBar(post.accentColor)} />
               <div css={blogInfo}>

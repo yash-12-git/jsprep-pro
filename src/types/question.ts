@@ -47,6 +47,10 @@ export interface Question {
   fixedCode?: string
   bugDescription?: string
 
+  // Linking fields — connect questions to topics and blog posts
+  topicSlug?: string         // Foreign key → topics.slug (e.g. 'javascript-closure-interview-questions')
+  relatedBlogSlugs?: string[] // Slugs of blog posts that explain this question in depth
+
   // Metadata
   status: QuestionStatus
   isPro: boolean           // false = free tier, true = pro only
