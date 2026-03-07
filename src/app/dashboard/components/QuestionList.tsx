@@ -1,83 +1,65 @@
 /** @jsxImportSource @emotion/react */
 'use client'
 
-import { css, keyframes } from '@emotion/react'
-import { C, RADIUS } from '@/styles/tokens'
+import { useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import * as S from '@/app/dashboard/styles'
 import QuestionCard from './QuestionCard'
 import type { Question } from '@/types/question'
 import type { UserProgress } from '@/lib/userProgress'
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface ProgressIds {
+  mastered:   Set<string>
+  bookmarked: Set<string>
+  solved:     Set<string>
+}
+
 interface Props {
-  questions: Question[]
-  loading: boolean
-  error: string | null
-  progress: UserProgress
-  progressIds: {
-    mastered: Set<string>
-    bookmarked: Set<string>
-    solved: Set<string>
+  questions:   Question[]
+  loading:     boolean
+  error:       string | null
+  progress:    UserProgress
+  progressIds: ProgressIds
+  onMastered:  (id: string) => void
+  onBookmark:  (id: string) => void
+  onNeedsPro:  (reason: string) => void
+}
+
+const PAGE_SIZE = 15
+
+// ─── Pagination helper ────────────────────────────────────────────────────────
+// Returns page numbers with 'gap' sentinels for ellipsis rendering.
+function buildPages(current: number, total: number): (number | 'gap')[] {
+  const pages: (number | 'gap')[] = []
+  const visible = new Set<number>()
+
+  visible.add(1)
+  visible.add(total)
+  for (let d = -1; d <= 1; d++) {
+    const p = current + d
+    if (p >= 1 && p <= total) visible.add(p)
   }
-  onMastered: (id: string) => void
-  onBookmark: (id: string) => void
-  onNeedsPro: (reason: string) => void
+
+  const sorted = [...visible].sort((a, b) => a - b)
+  sorted.forEach((p, i) => {
+    if (i > 0 && p - sorted[i - 1] > 1) pages.push('gap')
+    pages.push(p)
+  })
+  return pages
 }
 
-const shimmer = keyframes`
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-`
-
-const S = {
-  list: css`
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  `,
-
-  skeleton: css`
-    height: 4.5rem;
-    background: ${C.card};
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: ${RADIUS.xxl};
-    background-image: linear-gradient(
-      90deg,
-      rgba(255,255,255,0.02) 0px,
-      rgba(255,255,255,0.05) 80px,
-      rgba(255,255,255,0.02) 160px
-    );
-    background-size: 400px 100%;
-    animation: ${shimmer} 1.4s linear infinite;
-  `,
-
-  empty: css`
-    text-align: center;
-    padding: 4rem 1rem;
-    color: ${C.muted};
-  `,
-
-  emptyTitle: css`
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 0.5rem;
-  `,
-
-  error: css`
-    padding: 1.25rem;
-    background: ${C.danger}12;
-    border: 1px solid ${C.danger}33;
-    border-radius: ${RADIUS.xl};
-    color: ${C.danger};
-    font-size: 0.875rem;
-    text-align: center;
-  `,
-}
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function QuestionList({
   questions, loading, error,
   progress, progressIds,
   onMastered, onBookmark, onNeedsPro,
 }: Props) {
+  const [page, setPage] = useState(1)
+
+  // ── Loading skeleton ──
   if (loading) {
     return (
       <div css={S.list}>
@@ -88,39 +70,104 @@ export default function QuestionList({
     )
   }
 
+  // ── Error ──
   if (error) {
     return (
-      <div css={S.error}>
+      <div css={S.errorBox}>
         Failed to load questions: {error}. Check your Firestore connection.
       </div>
     )
   }
 
+  // ── Empty ──
   if (questions.length === 0) {
     return (
-      <div css={S.empty}>
+      <div css={S.emptyState}>
         <p css={S.emptyTitle}>No questions match your filters</p>
-        <p>Try adjusting the category, difficulty, or search term.</p>
+        <p>Try adjusting the category or difficulty.</p>
       </div>
     )
   }
 
+  const totalPages = Math.ceil(questions.length / PAGE_SIZE)
+  // Clamp page if questions list shrank (e.g. after a filter change with key reset)
+  const safePage  = Math.min(page, totalPages)
+  const paginated = questions.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+
+  function goPage(n: number) {
+    setPage(n)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const pageList = buildPages(safePage, totalPages)
+
   return (
-    <div css={S.list}>
-      {questions.map((q, i) => (
-        <QuestionCard
-          key={q.id}
-          question={q}
-          index={i}
-          isMastered={progressIds.mastered.has(q.id)}
-          isBookmarked={progressIds.bookmarked.has(q.id)}
-          isSolved={progressIds.solved.has(q.id)}
-          isPro={progress.isPro}
-          onMastered={() => onMastered(q.id)}
-          onBookmark={() => onBookmark(q.id)}
-          onNeedsPro={onNeedsPro}
-        />
-      ))}
+    <div>
+      {/* Meta row */}
+      <div css={S.listHeader}>
+        <span>
+          <span css={S.listHeaderCount}>{questions.length}</span>
+          {' '}question{questions.length !== 1 ? 's' : ''}
+        </span>
+        {totalPages > 1 && (
+          <span>Page {safePage} / {totalPages}</span>
+        )}
+      </div>
+
+      {/* Cards */}
+      <div css={S.list}>
+        {paginated.map((q, i) => (
+          <QuestionCard
+            key={q.id}
+            question={q}
+            index={(safePage - 1) * PAGE_SIZE + i}
+            isMastered={progressIds.mastered.has(q.id)}
+            isBookmarked={progressIds.bookmarked.has(q.id)}
+            isSolved={progressIds.solved.has(q.id)}
+            isPro={progress.isPro}
+            onMastered={() => onMastered(q.id)}
+            onBookmark={() => onBookmark(q.id)}
+            onNeedsPro={onNeedsPro}
+          />
+        ))}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div css={S.pagination}>
+          <button
+            css={S.pageBtn(safePage > 1)}
+            disabled={safePage <= 1}
+            onClick={() => goPage(safePage - 1)}
+          >
+            <ChevronLeft size={14} /> Prev
+          </button>
+
+          <div css={S.pageDots}>
+            {pageList.map((p, i) =>
+              p === 'gap' ? (
+                <span key={`gap-${i}`} css={S.pageEllipsis}>…</span>
+              ) : (
+                <button
+                  key={p}
+                  css={S.pageNum(p === safePage)}
+                  onClick={() => goPage(p)}
+                >
+                  {p}
+                </button>
+              )
+            )}
+          </div>
+
+          <button
+            css={S.pageBtn(safePage < totalPages)}
+            disabled={safePage >= totalPages}
+            onClick={() => goPage(safePage + 1)}
+          >
+            Next <ChevronRight size={14} />
+          </button>
+        </div>
+      )}
     </div>
   )
 }
