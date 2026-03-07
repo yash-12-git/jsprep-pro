@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { pageMeta, faqSchema, breadcrumbSchema, catToSlug, SITE } from '@/lib/seo/seo'
 import { questions, CATEGORIES } from '@/data/questions'
+import InlineEvaluator from '@/components/ui/InlineEvaluater'
 
 interface Props { params: { slug: string } }
 
@@ -165,50 +166,12 @@ export default function QuestionPage({ params }: Props) {
           />
         </section>
 
-        {/* ── Interview tips CTA ── */}
-        <section style={{
-          padding: '1.5rem',
-          background: 'linear-gradient(135deg, rgba(124,106,247,0.12), rgba(106,247,192,0.06))',
-          border: '1px solid rgba(124,106,247,0.25)',
-          borderRadius: '1.25rem',
-          marginBottom: '3rem',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, minWidth: 220 }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'white', marginBottom: '0.375rem' }}>
-                Can you explain this out loud?
-              </h3>
-              <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.65 }}>
-                Reading the answer isn't enough. Real interviews test whether you can explain it clearly under pressure.
-                Practice with AI feedback — get scored on accuracy, depth, and clarity.
-              </p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flexShrink: 0 }}>
-              <Link href="/auth" style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                padding: '0.625rem 1.25rem',
-                background: '#7c6af7', color: 'white',
-                borderRadius: '0.75rem', fontWeight: 800,
-                textDecoration: 'none', fontSize: '0.875rem',
-                whiteSpace: 'nowrap',
-              }}>
-                Practice Free →
-              </Link>
-              <Link href={`/questions/${catSlug}`} style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                padding: '0.5rem 1.25rem',
-                background: 'rgba(255,255,255,0.05)',
-                color: 'rgba(255,255,255,0.6)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '0.75rem', fontWeight: 700,
-                textDecoration: 'none', fontSize: '0.8125rem',
-                whiteSpace: 'nowrap',
-              }}>
-                More {question.cat} Questions
-              </Link>
-            </div>
-          </div>
-        </section>
+        {/* ── Inline AI Evaluator ── */}
+        <InlineEvaluator
+          question={question.q}
+          idealAnswer={question.answer.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()}
+          label="Can you explain this out loud?"
+        />
 
         {/* ── Related questions ── */}
         {related.length > 0 && (
