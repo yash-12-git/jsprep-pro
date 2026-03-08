@@ -1,14 +1,15 @@
 /** @jsxImportSource @emotion/react */
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { css } from '@emotion/react'
 import { Save, Eye, EyeOff, Loader2, Trash2, CheckCircle } from 'lucide-react'
 import { C, RADIUS, BP } from '@/styles/tokens'
 import MarkdownEditor from '@/components/md/MarkdownEditor'
 import MarkdownRenderer from '@/components/md/MarkdownRenderer'
 import type { Question, QuestionInput, QuestionType, Difficulty, Track, QuestionStatus } from '@/types/question'
-import { CATEGORIES } from '@/data/questions'
+import { getPublishedTopics } from '@/lib/topics'
+import type { Topic } from '@/types/topic'
 
 export type FormMode = 'create' | 'edit'
 
@@ -256,6 +257,7 @@ const EMPTY: QuestionInput = {
   category: '', tags: [], difficulty: 'core',
   expectedOutput: '', brokenCode: '', fixedCode: '', bugDescription: '',
   status: 'draft', isPro: false, order: 0,
+  topicSlug: '', relatedBlogSlugs: [],
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -268,6 +270,14 @@ export default function QuestionForm({ mode, initial = {}, onSubmit, onDelete }:
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [topics, setTopics] = useState<Topic[]>([])
+
+  // Load available topics for the dropdown
+  useEffect(() => {
+    getPublishedTopics()
+      .then(setTopics)
+      .catch(() => {/* topics not critical — form still works */})
+  }, [])
 
   function set<K extends keyof QuestionInput>(key: K, val: QuestionInput[K]) {
     setForm(f => {
@@ -314,8 +324,6 @@ export default function QuestionForm({ mode, initial = {}, onSubmit, onDelete }:
   }
 
   const isOutputOrDebug = form.type === 'output' || form.type === 'debug'
-
-  const categories = CATEGORIES.map(c => <option key={c} value={c}>{c.toLowerCase()}</option>)
 
   return (
     <form onSubmit={handleSubmit} css={S.wrap}>
@@ -364,9 +372,11 @@ export default function QuestionForm({ mode, initial = {}, onSubmit, onDelete }:
       <div css={S.row}>
         <div>
           <label css={S.label}>Category <span css={S.required}>*</span></label>
-          <select css={S.select} value={form.category} onChange={e => set('category', e.target.value)}>
-            {categories}
-          </select>
+          <input
+            css={S.input} value={form.category}
+            onChange={e => set('category', e.target.value)}
+            placeholder="e.g. Closures, Event Loop, Promises"
+          />
         </div>
         <div>
           <label css={S.label}>Slug (URL)</label>
@@ -376,6 +386,38 @@ export default function QuestionForm({ mode, initial = {}, onSubmit, onDelete }:
             placeholder="auto-generated from title"
           />
         </div>
+      </div>
+
+      {/* Topic link */}
+      <div css={S.field}>
+        <label css={S.label}>
+          Topic Page
+          <span css={{ color: C.muted, fontWeight: 500, textTransform: 'none', letterSpacing: 0, marginLeft: '0.5rem' }}>
+            — question appears on this topic's /[slug] page
+          </span>
+        </label>
+        <select
+          css={S.select}
+          value={form.topicSlug ?? ''}
+          onChange={e => set('topicSlug', e.target.value)}
+        >
+          <option value="">— no topic assigned —</option>
+          {topics.map(t => (
+            <option key={t.slug} value={t.slug}>
+              {t.keyword} — {t.category}
+            </option>
+          ))}
+        </select>
+        {topics.length === 0 && (
+          <p style={{ margin: '6px 0 0', fontSize: '0.75rem', color: '#fbbf24' }}>
+            ⚠ No published topics found. Publish topics in Admin → Topics first.
+          </p>
+        )}
+        {topics.length > 0 && !form.topicSlug && (
+          <p style={{ margin: '6px 0 0', fontSize: '0.75rem', color: '#6b7280' }}>
+            Tip: use Admin → Tag Questions to assign topics to many questions at once.
+          </p>
+        )}
       </div>
 
       <div css={S.row3}>

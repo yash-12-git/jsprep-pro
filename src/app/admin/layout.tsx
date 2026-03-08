@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { isAdmin } from '@/lib/admin'
 import { css } from '@emotion/react'
 import { C, RADIUS, BP } from '@/styles/tokens'
-import { LayoutDashboard, PlusCircle, List, Database, LogOut, ShieldAlert, BookOpen, Layers, Newspaper, RefreshCw } from 'lucide-react'
+import { LayoutDashboard, PlusCircle, List, Database, LogOut, ShieldAlert, BookOpen, Layers, Newspaper, RefreshCw, Tag } from 'lucide-react'
 import * as Shared from '@/styles/shared'
 
 const S = {
@@ -129,6 +129,7 @@ const NAV_ITEMS = [
   { href: '/admin',                  label: 'Overview',      icon: LayoutDashboard, exact: true,  section: 'Overview' },
   { href: '/admin/questions',        label: 'Questions',     icon: List,            section: 'Content' },
   { href: '/admin/questions/new',    label: 'Add Question',  icon: PlusCircle,      section: 'Content' },
+  { href: '/admin/tag-questions',    label: 'Tag Questions', icon: Tag,             section: 'Content' },
   { href: '/admin/topics',           label: 'Topics',        icon: Layers,          section: 'Content' },
   { href: '/admin/blog',             label: 'Blog Posts',    icon: Newspaper,       section: 'Content' },
   { href: '/admin/seed',             label: 'Seed Questions',icon: Database,        section: 'Tools' },

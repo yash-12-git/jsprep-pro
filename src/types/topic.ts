@@ -22,6 +22,12 @@ export interface Topic {
   interviewTips: string[]        // Numbered tips shown in the interview tips card
   related: string[]              // Slugs of related topic pages to cross-link
 
+  // ── Concept Hub fields (the "best explanation on the internet" layer) ────────
+  mentalModel?: string           // 1–3 sentence analogy that makes the concept click
+  deepDive?: string              // Full HTML explanation — progressive examples, visuals
+  misconceptions?: string[]      // Each item: "Many devs think X — but actually Y"
+  realWorldExamples?: string[]   // "React useState relies on closures because..."
+
   // Linking fields
   relatedBlogSlugs?: string[]    // Slugs of blog posts that cover this topic
 

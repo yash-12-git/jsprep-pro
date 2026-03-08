@@ -268,7 +268,12 @@ export default function BlogForm({ mode, initial = {}, onSubmit, onDelete }: Pro
     if (!form.content.trim()) { setError('Content is required'); return }
     setSaving(true); setError(null); setSuccess(false)
     try {
-      await onSubmit(form)
+      // Auto-sync: ensure primary topic is always in relatedTopicSlugs.
+      // getBlogPostsForTopic queries relatedTopicSlugs — primary topic alone does nothing.
+      const syncedRelated = form.topicSlug && !form.relatedTopicSlugs.includes(form.topicSlug)
+        ? [form.topicSlug, ...form.relatedTopicSlugs]
+        : form.relatedTopicSlugs
+      await onSubmit({ ...form, relatedTopicSlugs: syncedRelated })
       setSuccess(true)
       if (mode === 'create') setForm(EMPTY)
       setTimeout(() => setSuccess(false), 4000)

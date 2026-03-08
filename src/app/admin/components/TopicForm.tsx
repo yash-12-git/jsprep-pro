@@ -178,6 +178,7 @@ const EMPTY: TopicInput = {
   extraKeywords: [], difficulty: 'Intermediate', questionCount: '4–8',
   cheatSheet: [''], interviewTips: [''], related: [],
   relatedBlogSlugs: [], status: 'draft', order: 0,
+  mentalModel: '', deepDive: '', misconceptions: [], realWorldExamples: [],
 }
 
 // ─── Array editor — reusable for cheatSheet, interviewTips, related, etc ───────
@@ -379,6 +380,53 @@ export default function TopicForm({ mode, initial = {}, onSubmit, onDelete }: Pr
 
       <hr css={S.divider} />
 
+      {/* ── Concept Hub (optional — the "best explanation on the internet" layer) ── */}
+      <div css={S.sectionLabel}>Concept Hub <span style={{ fontWeight: 400, fontSize: '0.75rem', opacity: 0.5 }}>(optional — fills in the deep explanation sections)</span></div>
+
+      <div>
+        <label css={S.label}>
+          Mental Model
+          <span css={S.labelNote}>One analogy that makes the concept instantly click. e.g. "A closure is like a backpack…"</span>
+        </label>
+        <textarea
+          css={S.textarea}
+          rows={3}
+          value={form.mentalModel ?? ''}
+          onChange={e => set('mentalModel', e.target.value)}
+          placeholder="When you create a function inside another function, JavaScript gives it a backpack. It packs up every variable it can see and carries it everywhere, even after the outer function is gone."
+        />
+      </div>
+
+      <div>
+        <label css={S.label}>
+          Deep Explanation (HTML)
+          <span css={S.labelNote}>Full explanation with code examples. Use &lt;h3&gt;, &lt;p&gt;, &lt;pre&gt;&lt;code&gt; tags.</span>
+        </label>
+        <textarea
+          css={S.textarea}
+          rows={12}
+          value={form.deepDive ?? ''}
+          onChange={e => set('deepDive', e.target.value)}
+          placeholder="<h3>Why closures exist</h3><p>JavaScript uses lexical scoping…</p><pre><code>function outer() { … }</code></pre>"
+        />
+      </div>
+
+      <ArrayEditor
+        label="Common Misconceptions"
+        values={form.misconceptions ?? []}
+        onChange={v => set('misconceptions', v)}
+        placeholder="Many devs think closures copy the variable value — but they hold a reference. If the variable changes, the closure sees the new value."
+      />
+
+      <ArrayEditor
+        label="Real-World Examples"
+        values={form.realWorldExamples ?? []}
+        onChange={v => set('realWorldExamples', v)}
+        placeholder="React's useState hook — the updater function closes over the current state value, which is why stale closures happen in useEffect."
+      />
+
+      <hr css={S.divider} />
+
       {/* ── Linking ── */}
       <div css={S.sectionLabel}>Linking</div>
 
@@ -387,13 +435,6 @@ export default function TopicForm({ mode, initial = {}, onSubmit, onDelete }: Pr
         values={form.related}
         onChange={v => set('related', v)}
         placeholder="javascript-scope-interview-questions"
-      />
-
-      <ArrayEditor
-        label="Related Blog Post Slugs"
-        values={form.relatedBlogSlugs ?? []}
-        onChange={v => set('relatedBlogSlugs', v)}
-        placeholder="javascript-closures-deep-dive"
       />
 
       <ArrayEditor
