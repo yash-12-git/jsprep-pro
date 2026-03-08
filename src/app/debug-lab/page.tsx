@@ -126,7 +126,6 @@ export default function DebugLabPage() {
 
   return (
     <>
-      <Navbar />
       {showPaywall && (
         <PaywallBanner
           reason={`Free users get ${FREE_DEBUG_LIMIT} debug challenges. Upgrade for all + AI checking!`}

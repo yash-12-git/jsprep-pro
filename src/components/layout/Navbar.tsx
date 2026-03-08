@@ -1,66 +1,116 @@
 /** @jsxImportSource @emotion/react */
-'use client'
-import Link from 'next/link'
-import Image from 'next/image'
-import { usePathname } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth'
+"use client";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import {
-  Zap, BookOpen, BarChart2, Brain, LogOut, Mic, Map,
-  FileDown, ChevronDown, Code2, Bug, Menu, X, Newspaper, Layers
-} from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
-import * as S from './styles'
+  Zap,
+  BookOpen,
+  BarChart2,
+  Brain,
+  LogOut,
+  Mic,
+  Map,
+  FileDown,
+  ChevronDown,
+  Code2,
+  Bug,
+  Menu,
+  X,
+  Newspaper,
+  Layers,
+  ArrowRight,
+} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import * as S from "./styles";
+
+// Marketing nav links shown to logged-out visitors
+const MARKETING_LINKS = [
+  { href: "/#features", label: "Features" },
+  { href: "/#practice", label: "Practice" },
+  { href: "/topics", label: "Topics" },
+  { href: "/blog", label: "Blog" },
+  { href: "/#pricing", label: "Pricing" },
+];
 
 export default function Navbar() {
-  const { user, progress, logout } = useAuth()
-  const path = usePathname()
-  const [aiMenuOpen, setAiMenuOpen] = useState(false)
-  const [learnMenuOpen, setLearnMenuOpen] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
-  const learnRef = useRef<HTMLDivElement>(null)
+  const { user, progress, logout } = useAuth();
+  const path = usePathname();
+  const [aiMenuOpen, setAiMenuOpen] = useState(false);
+  const [learnMenuOpen, setLearnMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const learnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setAiMenuOpen(false)
+        setAiMenuOpen(false);
       }
       if (learnRef.current && !learnRef.current.contains(e.target as Node)) {
-        setLearnMenuOpen(false)
+        setLearnMenuOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
-  useEffect(() => { setMobileOpen(false) }, [path])
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [path]);
 
   const mainLinks = [
-    { href: '/dashboard', label: 'Questions', icon: BookOpen },
-    { href: '/output-quiz', label: 'Output', icon: Code2 },
-    { href: '/debug-lab', label: 'Debug', icon: Bug },
-    { href: '/quiz', label: 'Quiz', icon: Brain, pro: true },
-    { href: '/analytics', label: 'Analytics', icon: BarChart2, pro: true },
-  ]
+    { href: "/dashboard", label: "Questions", icon: BookOpen },
+    { href: "/output-quiz", label: "Output", icon: Code2 },
+    { href: "/debug-lab", label: "Debug", icon: Bug },
+    { href: "/quiz", label: "Quiz", icon: Brain, pro: true },
+    { href: "/analytics", label: "Analytics", icon: BarChart2, pro: true },
+  ];
 
   const aiLinks = [
-    { href: '/mock-interview', label: 'Mock Interview', icon: Mic, desc: 'AI interviewer' },
-    { href: '/study-plan', label: 'Study Plan', icon: Map, desc: 'Weak spot detection' },
-    { href: '/cheatsheet', label: 'Cheat Sheet', icon: FileDown, desc: 'Printable PDF' },
-  ]
+    {
+      href: "/mock-interview",
+      label: "Mock Interview",
+      icon: Mic,
+      desc: "AI interviewer",
+    },
+    {
+      href: "/study-plan",
+      label: "Study Plan",
+      icon: Map,
+      desc: "Weak spot detection",
+    },
+    {
+      href: "/cheatsheet",
+      label: "Cheat Sheet",
+      icon: FileDown,
+      desc: "Printable PDF",
+    },
+  ];
 
   const learnLinks = [
-    { href: '/topics', label: 'Interview Topics', icon: Layers, desc: '36 concept pages' },
-    { href: '/blog',   label: 'Blog',             icon: Newspaper, desc: 'Deep dives & guides' },
-  ]
+    {
+      href: "/topics",
+      label: "Interview Topics",
+      icon: Layers,
+      desc: "36 concept pages",
+    },
+    {
+      href: "/blog",
+      label: "Blog",
+      icon: Newspaper,
+      desc: "Deep dives & guides",
+    },
+  ];
 
-  const isLearnActive = learnLinks.some(l => path.startsWith(l.href))
+  const isLearnActive = learnLinks.some((l) => path.startsWith(l.href));
+  const isAiActive = aiLinks.some((l) => path === l.href);
 
   return (
     <>
       <nav css={S.nav}>
         <div css={S.navInner}>
-
           <Link href="/" css={S.logoLink}>
             <div css={S.logoBadge}>JS</div>
             <span css={S.logoText}>
@@ -71,8 +121,11 @@ export default function Navbar() {
           {/* Learn dropdown — always visible, no auth required */}
           <div css={S.learnDropdownWrapper} ref={learnRef}>
             <button
-              css={[S.learnDropdownTrigger, isLearnActive && S.learnNavLinkActive]}
-              onClick={() => setLearnMenuOpen(v => !v)}
+              css={[
+                S.learnDropdownTrigger,
+                isLearnActive && S.learnNavLinkActive,
+              ]}
+              onClick={() => setLearnMenuOpen((v) => !v)}
             >
               <Layers size={13} />
               Learn
@@ -85,7 +138,10 @@ export default function Navbar() {
                   <Link
                     key={href}
                     href={href}
-                    css={[S.learnDropdownItem, path.startsWith(href) && S.learnDropdownItemActive]}
+                    css={[
+                      S.learnDropdownItem,
+                      path.startsWith(href) && S.learnDropdownItemActive,
+                    ]}
                     onClick={() => setLearnMenuOpen(false)}
                   >
                     <div css={S.learnIconBadge}>
@@ -117,8 +173,8 @@ export default function Navbar() {
 
               <div css={S.aiDropdownWrapper} ref={menuRef}>
                 <button
-                  css={[S.aiDropdownTrigger, aiMenuOpen && S.navLinkAiActive]}
-                  onClick={() => setAiMenuOpen(v => !v)}
+                  css={[S.aiDropdownTrigger, isAiActive && S.navLinkAiActive]}
+                  onClick={() => setAiMenuOpen((v) => !v)}
                 >
                   <Zap size={13} />
                   AI Tools
@@ -132,7 +188,10 @@ export default function Navbar() {
                       <Link
                         key={href}
                         href={href}
-                        css={[S.aiDropdownItem, path === href && S.aiDropdownItemActive]}
+                        css={[
+                          S.aiDropdownItem,
+                          path === href && S.aiDropdownItemActive,
+                        ]}
                         onClick={() => setAiMenuOpen(false)}
                       >
                         <div css={S.aiIconBadge}>
@@ -147,7 +206,17 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
 
+          {/* Marketing nav — only for logged-out visitors */}
+          {!user && (
+            <div css={S.marketingLinks}>
+              {MARKETING_LINKS.map(({ href, label }) => (
+                <Link key={href} href={href} css={S.marketingLink}>
+                  {label}
+                </Link>
+              ))}
             </div>
           )}
 
@@ -167,9 +236,18 @@ export default function Navbar() {
                   </div>
                 )}
                 {user.photoURL && (
-                  <Image src={user.photoURL} alt="" width={28} height={28} css={S.avatar} />
+                  <Image
+                    src={user.photoURL}
+                    alt=""
+                    width={28}
+                    height={28}
+                    css={S.avatar}
+                  />
                 )}
-                <button css={S.hamburgerBtn} onClick={() => setMobileOpen(v => !v)}>
+                <button
+                  css={S.hamburgerBtn}
+                  onClick={() => setMobileOpen((v) => !v)}
+                >
                   {mobileOpen ? <X size={18} /> : <Menu size={18} />}
                 </button>
                 <button css={S.logoutBtn} onClick={logout} title="Sign out">
@@ -177,10 +255,16 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <Link href="/auth" css={S.signInBtn}>Sign in</Link>
+              <div css={S.authCtas}>
+                <Link href="/auth" css={S.signInBtn}>
+                  Log in
+                </Link>
+                <Link href="/auth" css={S.getStartedBtn}>
+                  Get started <ArrowRight size={13} />
+                </Link>
+              </div>
             )}
           </div>
-
         </div>
       </nav>
 
@@ -195,7 +279,9 @@ export default function Navbar() {
               >
                 <Icon size={16} />
                 {label}
-                {pro && !progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
+                {pro && !progress?.isPro && (
+                  <span css={S.mobileProBadge}>PRO</span>
+                )}
               </Link>
             ))}
 
@@ -206,7 +292,10 @@ export default function Navbar() {
               <Link
                 key={href}
                 href={href}
-                css={[S.mobileNavLink, path.startsWith(href) && S.learnNavLinkActive]}
+                css={[
+                  S.mobileNavLink,
+                  path.startsWith(href) && S.learnNavLinkActive,
+                ]}
               >
                 <div css={S.mobileAiItemIcon}>
                   <Icon size={14} color="#6af7c0" />
@@ -225,7 +314,10 @@ export default function Navbar() {
               <Link
                 key={href}
                 href={href}
-                css={[S.mobileNavLink, path === href && S.mobileNavLinkAiActive]}
+                css={[
+                  S.mobileNavLink,
+                  path === href && S.mobileNavLinkAiActive,
+                ]}
               >
                 <div css={S.mobileAiItemIcon}>
                   <Icon size={14} color="#a78bfa" />
@@ -240,7 +332,13 @@ export default function Navbar() {
 
             <hr css={S.mobileDivider} />
 
-            <button css={S.mobileLogoutBtn} onClick={() => { logout(); setMobileOpen(false) }}>
+            <button
+              css={S.mobileLogoutBtn}
+              onClick={() => {
+                logout();
+                setMobileOpen(false);
+              }}
+            >
               <LogOut size={16} />
               Sign out
             </button>
@@ -248,5 +346,5 @@ export default function Navbar() {
         </div>
       )}
     </>
-  )
+  );
 }

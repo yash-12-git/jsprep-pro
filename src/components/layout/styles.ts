@@ -26,17 +26,17 @@ export const nav = css`
   position: sticky;
   top: 0;
   z-index: 50;
-  border-bottom: 1px solid ${C.border};
-  background: rgba(10, 10, 16, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(7, 7, 14, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 `;
 
 export const navInner = css`
   max-width: 1152px;
   margin: 0 auto;
-  padding: 0 1rem;
-  height: 3.5rem;
+  padding: 0 1.25rem;
+  height: 3.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -48,7 +48,7 @@ export const navInner = css`
 export const logoLink = css`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
   font-weight: 700;
   font-size: 1rem;
   text-decoration: none;
@@ -57,19 +57,25 @@ export const logoLink = css`
 `;
 
 export const logoBadge = css`
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 0.5rem;
-  background: ${C.accent};
+  background: linear-gradient(135deg, #7c6af7 0%, #6b59e8 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 900;
   color: white;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(124,106,247,0.4);
 `;
 
 export const logoText = css`
+  font-family: 'Syne', sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   @media (max-width: ${BREAKPOINTS.sm}) {
     display: none;
   }
@@ -78,6 +84,62 @@ export const logoText = css`
 export const logoAccent = css`
   color: ${C.accent};
 `;
+
+// ─── Marketing nav (logged-out) ───────────────────────────────────────────────
+
+export const marketingLinks = css`
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+  @media (min-width: ${BREAKPOINTS.md}) {
+    display: flex;
+  }
+`;
+
+export const marketingLink = css`
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  transition: color 0.15s ease, background 0.15s ease;
+  &:hover {
+    color: white;
+    background: rgba(255,255,255,0.06);
+  }
+`;
+
+export const authCtas = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+export const getStartedBtn = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: ${C.accent};
+  color: white;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 0.625rem;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(124,106,247,0.35);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  &:hover {
+    background: #6b59e8;
+    box-shadow: 0 6px 18px rgba(124,106,247,0.45);
+  }
+  @media (max-width: ${BREAKPOINTS.sm}) {
+    display: none;
+  }
+`;
+
+
 
 // ─── Desktop nav links ────────────────────────────────────────────────────────
 

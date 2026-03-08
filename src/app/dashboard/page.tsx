@@ -118,7 +118,6 @@ export default function DashboardPage() {
 
   return (
     <>
-      <Navbar />
       {showPaywall && (
         <PaywallBanner reason={paywallReason} onClose={() => setShowPaywall(false)} />
       )}
