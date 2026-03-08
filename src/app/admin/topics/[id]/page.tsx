@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { getTopic, updateTopic, deleteTopic } from '@/lib/topics'
+import { revalidateTopics } from '@/lib/adminRevalidate'
 import TopicForm from '@/app/admin/components/TopicForm'
 import type { Topic, TopicInput } from '@/types/topic'
 import { C } from '@/styles/tokens'
 import { ArrowLeft } from 'lucide-react'
-import * as Shared from '@/styles/shared'
 
 export default function EditTopicPage({ params }: { params: { id: string } }) {
   const { user } = useAuth()
@@ -22,11 +22,13 @@ export default function EditTopicPage({ params }: { params: { id: string } }) {
 
   async function handleSubmit(data: TopicInput) {
     await updateTopic(params.id, data)
+    await revalidateTopics()
     router.push('/admin/topics')
   }
 
   async function handleDelete() {
     await deleteTopic(params.id)
+    await revalidateTopics()
     router.push('/admin/topics')
   }
 

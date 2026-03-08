@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { getBlogPost, updateBlogPost, deleteBlogPost } from '@/lib/blogPosts'
+import { revalidateBlogPosts } from '@/lib/adminRevalidate'
 import BlogForm from '@/app/admin/components/BlogForm'
 import type { BlogPost, BlogPostInput } from '@/types/blogPost'
 import { C } from '@/styles/tokens'
@@ -20,6 +21,7 @@ export default function EditBlogPostPage({ params }: { params: { id: string } })
 
   async function handleSubmit(data: BlogPostInput) {
     await updateBlogPost(params.id, data)
+    await revalidateBlogPosts()
     router.push('/admin/blog')
   }
 
