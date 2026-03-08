@@ -8,6 +8,14 @@ import { getPublishedBlogPosts } from '@/lib/blogPosts'
 import type { Topic } from '@/types/topic'
 import type { BlogPost } from '@/types/blogPost'
 
+// Module-level cache — survives navigation, cleared after 30min
+// Prevents re-fetching topics/posts on every dashboard mount
+const _cache: {
+  topics?: { data: Topic[]; at: number }
+  posts?:  { data: BlogPost[]; at: number }
+} = {}
+const CACHE_MS = 30 * 60 * 1000
+
 const FEATURED_SLUGS = [
   'javascript-closure-interview-questions',
   'javascript-hoisting-interview-questions',
@@ -227,16 +235,28 @@ export default function LearnSection() {
   const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([])
 
   useEffect(() => {
-    getPublishedTopics().then(all => {
-      const featured = all
-        .filter(t => FEATURED_SLUGS.includes(t.slug))
-        .slice(0, 4)
-      setFeaturedTopics(featured)
-    }).catch(() => {})
+    const now = Date.now()
 
-    getPublishedBlogPosts().then(all => {
-      setFeaturedPosts(all.slice(0, 3))
-    }).catch(() => {})
+    // Topics — use module cache if fresh
+    if (_cache.topics && now - _cache.topics.at < CACHE_MS) {
+      const featured = _cache.topics.data.filter(t => FEATURED_SLUGS.includes(t.slug)).slice(0, 4)
+      setFeaturedTopics(featured)
+    } else {
+      getPublishedTopics().then(all => {
+        _cache.topics = { data: all, at: Date.now() }
+        setFeaturedTopics(all.filter(t => FEATURED_SLUGS.includes(t.slug)).slice(0, 4))
+      }).catch(() => {})
+    }
+
+    // Posts — use module cache if fresh
+    if (_cache.posts && now - _cache.posts.at < CACHE_MS) {
+      setFeaturedPosts(_cache.posts.data.slice(0, 3))
+    } else {
+      getPublishedBlogPosts().then(all => {
+        _cache.posts = { data: all, at: Date.now() }
+        setFeaturedPosts(all.slice(0, 3))
+      }).catch(() => {})
+    }
   }, [])
   return (
     <div>

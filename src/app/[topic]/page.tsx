@@ -1,10 +1,8 @@
 import { notFound } from 'next/navigation'
+import { getBlogPostsForTopic, getQuestions, getRelatedTopics, getTopicBySlug, getTopicSlugs } from '@/lib/cachedQueries'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { getTopicBySlug, getTopicSlugs, getRelatedTopics } from '@/lib/topics'
-import { getBlogPostsForTopic } from '@/lib/blogPosts'
-import { getQuestions } from '@/lib/questions'
 import { pageMeta, faqSchema, breadcrumbSchema } from '@/lib/seo/seo'
 
 export const revalidate = 3600

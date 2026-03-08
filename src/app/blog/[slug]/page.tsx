@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getBlogPostBySlug, getBlogPostSlugs, getPublishedBlogPosts, getRelatedTopics } from '@/lib/cachedQueries'
 import Link from 'next/link'
 import { pageMeta, articleSchema, breadcrumbSchema } from '@/lib/seo/seo'
-import { getBlogPostBySlug, getBlogPostSlugs, getPublishedBlogPosts } from '@/lib/blogPosts'
-import { getRelatedTopics } from '@/lib/topics'
 
 // ─── ISR ─────────────────────────────────────────────────────────────────────
 export const revalidate = 3600

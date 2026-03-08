@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next'
-import { getPublishedBlogPosts, getBlogPostSlugs } from '@/lib/blogPosts'
-import { getTopicSlugs } from '@/lib/topics'
-import { getPublishedQuestionSlugs, getPublishedCategories } from '@/lib/questions'
+import { getBlogPostSlugs, getPublishedBlogPosts, getPublishedCategories, getPublishedQuestionSlugs, getTopicSlugs } from '@/lib/cachedQueries'
+
 import { catToSlug, SITE } from '@/lib/seo/seo'
 
 function toSlug(text: string): string {
