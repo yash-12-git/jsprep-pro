@@ -55,7 +55,7 @@ export const CACHE_TAGS = {
   questions: 'questions',
 } as const
 
-const TTL = 3600 // 1 hour — matches page revalidate values
+// revalidate: false = cache forever, cleared only by revalidateTag() on admin write
 
 // ─── Topics ───────────────────────────────────────────────────────────────────
 
@@ -63,7 +63,7 @@ const TTL = 3600 // 1 hour — matches page revalidate values
 export const getPublishedTopics = unstable_cache(
   () => getTopics({ status: 'published' }),
   ['published-topics'],
-  { revalidate: TTL, tags: [CACHE_TAGS.topics] },
+  { revalidate: false, tags: [CACHE_TAGS.topics] },
 )
 
 /** Topic slugs — lightweight for generateStaticParams */
@@ -73,21 +73,21 @@ export const getTopicSlugs = unstable_cache(
     return topics.map(t => t.slug)
   },
   ['topic-slugs'],
-  { revalidate: TTL, tags: [CACHE_TAGS.topics] },
+  { revalidate: false, tags: [CACHE_TAGS.topics] },
 )
 
 /** Single topic by slug */
 export const getTopicBySlug = unstable_cache(
   (slug: string) => _getTopicBySlug(slug),
   ['topic-by-slug'],
-  { revalidate: TTL, tags: [CACHE_TAGS.topics] },
+  { revalidate: false, tags: [CACHE_TAGS.topics] },
 )
 
 /** Related topics by slug array */
 export const getRelatedTopics = unstable_cache(
   (slugs: string[]) => _getRelatedTopics(slugs),
   ['related-topics'],
-  { revalidate: TTL, tags: [CACHE_TAGS.topics] },
+  { revalidate: false, tags: [CACHE_TAGS.topics] },
 )
 
 // ─── Blog posts ───────────────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ export const getRelatedTopics = unstable_cache(
 export const getPublishedBlogPosts = unstable_cache(
   () => getBlogPosts({ status: 'published' }),
   ['published-blog-posts'],
-  { revalidate: TTL, tags: [CACHE_TAGS.blogPosts] },
+  { revalidate: false, tags: [CACHE_TAGS.blogPosts] },
 )
 
 /** Blog post slugs — for generateStaticParams */
@@ -106,21 +106,21 @@ export const getBlogPostSlugs = unstable_cache(
     return posts.map(p => p.slug)
   },
   ['blog-post-slugs'],
-  { revalidate: TTL, tags: [CACHE_TAGS.blogPosts] },
+  { revalidate: false, tags: [CACHE_TAGS.blogPosts] },
 )
 
 /** Single post by slug */
 export const getBlogPostBySlug = unstable_cache(
   (slug: string) => _getBlogPostBySlug(slug),
   ['blog-post-by-slug'],
-  { revalidate: TTL, tags: [CACHE_TAGS.blogPosts] },
+  { revalidate: false, tags: [CACHE_TAGS.blogPosts] },
 )
 
 /** Posts linked to a topic — for /[topic] "Deep Dive Articles" section */
 export const getBlogPostsForTopic = unstable_cache(
   (topicSlug: string) => _getBlogPostsForTopic(topicSlug),
   ['blog-posts-for-topic'],
-  { revalidate: TTL, tags: [CACHE_TAGS.blogPosts, CACHE_TAGS.topics] },
+  { revalidate: false, tags: [CACHE_TAGS.blogPosts, CACHE_TAGS.topics] },
 )
 
 // ─── Questions ────────────────────────────────────────────────────────────────
@@ -129,14 +129,14 @@ export const getBlogPostsForTopic = unstable_cache(
 export const getQuestions = unstable_cache(
   (opts: GetQuestionsOptions) => _getQuestions(opts),
   ['questions'],
-  { revalidate: TTL, tags: [CACHE_TAGS.questions] },
+  { revalidate: false, tags: [CACHE_TAGS.questions] },
 )
 
 /** Published categories — for /questions/[slug] nav */
 export const getPublishedCategories = unstable_cache(
   () => _getPublishedCategories(),
   ['published-categories'],
-  { revalidate: TTL, tags: [CACHE_TAGS.questions] },
+  { revalidate: false, tags: [CACHE_TAGS.questions] },
 )
 
 /** Question slugs — for generateStaticParams on /q/[slug] */
@@ -151,5 +151,5 @@ export const getPublishedQuestionSlugs = unstable_cache(
     return result.questions.map(q => q.slug)
   },
   ['published-question-slugs'],
-  { revalidate: TTL, tags: [CACHE_TAGS.questions] },
+  { revalidate: false, tags: [CACHE_TAGS.questions] },
 )
