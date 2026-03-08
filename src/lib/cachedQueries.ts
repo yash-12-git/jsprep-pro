@@ -76,19 +76,23 @@ export const getTopicSlugs = unstable_cache(
   { revalidate: false, tags: [CACHE_TAGS.topics] },
 )
 
-/** Single topic by slug */
-export const getTopicBySlug = unstable_cache(
-  (slug: string) => _getTopicBySlug(slug),
-  ['topic-by-slug'],
-  { revalidate: false, tags: [CACHE_TAGS.topics] },
-)
+/** Single topic by slug — slug baked into key so each topic is cached separately */
+export const getTopicBySlug = (slug: string) =>
+  unstable_cache(
+    () => _getTopicBySlug(slug),
+    ['topic-by-slug', slug],
+    { revalidate: false, tags: [CACHE_TAGS.topics] },
+  )()
 
 /** Related topics by slug array */
-export const getRelatedTopics = unstable_cache(
-  (slugs: string[]) => _getRelatedTopics(slugs),
-  ['related-topics'],
-  { revalidate: false, tags: [CACHE_TAGS.topics] },
-)
+export const getRelatedTopics = (slugs: string[]) => {
+  const key = [...slugs].sort().join(',')
+  return unstable_cache(
+    () => _getRelatedTopics(slugs),
+    ['related-topics', key],
+    { revalidate: false, tags: [CACHE_TAGS.topics] },
+  )()
+}
 
 // ─── Blog posts ───────────────────────────────────────────────────────────────
 
@@ -109,28 +113,33 @@ export const getBlogPostSlugs = unstable_cache(
   { revalidate: false, tags: [CACHE_TAGS.blogPosts] },
 )
 
-/** Single post by slug */
-export const getBlogPostBySlug = unstable_cache(
-  (slug: string) => _getBlogPostBySlug(slug),
-  ['blog-post-by-slug'],
-  { revalidate: false, tags: [CACHE_TAGS.blogPosts] },
-)
+/** Single post by slug — slug baked into key */
+export const getBlogPostBySlug = (slug: string) =>
+  unstable_cache(
+    () => _getBlogPostBySlug(slug),
+    ['blog-post-by-slug', slug],
+    { revalidate: false, tags: [CACHE_TAGS.blogPosts] },
+  )()
 
-/** Posts linked to a topic — for /[topic] "Deep Dive Articles" section */
-export const getBlogPostsForTopic = unstable_cache(
-  (topicSlug: string) => _getBlogPostsForTopic(topicSlug),
-  ['blog-posts-for-topic'],
-  { revalidate: false, tags: [CACHE_TAGS.blogPosts, CACHE_TAGS.topics] },
-)
+/** Posts linked to a topic — topicSlug baked into key */
+export const getBlogPostsForTopic = (topicSlug: string) =>
+  unstable_cache(
+    () => _getBlogPostsForTopic(topicSlug),
+    ['blog-posts-for-topic', topicSlug],
+    { revalidate: false, tags: [CACHE_TAGS.blogPosts, CACHE_TAGS.topics] },
+  )()
 
 // ─── Questions ────────────────────────────────────────────────────────────────
 
-/** Public question list with filters — for topic pages, sitemaps, generateStaticParams */
-export const getQuestions = unstable_cache(
-  (opts: GetQuestionsOptions) => _getQuestions(opts),
-  ['questions'],
-  { revalidate: false, tags: [CACHE_TAGS.questions] },
-)
+/** Public question list with filters — each unique opts combo gets its own cache entry */
+export const getQuestions = (opts: GetQuestionsOptions) => {
+  const key = JSON.stringify(opts)
+  return unstable_cache(
+    () => _getQuestions(opts),
+    ['questions', key],
+    { revalidate: false, tags: [CACHE_TAGS.questions] },
+  )()
+}
 
 /** Published categories — for /questions/[slug] nav */
 export const getPublishedCategories = unstable_cache(
