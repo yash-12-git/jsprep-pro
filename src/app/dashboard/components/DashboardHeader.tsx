@@ -1,172 +1,215 @@
 /** @jsxImportSource @emotion/react */
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { css } from '@emotion/react'
-import { Flame } from 'lucide-react'
-import { C, RADIUS, BP } from '@/styles/tokens'
-import * as Shared from '@/styles/shared'
-import type { UserProgress } from '@/lib/userProgress'
+import { css } from "@emotion/react";
+import { Flame, Zap } from "lucide-react";
+import { C, BP } from "@/styles/tokens";
+import type { UserProgress } from "@/lib/userProgress";
 
 interface Props {
-  user: { displayName?: string | null }
-  progress: UserProgress
-  totalQuestions: number
-  masteredCount: number
+  user: { displayName?: string | null };
+  progress: UserProgress;
+  totalQuestions: number;
+  masteredCount: number;
 }
 
 const S = {
-  wrap: css`margin-bottom: 1.75rem;`,
+  wrap: css`
+    margin-bottom: 0.25rem;
+  `,
 
   topRow: css`
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 0.875rem;
+    margin-bottom: 1.125rem;
+  `,
+
+  left: css`
+    flex: 1;
+    min-width: 0;
   `,
 
   greeting: css`
-    font-size: 1.375rem;
-    font-weight: 900;
+    font-family: "Syne", sans-serif;
+    font-size: clamp(1.375rem, 5vw, 1.75rem);
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.02em;
     line-height: 1.2;
+    margin-bottom: 0.25rem;
   `,
 
-  right: css`
+  subLine: css`
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.38);
+    font-weight: 500;
+  `,
+
+  pills: css`
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   `,
 
-  streak: css`
+  streakPill: css`
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.3rem;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 800;
     color: #fb923c;
-    background: rgba(251,146,60,0.1);
-    border: 1px solid rgba(251,146,60,0.2);
-    border-radius: ${RADIUS.md};
-    padding: 0.25rem 0.625rem;
+    background: rgba(251, 146, 60, 0.1);
+    border: 1px solid rgba(251, 146, 60, 0.22);
+    padding: 0.3125rem 0.625rem;
+    border-radius: 100px;
   `,
 
-  masteredBadge: css`
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: ${C.accent3};
-  `,
-
-  progressWrap: css`
+  proPill: css`
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.375rem;
+    gap: 0.3rem;
+    font-size: 0.625rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #7c6af7;
+    background: rgba(124, 106, 247, 0.12);
+    border: 1px solid rgba(124, 106, 247, 0.25);
+    padding: 0.3125rem 0.625rem;
+    border-radius: 100px;
+  `,
+
+  /* Progress block */
+  progressBlock: css`
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 1rem 1.125rem;
+  `,
+
+  progressTopRow: css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.625rem;
   `,
 
   progressLabel: css`
     font-size: 0.6875rem;
-    color: ${C.muted};
-    white-space: nowrap;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.45);
+  `,
+
+  progressFraction: css`
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: white;
+  `,
+
+  progressPct: css`
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: #6af7c0;
+    margin-left: 0.3rem;
+  `,
+
+  track: css`
+    height: 6px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 99px;
+    overflow: hidden;
+  `,
+
+  fill: (pct: number) => css`
+    height: 100%;
+    width: ${pct}%;
+    background: linear-gradient(90deg, #7c6af7, #6af7c0);
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   `,
 
   freeNotice: css`
+    margin-top: 0.5rem;
     font-size: 0.6875rem;
-    color: rgba(251,191,36,0.65);
-    margin-bottom: 1.25rem;
+    color: rgba(247, 199, 106, 0.6);
   `,
+};
 
-  shortcuts: css`
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.625rem;
-    margin-bottom: 1.5rem;
-    @media (min-width: ${BP.sm}) {
-      grid-template-columns: repeat(6, 1fr);
-    }
-  `,
-
-  shortcut: (border: string) => css`
-    background: ${C.card};
-    border: 1px solid ${border};
-    border-radius: ${RADIUS.xl};
-    padding: 0.75rem 0.375rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    &:hover { transform: translateY(-1px); background: ${C.surface}; }
-    &:active { transform: scale(0.97); }
-  `,
-
-  shortcutEmoji: css`font-size: 1.125rem; display: block; margin-bottom: 0.25rem;`,
-  shortcutLabel: css`font-size: 0.5625rem; font-weight: 700; color: ${C.text};`,
-}
-
-const SHORTCUTS = [
-  { href: '/output-quiz', emoji: '💻', label: 'Output Quiz', border: `${C.accent2}4d` },
-  { href: '/debug-lab',   emoji: '🐛', label: 'Debug Lab',   border: `${C.danger}4d` },
-  { href: '/quiz',        emoji: '⚡', label: 'Quiz Mode',   border: `${C.accent}4d`, pro: true },
-  { href: '/mock-interview', emoji: '🎤', label: 'Mock Interview', border: `${C.purple}4d`, pro: true },
-  { href: '/study-plan',  emoji: '🧠', label: 'Study Plan',  border: `${C.accent2}4d`, pro: true },
-  { href: '/cheatsheet',  emoji: '📄', label: 'Cheat Sheet', border: `${C.accent3}4d`, pro: true },
-]
-
-export default function DashboardHeader({ user, progress, totalQuestions, masteredCount }: Props) {
-  const router = useRouter()
+export default function DashboardHeader({
+  user,
+  progress,
+  totalQuestions,
+  masteredCount
+}: Props) {
+  const firstName = user.displayName?.split(" ")[0] ?? "there";
+  const FREE_LIMIT = 5;
+  const remaining = Math.max(0, FREE_LIMIT - masteredCount);
   const pct = totalQuestions > 0 ? Math.round((masteredCount / totalQuestions) * 100) : 0
-  const FREE_LIMIT = 5
-  const remainingFreeMarks = Math.max(0, FREE_LIMIT - masteredCount)
 
-  const visibleShortcuts = progress.isPro
-    ? SHORTCUTS
-    : SHORTCUTS.filter(s => !s.pro).concat(SHORTCUTS.filter(s => s.pro))
+  const hour = new Date().getHours();
+  const timeGreeting =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
     <div css={S.wrap}>
       <div css={S.topRow}>
-        <h1 css={S.greeting}>
-          Hey {user.displayName?.split(' ')[0] ?? 'there'} 👋
-        </h1>
-        <div css={S.right}>
+        <div css={S.left}>
+          <h1 css={S.greeting}>
+            {timeGreeting}, {firstName} 👋
+          </h1>
+          <p css={S.subLine}>
+            {masteredCount === 0
+              ? "Ready to start prepping?"
+              : pct >= 80
+                ? "Almost interview-ready 🔥"
+                : pct >= 50
+                  ? "Solid progress — keep going"
+                  : "Building momentum"}
+          </p>
+        </div>
+        <div css={S.pills}>
           {progress.streakDays > 0 && (
-            <div css={S.streak}>
-              <Flame size={12} />
+            <div css={S.streakPill}>
+              <Flame size={11} />
               {progress.streakDays}d streak
             </div>
           )}
-          <span css={S.masteredBadge}>{masteredCount}/{totalQuestions}</span>
+          {progress.isPro && (
+            <div css={S.proPill}>
+              <Zap size={9} />
+              PRO
+            </div>
+          )}
         </div>
       </div>
 
-      <div css={S.progressWrap}>
-        <div css={[Shared.progressBarTrack, { flex: 1 }]}>
-          <div css={Shared.progressBarFill(pct)} />
-        </div>
-        <span css={S.progressLabel}>{pct}%</span>
-      </div>
-
-      {!progress.isPro && masteredCount < FREE_LIMIT && (
-        <p css={S.freeNotice}>
-          {remainingFreeMarks} free mark{remainingFreeMarks !== 1 ? 's' : ''} remaining — upgrade to track all
-        </p>
-      )}
-
-      <div css={S.shortcuts}>
-        {visibleShortcuts.map(({ href, emoji, label, border, pro }) => (
-          <button
-            key={href}
-            css={S.shortcut(border)}
-            onClick={() => router.push(href)}
-            title={pro && !progress.isPro ? `${label} (Pro)` : label}
-          >
-            <span css={S.shortcutEmoji}>
-              {pro && !progress.isPro ? '🔒' : emoji}
+      {/* Progress bar block */}
+      <div css={S.progressBlock}>
+        <div css={S.progressTopRow}>
+          <span css={S.progressLabel}>Questions mastered</span>
+          <span css={S.progressFraction}>
+            {masteredCount}
+            <span style={{ color: "rgba(255,255,255,0.25)" }}>
+              /{totalQuestions}
             </span>
-            <span css={S.shortcutLabel}>{label}</span>
-          </button>
-        ))}
+            <span css={S.progressPct}>{pct}%</span>
+          </span>
+        </div>
+        <div css={S.track}>
+          <div css={S.fill(pct)} />
+        </div>
+        {!progress.isPro && masteredCount < FREE_LIMIT && (
+          <p css={S.freeNotice}>
+            {remaining} free mark{remaining !== 1 ? "s" : ""} left — upgrade to
+            track unlimited
+          </p>
+        )}
       </div>
     </div>
-  )
+  );
 }

@@ -1,49 +1,63 @@
 /** @jsxImportSource @emotion/react */
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { css } from '@emotion/react'
-import { ChevronDown, Eye, Star, Zap } from 'lucide-react'
-import { C, RADIUS } from '@/styles/tokens'
-import MarkdownRenderer from '@/components/md/MarkdownRenderer'
-import AIChat from '@/components/ui/AIChat/page'
-import AnswerEvaluator from '@/components/ui/AnswerEvaluator/page'
-import QuestionActions, { type ActivePanel } from './QuestionActions'
-import type { Question } from '@/types/question'
+import { useState } from "react";
+import { css } from "@emotion/react";
+import { ChevronDown, Eye, Star, Zap } from "lucide-react";
+import { C, RADIUS } from "@/styles/tokens";
+import MarkdownRenderer from "@/components/md/MarkdownRenderer";
+import AIChat from "@/components/ui/AIChat/page";
+import AnswerEvaluator from "@/components/ui/AnswerEvaluator/page";
+import QuestionActions, { type ActivePanel } from "./QuestionActions";
+import type { Question } from "@/types/question";
 
 interface Props {
-  question: Question
-  index: number
-  isMastered: boolean
-  isBookmarked: boolean
-  isSolved: boolean
-  isPro: boolean
-  onMastered: () => void
-  onBookmark: () => void
-  onNeedsPro: (reason: string) => void
+  question: Question;
+  index: number;
+  isMastered: boolean;
+  isBookmarked: boolean;
+  isSolved: boolean;
+  isPro: boolean;
+  onMastered: () => void;
+  onBookmark: () => void;
+  onNeedsPro: (reason: string) => void;
 }
 
-const DIFF_COLORS: Record<string, { bg: string; color: string; border: string }> = {
-  beginner: { bg: `${C.accent3}12`, color: C.accent3, border: `${C.accent3}33` },
-  core:     { bg: `${C.accent}12`,  color: C.accent,  border: `${C.accent}33` },
-  advanced: { bg: `${C.accent2}12`, color: C.accent2, border: `${C.accent2}33` },
-  expert:   { bg: `${C.danger}12`,  color: C.danger,  border: `${C.danger}33` },
-}
+const DIFF_COLORS: Record<
+  string,
+  { bg: string; color: string; border: string }
+> = {
+  beginner: {
+    bg: `${C.accent3}12`,
+    color: C.accent3,
+    border: `${C.accent3}33`,
+  },
+  core: { bg: `${C.accent}12`, color: C.accent, border: `${C.accent}33` },
+  advanced: {
+    bg: `${C.accent2}12`,
+    color: C.accent2,
+    border: `${C.accent2}33`,
+  },
+  expert: { bg: `${C.danger}12`, color: C.danger, border: `${C.danger}33` },
+};
 
 const S = {
   card: (mastered: boolean, open: boolean) => css`
     background: ${C.card};
-    border: 1px solid ${
-      mastered ? C.accent3 + '44' :
-      open     ? C.accent  + '33' :
-                 'rgba(255,255,255,0.07)'
-    };
+    border: 1px solid
+      ${mastered
+        ? C.accent3 + "44"
+        : open
+          ? C.accent + "33"
+          : "rgba(255,255,255,0.07)"};
     border-radius: ${RADIUS.xxl};
     overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
     &:hover {
-      border-color: ${mastered ? C.accent3 + '66' : C.accent + '33'};
-      ${mastered ? `box-shadow: 0 0 0 1px ${C.accent3}22;` : ''}
+      border-color: ${mastered ? C.accent3 + "66" : C.accent + "33"};
+      ${mastered ? `box-shadow: 0 0 0 1px ${C.accent3}22;` : ""}
     }
   `,
 
@@ -57,7 +71,7 @@ const S = {
   `,
 
   qNum: css`
-    font-family: 'JetBrains Mono', monospace;
+    font-family: "JetBrains Mono", monospace;
     font-size: 0.625rem;
     font-weight: 600;
     color: ${C.accent};
@@ -70,7 +84,10 @@ const S = {
     letter-spacing: 0.03em;
   `,
 
-  meta: css`flex: 1; min-width: 0;`,
+  meta: css`
+    flex: 1;
+    min-width: 0;
+  `,
 
   title: css`
     font-weight: 600;
@@ -101,11 +118,13 @@ const S = {
     flex-shrink: 0;
     color: ${C.muted};
     transition: transform 0.25s ease;
-    transform: rotate(${open ? '180deg' : '0deg'});
+    transform: rotate(${open ? "180deg" : "0deg"});
     margin-top: 0.1875rem;
   `,
 
-  body: css`border-top: 1px solid rgba(255,255,255,0.06);`,
+  body: css`
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  `,
 
   hintBox: css`
     margin: 0.875rem 1.25rem 0;
@@ -118,7 +137,9 @@ const S = {
     line-height: 1.5;
   `,
 
-  answerWrap: css`padding: 0.875rem 1.25rem 0.25rem;`,
+  answerWrap: css`
+    padding: 0.875rem 1.25rem 0.25rem;
+  `,
 
   proLabel: css`
     display: flex;
@@ -157,62 +178,71 @@ const S = {
     align-items: center;
     gap: 0.375rem;
   `,
-}
+};
 
 export default function QuestionCard({
-  question, index,
-  isMastered, isBookmarked, isSolved, isPro,
-  onMastered, onBookmark, onNeedsPro,
+  question,
+  index,
+  isMastered,
+  isBookmarked,
+  isSolved,
+  isPro,
+  onMastered,
+  onBookmark,
+  onNeedsPro,
 }: Props) {
-  const [open, setOpen] = useState(false)
-  const [activePanel, setActivePanel] = useState<ActivePanel>(null)
+  const [open, setOpen] = useState(false);
+  const [activePanel, setActivePanel] = useState<ActivePanel>(null);
 
-  const diffStyle = DIFF_COLORS[question.difficulty] ?? DIFF_COLORS.core
+  const diffStyle = DIFF_COLORS[question.difficulty] ?? DIFF_COLORS.core;
 
-  function handlePanel(p: 'chat' | 'eval') {
+  function handlePanel(p: "chat" | "eval") {
     if (!isPro) {
-      onNeedsPro('AI features are Pro only. Upgrade for AI tutoring, answer evaluation, and more.')
-      return
+      onNeedsPro(
+        "AI features are Pro only. Upgrade for AI tutoring, answer evaluation, and more.",
+      );
+      return;
     }
-    setActivePanel(prev => prev === p ? null : p)
+    setActivePanel((prev) => (prev === p ? null : p));
   }
 
   function handleBookmark() {
     if (!isPro) {
-      onNeedsPro('Bookmarks are a Pro feature. Upgrade to save questions for quick review.')
-      return
+      onNeedsPro(
+        "Bookmarks are a Pro feature. Upgrade to save questions for quick review.",
+      );
+      return;
     }
-    onBookmark()
+    onBookmark();
   }
 
   return (
     <div css={S.card(isMastered, open)}>
       {/* ── Summary row ── */}
-      <div css={S.summary} onClick={() => setOpen(o => !o)}>
-        <span css={S.qNum}>#{String(index + 1).padStart(2, '0')}</span>
+      <div css={S.summary} onClick={() => setOpen((o) => !o)}>
+        <span css={S.qNum}>#{String(index + 1).padStart(2, "0")}</span>
 
         <div css={S.meta}>
-          <p css={S.title}>{question.title}</p>
+          <p css={S.title}>
+            {isMastered && (
+              <span style={{ color: C.accent3, marginRight: "0.3rem" }}>✓</span>
+            )}
+            {question.title}
+          </p>
           <div css={S.tags}>
             <span css={S.tag(diffStyle.bg, diffStyle.color, diffStyle.border)}>
               {question.difficulty}
             </span>
-            <span css={S.tag(`${C.accent}12`, `${C.accent}cc`, `${C.accent}2a`)}>
+            <span
+              css={S.tag(`${C.accent}12`, `${C.accent}99`, `${C.accent}22`)}
+            >
               {question.category}
             </span>
-            {question.isPro && (
-              <span css={S.proBadge}><Zap size={8} /> PRO</span>
-            )}
-            {isMastered && (
-              <span css={S.tag(C.accent3 + '12', C.accent3, C.accent3 + '33')}>
-                ✓ mastered
+            {question.isPro && !isPro && (
+              <span css={S.proBadge}>
+                <Zap size={8} /> PRO
               </span>
             )}
-            {question.tags.slice(0, 2).map(t => (
-              <span key={t} css={S.tag('rgba(255,255,255,0.04)', C.muted, 'rgba(255,255,255,0.08)')}>
-                {t}
-              </span>
-            ))}
           </div>
         </div>
 
@@ -231,9 +261,32 @@ export default function QuestionCard({
             </div>
           )}
 
-          {question.hint && (
-            <div css={S.hintBox}>💡 Hint: {question.hint}</div>
+          {/* PRO + tags only visible when expanded */}
+          {(question.isPro || question.tags.length > 0) && (
+            <div
+              css={[S.tags, { padding: "0.5rem 1.25rem 0", flexWrap: "wrap" }]}
+            >
+              {question.isPro && (
+                <span css={S.proBadge}>
+                  <Zap size={8} /> PRO
+                </span>
+              )}
+              {question.tags.slice(0, 3).map((t) => (
+                <span
+                  key={t}
+                  css={S.tag(
+                    "rgba(255,255,255,0.04)",
+                    C.muted,
+                    "rgba(255,255,255,0.08)",
+                  )}
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
           )}
+
+          {question.hint && <div css={S.hintBox}>💡 Hint: {question.hint}</div>}
 
           <div css={S.answerWrap}>
             <MarkdownRenderer content={question.answer} />
@@ -250,14 +303,14 @@ export default function QuestionCard({
             onPanel={handlePanel}
           />
 
-          {activePanel === 'chat' && (
+          {activePanel === "chat" && (
             <AIChat
               question={question.question}
               answer={question.answer}
               onClose={() => setActivePanel(null)}
             />
           )}
-          {activePanel === 'eval' && (
+          {activePanel === "eval" && (
             <AnswerEvaluator
               question={question.question}
               idealAnswer={question.answer}
@@ -267,5 +320,5 @@ export default function QuestionCard({
         </div>
       )}
     </div>
-  )
+  );
 }
