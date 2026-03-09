@@ -128,10 +128,6 @@ export default async function TopicPage({ params }: Props) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faq }}
-      />
-      <script
-        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: breadcrumbs }}
       />
 
