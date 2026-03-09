@@ -1,584 +1,1003 @@
-import { css } from '@emotion/react'
-import { C, BP, RADIUS } from '@/styles/tokens'
+import { BP } from "@/styles/tokens";
+import { css, keyframes } from "@emotion/react";
+
+export const shimmer = keyframes`
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+`;
+export const fadeUp = keyframes`
+  from { opacity:0; transform:translateY(20px) }
+  to   { opacity:1; transform:translateY(0) }
+`;
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
 export const page = css`
   position: relative;
+  background: #07070e;
   min-height: 100vh;
-`
-
-export const glow1 = css`
+  /* Dot grid */
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.045) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+`;
+export const purpleGlow = css`
   position: fixed;
-  width: 16rem;
-  height: 16rem;
-  border-radius: 9999px;
-  background: ${C.accent}0d;
-  filter: blur(80px);
-  top: -50px;
-  left: -50px;
+  inset: -200px -300px auto auto;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(124, 106, 247, 0.12) 0%,
+    transparent 65%
+  );
   pointer-events: none;
-  @media (min-width: ${BP.sm}) { width: 600px; height: 600px; top: -100px; left: -100px; }
-`
-
-export const glow2 = css`
+  z-index: 0;
+`;
+export const greenGlow = css`
   position: fixed;
-  width: 12rem;
-  height: 12rem;
-  border-radius: 9999px;
-  background: ${C.accent3}0d;
-  filter: blur(80px);
-  bottom: 0;
-  right: 0;
+  bottom: -100px;
+  left: -100px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(106, 247, 192, 0.07) 0%,
+    transparent 65%
+  );
   pointer-events: none;
-  @media (min-width: ${BP.sm}) { width: 400px; height: 400px; }
-`
-
-export const inner = css`
-  max-width: 64rem;
+  z-index: 0;
+`;
+export const wrap = css`
+  max-width: 68rem;
   margin: 0 auto;
-  padding: 3rem 1rem;
+  padding: 0 1.25rem 5rem;
   position: relative;
   z-index: 1;
-  @media (min-width: ${BP.sm}) { padding: 5rem 1.5rem; }
-`
+  @media (min-width: ${BP.sm}) {
+    padding: 0 2rem 6rem;
+  }
+`;
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
-
+/* ─ Hero */
 export const hero = css`
   text-align: center;
-  margin-bottom: 3.5rem;
-  @media (min-width: ${BP.sm}) { margin-bottom: 5rem; }
-`
-
-export const heroPill = css`
+  padding: 4rem 0 3rem;
+  animation: ${fadeUp} 0.6s ease both;
+  @media (min-width: ${BP.sm}) {
+    padding: 5.5rem 0 4rem;
+  }
+`;
+export const badge = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #a78bfa;
+  background: rgba(124, 106, 247, 0.1);
+  border: 1px solid rgba(124, 106, 247, 0.2);
+  padding: 0.375rem 0.9375rem;
+  border-radius: 100px;
+  margin-bottom: 1.75rem;
+`;
+export const h1 = css`
+  font-family: "Syne", sans-serif;
+  font-size: clamp(2.75rem, 8vw, 5.25rem);
+  font-weight: 800;
+  line-height: 1.07;
+  letter-spacing: -0.04em;
+  color: white;
+  margin-bottom: 1.375rem;
+`;
+export const grad = css`
+  background: linear-gradient(
+    130deg,
+    #7c6af7 0%,
+    #a78bfa 35%,
+    #6af7c0 65%,
+    #7c6af7 100%
+  );
+  background-size: 200% auto;
+  animation: ${shimmer} 5s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+`;
+export const sub = css`
+  font-size: clamp(1rem, 1.75vw, 1.125rem);
+  color: rgba(255, 255, 255, 0.48);
+  max-width: 34rem;
+  margin: 0 auto 2.25rem;
+  line-height: 1.75;
+`;
+export const ctas = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  @media (min-width: ${BP.sm}) {
+    flex-direction: row;
+    justify-content: center;
+  }
+`;
+export const btnP = css`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: ${C.accent}1a;
-  border: 1px solid ${C.accent}33;
-  color: ${C.accent};
-  font-size: 0.625rem;
+  padding: 0.9375rem 2.25rem;
+  background: #7c6af7;
+  color: white;
+  font-size: 1rem;
   font-weight: 700;
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  margin-bottom: 1.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  @media (min-width: ${BP.sm}) { font-size: 0.75rem; }
-`
-
-export const heroTitle = css`
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1.15;
-  margin-bottom: 1rem;
-  padding: 0 0.5rem;
-  @media (min-width: ${BP.sm}) { font-size: 3.5rem; }
-  @media (min-width: ${BP.md}) { font-size: 4.5rem; }
-`
-
-export const heroAccent = css`
-  color: ${C.accent};
-`
-
-export const heroDesc = css`
-  color: ${C.muted};
-  font-size: 0.875rem;
-  max-width: 36rem;
-  margin: 0 auto 0.75rem;
-  padding: 0 1rem;
-  @media (min-width: ${BP.sm}) { font-size: 1.125rem; }
-`
-
-export const heroSubDesc = css`
-  color: rgba(255,255,255,0.3);
-  font-size: 0.75rem;
-  margin-bottom: 2rem;
-  @media (min-width: ${BP.sm}) { font-size: 0.875rem; }
-`
-
-export const heroCtas = css`
-  display: flex;
-  flex-direction: column;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 8px 36px rgba(124, 106, 247, 0.42);
+  transition: all 0.18s;
+  &:hover {
+    background: #6b59e8;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 44px rgba(124, 106, 247, 0.52);
+  }
+`;
+export const btnO = css`
+  display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-`
+  gap: 0.4rem;
+  padding: 0.9375rem 1.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: 12px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  transition: all 0.18s;
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    color: white;
+  }
+`;
 
-export const ctaPrimary = css`
-  width: 100%;
-  max-width: 20rem;
+/* ─ Free banner */
+export const freeBanner = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  background: ${C.accent};
-  color: white;
-  font-weight: 900;
-  font-size: 0.875rem;
-  padding: 1rem 2rem;
-  border-radius: ${RADIUS.xl};
-  text-decoration: none;
-  transition: all 0.15s ease;
-  box-shadow: 0 8px 24px ${C.accent}40;
-  &:hover { background: ${C.accent}e6; transform: translateY(-1px); }
-  &:active { transform: scale(0.98); }
-  @media (min-width: ${BP.sm}) { width: auto; font-size: 1rem; }
-`
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: rgba(106, 247, 192, 0.06);
+  border: 1px solid rgba(106, 247, 192, 0.15);
+  border-radius: 14px;
+  padding: 0.9375rem 1.75rem;
+  margin: 0 auto 4rem;
+  max-width: 42rem;
+  animation: ${fadeUp} 0.6s 0.1s ease both;
+`;
 
-export const ctaSecondary = css`
-  color: ${C.muted};
-  font-size: 0.75rem;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  &:hover { color: white; }
-`
-
-// ─── Stats ────────────────────────────────────────────────────────────────────
-
-export const statsGrid = css`
+/* ─ Stats */
+export const statsRow = css`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 4rem;
-  @media (min-width: ${BP.sm}) { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-`
-
-export const statCard = css`
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 4.5rem;
+  @media (min-width: ${BP.sm}) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
+export const statCell = css`
   text-align: center;
-  background: ${C.surface};
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xl};
-  padding: 1rem;
-  @media (min-width: ${BP.sm}) { padding: 1.5rem; border-radius: ${RADIUS.xxl}; }
-`
-
-export const statNum = css`
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: ${C.accent2};
-  margin-bottom: 0.25rem;
-  @media (min-width: ${BP.sm}) { font-size: 2rem; }
-`
-
-export const statLabel = css`
-  color: ${C.muted};
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 600;
-  @media (min-width: ${BP.sm}) { font-size: 0.75rem; }
-`
-
-// ─── Section headers ──────────────────────────────────────────────────────────
-
-export const sectionWrapper = css`
-  margin-bottom: 4rem;
-  @media (min-width: ${BP.sm}) { margin-bottom: 6rem; }
-`
-
-export const sectionEyebrow = (color: string) => css`
-  text-align: center;
-  font-size: 0.625rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: ${color};
-  margin-bottom: 0.75rem;
-  @media (min-width: ${BP.sm}) { font-size: 0.75rem; }
-`
-
-export const sectionTitle = css`
-  font-size: 1.5rem;
-  font-weight: 900;
-  text-align: center;
-  margin-bottom: 0.75rem;
-  padding: 0 0.5rem;
-  @media (min-width: ${BP.sm}) { font-size: 2.25rem; }
-`
-
-export const sectionDesc = css`
-  color: ${C.muted};
-  text-align: center;
-  font-size: 0.75rem;
-  max-width: 24rem;
-  margin: 0 auto 2rem;
-  @media (min-width: ${BP.sm}) { font-size: 0.875rem; }
-`
-
-// ─── Mode tabs ────────────────────────────────────────────────────────────────
-
-export const tabRow = css`
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  margin-bottom: 1.5rem;
-  @media (min-width: ${BP.sm}) { justify-content: center; }
-`
-
-export const tabBtn = (active: boolean, bg: string, color: string) => css`
-  flex-shrink: 0;
-  padding: 0.5rem 1rem;
-  border-radius: ${RADIUS.xl};
-  font-size: 0.75rem;
-  font-weight: 700;
-  border: 1px solid ${active ? color + '80' : C.border};
-  background: ${active ? bg : 'transparent'};
-  color: ${active ? color : C.muted};
-  cursor: pointer;
-  transition: all 0.15s ease;
-  &:hover { color: ${active ? color : 'white'}; }
-  &:active { transform: scale(0.97); }
-`
-
-export const tabContent = css`
-  background: ${C.card};
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xxl};
-  padding: 1.25rem;
-  @media (min-width: ${BP.sm}) { padding: 2rem; }
-`
-
-export const tabContentInner = css`
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  @media (min-width: ${BP.sm}) { gap: 1rem; }
-`
-
-export const tabIconBox = (bg: string) => css`
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: ${RADIUS.xl};
-  border: 1px solid;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: ${bg};
-  @media (min-width: ${BP.sm}) { width: 3rem; height: 3rem; }
-`
-
-export const tabMeta = css`
-  flex: 1;
-  min-width: 0;
-`
-
-export const tabTitleRow = css`
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-`
-
-export const tabTitle = css`
-  font-weight: 900;
-  font-size: 1rem;
-  @media (min-width: ${BP.sm}) { font-size: 1.25rem; }
-`
-
-export const tabCount = (bg: string, color: string) => css`
-  font-size: 0.625rem;
-  font-weight: 700;
-  padding: 0.125rem 0.5rem;
-  border-radius: 9999px;
-  border: 1px solid ${color}33;
-  background: ${bg};
-  color: ${color};
-`
-
-export const tabDesc = css`
-  color: ${C.muted};
-  font-size: 0.75rem;
-  line-height: 1.6;
-  @media (min-width: ${BP.sm}) { font-size: 0.875rem; }
-`
-
-export const tabFeatures = css`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
-  @media (min-width: ${BP.sm}) { grid-template-columns: 1fr 1fr; }
-`
-
-export const tabFeatureItem = css`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: ${C.text};
-  @media (min-width: ${BP.sm}) { font-size: 0.875rem; }
-`
-
-// ─── AI Features grid ─────────────────────────────────────────────────────────
-
-export const aiFeaturesGrid = css`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-  @media (min-width: ${BP.sm}) { grid-template-columns: 1fr 1fr; }
-  @media (min-width: ${BP.lg}) { grid-template-columns: 1fr 1fr 1fr; }
-`
-
-export const aiFeatureCard = css`
-  background: ${C.card};
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xl};
-  padding: 1rem;
-  display: flex;
-  gap: 0.75rem;
-  transition: border-color 0.15s ease;
-  &:hover { border-color: ${C.accent}4d; }
-  @media (min-width: ${BP.sm}) { display: block; padding: 1.5rem; border-radius: ${RADIUS.xxl}; }
-`
-
-export const aiFeatureIcon = css`
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.5rem;
-  background: rgba(255,255,255,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  @media (min-width: ${BP.sm}) { margin-bottom: 0.75rem; }
-`
-
-export const aiFeatureTitle = css`
-  font-weight: 700;
-  font-size: 0.75rem;
-  margin-bottom: 0.25rem;
-  @media (min-width: ${BP.sm}) { font-size: 0.875rem; }
-`
-
-export const aiFeatureDesc = css`
-  color: ${C.muted};
-  font-size: 0.6875rem;
-  line-height: 1.6;
-  @media (min-width: ${BP.sm}) { font-size: 0.75rem; }
-`
-
-// ─── Before/After ─────────────────────────────────────────────────────────────
-
-export const beforeAfterCard = css`
-  background: ${C.card};
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xxl};
-  padding: 1.25rem;
-  @media (min-width: ${BP.sm}) { padding: 2rem; }
-`
-
-export const beforeAfterTitle = css`
-  font-size: 1.25rem;
-  font-weight: 900;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  @media (min-width: ${BP.sm}) { font-size: 1.5rem; margin-bottom: 2rem; }
-`
-
-export const beforeAfterGrid = css`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
-  @media (min-width: ${BP.sm}) { grid-template-columns: repeat(3, 1fr); }
-`
-
-export const beforeAfterItem = css`
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  @media (min-width: ${BP.sm}) { display: block; }
-`
-
-export const beforeAfterEmoji = css`
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  @media (min-width: ${BP.sm}) { font-size: 1.5rem; margin-bottom: 0.75rem; }
-`
-
-export const beforeAfterLabel = css`
-  font-size: 0.625rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: ${C.muted};
-  margin-bottom: 0.5rem;
-`
-
-export const beforeRow = css`
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.4);
+  padding: 1.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  &:last-child {
+    border-right: none;
+  }
+  &:nth-child(2) {
+    border-right: none;
+  }
+  @media (min-width: ${BP.sm}) {
+    &:nth-child(2) {
+      border-right: 1px solid rgba(255, 255, 255, 0.07);
+    }
+  }
+`;
+export const statN = css`
+  font-family: "Syne", sans-serif;
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
   margin-bottom: 0.375rem;
-`
+`;
+export const statL = css`
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+`;
 
-export const afterRow = css`
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: ${C.text};
-`
+/* ─ Section */
+export const sec = css`
+  margin-bottom: 5rem;
+`;
+export const eye = (c: string) => css`
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: ${c};
+  text-align: center;
+  margin-bottom: 0.875rem;
+`;
+export const sh2 = css`
+  font-family: "Syne", sans-serif;
+  font-size: clamp(1.875rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: white;
+  margin-bottom: 0.75rem;
+`;
+export const ssub = css`
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.9375rem;
+  max-width: 30rem;
+  margin: 0 auto 2.75rem;
+  line-height: 1.75;
+`;
 
-// ─── Pricing ─────────────────────────────────────────────────────────────────
-
-export const pricingGrid = css`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  max-width: 40rem;
+/* ─ AI Demo */
+export const demoShell = css`
+  background: #0c0c17;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 52rem;
   margin: 0 auto;
-  @media (min-width: ${BP.sm}) { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-`
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(124, 106, 247, 0.08);
+`;
+export const demoBar = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  background: rgba(255, 255, 255, 0.025);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+`;
+export const dd = (c: string) => css`
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: ${c};
+`;
+export const demoTitle = css`
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.22);
+  margin-left: 0.5rem;
+  flex: 1;
+  text-align: center;
+`;
+export const demoInner = css`
+  padding: 1.75rem;
+  @media (min-width: ${BP.sm}) {
+    padding: 2.25rem;
+  }
+`;
+export const demoQL = css`
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.875rem;
+`;
+export const demoPill = css`
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #7c6af7;
+  background: rgba(124, 106, 247, 0.1);
+  border: 1px solid rgba(124, 106, 247, 0.18);
+  padding: 2px 9px;
+  border-radius: 100px;
+`;
+export const demoQ = css`
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  color: white;
+  font-weight: 700;
+  line-height: 1.45;
+  margin-bottom: 1.5rem;
+`;
+export const demoAns = css`
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 1.125rem;
+  margin-bottom: 1.25rem;
+`;
+export const demoAnsL = css`
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(255, 255, 255, 0.22);
+  margin-bottom: 0.5rem;
+`;
+export const demoAnsT = css`
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.58);
+  line-height: 1.7;
+`;
+export const demoResult = css`
+  background: rgba(106, 247, 192, 0.05);
+  border: 1px solid rgba(106, 247, 192, 0.16);
+  border-radius: 14px;
+  padding: 1.375rem;
+`;
+export const demoScoreRow = css`
+  display: flex;
+  align-items: center;
+  gap: 1.125rem;
+  margin-bottom: 1rem;
+`;
+export const demoScore = css`
+  font-family: "Syne", sans-serif;
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #6af7c0;
+  line-height: 1;
+  white-space: nowrap;
+`;
+export const demoDenom = css`
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.2);
+`;
+export const demoBarWrap = css`
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 3px;
+  overflow: hidden;
+`;
+export const demoBarFill = css`
+  height: 100%;
+  width: 70%;
+  background: linear-gradient(90deg, #6af7c0, #7c6af7);
+  border-radius: 3px;
+`;
+export const demoFb = css`
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.58);
+  line-height: 1.8;
+`;
 
-export const pricingCard = css`
-  background: ${C.card};
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xxl};
-  padding: 1.5rem;
+/* ─ Modes */
+export const modesG = css`
+  display: grid;
+  gap: 1.125rem;
+  @media (min-width: ${BP.sm}) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
+export const modeCard = (c: string) => css`
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 1.875rem;
+  transition:
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  &:hover {
+    border-color: ${c}35;
+    transform: translateY(-3px);
+    box-shadow:
+      0 16px 48px rgba(0, 0, 0, 0.3),
+      0 0 0 1px ${c}12;
+  }
+`;
+export const modeE = css`
+  font-size: 2.25rem;
+  display: block;
+  margin-bottom: 1.125rem;
+`;
+export const modeFree = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6af7c0;
+  background: rgba(106, 247, 192, 0.1);
+  border: 1px solid rgba(106, 247, 192, 0.18);
+  padding: 2px 8px;
+  border-radius: 4px;
+`;
+export const modeL = css`
+  font-family: "Syne", sans-serif;
+  font-size: 1.1875rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 0.375rem;
+`;
+export const modeC = (c: string) => css`
+  font-size: 0.8125rem;
+  color: ${c};
+  font-weight: 700;
+  margin-bottom: 0.875rem;
+`;
+export const modeD = css`
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.75;
+  margin-bottom: 1.25rem;
+`;
+export const modeTagRow = css`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+`;
+export const modeT = (c: string) => css`
+  font-size: 0.6875rem;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: ${c}10;
+  border: 1px solid ${c}1f;
+  color: ${c};
+  font-weight: 600;
+`;
+
+/* ─ 2-col layout */
+export const twoCol = css`
+  display: grid;
+  gap: 1.5rem;
+  @media (min-width: ${BP.sm}) {
+    grid-template-columns: 1fr 1fr;
+  }
+`;
+
+/* ─ QOTD card */
+export const qotdCard = css`
+  background: linear-gradient(
+    135deg,
+    rgba(124, 106, 247, 0.1),
+    rgba(106, 247, 192, 0.06)
+  );
+  border: 1px solid rgba(124, 106, 247, 0.2);
+  border-radius: 20px;
+  padding: 1.875rem;
   display: flex;
   flex-direction: column;
-  @media (min-width: ${BP.sm}) { padding: 2rem; }
-`
+  justify-content: space-between;
+  gap: 1.5rem;
+`;
+export const qotdBadge = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #c4b5fd;
+  background: rgba(124, 106, 247, 0.15);
+  padding: 3px 10px;
+  border-radius: 100px;
+`;
+export const qotdTitle = css`
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1.45;
+  margin-bottom: 0.5rem;
+  font-family: "Syne", sans-serif;
+`;
+export const qotdSub = css`
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.65;
+`;
+export const qotdBtn = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.625rem 1.25rem;
+  background: #7c6af7;
+  color: white;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(124, 106, 247, 0.35);
+  transition: all 0.15s;
+  align-self: flex-start;
+  &:hover {
+    background: #6b59e8;
+    transform: translateY(-1px);
+  }
+`;
 
-export const pricingCardPro = css`
-  background: ${C.card};
-  border: 2px solid ${C.accent};
-  border-radius: ${RADIUS.xxl};
-  padding: 1.5rem;
+/* ─ Leaderboard */
+export const lbCard = css`
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  overflow: hidden;
+`;
+export const lbHead = css`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.125rem 1.375rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+`;
+export const lbHeadT = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: white;
+`;
+export const lbReset = css`
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.28);
+`;
+export const lbRow = (bg: string) => css`
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1.375rem;
+  background: ${bg};
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+`;
+export const lbAv = css`
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(124, 106, 247, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #c4b5fd;
+`;
+export const lbName = css`
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: white;
+  flex: 1;
+`;
+export const lbXp = css`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #f7c76a;
+`;
+export const lbCta = css`
+  display: block;
+  text-align: center;
+  padding: 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #7c6af7;
+  text-decoration: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.15s;
+  &:hover {
+    background: rgba(124, 106, 247, 0.05);
+  }
+`;
+
+/* ─ Why switch (before/after) */
+export const whyCard = css`
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 1.875rem 2rem;
+`;
+export const whyG = css`
+  display: grid;
+  gap: 1.5rem;
+  @media (min-width: ${BP.sm}) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
+export const whyItem = css`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+export const whyEmoji = css`
+  font-size: 1.5rem;
+  margin-bottom: 0.375rem;
+`;
+export const whyLabel = css`
+  font-size: 0.6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 0.125rem;
+`;
+export const whyBefore = css`
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+`;
+export const whyAfter = css`
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.75);
+`;
+
+/* ─ Testimonials */
+export const tGrid = css`
+  display: grid;
+  gap: 1.125rem;
+  @media (min-width: ${BP.sm}) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
+export const tCard = css`
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 1.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.375rem;
+`;
+export const tStars = css`
+  display: flex;
+  gap: 3px;
+  margin-bottom: 0.625rem;
+`;
+export const tQuote = css`
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.8;
+  flex: 1;
+`;
+export const tMark = css`
+  font-family: "Syne", sans-serif;
+  font-size: 3.5rem;
+  color: rgba(124, 106, 247, 0.22);
+  line-height: 0.5;
+  display: block;
+  margin-bottom: 0.75rem;
+`;
+export const tAuthor = css`
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+`;
+export const tAv = (c: string) => css`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: ${c}18;
+  border: 1.5px solid ${c}35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: ${c};
+`;
+export const tName = css`
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.125rem;
+`;
+export const tRole = css`
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+`;
+
+/* ─ Topics */
+export const tpGrid = css`
+  display: grid;
+  gap: 0.875rem;
+  grid-template-columns: repeat(2, 1fr);
+  @media (min-width: ${BP.sm}) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
+export const tpCard = (c: string) => css`
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-decoration: none;
+  display: block;
+  transition: all 0.2s;
+  &:hover {
+    border-color: ${c}35;
+    background: ${c}07;
+    transform: translateY(-2px);
+  }
+`;
+export const tpDot = (c: string) => css`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: ${c};
+  box-shadow: 0 0 8px ${c}80;
+  margin-bottom: 0.875rem;
+`;
+export const tpName = css`
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.5rem;
+`;
+export const tpMeta = css`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+export const tpDiff = (c: string) => css`
+  font-size: 0.6875rem;
+  color: ${c};
+  font-weight: 700;
+`;
+export const tpQs = css`
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.25);
+`;
+
+/* ─ AI tools */
+export const aiG = css`
+  display: grid;
+  gap: 0.875rem;
+  @media (min-width: ${BP.sm}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
+export const aiCard = css`
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 1.25rem 1.375rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  transition: border-color 0.2s;
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+`;
+export const aiIco = (c: string) => css`
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: ${c}14;
+  border: 1px solid ${c}22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+export const aiLab = css`
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+export const aiBdg = css`
+  font-size: 0.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #f7c76a;
+  background: rgba(247, 199, 106, 0.1);
+  border: 1px solid rgba(247, 199, 106, 0.2);
+  padding: 1px 5px;
+  border-radius: 4px;
+`;
+export const aiDsc = css`
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1.65;
+`;
+
+/* ─ Pricing */
+export const priceG = css`
+  display: grid;
+  gap: 1.125rem;
+  max-width: 48rem;
+  margin: 0 auto;
+  @media (min-width: ${BP.sm}) {
+    grid-template-columns: 1fr 1fr;
+  }
+`;
+export const priceC = css`
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 22px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+`;
+export const priceCPro = css`
+  background: rgba(124, 106, 247, 0.07);
+  border: 1.5px solid rgba(124, 106, 247, 0.35);
+  border-radius: 22px;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  @media (min-width: ${BP.sm}) { padding: 2rem; }
-`
-
-export const popularBadge = css`
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #7c6af7, #6af7c0, #7c6af7);
+  }
+`;
+export const popularTag = css`
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: ${C.accent};
-  color: white;
+  top: 1.125rem;
+  right: 1.125rem;
   font-size: 0.5625rem;
   font-weight: 900;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.5rem;
-  @media (min-width: ${BP.sm}) { top: 1rem; right: 1rem; font-size: 0.625rem; }
-`
-
-export const planName = css`
-  font-size: 1.125rem;
-  font-weight: 900;
-  margin-bottom: 0.25rem;
-`
-
-export const planPrice = css`
-  font-size: 1.875rem;
-  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: white;
+  background: #7c6af7;
+  padding: 3px 9px;
+  border-radius: 6px;
+`;
+export const pTier = css`
+  font-family: "Syne", sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.42);
+  margin-bottom: 0.5rem;
+`;
+export const pPrice = css`
+  font-family: "Syne", sans-serif;
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
   margin-bottom: 0.25rem;
-  @media (min-width: ${BP.sm}) { font-size: 2.25rem; }
-`
-
-export const planPriceNote = css`
+`;
+export const pPer = css`
   font-size: 0.875rem;
   font-weight: 400;
-  color: ${C.muted};
-`
-
-export const planTagline = css`
-  font-size: 0.75rem;
-  color: ${C.muted};
-  margin-bottom: 1.25rem;
-`
-
-export const featureList = css`
+  color: rgba(255, 255, 255, 0.3);
+`;
+export const pNote = css`
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 1.75rem;
+`;
+export const pFeats = css`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0.625rem;
   flex: 1;
-`
-
-export const featureItem = css`
+  margin-bottom: 1.875rem;
+`;
+export const pFeat = css`
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  @media (min-width: ${BP.sm}) { font-size: 0.875rem; }
-`
-
-export const planBtnFree = css`
+  gap: 0.625rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.65);
+`;
+export const pBtnF = css`
   display: block;
   text-align: center;
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xl};
-  padding: 0.75rem;
-  font-size: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.9375rem;
   font-weight: 700;
   color: white;
   text-decoration: none;
-  transition: border-color 0.15s ease;
-  &:hover { border-color: ${C.accent}80; }
-  &:active { transform: scale(0.98); }
-`
-
-export const planBtnPro = css`
+  transition: all 0.15s;
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.04);
+  }
+`;
+export const pBtnP = css`
   display: block;
   text-align: center;
-  background: ${C.accent};
-  border-radius: ${RADIUS.xl};
-  padding: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 900;
+  background: #7c6af7;
+  border-radius: 12px;
+  padding: 0.9375rem;
+  font-weight: 700;
   color: white;
   text-decoration: none;
-  transition: all 0.15s ease;
-  box-shadow: 0 4px 16px ${C.accent}33;
-  &:hover { background: ${C.accent}e6; transform: translateY(-1px); }
-  &:active { transform: scale(0.98); }
-`
+  box-shadow: 0 8px 24px rgba(124, 106, 247, 0.32);
+  transition: all 0.18s;
+  &:hover {
+    background: #6b59e8;
+    transform: translateY(-1px);
+  }
+`;
 
-// ─── Bottom CTA ───────────────────────────────────────────────────────────────
-
-export const bottomCta = css`
+/* ─ Bottom CTA */
+export const btmCta = css`
   text-align: center;
-  background: ${C.card};
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xxl};
-  padding: 2rem 1.25rem;
-  margin-bottom: 2.5rem;
-  @media (min-width: ${BP.sm}) { padding: 3rem; }
-`
-
-export const bottomCtaEmoji = css`
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  @media (min-width: ${BP.sm}) { font-size: 3rem; }
-`
-
-export const bottomCtaTitle = css`
-  font-size: 1.5rem;
-  font-weight: 900;
-  margin-bottom: 0.75rem;
-  @media (min-width: ${BP.sm}) { font-size: 2rem; }
-`
-
-export const bottomCtaDesc = css`
-  color: ${C.muted};
-  font-size: 0.875rem;
-  margin-bottom: 1.5rem;
-  max-width: 24rem;
-  margin-left: auto;
-  margin-right: auto;
-`
-
-export const footer = css`
+  padding: 4.5rem 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(124, 106, 247, 0.45),
+      transparent
+    );
+  }
+`;
+export const btmH = css`
+  font-family: "Syne", sans-serif;
+  font-size: clamp(1.875rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: white;
+  margin-bottom: 0.875rem;
+`;
+export const btmD = css`
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 2.25rem;
+  line-height: 1.7;
+`;
+export const foot = css`
   text-align: center;
-  color: ${C.muted};
-  font-size: 0.75rem;
-  padding-bottom: 1rem;
-`
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.8125rem;
+  padding-bottom: 2rem;
+`;
+export const hr = css`
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin: 0 0 5rem;
+`;

@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuestions, useUserProgress } from "@/hooks/useQuestions";
-import Navbar from "@/components/layout/Navbar";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import { Flame, Brain, Code2, Bug } from "lucide-react";
 import { format, parseISO } from "date-fns";

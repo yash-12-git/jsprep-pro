@@ -1,32 +1,43 @@
-import { notFound } from 'next/navigation'
-import { getBlogPostsForTopic, getQuestions, getRelatedTopics, getTopicBySlug, getTopicSlugs } from '@/lib/cachedQueries'
-import type { Metadata } from 'next'
-import Link from 'next/link'
+import { notFound } from "next/navigation";
+import {
+  getBlogPostsForTopic,
+  getQuestions,
+  getRelatedTopics,
+  getTopicBySlug,
+  getTopicSlugs,
+} from "@/lib/cachedQueries";
+import type { Metadata } from "next";
+import Link from "next/link";
 
-import { pageMeta, faqSchema, breadcrumbSchema } from '@/lib/seo/seo'
+import { pageMeta, faqSchema, breadcrumbSchema } from "@/lib/seo/seo";
+import { getTopicFaqs } from "@/data/seo/topicFaqs";
 
-export const revalidate = 3600
+export const revalidate = 3600;
 
-interface Props { params: { topic: string } }
+interface Props {
+  params: { topic: string };
+}
 
 export async function generateStaticParams() {
   try {
-    const slugs = await getTopicSlugs()
-    return slugs.map(topic => ({ topic }))
-  } catch { return [] }
+    const slugs = await getTopicSlugs();
+    return slugs.map((topic) => ({ topic }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const topic = await getTopicBySlug(params.topic)
-  if (!topic) return {}
-  const hasConceptHub = !!(topic.mentalModel || topic.deepDive)
+  const topic = await getTopicBySlug(params.topic);
+  if (!topic) return {};
+  const hasConceptHub = !!(topic.mentalModel || topic.deepDive);
   return pageMeta({
     title: hasConceptHub
       ? `${topic.title} — Explained + ${topic.questionCount} Interview Questions`
       : `${topic.title} (${topic.questionCount} Questions) | JSPrep Pro`,
     description: hasConceptHub
       ? `${(topic.mentalModel ?? topic.description).slice(0, 120)} — with code examples, common mistakes, and ${topic.questionCount} practice interview questions.`
-      : `${topic.description} Covers ${topic.cheatSheet.slice(0, 2).join('. ')}. Practice with AI feedback.`,
+      : `${topic.description} Covers ${topic.cheatSheet.slice(0, 2).join(". ")}. Practice with AI feedback.`,
     path: `/${topic.slug}`,
     keywords: [
       `${topic.keyword} javascript`,
@@ -36,109 +47,231 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `javascript ${topic.keyword} questions`,
       ...(topic.extraKeywords ?? []),
     ],
-  })
+  });
 }
 
 const DIFF_STYLE: Record<string, { bg: string; color: string }> = {
-  Beginner:     { bg: 'rgba(74,222,128,0.15)',  color: '#4ade80' },
-  Intermediate: { bg: 'rgba(251,191,36,0.15)',  color: '#fbbf24' },
-  Advanced:     { bg: 'rgba(251,146,60,0.15)',  color: '#fb923c' },
-  Senior:       { bg: 'rgba(248,113,113,0.15)', color: '#f87171' },
-}
+  Beginner: { bg: "rgba(74,222,128,0.15)", color: "#4ade80" },
+  Intermediate: { bg: "rgba(251,191,36,0.15)", color: "#fbbf24" },
+  Advanced: { bg: "rgba(251,146,60,0.15)", color: "#fb923c" },
+  Senior: { bg: "rgba(248,113,113,0.15)", color: "#f87171" },
+};
 
 function Anchor({ id }: { id: string }) {
-  return <div id={id} style={{ marginTop: -80, paddingTop: 80 }} />
+  return <div id={id} style={{ marginTop: -80, paddingTop: 80 }} />;
 }
 
 export default async function TopicPage({ params }: Props) {
-  const topic = await getTopicBySlug(params.topic)
-  if (!topic) notFound()
+  const topic = await getTopicBySlug(params.topic);
+  if (!topic) notFound();
 
   // Only show questions explicitly tagged to this topic via topicSlug.
   // No category fallback — that pulls in unrelated questions from the same broad category.
   // Tag questions to topics in /admin/questions by setting the "Topic Page" field.
   const { questions } = await getQuestions({
-    filters: { status: 'published' },
+    filters: { status: "published" },
     pageSize: 200,
-    orderByField: 'order',
-    orderDir: 'asc',
-  }).then(r => ({ questions: r.questions.filter(q => q.topicSlug === topic.slug) }))
+    orderByField: "order",
+    orderDir: "asc",
+  }).then((r) => ({
+    questions: r.questions.filter((q) => q.topicSlug === topic.slug),
+  }));
 
   const [relatedTopics, relatedPosts] = await Promise.all([
     getRelatedTopics(topic.related ?? []),
     getBlogPostsForTopic(topic.slug),
-  ])
+  ]);
 
-  const diff = DIFF_STYLE[topic.difficulty] ?? DIFF_STYLE.Intermediate
-  const hasConceptHub = !!(topic.mentalModel || topic.deepDive)
+  const diff = DIFF_STYLE[topic.difficulty] ?? DIFF_STYLE.Intermediate;
+  const hasConceptHub = !!(topic.mentalModel || topic.deepDive);
 
-  const faq = faqSchema(questions.map(q => ({
-    question: q.title,
-    answer: (q.answer ?? '').replace(/<[^>]*>?/gm, '').slice(0, 500),
-  })))
+  const dedicatedFaqs = getTopicFaqs(topic.slug);
+  const faqItems =
+    dedicatedFaqs.length > 0
+      ? dedicatedFaqs
+      : questions.slice(0, 8).map((q) => ({
+          question: q.title,
+          answer: (q.answer ?? "").replace(/<[^>]*>?/gm, "").slice(0, 400),
+        }));
+  const faq = faqSchema(faqItems);
   const breadcrumbs = breadcrumbSchema([
-    { name: 'Home',   path: '/' },
-    { name: 'Topics', path: '/topics' },
+    { name: "Home", path: "/" },
+    { name: "Topics", path: "/topics" },
     { name: topic.title, path: `/${topic.slug}` },
-  ])
+  ]);
 
   const tocItems = [
-    hasConceptHub && topic.mentalModel       && { id: 'concept',         label: 'The Mental Model' },
-    hasConceptHub && topic.deepDive          && { id: 'explanation',     label: 'Deep Explanation' },
-    topic.misconceptions?.length             && { id: 'misconceptions',  label: 'Common Mistakes' },
-    topic.realWorldExamples?.length          && { id: 'real-world',      label: 'Real-World Usage' },
-                                                { id: 'cheatsheet',     label: 'Cheat Sheet' },
-                                                { id: 'interview-tips', label: 'Interview Tips' },
-    relatedPosts.length                      && { id: 'articles',        label: 'Deep Dives' },
-                                                { id: 'questions',      label: questions.length > 0 ? `${questions.length} Questions` : 'Questions' },
-    relatedTopics.length                     && { id: 'related',         label: 'Related Topics' },
-  ].filter(Boolean) as { id: string; label: string }[]
+    hasConceptHub &&
+      topic.mentalModel && { id: "concept", label: "The Mental Model" },
+    hasConceptHub &&
+      topic.deepDive && { id: "explanation", label: "Deep Explanation" },
+    topic.misconceptions?.length && {
+      id: "misconceptions",
+      label: "Common Mistakes",
+    },
+    topic.realWorldExamples?.length && {
+      id: "real-world",
+      label: "Real-World Usage",
+    },
+    { id: "cheatsheet", label: "Cheat Sheet" },
+    { id: "interview-tips", label: "Interview Tips" },
+    relatedPosts.length && { id: "articles", label: "Deep Dives" },
+    {
+      id: "questions",
+      label:
+        questions.length > 0 ? `${questions.length} Questions` : "Questions",
+    },
+    relatedTopics.length && { id: "related", label: "Related Topics" },
+  ].filter(Boolean) as { id: string; label: string }[];
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faq }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbs }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: faq }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: breadcrumbs }}
+      />
 
-      <div style={{ maxWidth: 920, margin: '0 auto', padding: '32px 24px 100px', color: '#c8c8d8', fontFamily: "'DM Sans',system-ui,sans-serif" }}>
-
+      <div
+        style={{
+          maxWidth: 920,
+          margin: "0 auto",
+          padding: "32px 24px 100px",
+          color: "#c8c8d8",
+          fontFamily: "'DM Sans',system-ui,sans-serif",
+        }}
+      >
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" style={{ marginBottom: 28, fontSize: 13, color: '#6b7280' }}>
-          <Link href="/" style={{ color: '#6b7280', textDecoration: 'none' }}>Home</Link>
-          <span style={{ margin: '0 8px' }}>›</span>
-          <Link href="/topics" style={{ color: '#6b7280', textDecoration: 'none' }}>Topics</Link>
-          <span style={{ margin: '0 8px' }}>›</span>
-          <span style={{ color: '#a78bfa' }}>{topic.title}</span>
+        <nav
+          aria-label="Breadcrumb"
+          style={{ marginBottom: 28, fontSize: 13, color: "#6b7280" }}
+        >
+          <Link href="/" style={{ color: "#6b7280", textDecoration: "none" }}>
+            Home
+          </Link>
+          <span style={{ margin: "0 8px" }}>›</span>
+          <Link
+            href="/topics"
+            style={{ color: "#6b7280", textDecoration: "none" }}
+          >
+            Topics
+          </Link>
+          <span style={{ margin: "0 8px" }}>›</span>
+          <span style={{ color: "#a78bfa" }}>{topic.title}</span>
         </nav>
 
         {/* Hero */}
         <header style={{ marginBottom: 36 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
-            <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', background: diff.bg, color: diff.color }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 14,
+              flexWrap: "wrap",
+            }}
+          >
+            <span
+              style={{
+                padding: "4px 12px",
+                borderRadius: 20,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                background: diff.bg,
+                color: diff.color,
+              }}
+            >
               {topic.difficulty}
             </span>
-            <span style={{ color: '#6b7280', fontSize: 13 }}>
-              {questions.length} question{questions.length !== 1 ? 's' : ''}
+            <span style={{ color: "#6b7280", fontSize: 13 }}>
+              {questions.length} question{questions.length !== 1 ? "s" : ""}
             </span>
             {hasConceptHub && (
-              <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', background: 'rgba(106,247,192,0.1)', color: '#6af7c0', border: '1px solid rgba(106,247,192,0.2)' }}>
+              <span
+                style={{
+                  padding: "3px 10px",
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                  background: "rgba(106,247,192,0.1)",
+                  color: "#6af7c0",
+                  border: "1px solid rgba(106,247,192,0.2)",
+                }}
+              >
                 Full Guide
               </span>
             )}
           </div>
-          <h1 style={{ color: '#f1f0ff', fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 800, lineHeight: 1.2, marginBottom: 14, letterSpacing: '-0.02em' }}>
+          <h1
+            style={{
+              color: "#f1f0ff",
+              fontSize: "clamp(1.6rem,4vw,2.4rem)",
+              fontWeight: 800,
+              lineHeight: 1.2,
+              marginBottom: 14,
+              letterSpacing: "-0.02em",
+            }}
+          >
             {topic.title}
           </h1>
-          <p style={{ fontSize: 16, lineHeight: 1.7, color: '#a0a0b8', maxWidth: 680 }}>{topic.description}</p>
+          <p
+            style={{
+              fontSize: 16,
+              lineHeight: 1.7,
+              color: "#a0a0b8",
+              maxWidth: 680,
+            }}
+          >
+            {topic.description}
+          </p>
         </header>
 
         {/* Table of Contents */}
         {tocItems.length > 3 && (
-          <nav style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '16px 20px', marginBottom: 44 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b7280', marginBottom: 12 }}>On this page</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 20px' }}>
+          <nav
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              borderRadius: 12,
+              padding: "16px 20px",
+              marginBottom: 44,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "#6b7280",
+                marginBottom: 12,
+              }}
+            >
+              On this page
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 20px" }}>
               {tocItems.map((item, i) => (
-                <a key={item.id} href={`#${item.id}`} style={{ fontSize: 13, color: '#a78bfa', textDecoration: 'none' }}>
-                  <span style={{ color: '#4b5563', fontSize: 11, marginRight: 4 }}>{i + 1}.</span>
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  style={{
+                    fontSize: 13,
+                    color: "#a78bfa",
+                    textDecoration: "none",
+                  }}
+                >
+                  <span
+                    style={{ color: "#4b5563", fontSize: 11, marginRight: 4 }}
+                  >
+                    {i + 1}.
+                  </span>
                   {item.label}
                 </a>
               ))}
@@ -151,12 +284,52 @@ export default async function TopicPage({ params }: Props) {
         {topic.mentalModel && (
           <section style={{ marginBottom: 40 }}>
             <Anchor id="concept" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <span style={{ width: 3, height: 20, borderRadius: 2, background: '#6af7c0', display: 'inline-block', flexShrink: 0 }} />
-              <h2 style={{ color: '#f1f0ff', fontSize: 18, fontWeight: 700, margin: 0 }}>The Mental Model</h2>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 16,
+              }}
+            >
+              <span
+                style={{
+                  width: 3,
+                  height: 20,
+                  borderRadius: 2,
+                  background: "#6af7c0",
+                  display: "inline-block",
+                  flexShrink: 0,
+                }}
+              />
+              <h2
+                style={{
+                  color: "#f1f0ff",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  margin: 0,
+                }}
+              >
+                The Mental Model
+              </h2>
             </div>
-            <div style={{ background: 'rgba(106,247,192,0.05)', border: '1px solid rgba(106,247,192,0.18)', borderRadius: 14, padding: '24px 28px' }}>
-              <p style={{ fontSize: 16, lineHeight: 1.85, color: '#d4f5e8', margin: 0, fontStyle: 'italic' }}>
+            <div
+              style={{
+                background: "rgba(106,247,192,0.05)",
+                border: "1px solid rgba(106,247,192,0.18)",
+                borderRadius: 14,
+                padding: "24px 28px",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: 16,
+                  lineHeight: 1.85,
+                  color: "#d4f5e8",
+                  margin: 0,
+                  fontStyle: "italic",
+                }}
+              >
                 {topic.mentalModel}
               </p>
             </div>
@@ -166,26 +339,100 @@ export default async function TopicPage({ params }: Props) {
         {topic.deepDive && (
           <section style={{ marginBottom: 40 }}>
             <Anchor id="explanation" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-              <span style={{ width: 3, height: 20, borderRadius: 2, background: '#7c6af7', display: 'inline-block', flexShrink: 0 }} />
-              <h2 style={{ color: '#f1f0ff', fontSize: 18, fontWeight: 700, margin: 0 }}>The Explanation</h2>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 20,
+              }}
+            >
+              <span
+                style={{
+                  width: 3,
+                  height: 20,
+                  borderRadius: 2,
+                  background: "#7c6af7",
+                  display: "inline-block",
+                  flexShrink: 0,
+                }}
+              />
+              <h2
+                style={{
+                  color: "#f1f0ff",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  margin: 0,
+                }}
+              >
+                The Explanation
+              </h2>
             </div>
-            <div className="concept-body" dangerouslySetInnerHTML={{ __html: topic.deepDive }} />
+            <div
+              className="concept-body"
+              dangerouslySetInnerHTML={{ __html: topic.deepDive }}
+            />
           </section>
         )}
 
         {topic.misconceptions && topic.misconceptions.length > 0 && (
           <section style={{ marginBottom: 40 }}>
             <Anchor id="misconceptions" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <span style={{ width: 3, height: 20, borderRadius: 2, background: '#f87171', display: 'inline-block', flexShrink: 0 }} />
-              <h2 style={{ color: '#f1f0ff', fontSize: 18, fontWeight: 700, margin: 0 }}>Common Misconceptions</h2>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 16,
+              }}
+            >
+              <span
+                style={{
+                  width: 3,
+                  height: 20,
+                  borderRadius: 2,
+                  background: "#f87171",
+                  display: "inline-block",
+                  flexShrink: 0,
+                }}
+              />
+              <h2
+                style={{
+                  color: "#f1f0ff",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  margin: 0,
+                }}
+              >
+                Common Misconceptions
+              </h2>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {topic.misconceptions.map((item, i) => (
-                <div key={i} style={{ background: 'rgba(248,113,113,0.05)', border: '1px solid rgba(248,113,113,0.18)', borderRadius: 12, padding: '16px 20px', display: 'flex', gap: 14 }}>
-                  <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>⚠️</span>
-                  <p style={{ fontSize: 14, lineHeight: 1.75, color: '#f5c6c6', margin: 0 }}>{item}</p>
+                <div
+                  key={i}
+                  style={{
+                    background: "rgba(248,113,113,0.05)",
+                    border: "1px solid rgba(248,113,113,0.18)",
+                    borderRadius: 12,
+                    padding: "16px 20px",
+                    display: "flex",
+                    gap: 14,
+                  }}
+                >
+                  <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>
+                    ⚠️
+                  </span>
+                  <p
+                    style={{
+                      fontSize: 14,
+                      lineHeight: 1.75,
+                      color: "#f5c6c6",
+                      margin: 0,
+                    }}
+                  >
+                    {item}
+                  </p>
                 </div>
               ))}
             </div>
@@ -195,15 +442,70 @@ export default async function TopicPage({ params }: Props) {
         {topic.realWorldExamples && topic.realWorldExamples.length > 0 && (
           <section style={{ marginBottom: 44 }}>
             <Anchor id="real-world" />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <span style={{ width: 3, height: 20, borderRadius: 2, background: '#60a5fa', display: 'inline-block', flexShrink: 0 }} />
-              <h2 style={{ color: '#f1f0ff', fontSize: 18, fontWeight: 700, margin: 0 }}>Where You'll See This in Real Code</h2>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 16,
+              }}
+            >
+              <span
+                style={{
+                  width: 3,
+                  height: 20,
+                  borderRadius: 2,
+                  background: "#60a5fa",
+                  display: "inline-block",
+                  flexShrink: 0,
+                }}
+              />
+              <h2
+                style={{
+                  color: "#f1f0ff",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  margin: 0,
+                }}
+              >
+                Where You'll See This in Real Code
+              </h2>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {topic.realWorldExamples.map((item, i) => (
-                <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '12px 16px', background: 'rgba(96,165,250,0.05)', border: '1px solid rgba(96,165,250,0.12)', borderRadius: 10 }}>
-                  <span style={{ color: '#60a5fa', flexShrink: 0, fontWeight: 700, fontSize: 13, marginTop: 2 }}>→</span>
-                  <p style={{ fontSize: 14, lineHeight: 1.7, color: '#b8d4f8', margin: 0 }}>{item}</p>
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    alignItems: "flex-start",
+                    padding: "12px 16px",
+                    background: "rgba(96,165,250,0.05)",
+                    border: "1px solid rgba(96,165,250,0.12)",
+                    borderRadius: 10,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#60a5fa",
+                      flexShrink: 0,
+                      fontWeight: 700,
+                      fontSize: 13,
+                      marginTop: 2,
+                    }}
+                  >
+                    →
+                  </span>
+                  <p
+                    style={{
+                      fontSize: 14,
+                      lineHeight: 1.7,
+                      color: "#b8d4f8",
+                      margin: 0,
+                    }}
+                  >
+                    {item}
+                  </p>
                 </div>
               ))}
             </div>
@@ -214,16 +516,62 @@ export default async function TopicPage({ params }: Props) {
 
         <section style={{ marginBottom: 28 }}>
           <Anchor id="cheatsheet" />
-          <div style={{ background: 'rgba(124,106,247,0.08)', border: '1px solid rgba(124,106,247,0.25)', borderRadius: 14, padding: '24px 28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+          <div
+            style={{
+              background: "rgba(124,106,247,0.08)",
+              border: "1px solid rgba(124,106,247,0.25)",
+              borderRadius: 14,
+              padding: "24px 28px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 18,
+              }}
+            >
               <span style={{ fontSize: 20 }}>⚡</span>
-              <h2 style={{ color: '#c4b5fd', fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Interview Cheat Sheet</h2>
+              <h2
+                style={{
+                  color: "#c4b5fd",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  margin: 0,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Interview Cheat Sheet
+              </h2>
             </div>
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <ul
+              style={{
+                margin: 0,
+                padding: 0,
+                listStyle: "none",
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+              }}
+            >
               {topic.cheatSheet.map((point, i) => (
-                <li key={i} style={{ display: 'flex', gap: 10, fontSize: 14, lineHeight: 1.6 }}>
-                  <span style={{ color: '#7c6af7', flexShrink: 0, marginTop: 1 }}>✦</span>
-                  <span style={{ color: '#d4d0e8' }}>{point}</span>
+                <li
+                  key={i}
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    fontSize: 14,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  <span
+                    style={{ color: "#7c6af7", flexShrink: 0, marginTop: 1 }}
+                  >
+                    ✦
+                  </span>
+                  <span style={{ color: "#d4d0e8" }}>{point}</span>
                 </li>
               ))}
             </ul>
@@ -232,15 +580,62 @@ export default async function TopicPage({ params }: Props) {
 
         <section style={{ marginBottom: relatedPosts.length ? 32 : 44 }}>
           <Anchor id="interview-tips" />
-          <div style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.2)', borderRadius: 14, padding: '20px 24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div
+            style={{
+              background: "rgba(251,191,36,0.06)",
+              border: "1px solid rgba(251,191,36,0.2)",
+              borderRadius: 14,
+              padding: "20px 24px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 14,
+              }}
+            >
               <span style={{ fontSize: 18 }}>💡</span>
-              <h2 style={{ color: '#fcd34d', fontSize: 14, fontWeight: 700, margin: 0, letterSpacing: '0.04em', textTransform: 'uppercase' }}>How to Answer in an Interview</h2>
+              <h2
+                style={{
+                  color: "#fcd34d",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  margin: 0,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                }}
+              >
+                How to Answer in an Interview
+              </h2>
             </div>
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <ul
+              style={{
+                margin: 0,
+                padding: 0,
+                listStyle: "none",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
               {topic.interviewTips.map((tip, i) => (
-                <li key={i} style={{ display: 'flex', gap: 10, fontSize: 14, lineHeight: 1.65, color: '#c8b87a' }}>
-                  <span style={{ color: '#fbbf24', flexShrink: 0, fontWeight: 700 }}>{i + 1}.</span>
+                <li
+                  key={i}
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    fontSize: 14,
+                    lineHeight: 1.65,
+                    color: "#c8b87a",
+                  }}
+                >
+                  <span
+                    style={{ color: "#fbbf24", flexShrink: 0, fontWeight: 700 }}
+                  >
+                    {i + 1}.
+                  </span>
                   <span>{tip}</span>
                 </li>
               ))}
@@ -251,12 +646,57 @@ export default async function TopicPage({ params }: Props) {
         {relatedPosts.length > 0 && (
           <section style={{ marginBottom: 44 }}>
             <Anchor id="articles" />
-            <div style={{ background: 'rgba(167,139,250,0.06)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 14, padding: '18px 22px' }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#a78bfa', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.07em' }}>📖 Deep Dive Articles</div>
+            <div
+              style={{
+                background: "rgba(167,139,250,0.06)",
+                border: "1px solid rgba(167,139,250,0.2)",
+                borderRadius: 14,
+                padding: "18px 22px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "#a78bfa",
+                  marginBottom: 12,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.07em",
+                }}
+              >
+                📖 Deep Dive Articles
+              </div>
               {relatedPosts.map((post, i) => (
-                <Link key={post.slug} href={`/blog/${post.slug}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, textDecoration: 'none', padding: '8px 0', borderBottom: i < relatedPosts.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
-                  <span style={{ fontSize: 14, color: '#d4d0e8', fontWeight: 600 }}>{post.title}</span>
-                  <span style={{ fontSize: 12, color: '#6b7280', whiteSpace: 'nowrap' }}>{post.readTime}</span>
+                <Link
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    textDecoration: "none",
+                    padding: "8px 0",
+                    borderBottom:
+                      i < relatedPosts.length - 1
+                        ? "1px solid rgba(255,255,255,0.04)"
+                        : "none",
+                  }}
+                >
+                  <span
+                    style={{ fontSize: 14, color: "#d4d0e8", fontWeight: 600 }}
+                  >
+                    {post.title}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: "#6b7280",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {post.readTime}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -265,48 +705,176 @@ export default async function TopicPage({ params }: Props) {
 
         <section style={{ marginBottom: 60 }}>
           <Anchor id="questions" />
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 28 }}>
-            <h2 style={{ color: '#f1f0ff', fontSize: 22, fontWeight: 700, margin: 0 }}>Practice Questions</h2>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              gap: 12,
+              marginBottom: 28,
+            }}
+          >
+            <h2
+              style={{
+                color: "#f1f0ff",
+                fontSize: 22,
+                fontWeight: 700,
+                margin: 0,
+              }}
+            >
+              Practice Questions
+            </h2>
             {questions.length > 0 && (
-              <span style={{ color: '#6b7280', fontSize: 13 }}>{questions.length} question{questions.length !== 1 ? 's' : ''}</span>
+              <span style={{ color: "#6b7280", fontSize: 13 }}>
+                {questions.length} question{questions.length !== 1 ? "s" : ""}
+              </span>
             )}
           </div>
 
           {questions.length === 0 ? (
-            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 12, padding: '32px 24px', textAlign: 'center' }}>
-              <p style={{ color: '#6b7280', fontSize: 14, margin: '0 0 8px' }}>No questions tagged to this topic yet.</p>
-              <p style={{ color: '#4b5563', fontSize: 13, margin: 0 }}>
-                Tag questions in{' '}
-                <a href="/admin/questions" style={{ color: '#7c6af7', textDecoration: 'none' }}>Admin → Questions</a>
-                {' '}by setting the "Topic Page" field to <code style={{ background: 'rgba(124,106,247,0.15)', padding: '1px 6px', borderRadius: 4, fontSize: 12, color: '#c4b5fd' }}>{topic.slug}</code>
+            <div
+              style={{
+                background: "rgba(255,255,255,0.02)",
+                border: "1px dashed rgba(255,255,255,0.1)",
+                borderRadius: 12,
+                padding: "32px 24px",
+                textAlign: "center",
+              }}
+            >
+              <p style={{ color: "#6b7280", fontSize: 14, margin: "0 0 8px" }}>
+                No questions tagged to this topic yet.
+              </p>
+              <p style={{ color: "#4b5563", fontSize: 13, margin: 0 }}>
+                Tag questions in{" "}
+                <a
+                  href="/admin/questions"
+                  style={{ color: "#7c6af7", textDecoration: "none" }}
+                >
+                  Admin → Questions
+                </a>{" "}
+                by setting the "Topic Page" field to{" "}
+                <code
+                  style={{
+                    background: "rgba(124,106,247,0.15)",
+                    padding: "1px 6px",
+                    borderRadius: 4,
+                    fontSize: 12,
+                    color: "#c4b5fd",
+                  }}
+                >
+                  {topic.slug}
+                </code>
               </p>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
               {questions.map((q, i) => (
-                <article key={q.id} id={`q${i + 1}`} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 32 }}>
-                  <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
-                    <span style={{ flexShrink: 0, width: 28, height: 28, borderRadius: 8, background: 'rgba(124,106,247,0.18)', color: '#a78bfa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, marginTop: 2 }}>
+                <article
+                  key={q.id}
+                  id={`q${i + 1}`}
+                  style={{
+                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    paddingBottom: 32,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 12,
+                      alignItems: "flex-start",
+                      marginBottom: 16,
+                    }}
+                  >
+                    <span
+                      style={{
+                        flexShrink: 0,
+                        width: 28,
+                        height: 28,
+                        borderRadius: 8,
+                        background: "rgba(124,106,247,0.18)",
+                        color: "#a78bfa",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        marginTop: 2,
+                      }}
+                    >
                       {i + 1}
                     </span>
                     <div style={{ flex: 1 }}>
-                      <h3 style={{ color: '#e8e6f8', fontSize: 17, fontWeight: 700, margin: '0 0 6px', lineHeight: 1.4 }}>{q.title}</h3>
-                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                        <span style={{ padding: '2px 9px', borderRadius: 12, fontSize: 11, fontWeight: 600, letterSpacing: '0.03em', textTransform: 'uppercase', background: 'rgba(96,165,250,0.12)', color: '#60a5fa' }}>
+                      <h3
+                        style={{
+                          color: "#e8e6f8",
+                          fontSize: 17,
+                          fontWeight: 700,
+                          margin: "0 0 6px",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {q.title}
+                      </h3>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span
+                          style={{
+                            padding: "2px 9px",
+                            borderRadius: 12,
+                            fontSize: 11,
+                            fontWeight: 600,
+                            letterSpacing: "0.03em",
+                            textTransform: "uppercase",
+                            background: "rgba(96,165,250,0.12)",
+                            color: "#60a5fa",
+                          }}
+                        >
                           {q.difficulty}
                         </span>
-                        {q.type !== 'theory' && (
-                          <span style={{ padding: '2px 9px', borderRadius: 12, fontSize: 11, fontWeight: 600, background: q.type === 'output' ? 'rgba(251,191,36,0.12)' : 'rgba(248,113,113,0.12)', color: q.type === 'output' ? '#fbbf24' : '#f87171' }}>
-                            {q.type === 'output' ? 'Output' : 'Debug'}
+                        {q.type !== "theory" && (
+                          <span
+                            style={{
+                              padding: "2px 9px",
+                              borderRadius: 12,
+                              fontSize: 11,
+                              fontWeight: 600,
+                              background:
+                                q.type === "output"
+                                  ? "rgba(251,191,36,0.12)"
+                                  : "rgba(248,113,113,0.12)",
+                              color:
+                                q.type === "output" ? "#fbbf24" : "#f87171",
+                            }}
+                          >
+                            {q.type === "output" ? "Output" : "Debug"}
                           </span>
                         )}
                         {q.hint && (
-                          <span style={{ padding: '2px 9px', borderRadius: 12, fontSize: 11, color: '#6b7280', background: 'rgba(255,255,255,0.04)' }}>💡 {q.hint}</span>
+                          <span
+                            style={{
+                              padding: "2px 9px",
+                              borderRadius: 12,
+                              fontSize: 11,
+                              color: "#6b7280",
+                              background: "rgba(255,255,255,0.04)",
+                            }}
+                          >
+                            💡 {q.hint}
+                          </span>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div style={{ paddingLeft: 40 }} className="answer-body" dangerouslySetInnerHTML={{ __html: q.answer ?? '' }} />
+                  <div
+                    style={{ paddingLeft: 40 }}
+                    className="answer-body"
+                    dangerouslySetInnerHTML={{ __html: q.answer ?? "" }}
+                  />
                 </article>
               ))}
             </div>
@@ -316,37 +884,147 @@ export default async function TopicPage({ params }: Props) {
         {relatedTopics.length > 0 && (
           <section style={{ marginBottom: 56 }}>
             <Anchor id="related" />
-            <h2 style={{ color: '#f1f0ff', fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Related Topics</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 12 }}>
-              {relatedTopics.map(t => {
-                const d = DIFF_STYLE[t.difficulty] ?? DIFF_STYLE.Intermediate
+            <h2
+              style={{
+                color: "#f1f0ff",
+                fontSize: 18,
+                fontWeight: 700,
+                marginBottom: 16,
+              }}
+            >
+              Related Topics
+            </h2>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))",
+                gap: 12,
+              }}
+            >
+              {relatedTopics.map((t) => {
+                const d = DIFF_STYLE[t.difficulty] ?? DIFF_STYLE.Intermediate;
                 return (
-                  <Link key={t.slug} href={`/${t.slug}`} style={{ display: 'block', padding: '16px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, textDecoration: 'none' }}>
-                    <div style={{ color: '#e8e6f8', fontSize: 14, fontWeight: 600, lineHeight: 1.4, marginBottom: 6 }}>{t.title}</div>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                      <span style={{ fontSize: 11, color: d.color, fontWeight: 600 }}>{t.difficulty}</span>
-                      <span style={{ color: '#4b5563', fontSize: 10 }}>·</span>
-                      <span style={{ fontSize: 11, color: '#6b7280' }}>{t.questionCount} Qs</span>
+                  <Link
+                    key={t.slug}
+                    href={`/${t.slug}`}
+                    style={{
+                      display: "block",
+                      padding: "16px 20px",
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: 12,
+                      textDecoration: "none",
+                    }}
+                  >
+                    <div
+                      style={{
+                        color: "#e8e6f8",
+                        fontSize: 14,
+                        fontWeight: 600,
+                        lineHeight: 1.4,
+                        marginBottom: 6,
+                      }}
+                    >
+                      {t.title}
+                    </div>
+                    <div
+                      style={{ display: "flex", gap: 6, alignItems: "center" }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: d.color,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t.difficulty}
+                      </span>
+                      <span style={{ color: "#4b5563", fontSize: 10 }}>·</span>
+                      <span style={{ fontSize: 11, color: "#6b7280" }}>
+                        {t.questionCount} Qs
+                      </span>
                     </div>
                   </Link>
-                )
+                );
               })}
             </div>
           </section>
         )}
 
-        <section style={{ background: 'linear-gradient(135deg,rgba(124,106,247,0.12) 0%,rgba(96,165,250,0.08) 100%)', border: '1px solid rgba(124,106,247,0.3)', borderRadius: 16, padding: '36px 32px', textAlign: 'center' }}>
+        <section
+          style={{
+            background:
+              "linear-gradient(135deg,rgba(124,106,247,0.12) 0%,rgba(96,165,250,0.08) 100%)",
+            border: "1px solid rgba(124,106,247,0.3)",
+            borderRadius: 16,
+            padding: "36px 32px",
+            textAlign: "center",
+          }}
+        >
           <div style={{ fontSize: 36, marginBottom: 12 }}>🎯</div>
-          <h3 style={{ color: '#f1f0ff', fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Can you answer these under pressure?</h3>
-          <p style={{ color: '#9090a8', fontSize: 15, lineHeight: 1.7, marginBottom: 24, maxWidth: 480, margin: '0 auto 24px' }}>
-            Reading answers is not the same as knowing them. Practice saying them out loud with AI feedback — that's what builds real interview confidence.
+          <h3
+            style={{
+              color: "#f1f0ff",
+              fontSize: 20,
+              fontWeight: 800,
+              marginBottom: 10,
+            }}
+          >
+            Can you answer these under pressure?
+          </h3>
+          <p
+            style={{
+              color: "#9090a8",
+              fontSize: 15,
+              lineHeight: 1.7,
+              marginBottom: 24,
+              maxWidth: 480,
+              margin: "0 auto 24px",
+            }}
+          >
+            Reading answers is not the same as knowing them. Practice saying
+            them out loud with AI feedback — that's what builds real interview
+            confidence.
           </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/auth" style={{ padding: '12px 28px', background: '#7c6af7', color: 'white', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>Practice Free →</Link>
-            <Link href="/output-quiz" style={{ padding: '12px 24px', background: 'rgba(255,255,255,0.06)', color: '#c4b5fd', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 15, border: '1px solid rgba(124,106,247,0.3)' }}>Try Output Quiz</Link>
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <Link
+              href="/auth"
+              style={{
+                padding: "12px 28px",
+                background: "#7c6af7",
+                color: "white",
+                borderRadius: 10,
+                textDecoration: "none",
+                fontWeight: 700,
+                fontSize: 15,
+              }}
+            >
+              Practice Free →
+            </Link>
+            <Link
+              href="/output-quiz"
+              style={{
+                padding: "12px 24px",
+                background: "rgba(255,255,255,0.06)",
+                color: "#c4b5fd",
+                borderRadius: 10,
+                textDecoration: "none",
+                fontWeight: 600,
+                fontSize: 15,
+                border: "1px solid rgba(124,106,247,0.3)",
+              }}
+            >
+              Try Output Quiz
+            </Link>
           </div>
         </section>
-
       </div>
 
       <style>{`
@@ -375,5 +1053,5 @@ export default async function TopicPage({ params }: Props) {
         .concept-body blockquote { border-left: 3px solid #7c6af7; margin: 20px 0; padding: 12px 20px; background: rgba(124,106,247,0.07); border-radius: 0 8px 8px 0; font-style: italic; color: #c4b5fd; }
       `}</style>
     </>
-  )
+  );
 }
