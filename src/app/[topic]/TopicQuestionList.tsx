@@ -2,14 +2,19 @@
 "use client";
 
 /**
- * TopicQuestionList — renders questions on topic hub pages.
+ * TopicQuestionList — renders questions on public topic hub pages.
  *
- * Uses the shared QuestionCards components — no duplicated card logic here.
- * Each card manages its own open state (uncontrolled, not accordion mode).
- * No paywall: topic pages are public, all questions fully accessible.
- * Debug AI check still requires Pro — the card handles that itself.
+ * Passes full auth/Pro context to every card type so:
+ *   - Theory cards show AI features (Tutor, Evaluate Me) with Pro lock icons for free users
+ *   - Output cards can be attempted by anyone, progress tracked if logged in
+ *   - Debug cards show AI checking as Pro, sign-in prompt for logged-out users
+ *   - PaywallBanner appears inline when free user clicks a Pro feature
+ *
+ * No hard paywalls on topic pages — these are public SEO pages.
+ * Pro features are visible but gated, driving upgrade intent.
  */
 
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
 import {
@@ -17,6 +22,7 @@ import {
   OutputCard,
   DebugCard,
 } from "@/components/ui/QuestionCards";
+import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import type { Question } from "@/types/question";
 
 interface Props {
@@ -28,6 +34,9 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
   const { user, progress } = useAuth();
   const uid = user?.uid ?? null;
   const isPro = progress?.isPro ?? false;
+  const isLoggedIn = !!user;
+
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const { isSolved, isRevealed, recordSolved, recordRevealed } =
     useUserProgress({ uid });
@@ -54,7 +63,7 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
           >
             Admin → Questions
           </a>{" "}
-          by setting the &ldquo;Topic Page&rdquo; field to{" "}
+          by setting the "Topic Page" field to{" "}
           <code
             style={{
               background: "rgba(124,106,247,0.15)",
@@ -73,22 +82,66 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      {questions.map((q, i) => {
-        const shared = {
-          key: q.id,
-          q,
-          index: i,
-          isSolved,
-          isRevealed,
-          recordSolved,
-          recordRevealed,
-        };
+    <>
+      {showPaywall && (
+        <PaywallBanner
+          reason="Upgrade to Pro to unlock AI Tutor, answer evaluation, and unlimited progress tracking."
+          onClose={() => setShowPaywall(false)}
+        />
+      )}
 
-        if (q.type === "output") return <OutputCard {...shared} />;
-        if (q.type === "debug") return <DebugCard {...shared} isPro={isPro} />;
-        return <TheoryCard key={q.id} q={q} index={i} />;
-      })}
-    </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        {questions.map((q, i) => {
+          const progressProps = {
+            isSolved,
+            isRevealed,
+            recordSolved,
+            recordRevealed,
+          };
+          const paywallProps = {
+            isPro,
+            isLoggedIn,
+            onPaywall: () => setShowPaywall(true),
+          };
+
+          if (q.type === "output") {
+            return (
+              <OutputCard
+                key={q.id}
+                q={q}
+                index={i}
+                {...progressProps}
+                onPaywall={paywallProps.onPaywall}
+              />
+            );
+          }
+
+          if (q.type === "debug") {
+            return (
+              <DebugCard
+                key={q.id}
+                q={q}
+                index={i}
+                {...progressProps}
+                isPro={isPro}
+                isLoggedIn={isLoggedIn}
+                onPaywall={paywallProps.onPaywall}
+              />
+            );
+          }
+          // Default: theory
+          return (
+            <TheoryCard
+              key={q.id}
+              q={q}
+              index={i}
+              isPro={isPro}
+              isLoggedIn={isLoggedIn}
+              onPaywall={() => setShowPaywall(true)}
+            />
+          );
+        })}
+      </div>
+    </>
   );
 }

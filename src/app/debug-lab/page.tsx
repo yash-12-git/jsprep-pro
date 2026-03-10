@@ -132,6 +132,7 @@ export default function DebugLabPage() {
                   q={q}
                   index={idx}
                   isPro={progress.isPro}
+                  isLoggedIn={!!user}
                   isSolved={isSolved}
                   isRevealed={isRevealed}
                   recordSolved={recordSolved}
