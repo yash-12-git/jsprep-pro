@@ -5,6 +5,7 @@ import Link from 'next/link'
 
 import { pageMeta, faqSchema, breadcrumbSchema } from '@/lib/seo/seo'
 import { getTopicFaqs } from '@/data/seo/topicFaqs'
+import TopicQuestionList from './TopicQuestionList'
 
 export const revalidate = 3600
 
@@ -278,45 +279,7 @@ export default async function TopicPage({ params }: Props) {
             )}
           </div>
 
-          {questions.length === 0 ? (
-            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 12, padding: '32px 24px', textAlign: 'center' }}>
-              <p style={{ color: '#6b7280', fontSize: 14, margin: '0 0 8px' }}>No questions tagged to this topic yet.</p>
-              <p style={{ color: '#4b5563', fontSize: 13, margin: 0 }}>
-                Tag questions in{' '}
-                <a href="/admin/questions" style={{ color: '#7c6af7', textDecoration: 'none' }}>Admin → Questions</a>
-                {' '}by setting the "Topic Page" field to <code style={{ background: 'rgba(124,106,247,0.15)', padding: '1px 6px', borderRadius: 4, fontSize: 12, color: '#c4b5fd' }}>{topic.slug}</code>
-              </p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-              {questions.map((q, i) => (
-                <article key={q.id} id={`q${i + 1}`} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 32 }}>
-                  <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
-                    <span style={{ flexShrink: 0, width: 28, height: 28, borderRadius: 8, background: 'rgba(124,106,247,0.18)', color: '#a78bfa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, marginTop: 2 }}>
-                      {i + 1}
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{ color: '#e8e6f8', fontSize: 17, fontWeight: 700, margin: '0 0 6px', lineHeight: 1.4 }}>{q.title}</h3>
-                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                        <span style={{ padding: '2px 9px', borderRadius: 12, fontSize: 11, fontWeight: 600, letterSpacing: '0.03em', textTransform: 'uppercase', background: 'rgba(96,165,250,0.12)', color: '#60a5fa' }}>
-                          {q.difficulty}
-                        </span>
-                        {q.type !== 'theory' && (
-                          <span style={{ padding: '2px 9px', borderRadius: 12, fontSize: 11, fontWeight: 600, background: q.type === 'output' ? 'rgba(251,191,36,0.12)' : 'rgba(248,113,113,0.12)', color: q.type === 'output' ? '#fbbf24' : '#f87171' }}>
-                            {q.type === 'output' ? 'Output' : 'Debug'}
-                          </span>
-                        )}
-                        {q.hint && (
-                          <span style={{ padding: '2px 9px', borderRadius: 12, fontSize: 11, color: '#6b7280', background: 'rgba(255,255,255,0.04)' }}>💡 {q.hint}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ paddingLeft: 40 }} className="answer-body" dangerouslySetInnerHTML={{ __html: q.answer ?? '' }} />
-                </article>
-              ))}
-            </div>
-          )}
+          <TopicQuestionList questions={questions} topicSlug={topic.slug} />
         </section>
 
         {relatedTopics.length > 0 && (
