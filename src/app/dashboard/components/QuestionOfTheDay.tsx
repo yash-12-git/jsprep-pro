@@ -398,6 +398,14 @@ const tryAgainBtn = css`
   }
 `;
 
+const responsiveText = css`
+  display: none;
+
+  @media (min-width: 400px) {
+    display: inline;
+  }
+`;
+
 // ─── Diff meta ────────────────────────────────────────────────────────────────
 const DIFF: Record<string, { color: string; bg: string; label: string }> = {
   core: { color: "#6af7c0", bg: "rgba(106,247,192,0.12)", label: "Core" },
@@ -571,16 +579,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
               title={answerOpen ? "Hide answer" : "Show answer"}
             >
               {answerOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-              <span
-                style={{
-                  display: "none",
-                  ["@media (min-width: 400px)" as string]: {
-                    display: "inline",
-                  },
-                }}
-              >
-                {answerOpen ? "Hide" : "Answer"}
-              </span>
+              <span css={responsiveText}>{answerOpen ? "Hide" : "Answer"}</span>
             </button>
             {!evalOpen && (
               <button css={doneBtn} onClick={markDone} title="I know this">

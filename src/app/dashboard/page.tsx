@@ -31,8 +31,7 @@ import CategoryFilter, {
 import QuestionOfTheDay from "./components/QuestionOfTheDay";
 import Leaderboard from "./components/Leaderboard";
 import dynamic from "next/dynamic";
-
-const LearnSection = dynamic(() => import("./components/LearnSection"));
+import LearnSection from "./components/LearnSection";
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 type Tab = "home" | "practice" | "learn" | "community";

@@ -8,6 +8,27 @@ import {
   getWeeklyLeaderboard,
   type LeaderboardEntry,
 } from "@/lib/userProgress";
+
+// ─── Module-level cache — shared across all mounts, 1-hour TTL ─────────────
+// Without this: every tab switch and re-mount fires 10 Firestore reads.
+// With this: reads happen at most once per hour per browser session.
+let _leaderboardCache: {
+  entries: LeaderboardEntry[];
+  fetchedAt: number;
+} | null = null;
+const LEADERBOARD_TTL_MS = 60 * 60 * 1000;
+
+async function getCachedLeaderboard(topN: number): Promise<LeaderboardEntry[]> {
+  if (
+    _leaderboardCache &&
+    Date.now() - _leaderboardCache.fetchedAt < LEADERBOARD_TTL_MS
+  ) {
+    return _leaderboardCache.entries;
+  }
+  const entries = await getWeeklyLeaderboard(topN);
+  _leaderboardCache = { entries, fetchedAt: Date.now() };
+  return entries;
+}
 import { C, RADIUS } from "@/styles/tokens";
 import Link from "next/link";
 
@@ -238,7 +259,7 @@ export default function Leaderboard({ currentUid }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getWeeklyLeaderboard(10)
+    getCachedLeaderboard(10)
       .then(setEntries)
       .finally(() => setLoading(false));
   }, []);
