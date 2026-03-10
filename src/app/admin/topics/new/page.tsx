@@ -7,6 +7,7 @@ import TopicForm from '@/app/admin/components/TopicForm'
 import type { TopicInput } from '@/types/topic'
 import { C } from '@/styles/tokens'
 import { ArrowLeft } from 'lucide-react'
+import { revalidateTopics } from '@/lib/adminRevalidate'
 
 export default function NewTopicPage() {
   const { user } = useAuth()
@@ -15,6 +16,7 @@ export default function NewTopicPage() {
   async function handleSubmit(data: TopicInput) {
     if (!user) return
     await createTopic(data, user.uid)
+    await revalidateTopics()
     router.push('/admin/topics')
   }
 

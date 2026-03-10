@@ -7,6 +7,7 @@ import BlogForm from '@/app/admin/components/BlogForm'
 import type { BlogPostInput } from '@/types/blogPost'
 import { C } from '@/styles/tokens'
 import { ArrowLeft } from 'lucide-react'
+import { revalidateBlogPosts } from '@/lib/adminRevalidate'
 
 export default function NewBlogPostPage() {
   const { user } = useAuth()
@@ -15,6 +16,7 @@ export default function NewBlogPostPage() {
   async function handleSubmit(data: BlogPostInput) {
     if (!user) return
     await createBlogPost(data, user.uid)
+    await revalidateBlogPosts()
     router.push('/admin/blog')
   }
 
