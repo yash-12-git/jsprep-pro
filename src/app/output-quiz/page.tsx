@@ -92,7 +92,7 @@ export default function OutputQuizPage() {
   }
 
   async function checkAnswer(q: Question, globalIdx: number) {
-    if (!progress!.isPro && globalIdx >= FREE_OUTPUT_LIMIT) {
+    if (!progress?.isPro && globalIdx >= FREE_OUTPUT_LIMIT) {
       setShowPaywall(true);
       return;
     }
