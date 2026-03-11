@@ -287,26 +287,32 @@ export const revealCard = css`
   padding: 1rem;
 `;
 
-// ─── Action chip (theory card actions row) ────────────────────────────────────
+// ─── Theory card action chips ─────────────────────────────────────────────────
 
 export const actionChip = (color: string, active: boolean) => css`
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.3125rem 0.75rem;
-  border-radius: ${RADIUS.md};
   font-size: 0.6875rem;
   font-weight: 700;
-  border: 1px solid ${active ? color + "66" : "rgba(255,255,255,0.08)"};
-  background: ${active ? color + "18" : "transparent"};
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.375rem;
+  border: 1px solid ${active ? color + "55" : "rgba(255,255,255,0.08)"};
+  background: ${active ? color + "18" : "rgba(255,255,255,0.03)"};
   color: ${active ? color : C.muted};
   cursor: pointer;
-  text-decoration: none;
   transition: all 0.15s ease;
+  white-space: nowrap;
+  text-decoration: none;
   &:hover {
-    border-color: ${color + "55"};
-    color: ${active ? color : "white"};
-    background: ${active ? color + "22" : color + "0d"};
+    border-color: ${color}44;
+    background: ${color}12;
+    color: ${color};
+  }
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 `;
 

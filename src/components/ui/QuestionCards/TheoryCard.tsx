@@ -14,46 +14,43 @@ import {
 } from "lucide-react";
 import { C } from "@/styles/tokens";
 import MarkdownRenderer from "@/components/md/MarkdownRenderer";
+import AIChat from "@/components/ui/AIChat/page";
+import AnswerEvaluator from "@/components/ui/AnswerEvaluator/page";
 import * as S from "./styles";
 import type { Question } from "@/types/question";
 
 /**
- * Unified TheoryCard used on BOTH dashboard and topic pages.
+ * Unified TheoryCard — used on dashboard AND topic pages.
  *
- * Dashboard context: pass isMastered, isBookmarked, isPro, onMastered, onBookmark,
- *   onPanel — AI Tutor and Evaluate Me work fully.
+ * AI panel state lives INSIDE this component. The parent does not coordinate
+ * which panel is open — the card is self-contained. This avoids prop-threading
+ * bugs where parent re-renders race with local card state.
  *
- * Topic page context: pass isPro + onPaywall — Pro feature buttons show with lock
- *   icon for free users, driving upgrades. No mastered/bookmark tracking needed
- *   on public pages.
- *
- * Both contexts show the same card shell — consistent brand experience.
+ * Usage:
+ *   Dashboard: pass isMastered, isBookmarked, onMastered, onBookmark
+ *   Topic page: omit mastered/bookmark props (buttons auto-hide)
+ *   Both: pass isPro, isLoggedIn, authLoading, onPaywall
  */
+
+type ActivePanel = "chat" | "eval" | null;
 
 interface Props {
   q: Question;
   index: number;
-  /** Optional: controlled open state for accordion mode */
+  // Controlled open state (accordion mode) — omit for self-managed
   isOpen?: boolean;
   onToggle?: () => void;
-
-  // Progress (optional — dashboard only)
+  // Progress — dashboard only
   isMastered?: boolean;
   isBookmarked?: boolean;
   isSolved?: boolean;
   onMastered?: () => void;
   onBookmark?: () => void;
-
-  // Auth / pro state
+  // Auth
   isPro?: boolean;
   isLoggedIn?: boolean;
+  authLoading?: boolean;
   onPaywall?: () => void;
-
-  // AI panels (dashboard only — renders inline)
-  onAITutor?: () => void;
-  onEvaluate?: () => void;
-  activePanel?: "chat" | "eval" | null;
-  aiPanelNode?: React.ReactNode; // rendered by parent (AIChat / AnswerEvaluator)
 }
 
 export default function TheoryCard({
@@ -68,33 +65,23 @@ export default function TheoryCard({
   onBookmark,
   isPro = false,
   isLoggedIn = false,
+  authLoading = false,
   onPaywall,
-  onAITutor,
-  onEvaluate,
-  activePanel,
-  aiPanelNode,
 }: Props) {
   const [internalOpen, setInternalOpen] = useState(false);
+  // AI panel state lives HERE — no parent coordination needed
+  const [activePanel, setActivePanel] = useState<ActivePanel>(null);
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const toggle = onToggle ?? (() => setInternalOpen((o) => !o));
-
   const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
 
-  // Pro action handlers — gate for non-pro users
-  function handleAITutor() {
-    if (!isLoggedIn) {
-      window.location.href = "/auth";
-      return;
-    }
-    if (!isPro) {
-      onPaywall?.();
-      return;
-    }
-    onAITutor?.();
+  function togglePanel(panel: "chat" | "eval") {
+    setActivePanel((prev) => (prev === panel ? null : panel));
   }
 
-  function handleEvaluate() {
+  function handleAIAction(panel: "chat" | "eval") {
+    if (authLoading) return;
     if (!isLoggedIn) {
       window.location.href = "/auth";
       return;
@@ -103,10 +90,11 @@ export default function TheoryCard({
       onPaywall?.();
       return;
     }
-    onEvaluate?.();
+    togglePanel(panel);
   }
 
   function handleBookmark() {
+    if (authLoading) return;
     if (!isLoggedIn) {
       window.location.href = "/auth";
       return;
@@ -117,8 +105,6 @@ export default function TheoryCard({
     }
     onBookmark?.();
   }
-
-  const showActionsRow = isLoggedIn !== undefined; // always show actions for CTAs
 
   return (
     <div css={S.questionCard(isMastered ? "correct" : "idle", C.accent)}>
@@ -250,7 +236,7 @@ export default function TheoryCard({
             <MarkdownRenderer content={q.answer} />
           </div>
 
-          {/* ── Pro feature action row — always shown, gated for non-pro ── */}
+          {/* ── Action row ── */}
           <div
             css={{
               display: "flex",
@@ -260,7 +246,7 @@ export default function TheoryCard({
               borderTop: "1px solid rgba(255,255,255,0.05)",
             }}
           >
-            {/* Mark mastered — free feature if logged in */}
+            {/* Mark mastered — free, dashboard only */}
             {onMastered && (
               <button
                 css={S.actionChip(isMastered ? C.accent3 : C.muted, isMastered)}
@@ -271,54 +257,61 @@ export default function TheoryCard({
               </button>
             )}
 
-            {/* Bookmark — Pro */}
-            {(onBookmark || !isPro) && (
-              <button
-                css={S.actionChip(
-                  isBookmarked ? C.accent2 : C.muted,
-                  isBookmarked,
-                )}
-                onClick={handleBookmark}
-              >
-                {!isPro ? <Lock size={10} /> : <Bookmark size={12} />}
-                {isBookmarked ? "Saved" : "Bookmark"}
-              </button>
-            )}
+            {/* Bookmark — Pro, dashboard only */}
+            {(onBookmark !== undefined || !isPro) &&
+              isLoggedIn &&
+              !authLoading && (
+                <button
+                  css={S.actionChip(
+                    isBookmarked ? C.accent2 : C.muted,
+                    isBookmarked,
+                  )}
+                  onClick={handleBookmark}
+                >
+                  {!isPro ? <Lock size={10} /> : <Bookmark size={12} />}
+                  {isBookmarked ? "Saved" : "Bookmark"}
+                </button>
+              )}
 
-            {/* AI Tutor — Pro */}
+            {/* AI Tutor */}
             <button
               css={S.actionChip(
                 activePanel === "chat" ? C.accent : C.muted,
                 activePanel === "chat",
               )}
-              onClick={handleAITutor}
+              onClick={() => handleAIAction("chat")}
+              disabled={authLoading}
+              style={authLoading ? { opacity: 0.4 } : undefined}
             >
               <Sparkles size={12} />
-              {!isPro && <Lock size={10} />}
+              {!authLoading && !isPro && isLoggedIn && <Lock size={10} />}
               AI Tutor
             </button>
 
-            {/* Evaluate Me — Pro */}
+            {/* Evaluate Me */}
             <button
               css={S.actionChip(
-                activePanel === "eval" ? C.purple : C.muted,
+                activePanel === "eval" ? "#a78bfa" : C.muted,
                 activePanel === "eval",
               )}
-              onClick={handleEvaluate}
+              onClick={() => handleAIAction("eval")}
+              disabled={authLoading}
+              style={authLoading ? { opacity: 0.4 } : undefined}
             >
               <Target size={12} />
-              {!isPro && <Lock size={10} />}
+              {!authLoading && !isPro && isLoggedIn && <Lock size={10} />}
               Evaluate Me
             </button>
 
-            {/* If not pro: subtle upgrade nudge */}
-            {!isPro && isLoggedIn && (
+            {/* Upgrade nudge for logged-in free users */}
+            {!isPro && isLoggedIn && !authLoading && (
               <button css={S.actionChip(C.accent2, false)} onClick={onPaywall}>
-                <Zap size={11} />
-                Unlock AI features
+                <Zap size={11} /> Unlock AI features
               </button>
             )}
-            {!isLoggedIn && (
+
+            {/* Sign in nudge for visitors */}
+            {!isLoggedIn && !authLoading && (
               <a
                 href="/auth"
                 css={[
@@ -326,14 +319,26 @@ export default function TheoryCard({
                   { textDecoration: "none" },
                 ]}
               >
-                <Zap size={11} />
-                Sign in for AI features
+                <Zap size={11} /> Sign in for AI features
               </a>
             )}
           </div>
 
-          {/* AI panels rendered here when provided by parent */}
-          {aiPanelNode}
+          {/* ── AI panels — rendered inline, state owned here ── */}
+          {activePanel === "chat" && (
+            <AIChat
+              question={q.question ?? q.title}
+              answer={q.answer ?? ""}
+              onClose={() => setActivePanel(null)}
+            />
+          )}
+          {activePanel === "eval" && (
+            <AnswerEvaluator
+              question={q.question ?? q.title}
+              idealAnswer={q.answer ?? ""}
+              onClose={() => setActivePanel(null)}
+            />
+          )}
         </div>
       )}
     </div>

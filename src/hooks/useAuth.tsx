@@ -41,10 +41,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   async function loadProgress(u: User) {
-    // Single read: getUserProgressAndStreak combines getUserProgress + updateStreak
-    // Previously two separate getDoc() calls — now one
-    const p = await getUserProgressAndStreak(u.uid);
-    setProgress(applyExpiryCheck(p));
+    try {
+      const p = await getUserProgressAndStreak(u.uid);
+      setProgress(applyExpiryCheck(p));
+    } catch (err) {
+      console.error("[useAuth] loadProgress failed — retrying once", err);
+      // Retry once after 1.5s (covers transient Firestore network blip)
+      try {
+        await new Promise((r) => setTimeout(r, 1500));
+        const p = await getUserProgressAndStreak(u.uid);
+        setProgress(applyExpiryCheck(p));
+      } catch (retryErr) {
+        console.error("[useAuth] loadProgress retry failed", retryErr);
+        // Fall through with progress = null rather than staying in loading state
+      }
+    }
   }
 
   useEffect(() => {

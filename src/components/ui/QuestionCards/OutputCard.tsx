@@ -54,13 +54,14 @@ export default function OutputCard({
   const [localRevealed, setLocalRevealed] = useState(false);
   // manuallyReset: overrides Firestore solved state so user can re-attempt
   const [manuallyReset, setManuallyReset] = useState(false);
+  const [answerState, setAnswerState] = useState<AnswerState>("idle");
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const toggle = onToggle ?? (() => setInternalOpen((o) => !o));
 
   // Priority: manuallyReset > localRevealed > Firestore solved > Firestore revealed > local wrong > idle
   const state: AnswerState =
-    !manuallyReset && isSolved(q.id)
+    !manuallyReset && (isSolved(q.id) || answerState === "correct")
       ? "correct"
       : localRevealed || (!manuallyReset && isRevealed(q.id))
         ? "revealed"
@@ -77,12 +78,15 @@ export default function OutputCard({
     const match =
       ua === correct ||
       ua.split("\n").join(",") === correct.split("\n").join(",");
+
     if (match) {
       await recordSolved(q.id);
       setLocalWrong(false);
       setManuallyReset(false);
+      setAnswerState("correct");
     } else {
       setLocalWrong(true);
+      setAnswerState("wrong");
     }
   }
 

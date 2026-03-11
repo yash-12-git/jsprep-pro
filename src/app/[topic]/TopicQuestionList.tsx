@@ -1,19 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
-/**
- * TopicQuestionList — renders questions on public topic hub pages.
- *
- * Passes full auth/Pro context to every card type so:
- *   - Theory cards show AI features (Tutor, Evaluate Me) with Pro lock icons for free users
- *   - Output cards can be attempted by anyone, progress tracked if logged in
- *   - Debug cards show AI checking as Pro, sign-in prompt for logged-out users
- *   - PaywallBanner appears inline when free user clicks a Pro feature
- *
- * No hard paywalls on topic pages — these are public SEO pages.
- * Pro features are visible but gated, driving upgrade intent.
- */
-
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
@@ -31,15 +18,21 @@ interface Props {
 }
 
 export default function TopicQuestionList({ questions, topicSlug }: Props) {
-  const { user, progress } = useAuth();
+  const { user, progress, loading: authLoading } = useAuth();
   const uid = user?.uid ?? null;
   const isPro = progress?.isPro ?? false;
   const isLoggedIn = !!user;
 
   const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallReason, setPaywallReason] = useState("");
 
   const { isSolved, isRevealed, recordSolved, recordRevealed } =
     useUserProgress({ uid });
+
+  function openPaywall(reason: string) {
+    setPaywallReason(reason);
+    setShowPaywall(true);
+  }
 
   if (questions.length === 0) {
     return (
@@ -85,51 +78,50 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
     <>
       {showPaywall && (
         <PaywallBanner
-          reason="Upgrade to Pro to unlock AI Tutor, answer evaluation, and unlimited progress tracking."
+          reason={paywallReason}
           onClose={() => setShowPaywall(false)}
         />
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         {questions.map((q, i) => {
-          const progressProps = {
-            isSolved,
-            isRevealed,
-            recordSolved,
-            recordRevealed,
-          };
-          const paywallProps = {
-            isPro,
-            isLoggedIn,
-            onPaywall: () => setShowPaywall(true),
-          };
-
-          if (q.type === "output") {
+          if (q.type === "output")
             return (
               <OutputCard
                 key={q.id}
                 q={q}
                 index={i}
-                {...progressProps}
-                onPaywall={paywallProps.onPaywall}
+                isSolved={isSolved}
+                isRevealed={isRevealed}
+                recordSolved={recordSolved}
+                recordRevealed={recordRevealed}
+                onPaywall={() =>
+                  openPaywall("Upgrade to Pro to unlock all output questions.")
+                }
               />
             );
-          }
 
-          if (q.type === "debug") {
+          if (q.type === "debug")
             return (
               <DebugCard
                 key={q.id}
                 q={q}
                 index={i}
-                {...progressProps}
                 isPro={isPro}
                 isLoggedIn={isLoggedIn}
-                onPaywall={paywallProps.onPaywall}
+                isSolved={isSolved}
+                isRevealed={isRevealed}
+                recordSolved={recordSolved}
+                recordRevealed={recordRevealed}
+                onPaywall={() =>
+                  openPaywall(
+                    "AI fix checking is a Pro feature. Upgrade for instant AI feedback.",
+                  )
+                }
               />
             );
-          }
-          // Default: theory
+
+          // theory — AI panel state lives inside TheoryCard
           return (
             <TheoryCard
               key={q.id}
@@ -137,7 +129,12 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
               index={i}
               isPro={isPro}
               isLoggedIn={isLoggedIn}
-              onPaywall={() => setShowPaywall(true)}
+              authLoading={authLoading}
+              onPaywall={() =>
+                openPaywall(
+                  "AI Tutor and Evaluate Me are Pro features. Upgrade for AI-powered coaching.",
+                )
+              }
             />
           );
         })}
