@@ -373,3 +373,113 @@ export const CAT_STYLE: Record<
     border: `${C.danger}33`,
   },
 };
+
+// ─── TheoryCard-specific (extracted from inline css={{}} objects) ──────────────
+
+export const titleRow = css`
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.375rem;
+  line-height: 1.4;
+`;
+
+export const badgeRow = css`
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+`;
+
+export const diffBadge = (style: {
+  bg: string;
+  color: string;
+  border: string;
+}) => css`
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid ${style.border};
+  background: ${style.bg};
+  color: ${style.color};
+`;
+
+export const catBadge = (accent: string) => css`
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid ${accent}33;
+  background: ${accent}1a;
+  color: ${accent}cc;
+`;
+
+export const proBadge = (accent2: string) => css`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.5625rem;
+  font-weight: 900;
+  padding: 0.125rem 0.4rem;
+  border-radius: 0.25rem;
+  background: ${accent2}18;
+  border: 1px solid ${accent2}44;
+  color: ${accent2};
+`;
+
+export const hintChip = css`
+  font-size: 0.625rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: ${C.muted};
+`;
+
+export const masteredBanner = (accent3: string) => css`
+  margin: 0.875rem 1.25rem 0;
+  padding: 0.375rem 0.75rem;
+  background: ${accent3}0f;
+  border: 1px solid ${accent3}25;
+  border-radius: 0.5rem;
+  font-size: 0.6875rem;
+  color: ${accent3};
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+`;
+
+export const hintBanner = (accent3: string) => css`
+  margin: 0.875rem 1.25rem 0;
+  padding: 0.5rem 0.875rem;
+  background: ${accent3}0f;
+  border: 1px solid ${accent3}30;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  color: ${accent3};
+  line-height: 1.5;
+`;
+
+export const answerPad = css`
+  padding: 0.875rem 1.25rem 0.25rem;
+`;
+
+export const actionRowTheory = css`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 0.75rem 1.25rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+`;
+
+export const titleMeta = css`
+  flex: 1;
+  min-width: 0;
+`;
+export const masteredCheck = (accent3: string) => css`
+  color: ${accent3};
+  margin-right: 0.3rem;
+`;
+
+export const noUnderline = css`
+  text-decoration: none;
+`;

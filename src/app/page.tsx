@@ -122,12 +122,13 @@ import {
   whyLabel,
   wrap,
 } from "./page.styles";
-import { proFeatures } from "@/data/proBenefits";
+
 import {
   AI_TOOLS,
   FREE_F,
   LEADERS,
   MODES,
+  proFeatures,
   TESTIMONIALS,
   TOPICS,
 } from "@/data/homepageStaticData";

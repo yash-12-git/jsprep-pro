@@ -158,4 +158,23 @@ export const FREE_F = [
   "Daily Question of the Day + AI eval",
   "First 5 output + 5 debug questions",
   "Weekly XP leaderboard",
+  "Interview Cheat Sheet (36 topics)",
+  "JavaScript Deep Dives (in-depth concept explanations)",
+];
+
+
+export const proFeatures = [
+  "Everything in Free",
+  "All output questions",
+  "All debug challenges",
+  "Unlimited mastery tracking",
+  "Bookmarks + cloud sync",
+  "Timed quiz / flashcard mode",
+  "AI Tutor on every question",
+  "AI Answer Evaluator",
+  "AI Code Checker",
+  "AI Mock Interviewer",
+  "AI Study Plan generator",
+  "Daily streak tracking",
+  "All future content",
 ];

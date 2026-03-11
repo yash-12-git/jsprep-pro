@@ -10,6 +10,7 @@ import {
   DebugCard,
 } from "@/components/ui/QuestionCards";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
+import * as S from "./styles";
 import type { Question } from "@/types/question";
 
 interface Props {
@@ -18,10 +19,9 @@ interface Props {
 }
 
 export default function TopicQuestionList({ questions, topicSlug }: Props) {
-  const { user, progress, loading: authLoading } = useAuth();
+  const { user, progress } = useAuth();
   const uid = user?.uid ?? null;
   const isPro = progress?.isPro ?? false;
-  const isLoggedIn = !!user;
 
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallReason, setPaywallReason] = useState("");
@@ -36,39 +36,15 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
 
   if (questions.length === 0) {
     return (
-      <div
-        style={{
-          background: "rgba(255,255,255,0.02)",
-          border: "1px dashed rgba(255,255,255,0.1)",
-          borderRadius: 12,
-          padding: "32px 24px",
-          textAlign: "center",
-        }}
-      >
-        <p style={{ color: "#6b7280", fontSize: 14, margin: "0 0 8px" }}>
-          No questions tagged to this topic yet.
-        </p>
-        <p style={{ color: "#4b5563", fontSize: 13, margin: 0 }}>
+      <div css={S.emptyState}>
+        <p css={S.emptyText}>No questions tagged to this topic yet.</p>
+        <p css={S.emptyHint}>
           Tag questions in{" "}
-          <a
-            href="/admin/questions"
-            style={{ color: "#7c6af7", textDecoration: "none" }}
-          >
+          <a href="/admin/questions" css={S.adminLink}>
             Admin → Questions
           </a>{" "}
           by setting the "Topic Page" field to{" "}
-          <code
-            style={{
-              background: "rgba(124,106,247,0.15)",
-              padding: "1px 6px",
-              borderRadius: 4,
-              fontSize: 12,
-              color: "#c4b5fd",
-            }}
-          >
-            {topicSlug}
-          </code>
-          .
+          <code css={S.emptyCode}>{topicSlug}</code>.
         </p>
       </div>
     );
@@ -83,7 +59,7 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
         />
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div css={S.list}>
         {questions.map((q, i) => {
           if (q.type === "output")
             return (
@@ -108,7 +84,7 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
                 q={q}
                 index={i}
                 isPro={isPro}
-                isLoggedIn={isLoggedIn}
+                isLoggedIn={!!user}
                 isSolved={isSolved}
                 isRevealed={isRevealed}
                 recordSolved={recordSolved}
@@ -121,22 +97,9 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
               />
             );
 
-          // theory — AI panel state lives inside TheoryCard
-          return (
-            <TheoryCard
-              key={q.id}
-              q={q}
-              index={i}
-              isPro={isPro}
-              isLoggedIn={isLoggedIn}
-              authLoading={authLoading}
-              onPaywall={() =>
-                openPaywall(
-                  "AI Tutor and Evaluate Me are Pro features. Upgrade for AI-powered coaching.",
-                )
-              }
-            />
-          );
+          // Theory — auth state and PaywallBanner are owned by TheoryCard itself.
+          // No auth props needed here.
+          return <TheoryCard key={q.id} q={q} index={i} />;
         })}
       </div>
     </>

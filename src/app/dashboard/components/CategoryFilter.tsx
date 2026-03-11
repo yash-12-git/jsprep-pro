@@ -10,7 +10,8 @@ export interface FilterState {
   search: string
   category: string
   difficulty: Difficulty | 'all'
-  type: QuestionType | 'all'
+  type: QuestionType | 'all',
+  showBookmarked: boolean
 }
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
   totalShown: number
   totalAll: number
   loading?: boolean
+  bookmarkCount?: number
 }
 
 const DIFF_LABELS: Record<string, string> = {
@@ -117,11 +119,11 @@ const S = {
 }
 
 export function defaultFilters(): FilterState {
-  return { search: '', category: 'All', difficulty: 'all', type: 'all' }
+  return { search: '', category: 'All', difficulty: 'all', type: 'all', showBookmarked: false }
 }
 
 export default function CategoryFilter({
-  categories, filters, onChange, totalShown, totalAll, loading
+  categories, filters, onChange, totalShown, totalAll, loading, bookmarkCount
 }: Props) {
   function set(partial: Partial<FilterState>) {
     onChange({ ...filters, ...partial })

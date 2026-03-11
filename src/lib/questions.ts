@@ -23,7 +23,6 @@ import {
   limit,
   startAfter,
   QueryDocumentSnapshot,
-  serverTimestamp,
   increment,
   writeBatch,
   DocumentData,
@@ -121,6 +120,8 @@ export async function getQuestions(
     constraints.push(where("difficulty", "==", filters.difficulty));
   if (filters.isPro !== undefined)
     constraints.push(where("isPro", "==", filters.isPro));
+  if (filters.isTricky !== undefined)
+    constraints.push(where("isTricky", "==", filters.isTricky));
   if (filters.topicSlug)
     constraints.push(where("topicSlug", "==", filters.topicSlug));
   if (filters.status) constraints.push(where("status", "==", filters.status));
@@ -293,30 +294,59 @@ export function invalidateProgressCache(uid: string) {
   _progressCache.delete(uid);
 }
 
+// ─── Write debounce — avoid per-keystroke Firestore writes ────────────────────
+// Batches rapid successive updates to the same questionId into one write.
+const _pendingWrites = new Map<
+  string,
+  {
+    uid: string;
+    questionId: string;
+    update: Partial<QuestionProgress>;
+    timer: ReturnType<typeof setTimeout>;
+  }
+>();
+const DEBOUNCE_MS = 600;
+
+export function scheduleProgressWrite(
+  uid: string,
+  questionId: string,
+  update: Partial<QuestionProgress>,
+): void {
+  const key = `${uid}:${questionId}`;
+  const existing = _pendingWrites.get(key);
+  if (existing) {
+    clearTimeout(existing.timer);
+    existing.update = { ...existing.update, ...update }; // merge
+  }
+  const timer = setTimeout(async () => {
+    _pendingWrites.delete(key);
+    await upsertProgress(uid, questionId, update).catch(() => {});
+  }, DEBOUNCE_MS);
+  _pendingWrites.set(key, { uid, questionId, update, timer });
+}
+
 export async function upsertProgress(
   uid: string,
   questionId: string,
   update: Partial<QuestionProgress>,
 ): Promise<void> {
   const ref = doc(db, USERS_COL, uid, "progress", questionId);
-  const snap = await getDoc(ref);
-  invalidateProgressCache(uid); // bust cache so next getAllProgress() re-reads
-  if (snap.exists()) {
-    await updateDoc(ref, {
+  invalidateProgressCache(uid);
+  // setDoc with merge:true = upsert in one write op. No getDoc read needed.
+  // Safe defaults only apply when the doc does not yet exist (merge preserves existing fields).
+  const { setDoc } = await import("firebase/firestore");
+  await setDoc(
+    ref,
+    {
+      questionId,
+      status: "attempted",
+      isBookmarked: false,
+      attempts: 1,
       ...update,
       lastAttemptAt: new Date().toISOString(),
-    });
-  } else {
-    await import("firebase/firestore").then(({ setDoc }) =>
-      setDoc(ref, {
-        questionId,
-        status: "attempted",
-        attempts: 1,
-        ...update,
-        lastAttemptAt: new Date().toISOString(),
-      }),
-    );
-  }
+    },
+    { merge: true },
+  );
 }
 
 export async function markMasteredV2(
@@ -336,9 +366,9 @@ export async function markBookmarked(
   questionId: string,
   bookmarked: boolean,
 ): Promise<void> {
-  await upsertProgress(uid, questionId, {
-    status: bookmarked ? "bookmarked" : "attempted",
-  });
+  // isBookmarked is a separate boolean — does NOT overwrite the learning status field.
+  // This allows a question to be both mastered AND bookmarked simultaneously.
+  await upsertProgress(uid, questionId, { isBookmarked: bookmarked });
 }
 
 export async function markSolved(

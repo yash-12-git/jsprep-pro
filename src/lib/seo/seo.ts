@@ -5,7 +5,7 @@
  * Change the site name once, updates everywhere.
  */
 
-import { proFeatures } from '@/data/proBenefits'
+import { proFeatures } from '@/data/homepageStaticData'
 import type { Metadata } from 'next'
 
 export const SITE = {

@@ -24,6 +24,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE.domain,                                       lastModified: now, changeFrequency: 'weekly',  priority: 1.0  },
     { url: `${SITE.domain}/javascript-interview-questions`,   lastModified: now, changeFrequency: 'weekly',  priority: 0.95 },
+    { url: `${SITE.domain}/javascript-output-questions`,      lastModified: now, changeFrequency: 'weekly',  priority: 0.95 },
+    { url: `${SITE.domain}/javascript-tricky-questions`,      lastModified: now, changeFrequency: 'weekly',  priority: 0.9  },
     { url: `${SITE.domain}/javascript-interview-cheatsheet`,  lastModified: now, changeFrequency: 'monthly', priority: 0.9  },
     { url: `${SITE.domain}/topics`,                           lastModified: now, changeFrequency: 'weekly',  priority: 0.9  },
     { url: `${SITE.domain}/blog`,                             lastModified: now, changeFrequency: 'weekly',  priority: 0.85 },

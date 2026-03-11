@@ -9,12 +9,11 @@ import {
   useCategories,
   useUserProgress,
 } from "@/hooks/useQuestions";
-import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import {
   BookOpen,
   Home,
   Layers,
-  Trophy,
+  Trophy
 } from "lucide-react";
 import * as ST from "./tab.styles";
 import * as Shared from "@/styles/shared";
@@ -25,14 +24,13 @@ import CategoryFilter, {
   defaultFilters,
   type FilterState,
 } from "./components/CategoryFilter";
+import LearnSection from "./components/LearnSection";
 import QuestionOfTheDay from "./components/QuestionOfTheDay";
 import Leaderboard from "./components/Leaderboard";
-import dynamic from "next/dynamic";
-import LearnSection from "./components/LearnSection";
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 type Tab = "home" | "practice" | "learn" | "community";
-const FREE_MASTER_LIMIT = 5;
 
 const TABS: { id: Tab; label: string; Icon: typeof Home }[] = [
   { id: "home", label: "Home", Icon: Home },
@@ -68,8 +66,6 @@ export default function DashboardPage() {
 
   const [tab, setTab] = useState<Tab>("home");
   const [filters, setFilters] = useState<FilterState>(defaultFilters());
-  const [showPaywall, setShowPaywall] = useState(false);
-  const [paywallReason, setPaywallReason] = useState("");
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/auth");
@@ -97,6 +93,10 @@ export default function DashboardPage() {
 
   const filtered = useMemo(() => {
     let qs = questions;
+    // Bookmark filter takes priority over all others — shows only saved questions
+    if (filters.showBookmarked) {
+      return qs.filter((q) => progressIds.bookmarked.has(q.id));
+    }
     if (filters.category !== "All")
       qs = qs.filter((q) => q.category === filters.category);
     if (filters.difficulty !== "all")
@@ -111,40 +111,18 @@ export default function DashboardPage() {
       );
     }
     return qs;
-  }, [questions, filters]);
+  }, [questions, filters, progressIds.bookmarked]);
 
-  // ── Paywall ───────────────────────────────────────────────────────────────
-  function gatePaywall(reason: string) {
-    setPaywallReason(reason);
-    setShowPaywall(true);
-  }
-
-  // ── Progress handlers ─────────────────────────────────────────────────────
+  // ── Progress handlers — Pro check is inside TheoryCard, not here ─────────
   async function handleMastered(questionId: string) {
-    if (
-      !progressIds.mastered.has(questionId) &&
-      !progress?.isPro &&
-      masteredCount >= FREE_MASTER_LIMIT
-    ) {
-      gatePaywall(
-        `Free plan is limited to ${FREE_MASTER_LIMIT} mastered questions. Upgrade to track all progress.`,
-      );
-      return;
-    }
     await toggleMastered(questionId);
   }
 
   async function handleBookmark(questionId: string) {
-    if (!progress?.isPro) {
-      gatePaywall(
-        "Bookmarks are a Pro feature. Upgrade to save questions for quick review.",
-      );
-      return;
-    }
     await toggleBookmark(questionId);
   }
 
-  if (authLoading || !user || !progress) {
+    if (authLoading || !user || !progress) {
     return (
       <div css={Shared.spinner}>
         <div css={Shared.spinnerDot} />
@@ -159,13 +137,6 @@ export default function DashboardPage() {
       {/* Ambient glows */}
       <div css={ST.purpleGlow} />
       <div css={ST.greenGlow} />
-
-      {showPaywall && (
-        <PaywallBanner
-          reason={paywallReason}
-          onClose={() => setShowPaywall(false)}
-        />
-      )}
 
       <div css={ST.content}>
         {/* ── Header ── */}
@@ -235,6 +206,7 @@ export default function DashboardPage() {
               onChange={(f) => setFilters(f)}
               totalShown={filtered.length}
               totalAll={questions.length}
+              bookmarkCount={bookmarkIds.length}
               loading={qLoading || pLoading}
             />
             <QuestionList
@@ -242,11 +214,9 @@ export default function DashboardPage() {
               questions={filtered}
               loading={qLoading || pLoading}
               error={qError}
-              progress={progress}
               progressIds={progressIds}
               onMastered={handleMastered}
               onBookmark={handleBookmark}
-              onNeedsPro={gatePaywall}
             />
           </div>
         )}

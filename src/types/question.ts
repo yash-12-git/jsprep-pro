@@ -83,6 +83,7 @@ export interface QuestionFilters {
   isPro?: boolean;
   status?: QuestionStatus;
   tags?: string[];
+  isTricky?: boolean; // for future "tricky" tag filter
 }
 
 // ─── User progress (per-question, not global) ─────────────────────────────────
@@ -103,4 +104,5 @@ export interface QuestionProgress {
   masteredAt?: string;
   score?: number; // AI eval score (1–10)
   userAnswer?: string; // last answer they typed
+  isBookmarked?: boolean;
 }
