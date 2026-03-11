@@ -147,28 +147,6 @@ export default function QuestionList({
                   "AI features are Pro only. Upgrade for AI tutoring, answer evaluation, and more.",
                 )
               }
-              activePanel={activePanel}
-              onAITutor={() => togglePanel(q.id, "chat")}
-              onEvaluate={() => togglePanel(q.id, "eval")}
-              aiPanelNode={
-                activePanel === "chat" ? (
-                  <AIChat
-                    question={q.question ?? q.title}
-                    answer={q.answer ?? ""}
-                    onClose={() =>
-                      setAIPanels((prev) => ({ ...prev, [q.id]: null }))
-                    }
-                  />
-                ) : activePanel === "eval" ? (
-                  <AnswerEvaluator
-                    question={q.question ?? q.title}
-                    idealAnswer={q.answer ?? ""}
-                    onClose={() =>
-                      setAIPanels((prev) => ({ ...prev, [q.id]: null }))
-                    }
-                  />
-                ) : null
-              }
             />
           );
         })}

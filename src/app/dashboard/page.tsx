@@ -15,9 +15,6 @@ import {
   Home,
   Layers,
   Trophy,
-  ArrowRight,
-  Flame,
-  Zap,
 } from "lucide-react";
 import * as ST from "./tab.styles";
 import * as Shared from "@/styles/shared";
