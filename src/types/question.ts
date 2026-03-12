@@ -65,6 +65,7 @@ export interface Question {
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
   createdBy?: string; // admin uid
+  isTricky?: boolean; // for future "tricky" tag
 }
 
 // ─── Firestore helpers ────────────────────────────────────────────────────────
