@@ -1,43 +1,51 @@
-import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import { pageMeta, faqSchema, breadcrumbSchema, catToSlug } from '@/lib/seo/seo'
-import { getQuestionBySlug, getPublishedQuestionSlugs, getPublishedCategories, getQuestions } from '@/lib/questions'
-import InlineEvaluator from '@/components/ui/InlineEvaluater'
+import type { Metadata } from "next";
+import { DIFF_STYLE, DIFF_LABEL } from "@/styles/tokens";
 
-interface Props { params: { slug: string } }
+import { notFound } from "next/navigation";
+import {
+  getPublishedCategories,
+  getPublishedQuestionSlugs,
+  getQuestions,
+} from "@/lib/cachedQueries";
+import Link from "next/link";
+import {
+  pageMeta,
+  faqSchema,
+  breadcrumbSchema,
+  catToSlug,
+  SITE,
+} from "@/lib/seo/seo";
+import InlineEvaluator from "@/components/ui/InlineEvaluater";
+import { getQuestionBySlug } from "@/lib/questions";
+
+interface Props {
+  params: { slug: string };
+}
 
 // ─── Slug helpers ─────────────────────────────────────────────────────────────
 
 function toSlug(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 80)
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
 }
 
-const DIFF_META: Record<string, { label: string; color: string; bg: string }> = {
-  beginner: { label: 'Beginner', color: '#6af7c0', bg: 'rgba(106,247,192,0.1)' },
-  core:     { label: 'Core',     color: '#6af7c0', bg: 'rgba(106,247,192,0.1)' },
-  advanced: { label: 'Advanced', color: '#f7c76a', bg: 'rgba(247,199,106,0.1)' },
-  expert:   { label: 'Expert',   color: '#f76a6a', bg: 'rgba(247,106,106,0.1)' },
-}
-
-export const revalidate = 3600
+export const revalidate = 3600;
 
 // ─── Static generation ────────────────────────────────────────────────────────
 
 export async function generateStaticParams() {
-  const slugs = await getPublishedQuestionSlugs().catch(() => [] as string[])
-  return slugs.map(slug => ({ slug }))
+  const slugs = await getPublishedQuestionSlugs().catch(() => [] as string[]);
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const q = await getQuestionBySlug(params.slug)
-  if (!q) return {}
+  const q = await getQuestionBySlug(params.slug);
+  if (!q) return {};
 
-  const diff = DIFF_META[q.difficulty]?.label ?? 'Core'
+  const diff = DIFF_LABEL[q.difficulty] ?? "Core";
 
   return pageMeta({
     title: `${q.title} — JavaScript Interview Question`,
@@ -47,105 +55,219 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       q.title.toLowerCase(),
       `${q.category.toLowerCase()} javascript interview`,
       `javascript interview ${q.category.toLowerCase()}`,
-      'javascript interview question',
-      `${params.slug.replace(/-/g, ' ')}`,
+      "javascript interview question",
+      `${params.slug.replace(/-/g, " ")}`,
     ],
-  })
+  });
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function QuestionPage({ params }: Props) {
-  const question = await getQuestionBySlug(params.slug)
-  if (!question) notFound()
+  const question = await getQuestionBySlug(params.slug);
+  if (!question) notFound();
 
-  const dm = DIFF_META[question.difficulty] ?? DIFF_META.core
-  const catSlug = catToSlug(question.category)
+  const dm = DIFF_STYLE[question.difficulty] ?? DIFF_STYLE.core;
+  const catSlug = catToSlug(question.category);
 
   // Related questions: same category, excluding current
   const { questions: allCatQs } = await getQuestions({
-    filters: { status: 'published', type: 'theory', category: question.category },
+    filters: {
+      status: "published",
+      type: "theory",
+      category: question.category,
+    },
     pageSize: 10,
-  })
-  const related = allCatQs.filter(q => q.id !== question.id).slice(0, 4)
+  });
+  const related = allCatQs.filter((q) => q.id !== question.id).slice(0, 4);
 
   // All categories for bottom nav
-  const categories = await getPublishedCategories()
+  const categories = await getPublishedCategories();
 
-  const jsonLd = faqSchema([{
-    question: question.title,
-    answer: (question.answer ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 500),
-  }])
+  const jsonLd = faqSchema([
+    {
+      question: question.title,
+      answer: (question.answer ?? "")
+        .replace(/<[^>]*>/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 500),
+    },
+  ]);
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbSchema([
-        { name: 'Home', path: '/' },
-        { name: 'JS Interview Questions', path: '/javascript-interview-questions' },
-        { name: question.category, path: `/questions/${catSlug}` },
-        { name: question.title.slice(0, 40) + '…', path: `/q/${params.slug}` },
-      ])}} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: breadcrumbSchema([
+            { name: "Home", path: "/" },
+            {
+              name: "JS Interview Questions",
+              path: "/javascript-interview-questions",
+            },
+            { name: question.category, path: `/questions/${catSlug}` },
+            {
+              name: question.title.slice(0, 40) + "…",
+              path: `/q/${params.slug}`,
+            },
+          ]),
+        }}
+      />
 
-      <div style={{ maxWidth: '50rem', margin: '0 auto', padding: '2.5rem 1.25rem 5rem', color: '#c8c8d8' }}>
-
+      <div
+        style={{
+          maxWidth: "50rem",
+          margin: "0 auto",
+          padding: "2.5rem 1.25rem 5rem",
+          color: "#c8c8d8",
+        }}
+      >
         {/* ── Breadcrumb ── */}
-        <nav style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
-          <Link href="/" style={{ color: '#7c6af7', textDecoration: 'none' }}>JSPrep Pro</Link>
+        <nav
+          style={{
+            fontSize: "0.8rem",
+            color: "rgba(255,255,255,0.35)",
+            marginBottom: "2rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.375rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <Link href="/" style={{ color: "#7c6af7", textDecoration: "none" }}>
+            JSPrep Pro
+          </Link>
           <span>›</span>
-          <Link href="/javascript-interview-questions" style={{ color: '#7c6af7', textDecoration: 'none' }}>Interview Questions</Link>
+          <Link
+            href="/javascript-interview-questions"
+            style={{ color: "#7c6af7", textDecoration: "none" }}
+          >
+            Interview Questions
+          </Link>
           <span>›</span>
-          <Link href={`/questions/${catSlug}`} style={{ color: '#7c6af7', textDecoration: 'none' }}>{question.category}</Link>
+          <Link
+            href={`/questions/${catSlug}`}
+            style={{ color: "#7c6af7", textDecoration: "none" }}
+          >
+            {question.category}
+          </Link>
           <span>›</span>
-          <span style={{ color: 'rgba(255,255,255,0.5)' }}>{question.title.slice(0, 45)}…</span>
+          <span style={{ color: "rgba(255,255,255,0.5)" }}>
+            {question.title.slice(0, 45)}…
+          </span>
         </nav>
 
         {/* ── Question header ── */}
-        <header style={{ marginBottom: '2.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-            <span style={{
-              fontSize: '0.6875rem', fontWeight: 800, letterSpacing: '0.06em',
-              textTransform: 'uppercase', padding: '3px 10px', borderRadius: 20,
-              background: dm.bg, color: dm.color,
-              border: `1px solid ${dm.color}33`,
-            }}>
-              {dm.label}
+        <header style={{ marginBottom: "2.5rem" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.625rem",
+              marginBottom: "1rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "0.6875rem",
+                fontWeight: 800,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                padding: "3px 10px",
+                borderRadius: 20,
+                background: dm.bg,
+                color: dm.color,
+                border: `1px solid ${dm.color}33`,
+              }}
+            >
+              {DIFF_LABEL[question.difficulty] ?? "Core"}
             </span>
-            <span style={{
-              fontSize: '0.6875rem', fontWeight: 700, color: '#7c6af7',
-              background: 'rgba(124,106,247,0.1)', padding: '3px 10px',
-              borderRadius: 20, border: '1px solid rgba(124,106,247,0.2)',
-            }}>
+            <span
+              style={{
+                fontSize: "0.6875rem",
+                fontWeight: 700,
+                color: "#7c6af7",
+                background: "rgba(124,106,247,0.1)",
+                padding: "3px 10px",
+                borderRadius: 20,
+                border: "1px solid rgba(124,106,247,0.2)",
+              }}
+            >
               {question.category}
             </span>
-            <span style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.3)', marginLeft: 'auto' }}>
+            <span
+              style={{
+                fontSize: "0.6875rem",
+                color: "rgba(255,255,255,0.3)",
+                marginLeft: "auto",
+              }}
+            >
               JavaScript Interview Question
             </span>
           </div>
 
-          <h1 style={{
-            fontSize: 'clamp(1.375rem, 3.5vw, 2rem)',
-            fontWeight: 900, color: 'white',
-            lineHeight: 1.3, marginBottom: '1rem',
-            letterSpacing: '-0.02em',
-          }}>
+          <h1
+            style={{
+              fontSize: "clamp(1.375rem, 3.5vw, 2rem)",
+              fontWeight: 900,
+              color: "white",
+              lineHeight: 1.3,
+              marginBottom: "1rem",
+              letterSpacing: "-0.02em",
+            }}
+          >
             {question.title}
           </h1>
 
           {question.hint && (
-            <div style={{
-              display: 'flex', alignItems: 'flex-start', gap: '0.625rem',
-              padding: '0.875rem 1rem',
-              background: 'rgba(247,199,106,0.07)',
-              border: '1px solid rgba(247,199,106,0.2)',
-              borderRadius: '0.875rem',
-            }}>
-              <span style={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0, marginTop: 1 }}>💡</span>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "0.625rem",
+                padding: "0.875rem 1rem",
+                background: "rgba(247,199,106,0.07)",
+                border: "1px solid rgba(247,199,106,0.2)",
+                borderRadius: "0.875rem",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "1rem",
+                  lineHeight: 1,
+                  flexShrink: 0,
+                  marginTop: 1,
+                }}
+              >
+                💡
+              </span>
               <div>
-                <p style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#f7c76a', marginBottom: '0.25rem' }}>
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 800,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    color: "#f7c76a",
+                    marginBottom: "0.25rem",
+                  }}
+                >
                   Hint
                 </p>
-                <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: 1.6 }}>
+                <p
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "rgba(255,255,255,0.6)",
+                    margin: 0,
+                    lineHeight: 1.6,
+                  }}
+                >
                   {question.hint}
                 </p>
               </div>
@@ -154,63 +276,119 @@ export default async function QuestionPage({ params }: Props) {
         </header>
 
         {/* ── Answer ── */}
-        <section style={{ marginBottom: '3rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'white', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ width: 3, height: 18, borderRadius: 2, background: '#7c6af7', display: 'inline-block' }} />
+        <section style={{ marginBottom: "3rem" }}>
+          <h2
+            style={{
+              fontSize: "1rem",
+              fontWeight: 800,
+              color: "white",
+              marginBottom: "1.25rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+            }}
+          >
+            <span
+              style={{
+                width: 3,
+                height: 18,
+                borderRadius: 2,
+                background: "#7c6af7",
+                display: "inline-block",
+              }}
+            />
             Full Answer
           </h2>
 
           <div
             className="answer-body"
-            dangerouslySetInnerHTML={{ __html: question.answer ?? '' }}
-            style={{ lineHeight: 1.75, fontSize: '0.9375rem' }}
+            dangerouslySetInnerHTML={{ __html: question.answer ?? "" }}
+            style={{ lineHeight: 1.75, fontSize: "0.9375rem" }}
           />
         </section>
 
         {/* ── Inline AI Evaluator ── */}
         <InlineEvaluator
           question={question.title}
-          idealAnswer={(question.answer ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()}
+          idealAnswer={(question.answer ?? "")
+            .replace(/<[^>]*>/g, "")
+            .replace(/\s+/g, " ")
+            .trim()}
           label="Can you explain this out loud?"
         />
 
         {/* ── Related questions ── */}
         {related.length > 0 && (
-          <section style={{ marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'white', marginBottom: '0.875rem' }}>
+          <section style={{ marginBottom: "3rem" }}>
+            <h2
+              style={{
+                fontSize: "0.9375rem",
+                fontWeight: 800,
+                color: "white",
+                marginBottom: "0.875rem",
+              }}
+            >
               More {question.category} Questions
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {related.map(r => {
-                const rdm = DIFF_META[r.difficulty] ?? DIFF_META.core
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+              }}
+            >
+              {related.map((r) => {
+                const rdm = DIFF_STYLE[r.difficulty] ?? DIFF_STYLE.core;
                 return (
                   <Link
                     key={r.id}
                     href={`/q/${r.slug}`}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: '0.75rem',
-                      padding: '0.875rem 1rem',
-                      background: '#0e0e16',
-                      border: '1px solid rgba(255,255,255,0.07)',
-                      borderRadius: '0.875rem',
-                      textDecoration: 'none',
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.75rem",
+                      padding: "0.875rem 1rem",
+                      background: "#0e0e16",
+                      border: "1px solid rgba(255,255,255,0.07)",
+                      borderRadius: "0.875rem",
+                      textDecoration: "none",
                     }}
                   >
-                    <span style={{
-                      fontSize: '0.625rem', fontWeight: 800,
-                      textTransform: 'uppercase', letterSpacing: '0.05em',
-                      padding: '2px 7px', borderRadius: 12,
-                      background: rdm.bg, color: rdm.color,
-                      flexShrink: 0,
-                    }}>
-                      {rdm.label}
+                    <span
+                      style={{
+                        fontSize: "0.625rem",
+                        fontWeight: 800,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        padding: "2px 7px",
+                        borderRadius: 12,
+                        background: rdm.bg,
+                        color: rdm.color,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {DIFF_LABEL[r.difficulty] ?? "Core"}
                     </span>
-                    <span style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.75)', flex: 1 }}>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "rgba(255,255,255,0.75)",
+                        flex: 1,
+                      }}
+                    >
                       {r.title}
                     </span>
-                    <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.875rem', flexShrink: 0 }}>→</span>
+                    <span
+                      style={{
+                        color: "rgba(255,255,255,0.2)",
+                        fontSize: "0.875rem",
+                        flexShrink: 0,
+                      }}
+                    >
+                      →
+                    </span>
                   </Link>
-                )
+                );
               })}
             </div>
           </section>
@@ -218,23 +396,36 @@ export default async function QuestionPage({ params }: Props) {
 
         {/* ── Browse by category ── */}
         <section>
-          <h2 style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', marginBottom: '0.875rem' }}>
+          <h2
+            style={{
+              fontSize: "0.9375rem",
+              fontWeight: 800,
+              color: "rgba(255,255,255,0.5)",
+              marginBottom: "0.875rem",
+            }}
+          >
             Browse by Category
           </h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {categories.map(cat => (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+            {categories.map((cat) => (
               <Link
                 key={cat}
                 href={`/questions/${catToSlug(cat)}`}
                 style={{
-                  padding: '0.4rem 0.875rem',
-                  background: cat === question.category ? 'rgba(124,106,247,0.15)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${cat === question.category ? 'rgba(124,106,247,0.35)' : 'rgba(255,255,255,0.07)'}`,
-                  color: cat === question.category ? '#c4b5fd' : 'rgba(255,255,255,0.5)',
+                  padding: "0.4rem 0.875rem",
+                  background:
+                    cat === question.category
+                      ? "rgba(124,106,247,0.15)"
+                      : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${cat === question.category ? "rgba(124,106,247,0.35)" : "rgba(255,255,255,0.07)"}`,
+                  color:
+                    cat === question.category
+                      ? "#c4b5fd"
+                      : "rgba(255,255,255,0.5)",
                   borderRadius: 20,
-                  fontSize: '0.8rem',
+                  fontSize: "0.8rem",
                   fontWeight: 600,
-                  textDecoration: 'none',
+                  textDecoration: "none",
                 }}
               >
                 {cat}
@@ -242,7 +433,6 @@ export default async function QuestionPage({ params }: Props) {
             ))}
           </div>
         </section>
-
       </div>
 
       {/* Answer body styles */}
@@ -282,5 +472,5 @@ export default async function QuestionPage({ params }: Props) {
         .answer-body h3 { color: white; font-size: 1rem; margin: 1.5rem 0 0.5rem; }
       `}</style>
     </>
-  )
+  );
 }

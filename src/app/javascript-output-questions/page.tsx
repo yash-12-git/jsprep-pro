@@ -9,7 +9,7 @@ import {
 } from "@/lib/seo/seo";
 import { outputQuestions } from "@/data/outputQuestions";
 import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
-import HeroCTA from "./HeroCta";
+import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
 
 export const metadata: Metadata = pageMeta({
   title: "JavaScript Output Questions: Predict the Console.log (2025)",
@@ -218,7 +218,7 @@ export default function JavaScriptOutputQuestionsPage() {
               alignItems: "center",
             }}
           >
-            <HeroCTA />
+            <SEOHeroCTA />
             <a
               href="#questions"
               style={{

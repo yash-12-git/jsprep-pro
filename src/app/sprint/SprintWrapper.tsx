@@ -1,0 +1,51 @@
+/** @jsxImportSource @emotion/react */
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { css } from "@emotion/react";
+import SprintClient from "./SprintClient";
+import * as Shared from "@/styles/shared";
+
+const bg = css`
+  min-height: 100vh;
+  background: #07070e;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.025) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+`;
+
+export default function SprintWrapper() {
+  const { user, progress, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) router.push("/auth");
+  }, [user, loading, router]);
+
+  if (loading || !user || !progress) {
+    return (
+      <div
+        css={bg}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div css={Shared.spinner}>
+          <div css={Shared.spinnerDot} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div css={bg}>
+      <SprintClient uid={user.uid} isPro={progress.isPro} />
+    </div>
+  );
+}

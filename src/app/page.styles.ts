@@ -1001,3 +1001,547 @@ export const hr = css`
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   margin: 0 0 5rem;
 `;
+
+export const sprintClaims = css`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  @media (min-width: ${BP.md}) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
+ export const sprintClaim = css`
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1rem;
+  padding: 1.125rem;
+  transition: border-color 0.2s;
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+`;
+export const sprintClaimIcon = css`
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+`;
+export const sprintClaimTitle = css`
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 0.375rem;
+`;
+export const sprintClaimDesc = css`
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.55;
+  margin: 0;
+`;
+
+// ── Demo shell ───────────────────────────────────────────────────────────────
+export const sprintDemo = css`
+  background: #0d0d18;
+  border: 1px solid rgba(124, 106, 247, 0.2);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  margin-bottom: 2.25rem;
+  box-shadow: 0 0 60px rgba(124, 106, 247, 0.08);
+`;
+
+// ── HUD ──────────────────────────────────────────────────────────────────────
+export const sprintHUD = css`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.625rem 1.25rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+`;
+export const sprintHUDLeft = css`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 70px;
+`;
+export const sprintHUDScoreNum = css`
+  font-size: 1.375rem;
+  font-weight: 900;
+  color: #f7c76a;
+  letter-spacing: -0.02em;
+  line-height: 1;
+`;
+export const sprintHUDScoreLabel = css`
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: rgba(247, 199, 106, 0.5);
+  text-transform: uppercase;
+`;
+export const sprintHUDProgress = css`
+  flex: 1;
+  min-width: 0;
+`;
+export const sprintHUDMeta = css`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+`;
+export const sprintHUDTrack = css`
+  height: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 99px;
+  overflow: hidden;
+`;
+export const sprintHUDFill = css`
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #7c6af7, #a78bfa);
+  border-radius: 99px;
+`;
+export const sprintHUDTimer = css`
+  flex-shrink: 0;
+  padding: 0.3rem 0.625rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+`;
+export const sprintHUDTimerText = css`
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.75);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+`;
+
+// ── Two-panel body ────────────────────────────────────────────────────────────
+export const sprintDemoBody = css`
+  display: grid;
+  grid-template-columns: 1fr;
+  @media (min-width: ${BP.md}) {
+    grid-template-columns: 1fr 1fr;
+  }
+`;
+export const sprintDemoLeft = css`
+  padding: 1.25rem;
+  border-right: 0 solid rgba(255, 255, 255, 0.06);
+  @media (min-width: ${BP.md}) {
+    border-right-width: 1px;
+  }
+`;
+export const sprintDemoRight = css`
+  padding: 1.25rem;
+  display: none;
+  @media (min-width: ${BP.md}) {
+    display: block;
+  }
+`;
+export const sprintDemoSectionLabel = css`
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 0.875rem;
+`;
+
+// ── Question card ─────────────────────────────────────────────────────────────
+export const sprintCard = css`
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 0.875rem;
+  padding: 1rem;
+`;
+export const sprintCardHeader = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+`;
+export const sprintTypeTag = (type: string) => css`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  ${type === "output"
+    ? "color:#6af7c0;background:rgba(106,247,192,0.1);"
+    : type === "debug"
+      ? "color:#f76a6a;background:rgba(247,106,106,0.1);"
+      : "color:#c4b5fd;background:rgba(124,106,247,0.1);"}
+`;
+export const sprintDiff = css`
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #6af7c0;
+  background: rgba(106, 247, 192, 0.08);
+  padding: 2px 7px;
+  border-radius: 10px;
+`;
+export const sprintCat = css`
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+`;
+export const sprintCardQ = css`
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+`;
+export const sprintCode = css`
+  background: #07070e;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: #c8d8e8;
+  margin-bottom: 0.75rem;
+  overflow-x: auto;
+  white-space: pre;
+`;
+export const sprintInputRow = css`
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+`;
+export const sprintFakeInput = css`
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8125rem;
+`;
+export const sprintFakePlaceholder = css`
+  color: rgba(255, 255, 255, 0.2);
+  font-style: italic;
+`;
+export const sprintCheckBtn = css`
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+  background: rgba(106, 247, 192, 0.1);
+  border: 1px solid rgba(106, 247, 192, 0.2);
+  color: #6af7c0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  white-space: nowrap;
+`;
+export const sprintSkipRow = css`
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.22);
+  text-align: right;
+`;
+
+// ── AI eval result card ────────────────────────────────────────────────────────
+export const sprintEvalCard = css`
+  background: rgba(124, 106, 247, 0.06);
+  border: 1px solid rgba(124, 106, 247, 0.15);
+  border-radius: 0.875rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+`;
+export const sprintEvalHeader = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+`;
+export const sprintEvalQ = css`
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+`;
+export const sprintEvalAnswer = css`
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-style: italic;
+  line-height: 1.5;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  margin-bottom: 0.625rem;
+`;
+export const sprintEvalResult = css`
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding-top: 0.625rem;
+`;
+export const sprintEvalScoreRow = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
+`;
+export const sprintEvalNum = css`
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #6af7c0;
+  line-height: 1;
+`;
+export const sprintEvalDenom = css`
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.35);
+`;
+export const sprintEvalBar = css`
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 99px;
+  overflow: hidden;
+`;
+export const sprintEvalFill = (n: number) => css`
+  height: 100%;
+  width: ${n * 10}%;
+  background: #6af7c0;
+  border-radius: 99px;
+`;
+export const sprintEvalVerdict = css`
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 0.375rem;
+  line-height: 1.4;
+`;
+export const sprintEvalFeedRow = css`
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+`;
+export const sprintFeedGood = css`
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #6af7c0;
+  background: rgba(106, 247, 192, 0.1);
+  padding: 1px 7px;
+  border-radius: 10px;
+`;
+export const sprintFeedMiss = css`
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #f7c76a;
+  background: rgba(247, 199, 106, 0.1);
+  padding: 1px 7px;
+  border-radius: 10px;
+`;
+export const sprintEvalPoints = css`
+  position: absolute;
+  top: 0.75rem;
+  right: 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #f7c76a;
+  background: rgba(247, 199, 106, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+`;
+
+// ── Upcoming queue ─────────────────────────────────────────────────────────────
+export const sprintQueue = css`
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.875rem;
+  padding: 0.75rem;
+`;
+export const sprintQueueLabel = css`
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: 0.5rem;
+`;
+export const sprintQueueItem = css`
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  &:last-child {
+    border: 0;
+  }
+`;
+export const sprintQueueDot = (c: string) => css`
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: ${c};
+  flex-shrink: 0;
+`;
+export const sprintQueueText = css`
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+`;
+
+// ── Results strip ─────────────────────────────────────────────────────────────
+export const sprintResultPreview = css`
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  padding: 0.875rem 1.25rem;
+  background: rgba(124, 106, 247, 0.07);
+  border-top: 1px solid rgba(124, 106, 247, 0.18);
+`;
+export const sprintResultBadge = css`
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+`;
+export const sprintResultScoreBlock = css`
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+`;
+export const sprintResultScore = css`
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: white;
+  letter-spacing: -0.03em;
+  line-height: 1;
+`;
+export const sprintResultMax = css`
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.35);
+`;
+export const sprintResultAccuracy = css`
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #6af7c0;
+  margin-left: 0.25rem;
+`;
+export const sprintResultDivider = css`
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  display: none;
+  @media (min-width: ${BP.sm}) {
+    display: block;
+  }
+`;
+export const sprintResultRight = css`
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 160px;
+`;
+export const sprintInsightRow = (c: string) => css`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: ${c};
+  font-weight: 600;
+`;
+export const sprintResultActions = css`
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+`;
+export const sprintShareChip = css`
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+`;
+
+// ── CTA row ────────────────────────────────────────────────────────────────────
+export const sprintCTARow = css`
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  justify-content: center;
+  flex-wrap: wrap;
+`;
+export const sprintStartBtn = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  border-radius: 0.875rem;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  background: linear-gradient(135deg, #7c6af7, #9b8bff);
+  color: white;
+  text-decoration: none;
+  box-shadow: 0 4px 24px rgba(124, 106, 247, 0.35);
+  transition: all 0.2s;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(124, 106, 247, 0.5);
+  }
+`;
+export const sprintCTASub = css`
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+`;
+
+// ── Pricing button variants ────────────────────────────────────────────────────
+// These 3 states are logic-coupled to the component, so they live here rather
+// than in page.styles.ts
+
+export const proActiveBtn = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.9375rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  background: rgba(106, 247, 192, 0.1);
+  border: 1px solid rgba(106, 247, 192, 0.25);
+  color: #6af7c0;
+  text-decoration: none;
+`;
+
+export const proPayBtn = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.9375rem;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 0.875rem;
+  background: #7c6af7;
+  border: none;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(124, 106, 247, 0.32);
+  transition: all 0.18s;
+  &:hover {
+    background: #6b59e8;
+    transform: translateY(-1px);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+`;

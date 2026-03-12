@@ -8,7 +8,6 @@ import {
   Zap,
   BookOpen,
   BarChart2,
-  Brain,
   LogOut,
   Mic,
   Map,
@@ -62,9 +61,15 @@ export default function Navbar() {
 
   const mainLinks = [
     { href: "/dashboard", label: "Questions", icon: BookOpen },
+    {
+      href: "/sprint",
+      label: "Sprint",
+      icon: Zap,
+      pro: false,
+      highlight: true,
+    },
     { href: "/output-quiz", label: "Output", icon: Code2 },
     { href: "/debug-lab", label: "Debug", icon: Bug },
-    { href: "/quiz", label: "Quiz", icon: Brain, pro: true },
     { href: "/analytics", label: "Analytics", icon: BarChart2, pro: true },
   ];
 
@@ -95,6 +100,18 @@ export default function Navbar() {
       label: "Interview Topics",
       icon: Layers,
       desc: "36 concept pages",
+    },
+    {
+      href: "/javascript-output-questions",
+      label: "Output Questions",
+      icon: Code2,
+      desc: "Predict the console.log",
+    },
+    {
+      href: "/javascript-tricky-questions",
+      label: "Tricky Questions",
+      icon: Zap,
+      desc: "[] == false explained",
     },
     {
       href: "/blog",
@@ -159,17 +176,38 @@ export default function Navbar() {
 
           {user && (
             <div css={S.desktopLinks}>
-              {mainLinks.map(({ href, label, icon: Icon, pro }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  css={[S.navLink, path === href && S.navLinkActive]}
-                >
-                  <Icon size={13} />
-                  {label}
-                  {pro && !progress?.isPro && <span css={S.proBadge}>PRO</span>}
-                </Link>
-              ))}
+              {mainLinks.map(
+                ({
+                  href,
+                  label,
+                  icon: Icon,
+                  pro,
+                  highlight,
+                }: {
+                  href: string;
+                  label: string;
+                  icon: any;
+                  pro?: boolean;
+                  highlight?: boolean;
+                }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    css={[
+                      S.navLink,
+                      path === href && S.navLinkActive,
+                      highlight && S.navLinkHighlight,
+                    ]}
+                  >
+                    <Icon size={13} />
+                    {label}
+                    {pro && !progress?.isPro && (
+                      <span css={S.proBadge}>PRO</span>
+                    )}
+                    {highlight && <span css={S.newBadge}>✨</span>}
+                  </Link>
+                ),
+              )}
 
               <div css={S.aiDropdownWrapper} ref={menuRef}>
                 <button
@@ -271,19 +309,48 @@ export default function Navbar() {
       {user && mobileOpen && (
         <div css={S.mobileMenu}>
           <div css={S.mobileMenuInner}>
-            {mainLinks.map(({ href, label, icon: Icon, pro }) => (
-              <Link
-                key={href}
-                href={href}
-                css={[S.mobileNavLink, path === href && S.mobileNavLinkActive]}
-              >
-                <Icon size={16} />
-                {label}
-                {pro && !progress?.isPro && (
-                  <span css={S.mobileProBadge}>PRO</span>
-                )}
-              </Link>
-            ))}
+            {mainLinks.map(
+              ({
+                href,
+                label,
+                icon: Icon,
+                pro,
+                highlight,
+              }: {
+                href: string;
+                label: string;
+                icon: any;
+                pro?: boolean;
+                highlight?: boolean;
+              }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  css={[
+                    S.mobileNavLink,
+                    path === href && S.mobileNavLinkActive,
+                  ]}
+                >
+                  <Icon size={16} />
+                  {label}
+                  {pro && !progress?.isPro && (
+                    <span css={S.mobileProBadge}>PRO</span>
+                  )}
+                  {highlight && (
+                    <span
+                      css={S.mobileProBadge}
+                      style={{
+                        background: "rgba(247,199,106,0.15)",
+                        color: "#f7c76a",
+                        borderColor: "rgba(247,199,106,0.25)",
+                      }}
+                    >
+                      NEW
+                    </span>
+                  )}
+                </Link>
+              ),
+            )}
 
             <hr css={S.mobileDivider} />
             <p css={S.mobileSectionLabel}>Learn</p>

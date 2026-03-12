@@ -1,23 +1,23 @@
-import { css } from '@emotion/react';
+import { css } from "@emotion/react";
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────
 // Keep colours in one place so a theme change is a one-line edit
 const C = {
-  accent: '#7c6af7',
-  accent2: '#f7c76a',
-  accent3: '#6af7c0',
-  danger: '#f76a6a',
-  purple: '#a78bfa',
-  bg: '#0a0a10',
-  card: '#111118',
-  surface: '#16161f',
-  border: 'rgba(255,255,255,0.07)',
-  muted: 'rgba(255,255,255,0.45)',
+  accent: "#7c6af7",
+  accent2: "#f7c76a",
+  accent3: "#6af7c0",
+  danger: "#f76a6a",
+  purple: "#a78bfa",
+  bg: "#0a0a10",
+  card: "#111118",
+  surface: "#16161f",
+  border: "rgba(255,255,255,0.07)",
+  muted: "rgba(255,255,255,0.45)",
 };
 
 const BREAKPOINTS = {
-  md: '768px',
-  sm: '640px',
+  md: "768px",
+  sm: "640px",
 };
 
 // ─── Nav shell ────────────────────────────────────────────────────────────────
@@ -26,7 +26,7 @@ export const nav = css`
   position: sticky;
   top: 0;
   z-index: 50;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(7, 7, 14, 0.85);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -68,11 +68,11 @@ export const logoBadge = css`
   font-weight: 900;
   color: white;
   letter-spacing: 0.02em;
-  box-shadow: 0 4px 12px rgba(124,106,247,0.4);
+  box-shadow: 0 4px 12px rgba(124, 106, 247, 0.4);
 `;
 
 export const logoText = css`
-  font-family: 'Syne', sans-serif;
+  font-family: "Syne", sans-serif;
   font-size: 1.0625rem;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -101,12 +101,14 @@ export const marketingLink = css`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   text-decoration: none;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
   &:hover {
     color: white;
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
   }
 `;
 
@@ -127,19 +129,17 @@ export const getStartedBtn = css`
   padding: 0.5rem 1rem;
   border-radius: 0.625rem;
   text-decoration: none;
-  box-shadow: 0 4px 14px rgba(124,106,247,0.35);
+  box-shadow: 0 4px 14px rgba(124, 106, 247, 0.35);
   transition: all 0.15s ease;
   white-space: nowrap;
   &:hover {
     background: #6b59e8;
-    box-shadow: 0 6px 18px rgba(124,106,247,0.45);
+    box-shadow: 0 6px 18px rgba(124, 106, 247, 0.45);
   }
   @media (max-width: ${BREAKPOINTS.sm}) {
     display: none;
   }
 `;
-
-
 
 // ─── Desktop nav links ────────────────────────────────────────────────────────
 
@@ -165,7 +165,9 @@ export const navLink = css`
   font-weight: 600;
   color: ${C.muted};
   text-decoration: none;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
   white-space: nowrap;
 
   &:hover {
@@ -193,7 +195,15 @@ export const navLinkAiActive = css`
   }
 `;
 
-export const proBadge = css`
+export const navLinkHighlight = css`
+  color: ${C.accent2};
+  &:hover {
+    color: ${C.accent2};
+    background: rgba(247, 199, 106, 0.08);
+  }
+`;
+
+export const newBadge = css`
   font-size: 0.5rem;
   background: rgba(247, 199, 106, 0.15);
   color: ${C.accent2};
@@ -220,7 +230,9 @@ export const aiDropdownTrigger = css`
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
 
   &:hover {
     color: white;
@@ -230,7 +242,7 @@ export const aiDropdownTrigger = css`
 
 export const chevron = (open: boolean) => css`
   transition: transform 0.2s ease;
-  transform: rotate(${open ? '180deg' : '0deg'});
+  transform: rotate(${open ? "180deg" : "0deg"});
 `;
 
 export const aiDropdownMenu = css`
@@ -241,7 +253,7 @@ export const aiDropdownMenu = css`
   background: ${C.card};
   border: 1px solid ${C.border};
   border-radius: 0.75rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   overflow: hidden;
   z-index: 50;
 `;
@@ -363,6 +375,16 @@ export const logoutBtn = css`
   }
 `;
 
+export const proBadge = css`
+  margin-left: auto;
+  font-size: 0.625rem;
+  background: rgba(247, 199, 106, 0.15);
+  color: ${C.accent2};
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-weight: 700;
+`;
+
 export const hamburgerBtn = css`
   display: flex;
   align-items: center;
@@ -409,7 +431,7 @@ export const mobileMenu = css`
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid ${C.border};
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   overflow-y: auto;
 
   @media (min-width: ${BREAKPOINTS.md}) {
@@ -436,7 +458,9 @@ export const mobileNavLink = css`
   font-weight: 600;
   color: ${C.muted};
   text-decoration: none;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
 
   &:hover {
     color: white;
@@ -541,12 +565,14 @@ export const learnDropdownTrigger = css`
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
   white-space: nowrap;
 
   &:hover {
     color: white;
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
   }
 `;
 
@@ -556,10 +582,10 @@ export const learnDropdownMenu = css`
   right: 0;
   width: 13rem;
   background: #13131c;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0.875rem;
   padding: 0.5rem;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   z-index: 100;
 `;
 
@@ -571,18 +597,20 @@ export const learnDropdownItem = css`
   border-radius: 0.625rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
 
   &:hover {
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
     color: white;
   }
 `;
 
 export const learnDropdownItemActive = css`
-  background: rgba(124,106,247,0.12);
+  background: rgba(124, 106, 247, 0.12);
   color: #c4b5fd;
 `;
 
@@ -590,7 +618,7 @@ export const learnIconBadge = css`
   width: 1.625rem;
   height: 1.625rem;
   border-radius: 0.4375rem;
-  background: rgba(124,106,247,0.15);
+  background: rgba(124, 106, 247, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -606,12 +634,12 @@ export const learnDropdownLabel = css`
 
 export const learnDropdownDesc = css`
   font-size: 0.6875rem;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255, 255, 255, 0.35);
   display: block;
   margin-top: 1px;
 `;
 
 export const learnNavLinkActive = css`
   color: #6af7c0;
-  background: rgba(106,247,192,0.08);
+  background: rgba(106, 247, 192, 0.08);
 `;

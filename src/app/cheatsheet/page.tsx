@@ -1,241 +1,530 @@
+/** @jsxImportSource @emotion/react */
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { css } from "@emotion/react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { getQuestions } from "@/lib/questions";
-import { useUserProgress } from "@/hooks/useQuestions";
-import type { Question } from "@/types/question";
-import PaywallBanner from "@/components/ui/PaywallBanner/page";
-import { FileDown, Printer, Lock, Sparkles } from "lucide-react";
+import { getPublishedTopics } from "@/lib/topics";
+import type { Topic } from "@/types/topic";
+
+import {
+  ChevronLeft,
+  ChevronDown,
+  ChevronUp,
+  Printer,
+  Target,
+  BookOpen,
+} from "lucide-react";
+import * as Shared from "@/styles/shared";
+import { C, RADIUS } from "@/styles/tokens";
+
+// ─── Group topics by category ─────────────────────────────────────────────────
+type CategoryMap = Record<string, Topic[]>;
+function groupByCategory(topics: Topic[]): CategoryMap {
+  return topics.reduce<CategoryMap>((acc, t) => {
+    if (!acc[t.category]) acc[t.category] = [];
+    acc[t.category].push(t);
+    return acc;
+  }, {});
+}
+
+const DIFF_COLOR: Record<string, { color: string; bg: string }> = {
+  Beginner: { color: "#6af7c0", bg: "rgba(106,247,192,0.1)" },
+  Intermediate: { color: "#f7c76a", bg: "rgba(247,199,106,0.1)" },
+  Advanced: { color: "#f76a6a", bg: "rgba(247,106,106,0.1)" },
+  Senior: { color: "#a78bfa", bg: "rgba(167,139,250,0.1)" },
+};
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  "Core JS": "⚡",
+  Functions: "🔧",
+  "Async JS": "⏳",
+  Promises: "🔗",
+  Objects: "🧱",
+  Arrays: "📦",
+  "'this' Keyword": "🎯",
+  "Error Handling": "🛡️",
+  "Modern JS": "✨",
+  Performance: "🚀",
+  "DOM & Events": "🌐",
+  "Browser APIs": "🔌",
+};
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+const pageWrap = css`
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 5rem;
+`;
+const topRow = css`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+`;
+const backBtn = css`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: ${C.muted};
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    color: white;
+  }
+`;
+const printBtn = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.125rem;
+  border-radius: ${RADIUS.lg};
+  background: rgba(124, 106, 247, 0.1);
+  border: 1px solid rgba(124, 106, 247, 0.25);
+  color: #c4b5fd;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover {
+    background: rgba(124, 106, 247, 0.2);
+  }
+  @media print {
+    display: none;
+  }
+`;
+const pageHeader = css`
+  margin-bottom: 1.75rem;
+`;
+const pageTitle = css`
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 900;
+  color: white;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.375rem;
+`;
+const pageSubtitle = css`
+  font-size: 0.875rem;
+  color: ${C.muted};
+  line-height: 1.6;
+`;
+
+// Filter tabs
+const filterRow = css`
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  @media print {
+    display: none;
+  }
+`;
+const filterChip = (active: boolean) => css`
+  padding: 0.3125rem 0.875rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: ${active ? "rgba(124,106,247,0.2)" : "rgba(255,255,255,0.04)"};
+  border: 1px solid
+    ${active ? "rgba(124,106,247,0.4)" : "rgba(255,255,255,0.07)"};
+  color: ${active ? "#c4b5fd" : C.muted};
+  transition: all 0.12s;
+  &:hover {
+    border-color: rgba(124, 106, 247, 0.3);
+    color: rgba(255, 255, 255, 0.75);
+  }
+`;
+
+// Category section
+const catSection = css`
+  margin-bottom: 2rem;
+  @media print {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+  }
+`;
+const catHeader = css`
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.875rem;
+`;
+const catEmoji = css`
+  font-size: 1.125rem;
+  line-height: 1;
+`;
+const catName = css`
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+`;
+const catCount = css`
+  font-size: 0.6875rem;
+  color: ${C.muted};
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 9999px;
+`;
+
+// Topic card
+const topicCard = css`
+  background: ${C.card};
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: ${RADIUS.xl};
+  overflow: hidden;
+  margin-bottom: 0.625rem;
+  transition: border-color 0.15s;
+  &:hover {
+    border-color: rgba(124, 106, 247, 0.2);
+  }
+  @media print {
+    break-inside: avoid;
+  }
+`;
+const topicCardHeader = css`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  @media print {
+    cursor: default;
+  }
+`;
+const topicKeyword = css`
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: white;
+  flex: 1;
+  text-transform: capitalize;
+`;
+const diffPill = (color: string, bg: string) => css`
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: ${color};
+  background: ${bg};
+  padding: 2px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+`;
+const chevron = (open: boolean) => css`
+  color: ${C.muted};
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  transform: rotate(${open ? "180deg" : "0deg"});
+  @media print {
+    display: none;
+  }
+`;
+
+// Body
+const topicBody = css`
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 1rem;
+  @media print {
+    padding-top: 0.75rem;
+  }
+`;
+const sectionLabel = (color: string) => css`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: ${color};
+  margin-bottom: 0.5rem;
+`;
+const bullet = css`
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.55;
+  margin-bottom: 0.375rem;
+`;
+const bulletDot = (color: string) => css`
+  font-size: 0.75rem;
+  color: ${color};
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+`;
+const divider = css`
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 0.875rem 0;
+`;
+
+// Pro gate
+const proGate = css`
+  text-align: center;
+  padding: 5rem 2rem;
+`;
+const proGateIcon = css`
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+`;
+const proGateTitle = css`
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+`;
+const proGateText = css`
+  font-size: 0.875rem;
+  color: ${C.muted};
+  max-width: 28rem;
+  margin: 0 auto 1.5rem;
+`;
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CheatSheetPage() {
   const { user, progress, loading } = useAuth();
-  const { masteredIds: masteredSubIds } = useUserProgress({
-    uid: user?.uid ?? null,
-  });
   const router = useRouter();
-  const printRef = useRef<HTMLDivElement>(null);
-  const [includeAll, setIncludeAll] = useState(false);
-  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [topicsLoading, setTopicsLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [openTopics, setOpenTopics] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!loading && !user) router.push("/auth");
   }, [user, loading, router]);
 
   useEffect(() => {
-    getQuestions({
-      filters: { status: "published", type: "theory" },
-      pageSize: 500,
-    })
-      .then(({ questions: qs }) => setAllQuestions(qs))
-      .catch(() => {});
+    async function load() {
+      const data = await getPublishedTopics();
+      setTopics(data);
+      setTopicsLoading(false);
+    }
+    load();
   }, []);
 
-  if (loading || !user || !progress) {
+  if (loading || !user || !progress || topicsLoading)
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      <div css={Shared.spinner}>
+        <div css={Shared.spinnerDot} />
       </div>
     );
-  }
 
-  if (!progress.isPro) {
+  if (!progress.isPro)
     return (
       <>
-        <PaywallBanner reason="Cheat Sheet Generator is a Pro feature. Upgrade to generate a printable PDF of all your mastered concepts!" />
+        <div css={[pageWrap, proGate]}>
+          <div css={proGateIcon}>📄</div>
+          <h2 css={proGateTitle}>Cheat Sheet is Pro</h2>
+          <p css={proGateText}>
+            Get instant access to crisp topic-by-topic revision cards covering
+            every concept you need to know before your JavaScript interview.
+          </p>
+          <button
+            css={Shared.primaryBtn(C.accent)}
+            style={{
+              width: "auto",
+              padding: "0.75rem 1.75rem",
+              margin: "0 auto",
+              display: "inline-flex",
+            }}
+            onClick={() => router.push("/dashboard")}
+          >
+            Upgrade to Pro →
+          </button>
+        </div>
       </>
     );
+
+  // Categories for filter
+  const allCategories = [...new Set(topics.map((t) => t.category))];
+  const filtered =
+    activeFilter === "All"
+      ? topics
+      : topics.filter((t) => t.category === activeFilter);
+
+  const grouped = groupByCategory(filtered);
+
+  function toggleTopic(slug: string) {
+    setOpenTopics((prev) => {
+      const next = new Set(prev);
+      next.has(slug) ? next.delete(slug) : next.add(slug);
+      return next;
+    });
   }
 
-  const masteredQs = allQuestions.filter((q) =>
-    includeAll ? true : masteredSubIds.includes(q.id),
-  );
-
-  function handlePrint() {
-    window.print();
+  function expandAll() {
+    setOpenTopics(new Set(filtered.map((t: Topic) => t.slug)));
+  }
+  function collapseAll() {
+    setOpenTopics(new Set());
   }
 
-  const byCategory: Record<string, Question[]> = {};
-  masteredQs.forEach((q) => {
-    if (!byCategory[q.category]) byCategory[q.category] = [];
-    byCategory[q.category].push(q);
-  });
+  const totalTopics = filtered.length;
+  const openCount = [...openTopics].filter((s) =>
+    filtered.some((t) => t.slug === s),
+  ).length;
 
   return (
     <>
-      {/* Screen UI - hidden on print */}
-      <div className="print:hidden">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-accent2/20 rounded-xl flex items-center justify-center">
-              <FileDown size={20} className="text-accent2" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-black">Cheat Sheet Generator</h1>
-              <p className="text-muted text-sm">
-                Auto-generates a printable 1-page PDF of your mastered concepts
-              </p>
-            </div>
-          </div>
-
-          {/* Controls */}
-          <div className="bg-card border border-border rounded-2xl p-6 mb-6">
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h2 className="font-black mb-1">What to include?</h2>
-                <p className="text-muted text-sm">
-                  {includeAll
-                    ? `All ${allQuestions.length} questions`
-                    : `${masteredSubIds.length} mastered questions`}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setIncludeAll(false)}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${!includeAll ? "bg-accent border-accent text-white" : "border-border text-muted"}`}
-                >
-                  Mastered Only
-                </button>
-                <button
-                  onClick={() => setIncludeAll(true)}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${includeAll ? "bg-accent border-accent text-white" : "border-border text-muted"}`}
-                >
-                  All Questions
-                </button>
-              </div>
-            </div>
-
-            {masteredSubIds.length === 0 && !includeAll && (
-              <div className="bg-accent2/10 border border-accent2/20 rounded-xl p-4 mb-4 text-sm text-accent2">
-                ⚠️ You haven't mastered any questions yet. Switch to "All
-                Questions" or go mark some questions as mastered first.
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <button
-                onClick={handlePrint}
-                disabled={masteredQs.length === 0}
-                className="flex-1 flex items-center justify-center gap-2 bg-accent2 hover:bg-accent2/90 disabled:opacity-40 text-black font-black py-3.5 rounded-xl transition-colors"
-              >
-                <Printer size={18} />
-                Print / Save as PDF
-              </button>
-            </div>
-            <p className="text-muted text-xs text-center mt-3">
-              In the print dialog, select "Save as PDF" to download. Works in
-              Chrome, Safari, and Firefox.
-            </p>
-          </div>
-
-          {/* Preview */}
-          <div className="bg-card border border-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles size={14} className="text-accent2" />
-              <h2 className="font-bold text-sm">Preview</h2>
-              <span className="text-muted text-xs">
-                ({masteredQs.length} questions, {Object.keys(byCategory).length}{" "}
-                categories)
-              </span>
-            </div>
-            <div className="bg-white rounded-xl p-5 text-black max-h-96 overflow-y-auto text-xs">
-              <div className="text-center mb-4 border-b border-gray-200 pb-3">
-                <h1 className="text-lg font-black text-gray-900">
-                  JavaScript Interview Cheat Sheet
-                </h1>
-                <p className="text-gray-500 text-xs">
-                  {user.displayName} · Generated{" "}
-                  {new Date().toLocaleDateString()} · JSPrep Pro
-                </p>
-              </div>
-              {Object.entries(byCategory).map(([cat, qs]) => (
-                <div key={cat} className="mb-4">
-                  <h2 className="font-black text-purple-700 text-sm border-b border-purple-200 pb-1 mb-2">
-                    {cat}
-                  </h2>
-                  {qs.map((q) => (
-                    <div key={q.id} className="mb-3">
-                      <p className="font-bold text-gray-800 mb-0.5">
-                        Q: {q.title}
-                      </p>
-                      {q.hint && (
-                        <p className="text-gray-500 italic text-[10px] mb-0.5">
-                          💡 {q.hint}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* PRINT LAYOUT - only visible when printing */}
-      <div ref={printRef} className="hidden print:block">
+      <div css={pageWrap}>
         <style>{`
           @media print {
-            @page { margin: 15mm; size: A4; }
-            body { font-family: -apple-system, sans-serif; color: #000; background: white; }
-            .print-header { text-align: center; border-bottom: 2px solid #7c6af7; padding-bottom: 10px; margin-bottom: 16px; }
-            .print-header h1 { font-size: 22px; font-weight: 900; color: #1a1a2e; margin: 0 0 4px; }
-            .print-header p { font-size: 10px; color: #666; margin: 0; }
-            .cat-header { font-size: 13px; font-weight: 900; color: #7c6af7; border-bottom: 1px solid #e5e5ff; padding-bottom: 4px; margin: 14px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-            .q-item { margin-bottom: 10px; padding: 8px 10px; background: #f9f9ff; border-left: 3px solid #7c6af7; border-radius: 0 6px 6px 0; page-break-inside: avoid; }
-            .q-text { font-size: 11px; font-weight: 700; color: #1a1a2e; margin: 0 0 2px; }
-            .q-hint { font-size: 9px; color: #888; font-style: italic; margin: 0 0 3px; }
-            .q-answer { font-size: 10px; color: #333; line-height: 1.5; margin: 4px 0 0; }
-            .q-answer code { background: #f0f0ff; padding: 1px 3px; border-radius: 2px; font-family: monospace; font-size: 9px; }
-            .tag { display: inline-block; font-size: 8px; padding: 1px 5px; border-radius: 3px; font-weight: 700; margin-right: 4px; background: #e8e4ff; color: #7c6af7; }
-            .footer { margin-top: 20px; text-align: center; font-size: 9px; color: #aaa; border-top: 1px solid #eee; padding-top: 8px; }
-            pre { background: #f5f5f5; padding: 6px 8px; border-radius: 4px; font-size: 8.5px; overflow: visible; white-space: pre-wrap; word-break: break-all; }
+            .print-hide { display: none !important; }
+            @page { size: A4; margin: 12mm; }
+            body { background: white !important; color: #111 !important; }
           }
         `}</style>
 
-        <div className="print-header">
-          <h1>JavaScript Interview Cheat Sheet</h1>
-          <p>
-            {user.displayName} · {user.email} · Generated{" "}
-            {new Date().toLocaleDateString("en-IN")} · JSPrep Pro
+        {/* Top row */}
+        <div css={topRow} className="print-hide">
+          <button css={backBtn} onClick={() => router.push("/dashboard")}>
+            <ChevronLeft size={16} /> Dashboard
+          </button>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button
+              css={[
+                printBtn,
+                {
+                  background: "rgba(255,255,255,0.04)",
+                  borderColor: "rgba(255,255,255,0.1)",
+                  color: C.muted,
+                },
+              ]}
+              onClick={openCount === totalTopics ? collapseAll : expandAll}
+            >
+              {openCount === totalTopics ? (
+                <ChevronUp size={14} />
+              ) : (
+                <ChevronDown size={14} />
+              )}
+              {openCount === totalTopics ? "Collapse all" : "Expand all"}
+            </button>
+            <button
+              css={printBtn}
+              onClick={() => {
+                expandAll();
+                setTimeout(() => window.print(), 300);
+              }}
+            >
+              <Printer size={14} /> Print / PDF
+            </button>
+          </div>
+        </div>
+
+        {/* Header */}
+        <div css={pageHeader}>
+          <h1 css={pageTitle}>JavaScript Interview Cheat Sheet</h1>
+          <p css={pageSubtitle}>
+            {totalTopics} topics · crisp bullet points for every concept you
+            need to know. Use this the night before your interview.
           </p>
         </div>
 
-        {Object.entries(byCategory).map(([cat, qs]) => (
-          <div key={cat}>
-            <div className="cat-header">{cat}</div>
-            {qs.map((q) => (
-              <div key={q.id} className="q-item">
-                <p className="q-text">Q: {q.title}</p>
-                {q.hint && <p className="q-hint">💡 Hint: {q.hint}</p>}
-                <div className="q-tags" style={{ marginBottom: "4px" }}>
-                  {q.tags.map((t) => (
-                    <span key={t} className="tag">
-                      {t.toUpperCase()}
+        {/* Category filter */}
+        <div css={filterRow}>
+          {["All", ...allCategories].map((cat) => (
+            <button
+              key={cat}
+              css={filterChip(activeFilter === cat)}
+              onClick={() => {
+                setActiveFilter(cat);
+                setOpenTopics(new Set());
+              }}
+            >
+              {cat === "All"
+                ? "All Topics"
+                : `${CATEGORY_EMOJI[cat] ?? ""} ${cat}`.trim()}
+            </button>
+          ))}
+        </div>
+
+        {/* Topic cards grouped by category */}
+        {Object.entries(grouped).map(([cat, topics]) => (
+          <div key={cat} css={catSection}>
+            <div css={catHeader}>
+              <span css={catEmoji}>{CATEGORY_EMOJI[cat] ?? "📌"}</span>
+              <span css={catName}>{cat}</span>
+              <span css={catCount}>{topics.length} topics</span>
+            </div>
+
+            {topics.map((topic) => {
+              const isOpen = openTopics.has(topic.slug);
+              const dm =
+                DIFF_COLOR[topic.difficulty] ?? DIFF_COLOR["Intermediate"];
+
+              return (
+                <div key={topic.slug} css={topicCard}>
+                  {/* Card header */}
+                  <div
+                    css={topicCardHeader}
+                    onClick={() => toggleTopic(topic.slug)}
+                  >
+                    <span css={topicKeyword}>{topic.keyword}</span>
+                    <span css={diffPill(dm.color, dm.bg)}>
+                      {topic.difficulty}
                     </span>
-                  ))}
+                    <div css={chevron(isOpen)}>
+                      <ChevronDown size={15} />
+                    </div>
+                  </div>
+
+                  {/* Card body — visible when expanded OR when printing */}
+                  {isOpen && (
+                    <div css={topicBody} className="topic-body">
+                      {/* What to know */}
+                      <div css={sectionLabel("#6af7c0")}>
+                        <BookOpen size={11} /> Key points
+                      </div>
+                      {topic.cheatSheet.map((pt, i) => (
+                        <div key={i} css={bullet}>
+                          <span css={bulletDot("#6af7c0")}>▸</span>
+                          {pt}
+                        </div>
+                      ))}
+
+                      <div css={divider} />
+
+                      {/* Interview tips */}
+                      <div css={sectionLabel("#f7c76a")}>
+                        <Target size={11} /> Interview tips
+                      </div>
+                      {topic.interviewTips.map((tip, i) => (
+                        <div key={i} css={bullet}>
+                          <span css={bulletDot("#f7c76a")}>▸</span>
+                          {tip}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div
-                  className="q-answer"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      q.answer ??
-                      ""
-                        .replace(/<pre><code>/g, "<pre>")
-                        .replace(/<\/code><\/pre>/g, "</pre>")
-                        .replace(
-                          /<div class="tip">/g,
-                          '<div style="background:#f0fff4;border-left:2px solid #6af7a0;padding:4px 6px;border-radius:0 4px 4px 0;margin-top:4px;font-size:9px;color:#333">',
-                        ),
-                  }}
-                />
-              </div>
-            ))}
+              );
+            })}
           </div>
         ))}
 
-        <div className="footer">
-          JSPrep Pro — JavaScript Interview Mastery · jsprep-pro.vercel.app
+        {/* Print footer */}
+        <div
+          style={{
+            marginTop: "2rem",
+            borderTop: `1px solid ${C.border}`,
+            paddingTop: "1rem",
+            textAlign: "center",
+          }}
+          className="print-hide"
+        >
+          <p style={{ fontSize: "0.75rem", color: C.muted }}>
+            jsprep.pro · JavaScript Interview Prep · Good luck! 🚀
+          </p>
         </div>
       </div>
     </>

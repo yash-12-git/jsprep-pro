@@ -153,18 +153,9 @@ export const LEADERS = [
   { name: "Rahul S.", xp: 215, av: "R", medal: "🥉", bg: "transparent" },
 ];
 
-export const FREE_F = [
-  "All 91 theory questions",
-  "Daily Question of the Day + AI eval",
-  "First 5 output + 5 debug questions",
-  "Weekly XP leaderboard",
-  "Interview Cheat Sheet (36 topics)",
-  "JavaScript Deep Dives (in-depth concept explanations)",
-];
-
-
 export const proFeatures = [
   "Everything in Free",
+  "Interview Sprint — unlimited",
   "All output questions",
   "All debug challenges",
   "Unlimited mastery tracking",
@@ -177,4 +168,14 @@ export const proFeatures = [
   "AI Study Plan generator",
   "Daily streak tracking",
   "All future content",
+];
+
+export const FREE_F = [
+  "All 91 theory questions",
+  "Interview Sprint — 5-question warmup",
+  "Daily Question of the Day + AI eval",
+  "First 5 output + 5 debug questions",
+  "Weekly XP leaderboard",
+  "Interview Cheat Sheet (36 topics)",
+  "JavaScript Deep Dives (in-depth concept explanations)",
 ];

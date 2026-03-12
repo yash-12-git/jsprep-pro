@@ -2,6 +2,8 @@
 "use client";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { useUpgrade } from "@/hooks/useUpgrade";
+import { css } from "@emotion/react";
 import {
   ArrowRight,
   CheckCircle,
@@ -9,7 +11,9 @@ import {
   Trophy,
   Flame,
   Star,
+  Target,
   Calendar,
+  Sparkles,
 } from "lucide-react";
 import {
   aiBdg,
@@ -81,6 +85,8 @@ import {
   priceC,
   priceCPro,
   priceG,
+  proActiveBtn,
+  proPayBtn,
   pTier,
   purpleGlow,
   qotdBadge,
@@ -90,6 +96,72 @@ import {
   qotdTitle,
   sec,
   sh2,
+  sprintCard,
+  sprintCardHeader,
+  sprintCardQ,
+  sprintCat,
+  sprintCheckBtn,
+  sprintClaim,
+  sprintClaimDesc,
+  sprintClaimIcon,
+  sprintClaims,
+  sprintClaimTitle,
+  sprintCode,
+  sprintCTARow,
+  sprintCTASub,
+  sprintDemo,
+  sprintDemoBody,
+  sprintDemoLeft,
+  sprintDemoRight,
+  sprintDemoSectionLabel,
+  sprintDiff,
+  sprintEvalAnswer,
+  sprintEvalBar,
+  sprintEvalCard,
+  sprintEvalDenom,
+  sprintEvalFeedRow,
+  sprintEvalFill,
+  sprintEvalHeader,
+  sprintEvalNum,
+  sprintEvalPoints,
+  sprintEvalQ,
+  sprintEvalResult,
+  sprintEvalScoreRow,
+  sprintEvalVerdict,
+  sprintFakeInput,
+  sprintFakePlaceholder,
+  sprintFeedGood,
+  sprintFeedMiss,
+  sprintHUD,
+  sprintHUDFill,
+  sprintHUDLeft,
+  sprintHUDMeta,
+  sprintHUDProgress,
+  sprintHUDScoreLabel,
+  sprintHUDScoreNum,
+  sprintHUDTimer,
+  sprintHUDTimerText,
+  sprintHUDTrack,
+  sprintInputRow,
+  sprintInsightRow,
+  sprintQueue,
+  sprintQueueDot,
+  sprintQueueItem,
+  sprintQueueLabel,
+  sprintQueueText,
+  sprintResultAccuracy,
+  sprintResultActions,
+  sprintResultBadge,
+  sprintResultDivider,
+  sprintResultMax,
+  sprintResultPreview,
+  sprintResultRight,
+  sprintResultScore,
+  sprintResultScoreBlock,
+  sprintShareChip,
+  sprintSkipRow,
+  sprintStartBtn,
+  sprintTypeTag,
   ssub,
   statCell,
   statL,
@@ -134,9 +206,60 @@ import {
 } from "@/data/homepageStaticData";
 
 export default function HomePage() {
-  const { user } = useAuth();
+  const { user, progress } = useAuth();
+  const { handleUpgrade, loading: payLoading, error: payError } = useUpgrade();
+
   const ctaHref = user ? "/dashboard" : "/auth";
   const ctaLabel = user ? "Go to Dashboard" : "Start Free — No Card Needed";
+
+  // ── 3-state Pro CTA ───────────────────────────────────────────────────────
+  // State 1: already Pro   → link to dashboard
+  // State 2: logged in     → fires Razorpay directly
+  // State 3: logged out    → link to /auth (account created during checkout)
+
+  function ProCTA() {
+    if (user && progress?.isPro) {
+      return (
+        <Link href="/dashboard" css={proActiveBtn}>
+          <CheckCircle size={15} /> You&apos;re Pro — Go to Dashboard
+        </Link>
+      );
+    }
+
+    if (user) {
+      return (
+        <>
+          <button css={proPayBtn} onClick={handleUpgrade} disabled={payLoading}>
+            {payLoading ? (
+              "Opening payment..."
+            ) : (
+              <>
+                <Zap size={16} /> Upgrade to Pro →
+              </>
+            )}
+          </button>
+          {payError && (
+            <p
+              style={{
+                color: "#f76a6a",
+                fontSize: "0.75rem",
+                textAlign: "center",
+                marginTop: "0.5rem",
+              }}
+            >
+              {payError}
+            </p>
+          )}
+        </>
+      );
+    }
+
+    return (
+      <Link href="/auth" css={pBtnP}>
+        Start with Pro →
+      </Link>
+    );
+  }
 
   return (
     <main css={page}>
@@ -155,15 +278,16 @@ export default function HomePage() {
           </h1>
           <p css={sub}>
             195+ questions across theory, output prediction, and debugging —
-            with 6 AI tools that score your answers like a real senior engineer
-            would.
+            with AI scoring and a timed{" "}
+            <strong style={{ color: "#f7c76a" }}>Interview Sprint</strong> that
+            tells you exactly if you&apos;re ready.
           </p>
           <div css={ctas}>
             <Link href={ctaHref} css={btnP}>
               {ctaLabel} <ArrowRight size={16} />
             </Link>
-            <a href="#pricing" css={btnO}>
-              See pricing
+            <a href="#sprint" css={btnO}>
+              <Zap size={14} /> Try the Sprint
             </a>
           </div>
         </div>
@@ -278,6 +402,185 @@ export default function HomePage() {
 
         <hr css={hr} />
 
+        {/* ── INTERVIEW SPRINT ─────────────────────── */}
+        <div css={sec} id="sprint">
+          <p css={eye("#f7c76a")}>⚡ New: Interview Sprint</p>
+          <h2 css={sh2}>The fastest way to know if you&apos;re ready</h2>
+          <p css={ssub}>
+            A timed mixed-question challenge. Theory + output + debugging. AI
+            judges your answers. One score tells you exactly where you stand.
+          </p>
+
+          <div css={sprintClaims}>
+            {[
+              {
+                icon: "🎯",
+                title: "Real interview format",
+                desc: "Mixed question types under time pressure — exactly how JS interviews work",
+              },
+              {
+                icon: "🤖",
+                title: "AI scores theory answers",
+                desc: "No multiple choice. You explain in your own words, AI grades like a senior engineer",
+              },
+              {
+                icon: "📊",
+                title: "Strengths & weak areas",
+                desc: "After each sprint: know exactly which categories to keep drilling",
+              },
+              {
+                icon: "🏆",
+                title: "Shareable score card",
+                desc: "Download or tweet your result — challenge your network to beat your score",
+              },
+            ].map(({ icon, title, desc }) => (
+              <div key={title} css={sprintClaim}>
+                <div css={sprintClaimIcon}>{icon}</div>
+                <div css={sprintClaimTitle}>{title}</div>
+                <p css={sprintClaimDesc}>{desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div css={sprintDemo}>
+            <div css={sprintHUD}>
+              <div css={sprintHUDLeft}>
+                <Zap size={12} style={{ color: "#f7c76a" }} />
+                <span css={sprintHUDScoreNum}>70</span>
+                <span css={sprintHUDScoreLabel}>pts</span>
+              </div>
+              <div css={sprintHUDProgress}>
+                <div css={sprintHUDMeta}>
+                  <span style={{ fontWeight: 700, color: "white" }}>
+                    Q5 / 10
+                  </span>
+                  <span>40% complete</span>
+                </div>
+                <div css={sprintHUDTrack}>
+                  <div css={sprintHUDFill} />
+                </div>
+              </div>
+              <div css={sprintHUDTimer}>
+                <span css={sprintHUDTimerText}>7:23</span>
+              </div>
+            </div>
+
+            <div css={sprintDemoBody}>
+              <div css={sprintDemoLeft}>
+                <div css={sprintDemoSectionLabel}>⚡ Active question</div>
+                <div css={sprintCard}>
+                  <div css={sprintCardHeader}>
+                    <span css={sprintTypeTag("output")}>💻 Output</span>
+                    <span css={sprintDiff}>Core</span>
+                    <span css={sprintCat}>Type Coercion</span>
+                  </div>
+                  <p css={sprintCardQ}>What does this print?</p>
+                  <pre css={sprintCode}>{`console.log([] + [])
+console.log([] + {})
+console.log({} + [])`}</pre>
+                  <div css={sprintInputRow}>
+                    <div css={sprintFakeInput}>
+                      <span css={sprintFakePlaceholder}>
+                        Type the expected output...
+                      </span>
+                    </div>
+                    <div css={sprintCheckBtn}>Check</div>
+                  </div>
+                  <div css={sprintSkipRow}>Skip →</div>
+                </div>
+              </div>
+
+              <div css={sprintDemoRight}>
+                <div css={sprintDemoSectionLabel}>🤖 Previous — AI scored</div>
+                <div css={sprintEvalCard}>
+                  <div css={sprintEvalHeader}>
+                    <span css={sprintTypeTag("theory")}>📖 Theory</span>
+                    <span css={sprintCat}>Closures</span>
+                  </div>
+                  <p css={sprintEvalQ}>What is a closure in JavaScript?</p>
+                  <div css={sprintEvalAnswer}>
+                    &ldquo;A closure is a function that remembers variables from
+                    its outer scope even after the outer function
+                    returns...&rdquo;
+                  </div>
+                  <div css={sprintEvalResult}>
+                    <div css={sprintEvalScoreRow}>
+                      <span css={sprintEvalNum}>8</span>
+                      <span css={sprintEvalDenom}>/10 · B+</span>
+                      <div css={sprintEvalBar}>
+                        <div css={sprintEvalFill(8)} />
+                      </div>
+                    </div>
+                    <div css={sprintEvalVerdict}>
+                      Good — missing lexical scoping detail
+                    </div>
+                    <div css={sprintEvalFeedRow}>
+                      <span css={sprintFeedGood}>✓ Scope retention</span>
+                      <span css={sprintFeedMiss}>✗ Module pattern</span>
+                    </div>
+                  </div>
+                  <div css={sprintEvalPoints}>+10 pts</div>
+                </div>
+
+                <div css={sprintQueue}>
+                  <div css={sprintQueueLabel}>Up next</div>
+                  <div css={sprintQueueItem}>
+                    <span css={sprintQueueDot("#f76a6a")} />
+                    <span css={sprintQueueText}>
+                      🐛 Find the bug in this async/await chain
+                    </span>
+                  </div>
+                  <div css={sprintQueueItem}>
+                    <span css={sprintQueueDot("#c4b5fd")} />
+                    <span css={sprintQueueText}>
+                      📖 Explain the JavaScript event loop
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div css={sprintResultPreview}>
+              <div css={sprintResultBadge}>🏆 Sample result</div>
+              <div css={sprintResultScoreBlock}>
+                <span css={sprintResultScore}>172</span>
+                <span css={sprintResultMax}>/200 pts</span>
+                <span css={sprintResultAccuracy}>86% accuracy</span>
+              </div>
+              <div css={sprintResultDivider} />
+              <div css={sprintResultRight}>
+                <div css={sprintInsightRow("#6af7c0")}>
+                  <CheckCircle size={10} />
+                  <span>
+                    <strong>Strong:</strong> Closures · Hoisting · Scope
+                  </span>
+                </div>
+                <div css={sprintInsightRow("#f7c76a")}>
+                  <Target size={10} />
+                  <span>
+                    <strong>Review:</strong> Event Loop · Promises
+                  </span>
+                </div>
+              </div>
+              <div css={sprintResultActions}>
+                <div css={sprintShareChip}>📤 Share score</div>
+                <div css={sprintShareChip}>⬇ Download card</div>
+              </div>
+            </div>
+          </div>
+
+          <div css={sprintCTARow}>
+            <Link href={user ? "/sprint" : "/auth"} css={sprintStartBtn}>
+              <Zap size={16} /> Start Your Sprint <ArrowRight size={14} />
+            </Link>
+            <span css={sprintCTASub}>
+              Free 5-question warmup — no card needed
+            </span>
+          </div>
+        </div>
+
+        <hr css={hr} />
+
         {/* ── 3 MODES ──────────────────────────────── */}
         <div css={sec} id="practice">
           <p css={eye("#6af7c0")}>Three Practice Modes</p>
@@ -305,7 +608,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* ── BEYOND QUESTIONS (QOTD + LB + WHY) ──── */}
+        {/* ── BEYOND QUESTIONS ─────────────────────── */}
         <div css={sec}>
           <p css={eye("#f7c76a")}>Beyond Questions</p>
           <h2 css={sh2}>A full interview prep ecosystem</h2>
@@ -313,9 +616,7 @@ export default function HomePage() {
             Not just a list of Q&As — habits, accountability, and depth.
           </p>
 
-          {/* QOTD + Leaderboard side by side */}
           <div css={[twoCol, { marginBottom: "1.5rem" }]}>
-            {/* QOTD */}
             <div css={qotdCard}>
               <div>
                 <div css={qotdBadge}>
@@ -334,7 +635,6 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Leaderboard */}
             <div css={lbCard}>
               <div css={lbHead}>
                 <div css={lbHeadT}>
@@ -365,7 +665,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Why devs switch */}
           <div css={whyCard}>
             <p
               style={{
@@ -510,6 +809,7 @@ export default function HomePage() {
             Start free with 91 real questions and AI feedback from day one.
           </p>
           <div css={priceG}>
+            {/* Free tier */}
             <div css={priceC}>
               <div css={pTier}>Free</div>
               <div css={pPrice}>₹0</div>
@@ -530,6 +830,8 @@ export default function HomePage() {
                 {user ? "Go to Dashboard" : "Get Started Free"}
               </Link>
             </div>
+
+            {/* Pro tier */}
             <div css={priceCPro}>
               <div css={popularTag}>POPULAR</div>
               <div css={[pTier, { color: "#c4b5fd" }]}>Pro</div>
@@ -550,9 +852,39 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
-              <Link href={ctaHref} css={pBtnP}>
-                {user ? "Upgrade to Pro →" : "Start with Pro →"}
-              </Link>
+
+              {/* ── 3-state CTA ── */}
+              <ProCTA />
+
+              {/* Contextual sub-notes */}
+              {user && progress?.isPro && (
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "rgba(255,255,255,0.3)",
+                    textAlign: "center",
+                    marginTop: "0.625rem",
+                  }}
+                >
+                  <Sparkles
+                    size={10}
+                    style={{ verticalAlign: "middle", marginRight: "3px" }}
+                  />
+                  Pro is active on your account
+                </p>
+              )}
+              {!user && (
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "rgba(255,255,255,0.3)",
+                    textAlign: "center",
+                    marginTop: "0.625rem",
+                  }}
+                >
+                  You&apos;ll sign in or create an account during checkout
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -4,7 +4,6 @@ import {
   setDoc,
   updateDoc,
   arrayUnion,
-  arrayRemove,
   increment,
   collection,
   query,
@@ -141,54 +140,6 @@ function getMondayISO(): string {
   return d.toISOString().slice(0, 10);
 }
 
-/**
- * awardXP — uses Firestore increment() for weeklyXp when we don't know
- * the current weeklyXpResetDate without a read. Only does a getDoc when
- * we need to check for week reset (once per week per user).
- *
- * Optimization: skips the read entirely when weeklyXpResetDate is the
- * current Monday (passed in by the caller who already has the user doc).
- */
-async function awardXP(
-  uid: string,
-  points: number,
-  opts?: {
-    weeklyXpResetDate?: string;
-    displayName?: string;
-    photoURL?: string;
-  },
-) {
-  const ref = doc(db, "users", uid);
-  const thisMonday = getMondayISO();
-
-  const updates: Record<string, unknown> = {
-    xp: increment(points),
-    weeklyXpResetDate: thisMonday,
-  };
-
-  // If caller already knows the reset date we avoid a getDoc
-  const knownResetDate = opts?.weeklyXpResetDate;
-  if (knownResetDate !== undefined) {
-    if (knownResetDate < thisMonday) {
-      updates.weeklyXp = points; // reset week, start fresh
-    } else {
-      updates.weeklyXp = increment(points); // same week, accumulate
-    }
-  } else {
-    // Fallback: read to check — only happens if caller doesn't pass opts
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-    const data = snap.data() as UserProgress;
-    const needsReset = (data.weeklyXpResetDate ?? "") < thisMonday;
-    updates.weeklyXp = needsReset ? points : increment(points);
-  }
-
-  if (opts?.displayName) updates.displayName = opts.displayName;
-  if (opts?.photoURL) updates.photoURL = opts.photoURL;
-
-  await updateDoc(ref, updates);
-}
-
 // ─── awardProgressXP — THE XP BRIDGE ─────────────────────────────────────────
 // Called by useQuestions.ts (subcollection hooks) to keep the root user doc
 // XP fields in sync. This is the ONLY place weeklyXp should be written.
@@ -212,57 +163,6 @@ export async function awardProgressXP(
     updates.masteredCount = increment(masteredDelta);
   }
   await updateDoc(ref, updates).catch(() => {});
-}
-
-// ─── Legacy XP wrappers (old numeric-ID system — kept for quiz page) ──────────
-
-export async function markMasteredWithXP(
-  uid: string,
-  questionId: number,
-  mastered: boolean,
-  displayName?: string,
-  photoURL?: string,
-) {
-  // Single updateDoc: combines masteredIds + XP in one write (was 2 sequential writes).
-  // On un-master: only removes from masteredIds — no XP change.
-  const ref = doc(db, "users", uid);
-  const thisMonday = getMondayISO();
-
-  const updates: Record<string, unknown> = {
-    masteredIds: mastered ? arrayUnion(questionId) : arrayRemove(questionId),
-  };
-
-  if (mastered) {
-    updates.xp = increment(XP.MASTER_QUESTION);
-    updates.weeklyXp = increment(XP.MASTER_QUESTION);
-    updates.weeklyXpResetDate = thisMonday;
-    if (displayName) updates.displayName = displayName;
-    if (photoURL) updates.photoURL = photoURL;
-  }
-
-  await updateDoc(ref, updates);
-}
-
-export async function markOutputSolvedWithXP(
-  uid: string,
-  questionId: number,
-  displayName?: string,
-  photoURL?: string,
-) {
-  const ref = doc(db, "users", uid);
-  await updateDoc(ref, { solvedOutputIds: arrayUnion(questionId) });
-  await awardXP(uid, XP.SOLVE_OUTPUT, { displayName, photoURL });
-}
-
-export async function markDebugSolvedWithXP(
-  uid: string,
-  questionId: number,
-  displayName?: string,
-  photoURL?: string,
-) {
-  const ref = doc(db, "users", uid);
-  await updateDoc(ref, { solvedDebugIds: arrayUnion(questionId) });
-  await awardXP(uid, XP.SOLVE_DEBUG, { displayName, photoURL });
 }
 
 // ─── Leaderboard ──────────────────────────────────────────────────────────────

@@ -73,12 +73,11 @@ export default function OutputCard({
   const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
 
   async function checkAnswer() {
-    const ua = answer.trim().toLowerCase().replace(/\s+/g, "\n").trim();
+    const ua = answer.trim();
     const correct = expectedOut.toLowerCase().trim();
     const match =
       ua === correct ||
-      ua.split("\n").join(",") === correct.split("\n").join(",");
-
+      ua.split("\n").join(",") === correct.split("\n").join(",");      
     if (match) {
       await recordSolved(q.id);
       setLocalWrong(false);

@@ -3,10 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --font-syne: 'Syne', sans-serif;
+  --font-syne: "Syne", sans-serif;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   background: #0a0a0f;
@@ -21,14 +23,14 @@ pre {
   padding: 16px 18px;
   overflow-x: auto;
   margin: 14px 0;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 13px;
   line-height: 1.8;
   color: #b0b0d0;
 }
 
 code {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 13px;
 }
 
@@ -42,19 +44,60 @@ code {
   color: #9a8cf7;
 }
 
-.answer p { color: #c8c8d8; font-size: 14px; line-height: 1.8; margin-bottom: 12px; }
-.answer ul { padding-left: 20px; margin-bottom: 12px; }
-.answer li { color: #c8c8d8; font-size: 14px; line-height: 1.8; margin-bottom: 4px; }
-.answer strong { color: #e8e8f0; }
-.answer code { background: rgba(124,106,247,0.15); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+.answer p {
+  color: #c8c8d8;
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+.answer ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.answer li {
+  color: #c8c8d8;
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 4px;
+}
+.answer strong {
+  color: #e8e8f0;
+}
+.answer code {
+  background: rgba(124, 106, 247, 0.15);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+}
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #111118; }
-::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #7c6af7; }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #111118;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a3a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7c6af7;
+}
 
 @layer utilities {
-  .font-syne { font-family: var(--font-syne), sans-serif; }
-  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .font-syne {
+    font-family: var(--font-syne), sans-serif;
+  }
+  .font-mono {
+    font-family: "JetBrains Mono", monospace;
+  }
+}
+
+/* Global animations — used by Loader2 spinner across all pages */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

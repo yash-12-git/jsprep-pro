@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { pageMeta, faqSchema, breadcrumbSchema } from '@/lib/seo/seo'
 import { getTopicFaqs } from '@/data/seo/topicFaqs'
 import TopicQuestionList from './TopicQuestionList'
+import { TOPIC_DIFF_BG, TOPIC_DIFF_COLOR } from '@/styles/tokens'
 
 export const revalidate = 3600
 
@@ -41,12 +42,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   })
 }
 
-const DIFF_STYLE: Record<string, { bg: string; color: string }> = {
-  Beginner:     { bg: 'rgba(74,222,128,0.15)',  color: '#4ade80' },
-  Intermediate: { bg: 'rgba(251,191,36,0.15)',  color: '#fbbf24' },
-  Advanced:     { bg: 'rgba(251,146,60,0.15)',  color: '#fb923c' },
-  Senior:       { bg: 'rgba(248,113,113,0.15)', color: '#f87171' },
-}
 
 function Anchor({ id }: { id: string }) {
   return <div id={id} style={{ marginTop: -80, paddingTop: 80 }} />
@@ -73,7 +68,8 @@ export default async function TopicPage({ params }: Props) {
     getBlogPostsForTopic(topic.slug),
   ])
 
-  const diff = DIFF_STYLE[topic.difficulty] ?? DIFF_STYLE.Intermediate
+  const diffColor = TOPIC_DIFF_COLOR[topic.difficulty] ?? TOPIC_DIFF_COLOR["Intermediate"]
+  const diffBg = TOPIC_DIFF_BG[topic.difficulty] ?? TOPIC_DIFF_BG["Intermediate"]
   const hasConceptHub = !!(topic.mentalModel || topic.deepDive)
 
   const dedicatedFaqs = getTopicFaqs(topic.slug)
@@ -104,6 +100,7 @@ export default async function TopicPage({ params }: Props) {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faq }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbs }} />
 
       <div style={{ maxWidth: 920, margin: '0 auto', padding: '32px 24px 100px', color: '#c8c8d8', fontFamily: "'DM Sans',system-ui,sans-serif" }}>
@@ -120,7 +117,7 @@ export default async function TopicPage({ params }: Props) {
         {/* Hero */}
         <header style={{ marginBottom: 36 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
-            <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', background: diff.bg, color: diff.color }}>
+            <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', background: diffBg, color: diffColor }}>
               {topic.difficulty}
             </span>
             <span style={{ color: '#6b7280', fontSize: 13 }}>
@@ -288,12 +285,12 @@ export default async function TopicPage({ params }: Props) {
             <h2 style={{ color: '#f1f0ff', fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Related Topics</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 12 }}>
               {relatedTopics.map(t => {
-                const d = DIFF_STYLE[t.difficulty] ?? DIFF_STYLE.Intermediate
+                const d = TOPIC_DIFF_COLOR[t.difficulty] ?? TOPIC_DIFF_COLOR["Intermediate"]
                 return (
                   <Link key={t.slug} href={`/${t.slug}`} style={{ display: 'block', padding: '16px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, textDecoration: 'none' }}>
                     <div style={{ color: '#e8e6f8', fontSize: 14, fontWeight: 600, lineHeight: 1.4, marginBottom: 6 }}>{t.title}</div>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                      <span style={{ fontSize: 11, color: d.color, fontWeight: 600 }}>{t.difficulty}</span>
+                      <span style={{ fontSize: 11, color: d, fontWeight: 600 }}>{t.difficulty}</span>
                       <span style={{ color: '#4b5563', fontSize: 10 }}>·</span>
                       <span style={{ fontSize: 11, color: '#6b7280' }}>{t.questionCount} Qs</span>
                     </div>

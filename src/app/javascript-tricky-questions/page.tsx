@@ -19,9 +19,8 @@ import {
   SITE,
 } from "@/lib/seo/seo";
 import { getQuestions } from "@/lib/cachedQueries";
-import type { Question } from "@/types/question";
 import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
-import HeroCTA from "./HeroCta";
+import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
 
 export const revalidate = 3600;
 
@@ -251,7 +250,7 @@ export default async function JavaScriptTrickyQuestionsPage() {
             {FREE_PREVIEW} interactive free &nbsp;·&nbsp; ✅ Commonly asked in
             interviews
           </p>
-          <HeroCTA />
+          <SEOHeroCTA />
         </header>
 
         {/* ── Why these matter ── */}

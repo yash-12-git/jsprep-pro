@@ -1,5 +1,5 @@
-import { css } from '@emotion/react'
-import { C, BP, RADIUS } from './tokens'
+import { css } from "@emotion/react";
+import { C, BP, RADIUS } from "./tokens";
 
 // ─── Reusable atoms used across multiple pages ────────────────────────────────
 
@@ -7,22 +7,26 @@ export const pageWrapper = css`
   max-width: 48rem;
   margin: 0 auto;
   padding: 2rem 1rem;
-  @media (min-width: ${BP.sm}) { padding: 2.5rem 1.5rem; }
-`
+  @media (min-width: ${BP.sm}) {
+    padding: 2.5rem 1.5rem;
+  }
+`;
 
 export const pageWrapperWide = css`
   max-width: 64rem;
   margin: 0 auto;
   padding: 2rem 1rem;
-  @media (min-width: ${BP.sm}) { padding: 2.5rem 1.5rem; }
-`
+  @media (min-width: ${BP.sm}) {
+    padding: 2.5rem 1.5rem;
+  }
+`;
 
 export const spinner = css`
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-`
+`;
 
 export const spinnerDot = css`
   width: 2rem;
@@ -31,14 +35,13 @@ export const spinnerDot = css`
   border-top-color: transparent;
   border-radius: 9999px;
   animation: spin 0.7s linear infinite;
-  @keyframes spin { to { transform: rotate(360deg); } }
-`
+`;
 
 export const card = css`
   background: ${C.card};
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.xxl};
-`
+`;
 
 export const progressBarTrack = css`
   height: 0.5rem;
@@ -46,15 +49,18 @@ export const progressBarTrack = css`
   border-radius: 9999px;
   overflow: hidden;
   flex: 1;
-`
+`;
 
-export const progressBarFill = (pct: number, gradient = `linear-gradient(90deg, ${C.accent}, ${C.accent3})`) => css`
+export const progressBarFill = (
+  pct: number,
+  gradient = `linear-gradient(90deg, ${C.accent}, ${C.accent3})`,
+) => css`
   height: 100%;
   width: ${pct}%;
   background: ${gradient};
   border-radius: 9999px;
   transition: width 0.5s ease;
-`
+`;
 
 export const categoryScroll = css`
   display: flex;
@@ -63,8 +69,10 @@ export const categoryScroll = css`
   padding-bottom: 0.5rem;
   margin-bottom: 1.5rem;
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
-`
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 export const categoryChip = (active: boolean, activeColor = C.accent) => css`
   flex-shrink: 0;
@@ -73,20 +81,35 @@ export const categoryChip = (active: boolean, activeColor = C.accent) => css`
   font-size: 0.75rem;
   font-weight: 700;
   border: 1px solid ${active ? activeColor : C.border};
-  background: ${active ? activeColor : 'transparent'};
-  color: ${active ? 'white' : C.muted};
+  background: ${active ? activeColor : "transparent"};
+  color: ${active ? "white" : C.muted};
   cursor: pointer;
   transition: all 0.15s ease;
-  &:hover { border-color: ${activeColor}; color: white; }
-`
-
-export const diffBadge = (level: 'easy' | 'medium' | 'hard') => {
-  const map = {
-    easy:   { bg: `rgba(106, 247, 192, 0.1)`, color: C.accent3, border: `rgba(106, 247, 192, 0.2)` },
-    medium: { bg: `rgba(247, 199, 106, 0.1)`, color: C.accent2, border: `rgba(247, 199, 106, 0.2)` },
-    hard:   { bg: `rgba(247, 106, 106, 0.1)`, color: C.danger,  border: `rgba(247, 106, 106, 0.2)` },
+  &:hover {
+    border-color: ${activeColor};
+    color: white;
   }
-  const t = map[level]
+`;
+
+export const diffBadge = (level: "easy" | "medium" | "hard") => {
+  const map = {
+    easy: {
+      bg: `rgba(106, 247, 192, 0.1)`,
+      color: C.accent3,
+      border: `rgba(106, 247, 192, 0.2)`,
+    },
+    medium: {
+      bg: `rgba(247, 199, 106, 0.1)`,
+      color: C.accent2,
+      border: `rgba(247, 199, 106, 0.2)`,
+    },
+    hard: {
+      bg: `rgba(247, 106, 106, 0.1)`,
+      color: C.danger,
+      border: `rgba(247, 106, 106, 0.2)`,
+    },
+  };
+  const t = map[level];
   return css`
     font-size: 0.625rem;
     font-weight: 700;
@@ -95,8 +118,8 @@ export const diffBadge = (level: 'easy' | 'medium' | 'hard') => {
     border: 1px solid ${t.border};
     background: ${t.bg};
     color: ${t.color};
-  `
-}
+  `;
+};
 
 export const proBadgeSmall = css`
   font-size: 0.5rem;
@@ -105,9 +128,9 @@ export const proBadgeSmall = css`
   border-radius: 0.25rem;
   background: rgba(247, 199, 106, 0.15);
   color: ${C.accent2};
-`
+`;
 
-export const iconBox = (color: string, size = '2.25rem') => css`
+export const iconBox = (color: string, size = "2.25rem") => css`
   width: ${size};
   height: ${size};
   border-radius: ${RADIUS.lg};
@@ -117,7 +140,7 @@ export const iconBox = (color: string, size = '2.25rem') => css`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-`
+`;
 
 export const infoBox = (color: string) => css`
   display: flex;
@@ -127,7 +150,7 @@ export const infoBox = (color: string) => css`
   border: 1px solid ${color}33;
   border-radius: ${RADIUS.xl};
   padding: 1rem;
-`
+`;
 
 export const sectionLabel = (color = C.accent) => css`
   font-size: 0.625rem;
@@ -135,7 +158,7 @@ export const sectionLabel = (color = C.accent) => css`
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: ${color};
-`
+`;
 
 export const actionBtn = (color: string, active = false) => css`
   display: flex;
@@ -145,14 +168,20 @@ export const actionBtn = (color: string, active = false) => css`
   border-radius: 0.5rem;
   font-size: 0.75rem;
   font-weight: 700;
-  border: 1px solid ${active ? color + '66' : C.border};
-  background: ${active ? color + '33' : 'transparent'};
+  border: 1px solid ${active ? color + "66" : C.border};
+  background: ${active ? color + "33" : "transparent"};
   color: ${active ? color : C.muted};
   cursor: pointer;
   transition: all 0.15s ease;
-  &:hover { border-color: ${color + '80'}; color: ${active ? color : 'white'}; }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
-`
+  &:hover {
+    border-color: ${color + "80"};
+    color: ${active ? color : "white"};
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
 
 export const primaryBtn = (color = C.accent) => css`
   display: flex;
@@ -169,9 +198,14 @@ export const primaryBtn = (color = C.accent) => css`
   color: ${color};
   cursor: pointer;
   transition: all 0.15s ease;
-  &:hover { background: ${color}4d; }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
-`
+  &:hover {
+    background: ${color}4d;
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
 
 export const ghostBtn = css`
   display: flex;
@@ -187,8 +221,11 @@ export const ghostBtn = css`
   background: transparent;
   cursor: pointer;
   transition: all 0.15s ease;
-  &:hover { color: white; border-color: rgba(255,255,255,0.2); }
-`
+  &:hover {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+`;
 
 export const textarea = (focusColor = C.accent) => css`
   width: 100%;
@@ -196,17 +233,24 @@ export const textarea = (focusColor = C.accent) => css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.xl};
   padding: 0.75rem 1rem;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.75rem;
   color: white;
   outline: none;
   resize: none;
   transition: border-color 0.15s ease;
   line-height: 1.8;
-  &::placeholder { color: ${C.muted}; }
-  &:focus { border-color: ${focusColor}80; }
-  &:disabled { opacity: 0.6; cursor: not-allowed; }
-`
+  &::placeholder {
+    color: ${C.muted};
+  }
+  &:focus {
+    border-color: ${focusColor}80;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
 
 export const codeBlock = (borderColor = C.border) => css`
   margin: 0;
@@ -214,17 +258,17 @@ export const codeBlock = (borderColor = C.border) => css`
   border: 1px solid ${borderColor};
   border-radius: ${RADIUS.xl};
   padding: 1rem;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.6875rem;
   overflow: auto;
   line-height: 1.7;
-`
+`;
 
 export const divider = css`
   border: none;
   border-top: 1px solid ${C.border};
   margin: 0.5rem 0;
-`
+`;
 
 export const glow = (color: string) => css`
   position: fixed;
@@ -232,4 +276,63 @@ export const glow = (color: string) => css`
   background: ${color};
   filter: blur(80px);
   pointer-events: none;
-`
+`;
+
+// ─── Page header (output-quiz, debug-lab pattern) ─────────────────────────────
+export const pageHeader = css`
+  margin-bottom: 2rem;
+`;
+
+export const pageHeaderTop = css`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+`;
+
+export const pageTitleText = css`
+  font-size: 1.5rem;
+  font-weight: 900;
+`;
+
+export const pageSubtitleText = css`
+  color: ${C.muted};
+  font-size: 0.75rem;
+`;
+
+export const pageProgressRow = css`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+`;
+
+export const pageProgressCount = (color = C.accent) => css`
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: ${color};
+  white-space: nowrap;
+`;
+
+// ─── Stat cards (analytics, quiz results, homepage) ───────────────────────────
+export const statCard = css`
+  background: ${C.card};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.xxl};
+  padding: 1.25rem;
+`;
+
+export const statNum = (color: string) => css`
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: ${color};
+  margin-bottom: 0.25rem;
+`;
+
+export const statLabel = css`
+  font-size: 0.6875rem;
+  color: ${C.muted};
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
