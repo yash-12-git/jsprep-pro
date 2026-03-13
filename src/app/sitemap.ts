@@ -1,10 +1,9 @@
 import { MetadataRoute } from "next";
 import {
-  getBlogPostSlugs,
   getPublishedBlogPosts,
-  getPublishedCategories,
   getPublishedQuestionSlugs,
   getTopicSlugs,
+  getQuestions,
 } from "@/lib/cachedQueries";
 
 import { catToSlug, SITE } from "@/lib/seo/seo";
@@ -20,12 +19,20 @@ function toSlug(text: string): string {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date().toISOString();
 
-  const [topicSlugs, blogPosts, questionSlugs, categories] = await Promise.all([
-    getTopicSlugs().catch(() => [] as string[]),
-    getPublishedBlogPosts().catch(() => []),
-    getPublishedQuestionSlugs().catch(() => [] as string[]),
-    getPublishedCategories().catch(() => [] as string[]),
-  ]);
+  const [topicSlugs, blogPosts, questionSlugs, theoryResult] =
+    await Promise.all([
+      getTopicSlugs().catch(() => [] as string[]),
+      getPublishedBlogPosts().catch(() => []),
+      getPublishedQuestionSlugs().catch(() => [] as string[]),
+      // Only theory categories — output/debug have dedicated pages not /questions/[slug]
+      getQuestions({
+        filters: { status: "published", type: "theory" },
+        pageSize: 300,
+      }).catch((error) => ({ questions: [] })),
+    ]);
+  const categories = [
+    ...new Set((theoryResult.questions as any[]).map((q) => q.category)),
+  ] as string[];
 
   const staticPages: MetadataRoute.Sitemap = [
     {

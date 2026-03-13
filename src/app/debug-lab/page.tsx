@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  useQuestions,
-  useCategories,
-  useUserProgress,
-} from "@/hooks/useQuestions";
+import { useCategories, useUserProgress } from "@/hooks/useQuestions";
+import { useAllQuestions } from "@/contexts/QuestionsContext";
 import PageGuard from "@/components/ui/PageGuard";
 import { Bug } from "lucide-react";
 import { DebugCard } from "@/components/ui/QuestionCards";
@@ -21,11 +18,7 @@ export default function DebugLabPage() {
   const { user, progress, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const { questions, loading: qLoading } = useQuestions({
-    type: "debug",
-    track: "javascript",
-    enabled: !!user,
-  });
+  const { debugQs: questions, loading: qLoading } = useAllQuestions();
   const { categories } = useCategories("debug", "javascript");
   const { isSolved, isRevealed, recordSolved, recordRevealed, solvedIds } =
     useUserProgress({ uid: user?.uid ?? null });

@@ -42,6 +42,7 @@ import {
 import {
   getQuestions as _getQuestions,
   getPublishedCategories as _getPublishedCategories,
+  getQuestionBySlug as _getQuestionBySlug,
 } from "@/lib/questions";
 
 import type { GetQuestionsOptions } from "@/lib/questions";
@@ -159,3 +160,10 @@ export const getPublishedQuestionSlugs = unstable_cache(
   ["published-question-slugs"],
   { revalidate: false, tags: [CACHE_TAGS.questions] },
 );
+
+/** Single question by slug — cached per slug, cleared on admin write */
+export const getQuestionBySlug = (slug: string) =>
+  unstable_cache(() => _getQuestionBySlug(slug), ["question-by-slug", slug], {
+    revalidate: false,
+    tags: [CACHE_TAGS.questions, `question-${slug}`],
+  })();

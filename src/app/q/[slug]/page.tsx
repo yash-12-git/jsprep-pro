@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { DIFF_STYLE, DIFF_LABEL } from "@/styles/tokens";
-
 import { notFound } from "next/navigation";
 import {
-  getPublishedCategories,
   getPublishedQuestionSlugs,
+  getQuestionBySlug,
   getQuestions,
 } from "@/lib/cachedQueries";
 import Link from "next/link";
@@ -16,20 +15,9 @@ import {
   SITE,
 } from "@/lib/seo/seo";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
-import { getQuestionBySlug } from "@/lib/questions";
 
 interface Props {
   params: { slug: string };
-}
-
-// ─── Slug helpers ─────────────────────────────────────────────────────────────
-
-function toSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 80);
 }
 
 export const revalidate = 3600;
@@ -46,19 +34,52 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!q) return {};
 
   const diff = DIFF_LABEL[q.difficulty] ?? "Core";
+  const typeLabel =
+    q.type === "output"
+      ? "Output Question"
+      : q.type === "debug"
+        ? "Debug Challenge"
+        : "Interview Question";
 
   return pageMeta({
-    title: `${q.title} — JavaScript Interview Question`,
-    description: `${diff} JavaScript interview question: ${q.title} — Detailed answer with code examples, common mistakes, and interview tips. Part of the ${q.category} category.`,
+    title: `${q.title} — JavaScript ${typeLabel}`,
+    description: `${diff} JavaScript ${typeLabel.toLowerCase()}: ${q.title} — Detailed answer with code examples and interview tips. Part of the ${q.category} category.`,
     path: `/q/${params.slug}`,
     keywords: [
       q.title.toLowerCase(),
-      `${q.category.toLowerCase()} javascript interview`,
-      `javascript interview ${q.category.toLowerCase()}`,
+      `${q.category.toLowerCase()} javascript`,
       "javascript interview question",
       `${params.slug.replace(/-/g, " ")}`,
     ],
   });
+}
+
+// ─── Simple markdown → HTML (no external dep) ────────────────────────────────
+// Handles the answer format used by output/debug questions:
+// "**Explanation:** ...\n\n**Key Insight:** ..."
+
+function markdownToHtml(text: string): string {
+  if (!text) return "";
+  // Already HTML (theory questions have <p>, <pre> etc)
+  if (text.trim().startsWith("<")) return text;
+
+  return (
+    text
+      // Bold
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      // Inline code
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      // Code blocks
+      .replace(/```[\w]*\n([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
+      // Double newline → paragraph break
+      .split(/\n\n+/)
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map((p) =>
+        p.startsWith("<pre") ? p : `<p>${p.replace(/\n/g, "<br/>")}</p>`,
+      )
+      .join("\n")
+  );
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -69,31 +90,48 @@ export default async function QuestionPage({ params }: Props) {
 
   const dm = DIFF_STYLE[question.difficulty] ?? DIFF_STYLE.core;
   const catSlug = catToSlug(question.category);
+  const isOutput = question.type === "output";
+  const isDebug = question.type === "debug";
+  const isTheory = question.type === "theory";
 
-  // Related questions: same category, excluding current
-  const { questions: allCatQs } = await getQuestions({
-    filters: {
-      status: "published",
-      type: "theory",
-      category: question.category,
-    },
-    pageSize: 10,
+  // Related questions: fetch by type (uses existing index), filter category in JS
+  // Avoids needing a 4-field composite index (status+type+category+order)
+  const { questions: allTypeQs } = await getQuestions({
+    filters: { status: "published", type: question.type },
+    pageSize: 100,
   });
-  const related = allCatQs.filter((q) => q.id !== question.id).slice(0, 4);
+  const related = allTypeQs
+    .filter((q) => q.id !== question.id && q.category === question.category)
+    .slice(0, 4);
 
-  // All categories for bottom nav
-  const categories = await getPublishedCategories();
+  const answerHtml = markdownToHtml(question.answer ?? "");
+  const plainAnswer = (question.answer ?? "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
   const jsonLd = faqSchema([
     {
       question: question.title,
-      answer: (question.answer ?? "")
-        .replace(/<[^>]*>/g, "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 500),
+      answer: plainAnswer.slice(0, 500),
     },
   ]);
+
+  const typeLabel = isOutput
+    ? "💻 Output Question"
+    : isDebug
+      ? "🐛 Debug Challenge"
+      : "📖 Theory Question";
+  const categoryPath = isTheory
+    ? `/questions/${catSlug}`
+    : isOutput
+      ? "/javascript-output-questions"
+      : "/debug-lab";
+  const categoryLabel = isTheory
+    ? question.category
+    : isOutput
+      ? "Output Quiz"
+      : "Debug Lab";
 
   return (
     <>
@@ -110,7 +148,7 @@ export default async function QuestionPage({ params }: Props) {
               name: "JS Interview Questions",
               path: "/javascript-interview-questions",
             },
-            { name: question.category, path: `/questions/${catSlug}` },
+            { name: categoryLabel, path: categoryPath },
             {
               name: question.title.slice(0, 40) + "…",
               path: `/q/${params.slug}`,
@@ -144,17 +182,10 @@ export default async function QuestionPage({ params }: Props) {
           </Link>
           <span>›</span>
           <Link
-            href="/javascript-interview-questions"
+            href={categoryPath}
             style={{ color: "#7c6af7", textDecoration: "none" }}
           >
-            Interview Questions
-          </Link>
-          <span>›</span>
-          <Link
-            href={`/questions/${catSlug}`}
-            style={{ color: "#7c6af7", textDecoration: "none" }}
-          >
-            {question.category}
+            {categoryLabel}
           </Link>
           <span>›</span>
           <span style={{ color: "rgba(255,255,255,0.5)" }}>
@@ -208,7 +239,7 @@ export default async function QuestionPage({ params }: Props) {
                 marginLeft: "auto",
               }}
             >
-              JavaScript Interview Question
+              {typeLabel}
             </span>
           </div>
 
@@ -225,7 +256,7 @@ export default async function QuestionPage({ params }: Props) {
             {question.title}
           </h1>
 
-          {question.hint && (
+          {question.hint && !isDebug && (
             <div
               style={{
                 display: "flex",
@@ -237,14 +268,7 @@ export default async function QuestionPage({ params }: Props) {
                 borderRadius: "0.875rem",
               }}
             >
-              <span
-                style={{
-                  fontSize: "1rem",
-                  lineHeight: 1,
-                  flexShrink: 0,
-                  marginTop: 1,
-                }}
-              >
+              <span style={{ fontSize: "1rem", flexShrink: 0, marginTop: 1 }}>
                 💡
               </span>
               <div>
@@ -275,7 +299,149 @@ export default async function QuestionPage({ params }: Props) {
           )}
         </header>
 
-        {/* ── Answer ── */}
+        {/* ── Code block (output + debug questions) ── */}
+        {(isOutput || isDebug) && question.code && (
+          <section style={{ marginBottom: "2rem" }}>
+            <h2
+              style={{
+                fontSize: "1rem",
+                fontWeight: 800,
+                color: "white",
+                marginBottom: "1rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              <span
+                style={{
+                  width: 3,
+                  height: 18,
+                  borderRadius: 2,
+                  background: isOutput ? "#f7c76a" : "#f76a6a",
+                  display: "inline-block",
+                }}
+              />
+              {isDebug
+                ? "Buggy Code — Can you spot the issue?"
+                : "What does this output?"}
+            </h2>
+            <pre
+              style={{
+                background: "#0d0d14",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: "0.875rem",
+                padding: "1.25rem 1.5rem",
+                overflowX: "auto",
+                fontSize: "0.875rem",
+                lineHeight: 1.7,
+                color: "#c8c8d8",
+                margin: 0,
+              }}
+            >
+              <code
+                style={{
+                  fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                }}
+              >
+                {question.code}
+              </code>
+            </pre>
+          </section>
+        )}
+
+        {/* ── Expected output (output questions only) ── */}
+        {isOutput && question.expectedOutput && (
+          <section style={{ marginBottom: "2rem" }}>
+            <h2
+              style={{
+                fontSize: "1rem",
+                fontWeight: 800,
+                color: "white",
+                marginBottom: "1rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              <span
+                style={{
+                  width: 3,
+                  height: 18,
+                  borderRadius: 2,
+                  background: "#6af7c0",
+                  display: "inline-block",
+                }}
+              />
+              Correct Output
+            </h2>
+            <pre
+              style={{
+                background: "rgba(106,247,192,0.05)",
+                border: "1px solid rgba(106,247,192,0.2)",
+                borderRadius: "0.875rem",
+                padding: "1rem 1.25rem",
+                fontSize: "0.9375rem",
+                fontFamily: "'JetBrains Mono', monospace",
+                color: "#6af7c0",
+                margin: 0,
+              }}
+            >
+              {question.expectedOutput}
+            </pre>
+          </section>
+        )}
+
+        {/* ── Fixed code (debug questions only) ── */}
+        {isDebug && question.fixedCode && (
+          <section style={{ marginBottom: "2rem" }}>
+            <h2
+              style={{
+                fontSize: "1rem",
+                fontWeight: 800,
+                color: "white",
+                marginBottom: "1rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              <span
+                style={{
+                  width: 3,
+                  height: 18,
+                  borderRadius: 2,
+                  background: "#6af7c0",
+                  display: "inline-block",
+                }}
+              />
+              Fixed Code
+            </h2>
+            <pre
+              style={{
+                background: "rgba(106,247,192,0.04)",
+                border: "1px solid rgba(106,247,192,0.15)",
+                borderRadius: "0.875rem",
+                padding: "1.25rem 1.5rem",
+                overflowX: "auto",
+                fontSize: "0.875rem",
+                lineHeight: 1.7,
+                color: "#c8c8d8",
+                margin: 0,
+              }}
+            >
+              <code
+                style={{
+                  fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                }}
+              >
+                {question.fixedCode}
+              </code>
+            </pre>
+          </section>
+        )}
+
+        {/* ── Answer / Explanation ── */}
         <section style={{ marginBottom: "3rem" }}>
           <h2
             style={{
@@ -297,25 +463,27 @@ export default async function QuestionPage({ params }: Props) {
                 display: "inline-block",
               }}
             />
-            Full Answer
+            {isDebug
+              ? "Bug Explained"
+              : isOutput
+                ? "Why this output?"
+                : "Full Answer"}
           </h2>
-
           <div
             className="answer-body"
-            dangerouslySetInnerHTML={{ __html: question.answer ?? "" }}
+            dangerouslySetInnerHTML={{ __html: answerHtml }}
             style={{ lineHeight: 1.75, fontSize: "0.9375rem" }}
           />
         </section>
 
-        {/* ── Inline AI Evaluator ── */}
-        <InlineEvaluator
-          question={question.title}
-          idealAnswer={(question.answer ?? "")
-            .replace(/<[^>]*>/g, "")
-            .replace(/\s+/g, " ")
-            .trim()}
-          label="Can you explain this out loud?"
-        />
+        {/* ── AI Evaluator (theory only — makes sense for open-ended answers) ── */}
+        {isTheory && (
+          <InlineEvaluator
+            question={question.title}
+            idealAnswer={plainAnswer}
+            label="Can you explain this out loud?"
+          />
+        )}
 
         {/* ── Related questions ── */}
         {related.length > 0 && (
@@ -328,7 +496,12 @@ export default async function QuestionPage({ params }: Props) {
                 marginBottom: "0.875rem",
               }}
             >
-              More {question.category} Questions
+              More {question.category}{" "}
+              {isOutput
+                ? "Output Questions"
+                : isDebug
+                  ? "Debug Challenges"
+                  : "Questions"}
             </h2>
             <div
               style={{
@@ -379,11 +552,7 @@ export default async function QuestionPage({ params }: Props) {
                       {r.title}
                     </span>
                     <span
-                      style={{
-                        color: "rgba(255,255,255,0.2)",
-                        fontSize: "0.875rem",
-                        flexShrink: 0,
-                      }}
+                      style={{ color: "rgba(255,255,255,0.2)", flexShrink: 0 }}
                     >
                       →
                     </span>
@@ -394,48 +563,74 @@ export default async function QuestionPage({ params }: Props) {
           </section>
         )}
 
-        {/* ── Browse by category ── */}
-        <section>
-          <h2
+        {/* ── Bottom CTA ── */}
+        <div
+          style={{
+            padding: "1.5rem",
+            background: "rgba(124,106,247,0.06)",
+            border: "1px solid rgba(124,106,247,0.15)",
+            borderRadius: "1rem",
+            textAlign: "center",
+            marginBottom: "2rem",
+          }}
+        >
+          <p
             style={{
               fontSize: "0.9375rem",
-              fontWeight: 800,
-              color: "rgba(255,255,255,0.5)",
-              marginBottom: "0.875rem",
+              fontWeight: 700,
+              color: "white",
+              marginBottom: "0.5rem",
             }}
           >
-            Browse by Category
-          </h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-            {categories.map((cat) => (
-              <Link
-                key={cat}
-                href={`/questions/${catToSlug(cat)}`}
-                style={{
-                  padding: "0.4rem 0.875rem",
-                  background:
-                    cat === question.category
-                      ? "rgba(124,106,247,0.15)"
-                      : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${cat === question.category ? "rgba(124,106,247,0.35)" : "rgba(255,255,255,0.07)"}`,
-                  color:
-                    cat === question.category
-                      ? "#c4b5fd"
-                      : "rgba(255,255,255,0.5)",
-                  borderRadius: 20,
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                }}
-              >
-                {cat}
-              </Link>
-            ))}
-          </div>
-        </section>
+            {isOutput
+              ? "Practice predicting output live →"
+              : isDebug
+                ? "Practice spotting bugs live →"
+                : "Practice this in a timed sprint →"}
+          </p>
+          <p
+            style={{
+              fontSize: "0.8125rem",
+              color: "rgba(255,255,255,0.45)",
+              marginBottom: "1rem",
+            }}
+          >
+            {isOutput
+              ? "66 output questions with instant feedback"
+              : isDebug
+                ? "38 debug challenges with AI hints"
+                : "5 free questions, no signup required"}
+          </p>
+          <Link
+            href={
+              isOutput
+                ? "/javascript-output-questions"
+                : isDebug
+                  ? "/debug-lab"
+                  : "/sprint"
+            }
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.625rem 1.25rem",
+              background: "linear-gradient(135deg, #7c6af7, #a78bfa)",
+              color: "white",
+              textDecoration: "none",
+              borderRadius: "0.75rem",
+              fontSize: "0.875rem",
+              fontWeight: 700,
+            }}
+          >
+            {isOutput
+              ? "💻 Try Output Quiz"
+              : isDebug
+                ? "🐛 Try Debug Lab"
+                : "⚡ Start Sprint"}
+          </Link>
+        </div>
       </div>
 
-      {/* Answer body styles */}
       <style>{`
         .answer-body p { color: rgba(255,255,255,0.75); margin-bottom: 1rem; }
         .answer-body strong { color: white; }
@@ -450,7 +645,7 @@ export default async function QuestionPage({ params }: Props) {
           line-height: 1.7;
         }
         .answer-body code {
-          font-family: 'Fira Code', 'Cascadia Code', monospace;
+          font-family: 'JetBrains Mono', 'Fira Code', monospace;
           color: #a5f3fc;
         }
         .answer-body pre code { color: #c8c8d8; }

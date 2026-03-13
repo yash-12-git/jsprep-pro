@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuestions, useUserProgress } from "@/hooks/useQuestions";
+import { useUserProgress } from "@/hooks/useQuestions";
+import { useAllQuestions } from "@/contexts/QuestionsContext";
 import PageGuard from "@/components/ui/PageGuard";
 import {
   Loader2,
@@ -39,11 +40,7 @@ export default function StudyPlanPage() {
   const { user, progress, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const { questions } = useQuestions({
-    type: "theory",
-    track: "javascript",
-    enabled: !!user,
-  });
+  const { theoryQs: questions } = useAllQuestions();
   const { masteredIds, progressMap } = useUserProgress({
     uid: user?.uid ?? null,
   });

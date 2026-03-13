@@ -84,7 +84,6 @@ const S = {
     border-radius: 100px;
   `,
 
-  /* Progress block */
   progressBlock: css`
     background: rgba(255, 255, 255, 0.025);
     border: 1px solid rgba(255, 255, 255, 0.07);
@@ -133,10 +132,10 @@ const S = {
     transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   `,
 
-  freeNotice: css`
+  proNotice: css`
     margin-top: 0.5rem;
     font-size: 0.6875rem;
-    color: rgba(247, 199, 106, 0.6);
+    color: rgba(124, 106, 247, 0.6);
   `,
 };
 
@@ -144,13 +143,11 @@ export default function DashboardHeader({
   user,
   progress,
   totalQuestions,
-  masteredCount
+  masteredCount,
 }: Props) {
   const firstName = user.displayName?.split(" ")[0] ?? "there";
-  const FREE_LIMIT = 5;
-  const remaining = Math.max(0, FREE_LIMIT - masteredCount);
-  const pct = totalQuestions > 0 ? Math.round((masteredCount / totalQuestions) * 100) : 0
-
+  const pct =
+    totalQuestions > 0 ? Math.round((masteredCount / totalQuestions) * 100) : 0;
   const hour = new Date().getHours();
   const timeGreeting =
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
@@ -188,26 +185,25 @@ export default function DashboardHeader({
         </div>
       </div>
 
-      {/* Progress bar block */}
+      {/* Progress bar — only meaningful for Pro (they can actually track mastery) */}
       <div css={S.progressBlock}>
         <div css={S.progressTopRow}>
-          <span css={S.progressLabel}>Questions mastered</span>
+          <span css={S.progressLabel}>
+            {progress.isPro ? "Questions mastered" : "Questions available"}
+          </span>
           <span css={S.progressFraction}>
-            {masteredCount}
+            {progress.isPro ? masteredCount : totalQuestions}
             <span style={{ color: "rgba(255,255,255,0.25)" }}>
               /{totalQuestions}
             </span>
-            <span css={S.progressPct}>{pct}%</span>
+            {progress.isPro && <span css={S.progressPct}>{pct}%</span>}
           </span>
         </div>
         <div css={S.track}>
-          <div css={S.fill(pct)} />
+          <div css={S.fill(progress.isPro ? pct : 100)} />
         </div>
-        {!progress.isPro && masteredCount < FREE_LIMIT && (
-          <p css={S.freeNotice}>
-            {remaining} free mark{remaining !== 1 ? "s" : ""} left — upgrade to
-            track unlimited
-          </p>
+        {!progress.isPro && (
+          <p css={S.proNotice}>Upgrade to Pro to track your mastery progress</p>
         )}
       </div>
     </div>

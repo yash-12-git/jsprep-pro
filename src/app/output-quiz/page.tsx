@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  useQuestions,
-  useCategories,
-  useUserProgress,
-} from "@/hooks/useQuestions";
+import { useCategories, useUserProgress } from "@/hooks/useQuestions";
+import { useAllQuestions } from "@/contexts/QuestionsContext";
 import PageGuard from "@/components/ui/PageGuard";
 import { Code2 } from "lucide-react";
 import { OutputCard } from "@/components/ui/QuestionCards";
@@ -21,11 +18,7 @@ export default function OutputQuizPage() {
   const { user, progress, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const { questions, loading: qLoading } = useQuestions({
-    type: "output",
-    track: "javascript",
-    enabled: !!user,
-  });
+  const { outputQs: questions, loading: qLoading } = useAllQuestions();
   const { categories } = useCategories("output", "javascript");
   const { isSolved, isRevealed, recordSolved, recordRevealed, solvedIds } =
     useUserProgress({ uid: user?.uid ?? null });
@@ -145,7 +138,7 @@ export default function OutputQuizPage() {
             </div>
           )}
         </div>
-      </>{" "}
+      </>
     </PageGuard>
   );
 }

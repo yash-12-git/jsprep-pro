@@ -10,7 +10,7 @@ import {
   Loader2,
   Target,
 } from "lucide-react";
-import { getQuestions } from "@/lib/questions";
+import { useAllQuestions } from "@/contexts/QuestionsContext";
 import type { Question } from "@/types/question";
 import { C, RADIUS } from "@/styles/tokens";
 
@@ -417,23 +417,20 @@ export default function QuestionOfTheDay({ isPro }: Props) {
   const [answerOpen, setAnswerOpen] = useState(false);
   const [evalOpen, setEvalOpen] = useState(false);
   const [userAnswer, setUserAnswer] = useState("");
+  const { theoryQs } = useAllQuestions();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<EvalResult | null>(null);
   const [showBetter, setShowBetter] = useState(false);
 
+  // Pick today's question from context — zero Firestore reads
   useEffect(() => {
     if (typeof window !== "undefined")
       setDone(localStorage.getItem(key) === "1");
-    // Fetch all published theory questions, pick deterministically by day
-    getQuestions({
-      filters: { status: "published", type: "theory" },
-      pageSize: 200,
-    })
-      .then(({ questions: all }) => {
-        if (all.length) setQ(all[getDayIndex() % all.length]);
-      })
-      .catch(() => {});
   }, [key]);
+
+  useEffect(() => {
+    if (theoryQs.length) setQ(theoryQs[getDayIndex() % theoryQs.length]);
+  }, [theoryQs]);
 
   function markDone() {
     localStorage.setItem(key, "1");

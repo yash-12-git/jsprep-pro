@@ -104,30 +104,20 @@ export function useQuestions({
 }
 
 // ─── useCategories hook ───────────────────────────────────────────────────────
+// Derives categories from QuestionsContext — zero extra Firestore reads.
 
-const catCache = new Map<string, string[]>();
+import { useAllQuestions } from "@/contexts/QuestionsContext";
+import { useMemo } from "react";
 
 export function useCategories(type?: QuestionType, track?: Track) {
-  const [categories, setCategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { allQs, loading } = useAllQuestions();
 
-  useEffect(() => {
-    const key = `${type}:${track}`;
-    const cached = catCache.get(key);
-    if (cached) {
-      setCategories(cached);
-      setLoading(false);
-      return;
-    }
-
-    getCategories(type, track)
-      .then((cats) => {
-        catCache.set(key, cats);
-        setCategories(cats);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [type, track]);
+  const categories = useMemo(() => {
+    let qs = allQs;
+    if (type) qs = qs.filter((q) => q.type === type);
+    if (track) qs = qs.filter((q) => q.track === track);
+    return [...new Set(qs.map((q) => q.category))].sort();
+  }, [allQs, type, track]);
 
   return { categories, loading };
 }
