@@ -52,7 +52,7 @@ export function useUpgrade({ onSuccess }: UseUpgradeOptions = {}) {
 
       const rzp = new window.Razorpay({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: Number(process.env.NEXT_PUBLIC_PRO_PRICE_PAISE || 9900), // 99 INR = 9900 paise
+        amount: Number(process.env.NEXT_PUBLIC_PRO_PRICE_PAISE || 19900), // 199 INR = 19900 paise
         currency: "INR",
         name: "JSPrep Pro",
         description: "Monthly Pro Subscription",

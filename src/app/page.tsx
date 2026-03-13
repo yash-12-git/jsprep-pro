@@ -836,7 +836,7 @@ console.log({} + [])`}</pre>
               <div css={popularTag}>POPULAR</div>
               <div css={[pTier, { color: "#c4b5fd" }]}>Pro</div>
               <div css={pPrice}>
-                ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 99}
+                ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}
                 <span css={pPer}>/month</span>
               </div>
               <div css={pNote}>Less than a coffee. Cancel anytime.</div>
