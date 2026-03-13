@@ -145,7 +145,7 @@ export default function DebugCard({
       );
       setFeedback(parsed);
       setUiPhase("feedback");
-      if (parsed.correct) await recordSolved(q.id);
+      if (parsed.correct && !persistedSolved) await recordSolved(q.id);
     } catch {
       setUiPhase("editing");
       alert("AI check failed — try again");
@@ -153,7 +153,7 @@ export default function DebugCard({
   }
 
   async function revealAnswer() {
-    if (!persistedSolved) await recordRevealed(q.id);
+    if (!persistedSolved && !persistedRevealed && isPro) await recordRevealed(q.id);
     setShowReveal(true);
   }
 
@@ -418,7 +418,7 @@ export default function DebugCard({
                     <EyeOff size={13} /> Hide Answer
                   </button>
                 )}
-                {(uiPhase === "feedback" || showReveal) && (
+                {(uiPhase === "feedback" || showReveal && !isSolvedQ) && (
                   <button
                     css={Shared.ghostBtn}
                     onClick={reset}

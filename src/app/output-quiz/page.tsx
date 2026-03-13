@@ -24,7 +24,6 @@ export default function OutputQuizPage() {
     useUserProgress({ uid: user?.uid ?? null });
 
   const [activeCategory, setActiveCategory] = useState("All");
-  const [openId, setOpenId] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
@@ -130,8 +129,6 @@ export default function OutputQuizPage() {
                     recordRevealed={recordRevealed}
                     isLocked={isLocked}
                     onPaywall={() => setShowPaywall(true)}
-                    isOpen={openId === q.id}
-                    onToggle={() => setOpenId(openId === q.id ? null : q.id)}
                   />
                 );
               })}

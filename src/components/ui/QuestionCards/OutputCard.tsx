@@ -30,9 +30,7 @@ interface Props {
   /** Locks the interactive body — hides code, shows upgrade prompt */
   isLocked?: boolean;
   onPaywall?: () => void;
-  /** Controlled open state — provide both or neither for accordion mode */
-  isOpen?: boolean;
-  onToggle?: () => void;
+  isPro: boolean;
 }
 
 export default function OutputCard({
@@ -44,10 +42,9 @@ export default function OutputCard({
   recordRevealed,
   isLocked = false,
   onPaywall,
-  isOpen: controlledOpen,
-  onToggle,
+  isPro
 }: Props) {
-  const [internalOpen, setInternalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [answer, setAnswer] = useState("");
   const [localWrong, setLocalWrong] = useState(false);
   // localRevealed: user clicked Reveal this session — show answer, but hideable
@@ -56,8 +53,7 @@ export default function OutputCard({
   const [manuallyReset, setManuallyReset] = useState(false);
   const [answerState, setAnswerState] = useState<AnswerState>("idle");
 
-  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
-  const toggle = onToggle ?? (() => setInternalOpen((o) => !o));
+  const toggle = (() => setIsOpen((o) => !o));
 
   // Priority: manuallyReset > localRevealed > Firestore solved > Firestore revealed > local wrong > idle
   const state: AnswerState =
@@ -79,7 +75,7 @@ export default function OutputCard({
       ua === correct ||
       ua.split("\n").join(",") === correct.split("\n").join(",");      
     if (match) {
-      await recordSolved(q.id);
+      !isSolved(q.id) && isPro && await recordSolved(q.id);
       setLocalWrong(false);
       setManuallyReset(false);
       setAnswerState("correct");
@@ -93,11 +89,12 @@ export default function OutputCard({
     setLocalRevealed(true);
     setLocalWrong(false);
     // Fire-and-forget for tracking — doesn't lock the card permanently
-    if (!isSolved(q.id)) recordRevealed(q.id).catch(() => {});
+    if (!isSolved(q.id) && !isRevealed(q.id) && isPro) recordRevealed(q.id).catch(() => {});
   }
 
   function hideAnswer() {
     setLocalRevealed(false);
+    setManuallyReset(true);
   }
 
   function reset() {
@@ -105,6 +102,7 @@ export default function OutputCard({
     setLocalWrong(false);
     setLocalRevealed(false);
     setManuallyReset(true);
+    setAnswerState("idle");
   }
 
   const highlight: S.CardHighlight =
@@ -230,7 +228,7 @@ export default function OutputCard({
                 </p>
 
                 <textarea
-                  value={answer}
+                  value={state === "correct" ? expectedOut : answer}
                   onChange={(e) => setAnswer(e.target.value)}
                   disabled={state === "correct"}
                   placeholder={
