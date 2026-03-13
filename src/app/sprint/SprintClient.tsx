@@ -84,15 +84,18 @@ function buildMix(
   debug: Question[],
   count: number,
 ): Question[] {
-  // Proportional mix: ~50% theory, ~30% output, ~20% debug
-  const tCount = Math.ceil(count * 0.5);
-  const oCount = Math.ceil(count * 0.3);
-  const dCount = count - tCount - oCount;
-
+  // Guarantee at least 1 of each type, then fill remainder proportionally
+  // count=5  → 1 debug, 1 output, 3 theory
+  // count=10 → 2 debug, 3 output, 5 theory
+  // count=15 → 3 debug, 4 output, 8 theory
+  // count=20 → 4 debug, 6 output, 10 theory
+  const dMin = Math.max(1, Math.floor(count * 0.2));
+  const oMin = Math.max(1, Math.floor(count * 0.3));
+  const tMin = count - dMin - oMin;
   const mixed = [
-    ...shuffle(theory).slice(0, tCount),
-    ...shuffle(output).slice(0, oCount),
-    ...shuffle(debug).slice(0, Math.max(0, dCount)),
+    ...shuffle(theory).slice(0, Math.max(1, tMin)),
+    ...shuffle(output).slice(0, oMin),
+    ...shuffle(debug).slice(0, dMin),
   ];
   return shuffle(mixed).slice(0, count);
 }
@@ -262,8 +265,7 @@ export default function SprintClient({ uid, isPro }: Props) {
     setSummary(s);
     setPhase("results");
 
-    // ── Single Firestore write ──────────────────────────────────────────────
-    if (uid) {
+    if (uid && isPro) {
       const sprintId = `${uid}_${Date.now()}`;
       setDoc(doc(db, "users", uid, "sprints", sprintId), {
         score: finalScore,
