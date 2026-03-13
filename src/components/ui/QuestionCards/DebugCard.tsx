@@ -61,9 +61,6 @@ interface Props {
   /** Hides code — show a locked upgrade card instead */
   isLocked?: boolean;
   onPaywall?: () => void;
-  /** Controlled accordion mode — provide both or neither */
-  isOpen?: boolean;
-  onToggle?: () => void;
 }
 
 export default function DebugCard({
@@ -77,17 +74,14 @@ export default function DebugCard({
   recordRevealed,
   isLocked = false,
   onPaywall,
-  isOpen: controlledOpen,
-  onToggle,
 }: Props) {
-  const [internalOpen, setInternalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [userCode, setUserCode] = useState(q.brokenCode || q.code || "");
   const [uiPhase, setUiPhase] = useState<UIPhase>("editing");
   const [feedback, setFeedback] = useState<AIFeedback | null>(null);
   const [showReveal, setShowReveal] = useState(false);
 
-  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
-  const toggle = onToggle ?? (() => setInternalOpen((o) => !o));
+  const toggle = () => setIsOpen((o) => !o);
 
   const persistedSolved = isSolved(q.id);
   const persistedRevealed = isRevealed(q.id);

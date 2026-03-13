@@ -71,6 +71,7 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
                 isRevealed={isRevealed}
                 recordSolved={recordSolved}
                 recordRevealed={recordRevealed}
+                isPro={!!progress?.isPro}
                 onPaywall={() =>
                   openPaywall("Upgrade to Pro to unlock all output questions.")
                 }

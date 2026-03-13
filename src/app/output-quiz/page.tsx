@@ -128,6 +128,7 @@ export default function OutputQuizPage() {
                     recordSolved={recordSolved}
                     recordRevealed={recordRevealed}
                     isLocked={isLocked}
+                    isPro={!!progress?.isPro}
                     onPaywall={() => setShowPaywall(true)}
                   />
                 );
