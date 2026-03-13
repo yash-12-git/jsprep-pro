@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Syne } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
+import { QuestionsProvider } from "@/contexts/QuestionsContext";
 import { SITE, softwareSchema, KEYWORDS } from "@/lib/seo/seo";
 import Navbar from "@/components/layout/Navbar";
 
@@ -64,10 +65,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE.domain,
   },
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-icon.png",
-  },
 };
 
 export default function RootLayout({
@@ -110,8 +107,10 @@ export default function RootLayout({
         className={`${syne.variable} font-syne bg-bg text-white antialiased`}
       >
         <AuthProvider>
-          <Navbar />
-          {children}
+          <QuestionsProvider>
+            <Navbar />
+            {children}
+          </QuestionsProvider>
         </AuthProvider>
       </body>
     </html>

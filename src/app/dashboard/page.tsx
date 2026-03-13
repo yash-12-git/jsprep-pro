@@ -4,11 +4,8 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  useQuestions,
-  useCategories,
-  useUserProgress,
-} from "@/hooks/useQuestions";
+import { useCategories, useUserProgress } from "@/hooks/useQuestions";
+import { useAllQuestions } from "@/contexts/QuestionsContext";
 import {
   BookOpen,
   Home,
@@ -45,15 +42,8 @@ export default function DashboardPage() {
   const { user, progress, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const {
-    questions,
-    loading: qLoading,
-    error: qError,
-  } = useQuestions({
-    type: "theory",
-    track: "javascript",
-    enabled: !!user,
-  });
+  const { theoryQs: questions, loading: qLoading } = useAllQuestions();
+  const qError = null; // errors handled by QuestionsContext
   const { categories } = useCategories("theory", "javascript");
   const {
     loading: pLoading,
@@ -122,7 +112,7 @@ export default function DashboardPage() {
     await toggleBookmark(questionId);
   }
 
-    if (authLoading || !user || !progress) {
+  if (authLoading || !user || !progress) {
     return (
       <div css={Shared.spinner}>
         <div css={Shared.spinnerDot} />

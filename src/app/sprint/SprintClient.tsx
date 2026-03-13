@@ -4,7 +4,7 @@
 import { css, keyframes } from "@emotion/react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Loader2 } from "lucide-react";
-import { getQuestions } from "@/lib/questions";
+import { useAllQuestions } from "@/contexts/QuestionsContext";
 import { awardProgressXP } from "@/lib/userProgress";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -147,48 +147,51 @@ export default function SprintClient({ uid, isPro }: Props) {
   const startTimeRef = useRef<number>(0);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // ── Questions from global context (no extra Firestore reads) ─────────────────
+  const {
+    theoryQs: ctxTheoryQs,
+    outputQs: ctxOutputQs,
+    debugQs: ctxDebugQs,
+    loading: qLoading,
+  } = useAllQuestions();
+
   // ── Load questions ──────────────────────────────────────────────────────────
 
-  async function loadAndStart(cfg: SprintConfig) {
+  function loadAndStart(cfg: SprintConfig) {
     setConfig(cfg);
-    setPhase("loading");
     setLoadError(null);
-    try {
-      const [t, o, d] = await Promise.all([
-        getQuestions({
-          filters: { status: "published", type: "theory" },
-          pageSize: 80,
-        }),
-        getQuestions({
-          filters: { status: "published", type: "output" },
-          pageSize: 60,
-        }),
-        getQuestions({
-          filters: { status: "published", type: "debug" },
-          pageSize: 40,
-        }),
-      ]);
-      const mixed = buildMix(
-        t.questions,
-        o.questions,
-        d.questions,
-        cfg.questionCount,
+
+    if (qLoading) {
+      // Questions still loading from context — wait and retry
+      setLoadError(
+        "Questions are still loading, please try again in a moment.",
       );
-      if (mixed.length === 0) {
-        setLoadError("No questions found. Make sure questions are published.");
-        setPhase("lobby");
-        return;
-      }
-      setQuestions(mixed);
-      setResults([]);
-      setScore(0);
-      setCurrentIdx(0);
-      startTimeRef.current = Date.now();
-      setPhase("active");
-    } catch (_err) {
-      setLoadError("Failed to load questions. Please try again.");
-      setPhase("lobby");
+      return;
     }
+
+    if (!ctxTheoryQs.length && !ctxOutputQs.length && !ctxDebugQs.length) {
+      setLoadError("No questions found. Make sure questions are published.");
+      return;
+    }
+
+    // Mix from context — zero Firestore reads
+    const mixed = buildMix(
+      ctxTheoryQs,
+      ctxOutputQs,
+      ctxDebugQs,
+      cfg.questionCount,
+    );
+    if (mixed.length === 0) {
+      setLoadError("Not enough questions for a sprint. Please try again.");
+      return;
+    }
+
+    setQuestions(mixed);
+    setResults([]);
+    setScore(0);
+    setCurrentIdx(0);
+    startTimeRef.current = Date.now();
+    setPhase("active");
   }
 
   // ── Handle question complete ────────────────────────────────────────────────

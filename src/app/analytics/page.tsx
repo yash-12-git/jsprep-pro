@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuestions, useUserProgress } from "@/hooks/useQuestions";
+import { useAllQuestions } from "@/contexts/QuestionsContext";
+import { useUserProgress } from "@/hooks/useQuestions";
 import PageGuard from "@/components/ui/PageGuard";
 import { Flame, Brain, Code2, Bug, Zap } from "lucide-react";
 import { format, parseISO } from "date-fns";
@@ -29,22 +30,8 @@ export default function AnalyticsPage() {
   const { user, progress, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // ── Question data ────────────────────────────────────────────────────────────
-  const { questions: theoryQs } = useQuestions({
-    type: "theory",
-    track: "javascript",
-    enabled: !!user,
-  });
-  const { questions: outputQs } = useQuestions({
-    type: "output",
-    track: "javascript",
-    enabled: !!user,
-  });
-  const { questions: debugQs } = useQuestions({
-    type: "debug",
-    track: "javascript",
-    enabled: !!user,
-  });
+  // ── Question data — shared from global context (0 extra Firestore reads) ───────
+  const { theoryQs, outputQs, debugQs } = useAllQuestions();
   const { masteredIds, solvedIds } = useUserProgress({
     uid: user?.uid ?? null,
   });
@@ -61,7 +48,6 @@ export default function AnalyticsPage() {
       orderBy("completedAt", "desc"),
       limit(10),
     );
-
     getDocs(ref)
       .then((snap) => setSprints(snap.docs.map((d) => d.data() as SprintDoc)))
       .catch(() => setSprints([]))
