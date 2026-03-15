@@ -3,7 +3,7 @@ import { Syne } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
 import { QuestionsProvider } from "@/contexts/QuestionsContext";
-import { SITE, softwareSchema, KEYWORDS } from "@/lib/seo/seo";
+import { SITE, softwareSchema, websiteSchema, KEYWORDS } from "@/lib/seo/seo";
 import Navbar from "@/components/layout/Navbar";
 
 const syne = Syne({ subsets: ["latin"], variable: "--font-syne" });
@@ -14,8 +14,8 @@ const syne = Syne({ subsets: ["latin"], variable: "--font-syne" });
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.domain),
   title: {
-    default: "JSPrep Pro — JavaScript Interview Preparation Platform",
-    template: "%s | JSPrep Pro",
+    default: "JavaScript Interview Questions & Practice — JSPrep Pro",
+    template: "%s — JSPrep Pro",
   },
   description: SITE.description,
   keywords: [...KEYWORDS.primary, ...KEYWORDS.platform].join(", "),
@@ -35,10 +35,10 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "en_IN",
     url: SITE.domain,
     siteName: SITE.name,
-    title: "JSPrep Pro — JavaScript Interview Preparation Platform",
+    title: "JavaScript Interview Questions & Practice — JSPrep Pro",
     description: SITE.description,
     images: [
       {
@@ -53,12 +53,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: SITE.twitterHandle,
     creator: SITE.twitterHandle,
-    title: "JSPrep Pro — JavaScript Interview Preparation Platform",
+    title: "JavaScript Interview Questions — JSPrep Pro",
     description: SITE.description,
     images: [`${SITE.domain}/og-default.png`],
   },
   verification: {
-    // Add these once you verify in Google Search Console + Bing Webmaster Tools
     // google: 'your-google-verification-code',
     // other: { 'msvalidate.01': 'your-bing-code' },
   },
@@ -75,7 +74,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Preconnect for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -87,19 +85,20 @@ export default function RootLayout({
           rel="stylesheet"
         />
 
-        {/* Site-wide structured data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: softwareSchema() }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: websiteSchema() }}
+        />
 
-        {/* PWA / App meta */}
         <meta name="application-name" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-title" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#7c6af7" />
 
-        {/* Geo targeting — update for your primary market */}
         <meta name="geo.region" content="IN" />
         <meta name="geo.placename" content="India" />
       </head>

@@ -25,8 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const hasConceptHub = !!(topic.mentalModel || topic.deepDive)
   return pageMeta({
     title: hasConceptHub
-      ? `${topic.title} — Explained + ${topic.questionCount} Interview Questions`
-      : `${topic.title} (${topic.questionCount} Questions) | JSPrep Pro`,
+      ? `${topic.title} — Explained Interview Questions`
+      : `${topic.title}`,
     description: hasConceptHub
       ? `${(topic.mentalModel ?? topic.description).slice(0, 120)} — with code examples, common mistakes, and ${topic.questionCount} practice interview questions.`
       : `${topic.description} Covers ${topic.cheatSheet.slice(0, 2).join('. ')}. Practice with AI feedback.`,
