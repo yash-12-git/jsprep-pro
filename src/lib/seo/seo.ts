@@ -226,12 +226,12 @@ export function softwareSchema(): string {
         billingDuration: "P1M",
       },
     ],
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      reviewCount: "247", // ⚠️  update this with real review count when you have it
-      bestRating: "5",
-    },
+    // aggregateRating: {
+    //   "@type": "AggregateRating",
+    //   ratingValue: "4.8",
+    //   reviewCount: "247", // ⚠️  update this with real review count when you have it
+    //   bestRating: "5",
+    // },
     featureList: proFeatures,
   });
 }
