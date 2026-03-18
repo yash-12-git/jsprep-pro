@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { pageMeta, faqSchema, breadcrumbSchema } from "@/lib/seo/seo";
-import { getTopicFaqs } from "@/data/seo/topicFaqs";
+import { getTopicFaqs, TOPIC_FAQS } from "@/data/seo/topicFaqs";
 import TopicQuestionList from "./TopicQuestionList";
 import { TOPIC_DIFF_BG, TOPIC_DIFF_COLOR } from "@/styles/tokens";
 
@@ -83,7 +83,7 @@ export default async function TopicPage({ params }: Props) {
     TOPIC_DIFF_BG[topic.difficulty] ?? TOPIC_DIFF_BG["Intermediate"];
   const hasConceptHub = !!(topic.mentalModel || topic.deepDive);
 
-  const dedicatedFaqs = getTopicFaqs(topic.slug);
+  const dedicatedFaqs = TOPIC_FAQS[topic.slug] ?? [];
   const faqItems = dedicatedFaqs.length > 0 ? faqSchema(dedicatedFaqs) : null;
 
   const tocItems = [
@@ -112,12 +112,6 @@ export default async function TopicPage({ params }: Props) {
 
   return (
     <>
-      {faqItems && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: faqItems }}
-        />
-      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -128,6 +122,12 @@ export default async function TopicPage({ params }: Props) {
           ]),
         }}
       />
+      {faqItems && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: faqItems }}
+        />
+      )}
 
       <div
         style={{
