@@ -50,10 +50,10 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: courseSchema() }}
       />
-      <script
+      {/* <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqSchema(HOME_FAQ) }}
-      />
+      /> */}
       <HomePageClient />
     </>
   );
