@@ -100,12 +100,12 @@ export default async function TopicPage({ params }: Props) {
 
   return (
     <>
-      {faq && (
+      {/* {faq && (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: faq }}
         />
-      )}
+      )} */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbs }} />
 
       <div style={{ maxWidth: 920, margin: '0 auto', padding: '32px 24px 100px', color: '#c8c8d8', fontFamily: "'DM Sans',system-ui,sans-serif" }}>
