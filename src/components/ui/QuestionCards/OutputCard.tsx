@@ -69,7 +69,7 @@ export default function OutputCard({
   const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
 
   async function checkAnswer() {
-    const ua = answer.trim();
+    const ua = answer.toLowerCase().trim();
     const correct = expectedOut.toLowerCase().trim();
     const match =
       ua === correct ||
