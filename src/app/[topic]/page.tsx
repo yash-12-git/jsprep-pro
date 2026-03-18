@@ -100,7 +100,6 @@ export default async function TopicPage({ params }: Props) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faq }} />
       {faq && (
         <script
           type="application/ld+json"
