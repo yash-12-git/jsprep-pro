@@ -20,6 +20,7 @@ import {
   Newspaper,
   RefreshCw,
   Tag,
+  Zap,
 } from "lucide-react";
 import * as Shared from "@/styles/shared";
 
@@ -193,6 +194,12 @@ const NAV_ITEMS = [
     icon: RefreshCw,
     section: "Tools",
   },
+  {
+    href: "/admin/generate",
+    label: "Generate Questions",
+    icon: Zap,
+    section: "Tools",
+  }, // ADD THIS
 ];
 
 export default function AdminLayout({

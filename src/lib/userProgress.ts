@@ -16,6 +16,7 @@ import { db } from "./firebase";
 export interface UserProgress {
   uid: string;
   isPro: boolean;
+  isAdmin?: boolean; // for future admin-only features
   subscriptionId?: string; // Stripe subscription or payment ID
   masteredIds: number[];
   bookmarkedIds: number[];
