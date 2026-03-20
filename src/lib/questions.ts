@@ -245,20 +245,6 @@ export async function reorderQuestions(
   await batch.commit();
 }
 
-// ─── Analytics ────────────────────────────────────────────────────────────────
-
-export async function incrementViewCount(questionId: string): Promise<void> {
-  await updateDoc(doc(db, QUESTIONS_COL, questionId), {
-    viewCount: increment(1),
-  });
-}
-
-export async function incrementSolveCount(questionId: string): Promise<void> {
-  await updateDoc(doc(db, QUESTIONS_COL, questionId), {
-    solveCount: increment(1),
-  });
-}
-
 // ─── User Progress (subcollection) ───────────────────────────────────────────
 
 export async function getQuestionProgress(
@@ -358,7 +344,6 @@ export async function markMasteredV2(
     status: mastered ? "mastered" : "attempted",
     ...(mastered ? { masteredAt: new Date().toISOString() } : {}),
   });
-  if (mastered) await incrementSolveCount(questionId);
 }
 
 export async function markBookmarked(
@@ -382,7 +367,6 @@ export async function markSolved(
     ...(score !== undefined ? { score } : {}),
     attempts: 1, // will be incremented by upsert
   });
-  await incrementSolveCount(questionId);
 }
 
 export async function markRevealed(

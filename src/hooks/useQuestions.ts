@@ -128,8 +128,7 @@ import {
   getAllProgress,
   scheduleProgressWrite,
   markSolved,
-  markRevealed,
-  incrementSolveCount,
+  markRevealed
 } from "@/lib/questions";
 import { awardProgressXP, XP } from "@/lib/userProgress";
 import type { QuestionProgress } from "@/types/question";
@@ -209,7 +208,6 @@ export function useUserProgress({ uid }: UseUserProgressOptions) {
       current ? 0 : XP.MASTER_QUESTION,
       current ? -1 : 1,
     ).catch(() => {});
-    if (!current) incrementSolveCount(questionId).catch(() => {});
   }
 
   async function toggleBookmark(questionId: string) {
@@ -237,6 +235,8 @@ export function useUserProgress({ uid }: UseUserProgressOptions) {
   async function recordSolved(questionId: string, score?: number) {
     if (!uid) return;
     await markSolved(uid, questionId, score);
+    console.log("mark solved done");
+    
     setProgressMap((prev) => {
       const next = new Map(prev);
       next.set(questionId, {
@@ -248,6 +248,8 @@ export function useUserProgress({ uid }: UseUserProgressOptions) {
     });
     // Award XP on the root doc so the leaderboard reflects this solve
     awardProgressXP(uid, XP.SOLVE_OUTPUT, 0).catch(() => {});
+    console.log("award xp done");
+    
   }
 
   async function recordRevealed(questionId: string) {
