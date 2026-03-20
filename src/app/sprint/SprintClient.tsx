@@ -141,8 +141,8 @@ function computeInsights(results: QuestionResult[]) {
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  uid: string | null;
-  isPro: boolean;
+  uid?: string | null;
+  isPro?: boolean;
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────

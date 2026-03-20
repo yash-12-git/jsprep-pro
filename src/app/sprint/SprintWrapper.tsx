@@ -18,11 +18,8 @@ export default function SprintWrapper() {
   const { user, progress, loading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && !user) router.push("/auth");
-  }, [user, loading, router]);
 
-  if (loading || !user || !progress) {
+  if (loading) {
     return (
       <div
         css={bg}
@@ -41,7 +38,7 @@ export default function SprintWrapper() {
 
   return (
     <div css={bg}>
-      <SprintClient uid={user.uid} isPro={progress.isPro} />
+      <SprintClient uid={user?.uid} isPro={progress?.isPro} />
     </div>
   );
 }

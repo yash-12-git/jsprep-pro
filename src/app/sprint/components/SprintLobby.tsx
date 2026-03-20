@@ -234,9 +234,9 @@ const upgradeNote = css`
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface Props {
-  isPro: boolean;
+  isPro?: boolean;
   onStart: (config: SprintConfig) => void;
-  uid: string | null;
+  uid?: string | null;
 }
 
 const OPTIONS: Array<{
@@ -340,7 +340,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
             return (
               <div
                 key={o.count}
-                css={countOption(active, isPro, locked)}
+                css={countOption(active, !!isPro, locked)}
                 onClick={() => handleSelect(o)}
               >
                 {locked && <Lock size={9} css={lockIcon} />}
