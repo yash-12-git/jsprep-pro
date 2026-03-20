@@ -10,6 +10,7 @@ import {
 import { outputQuestions } from "@/data/outputQuestions";
 import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
 import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
+import { C } from "@/styles/tokens";
 
 export const metadata: Metadata = pageMeta({
   title: "JavaScript Output Questions: Predict the Console.log (2025)",
@@ -29,18 +30,7 @@ export const metadata: Metadata = pageMeta({
   ],
 });
 
-/**
- * CONVERSION FUNNEL
- * ─────────────────────────────────────────────────────────────────────────────
- * FREE_PREVIEW  — first N questions fully interactive (predict → check → explain).
- *                 No account needed. Real taste of the product.
- * Questions N+  — code visible (SEO/indexable), prediction locked with quiz CTA.
- *                 Drives: sign up → /output-quiz (free: 5 Qs) → Pro (all Qs).
- *
- * Answers NEVER appear in the DOM until user checks or clicks Reveal.
- */
 const FREE_PREVIEW = 5;
-
 const allQuestions = [...outputQuestions];
 
 const CATEGORIES = [
@@ -84,17 +74,6 @@ const faqItems = [
   },
 ];
 
-const C = {
-  card: "#111118",
-  border: "rgba(255,255,255,0.07)",
-  muted: "rgba(255,255,255,0.4)",
-  text: "#c8c8d8",
-  accent: "#7c6af7",
-  accent2: "#f7c76a",
-  accent3: "#6af7c0",
-  danger: "#f76a6a",
-};
-
 export default function JavaScriptOutputQuestionsPage() {
   const byCategory = CATEGORIES.map((cat) => ({
     cat,
@@ -131,6 +110,7 @@ export default function JavaScriptOutputQuestionsPage() {
           fontFamily: "system-ui, sans-serif",
         }}
       >
+        {/* Breadcrumb */}
         <nav
           style={{
             fontSize: "0.8125rem",
@@ -141,10 +121,11 @@ export default function JavaScriptOutputQuestionsPage() {
           <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
             JSPrep Pro
           </Link>
-          <span style={{ margin: "0 0.5rem" }}>›</span>
-          <span>JavaScript Output Questions</span>
+          <span style={{ margin: "0 0.5rem", color: C.borderStrong }}>›</span>
+          <span style={{ color: C.muted }}>JavaScript Output Questions</span>
         </nav>
 
+        {/* Hero */}
         <header style={{ marginBottom: "2.5rem" }}>
           <div
             style={{
@@ -152,10 +133,10 @@ export default function JavaScriptOutputQuestionsPage() {
               alignItems: "center",
               gap: "0.5rem",
               fontSize: "0.8125rem",
-              fontWeight: 700,
-              color: C.accent2,
-              background: `${C.accent2}1a`,
-              border: `1px solid ${C.accent2}33`,
+              fontWeight: 600,
+              color: C.amber,
+              background: C.amberSubtle,
+              border: `1px solid ${C.amberBorder}`,
               padding: "0.25rem 0.75rem",
               borderRadius: "9999px",
               marginBottom: "1rem",
@@ -166,15 +147,16 @@ export default function JavaScriptOutputQuestionsPage() {
           <h1
             style={{
               fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               lineHeight: 1.15,
               marginBottom: "1rem",
+              letterSpacing: "-0.025em",
             }}
           >
             JavaScript Output Questions
             <br />
-            <span style={{ color: C.accent2 }}>What Does This Code Print?</span>
+            <span style={{ color: C.amber }}>What Does This Code Print?</span>
           </h1>
           <p
             style={{
@@ -182,6 +164,7 @@ export default function JavaScriptOutputQuestionsPage() {
               lineHeight: 1.75,
               marginBottom: "1rem",
               maxWidth: "44rem",
+              color: C.text,
             }}
           >
             {totalCount}+ real{" "}
@@ -189,11 +172,13 @@ export default function JavaScriptOutputQuestionsPage() {
             frontend interviews. Read code → predict{" "}
             <code
               style={{
-                background: "rgba(255,255,255,0.08)",
+                background: C.codeInlineBg,
+                border: `1px solid ${C.border}`,
                 padding: "0.1em 0.4em",
                 borderRadius: "0.25rem",
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: "0.9em",
+                color: C.codeText,
               }}
             >
               console.log
@@ -224,11 +209,11 @@ export default function JavaScriptOutputQuestionsPage() {
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                padding: "0.75rem 1.5rem",
-                border: "1px solid rgba(255,255,255,0.12)",
-                color: "white",
-                borderRadius: "0.875rem",
-                fontWeight: 600,
+                padding: "0.5625rem 1.25rem",
+                border: `1px solid ${C.border}`,
+                color: C.muted,
+                borderRadius: "0.625rem",
+                fontWeight: 500,
                 textDecoration: "none",
                 fontSize: "0.9375rem",
               }}
@@ -238,21 +223,21 @@ export default function JavaScriptOutputQuestionsPage() {
           </div>
         </header>
 
-        {/* ── How it works callout ── */}
+        {/* How it works */}
         <section
           style={{
-            background: C.card,
-            border: `1px solid rgba(255,255,255,0.08)`,
-            borderRadius: "1rem",
-            padding: "1.25rem 1.5rem",
+            background: C.bgSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.875rem",
+            padding: "1.125rem 1.375rem",
             marginBottom: "2.5rem",
           }}
         >
           <h2
             style={{
               fontSize: "0.9375rem",
-              fontWeight: 800,
-              color: "white",
+              fontWeight: 600,
+              color: C.text,
               marginBottom: "0.5rem",
             }}
           >
@@ -262,37 +247,37 @@ export default function JavaScriptOutputQuestionsPage() {
             style={{
               fontSize: "0.9rem",
               lineHeight: 1.75,
-              color: "rgba(255,255,255,0.6)",
+              color: C.muted,
               margin: 0,
             }}
           >
-            <strong style={{ color: "white" }}>
+            <strong style={{ color: C.text }}>
               Try the first {FREE_PREVIEW} questions here
             </strong>{" "}
             — click a question, type your prediction, check it. No account
             needed. The rest are in the{" "}
-            <Link href="/output-quiz" style={{ color: C.accent2 }}>
+            <Link href="/output-quiz" style={{ color: C.amber }}>
               interactive quiz
             </Link>{" "}
             where progress is tracked. Reading answers ≠ predicting them.
           </p>
         </section>
 
-        {/* ── TOC ── */}
+        {/* TOC */}
         <nav
           style={{
-            background: C.card,
-            border: `1px solid rgba(255,255,255,0.08)`,
-            borderRadius: "1rem",
-            padding: "1.5rem",
+            background: C.bgSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.875rem",
+            padding: "1.375rem",
             marginBottom: "2.5rem",
           }}
         >
           <h2
             style={{
-              fontSize: "1rem",
-              fontWeight: 800,
-              color: "white",
+              fontSize: "0.9375rem",
+              fontWeight: 600,
+              color: C.text,
               marginBottom: "1rem",
             }}
           >
@@ -313,10 +298,10 @@ export default function JavaScriptOutputQuestionsPage() {
                   display: "flex",
                   alignItems: "center",
                   gap: "0.625rem",
-                  padding: "0.625rem 0.875rem",
-                  background: "rgba(255,255,255,0.03)",
+                  padding: "0.5625rem 0.875rem",
+                  background: C.bg,
                   border: `1px solid ${C.border}`,
-                  borderRadius: "0.625rem",
+                  borderRadius: "0.5rem",
                   textDecoration: "none",
                   color: C.text,
                   fontSize: "0.875rem",
@@ -327,8 +312,8 @@ export default function JavaScriptOutputQuestionsPage() {
                 <span
                   style={{
                     fontSize: "0.75rem",
-                    color: "rgba(255,255,255,0.35)",
-                    background: "rgba(255,255,255,0.05)",
+                    color: C.muted,
+                    background: C.bgActive,
                     padding: "0.1rem 0.5rem",
                     borderRadius: "9999px",
                   }}
@@ -340,7 +325,7 @@ export default function JavaScriptOutputQuestionsPage() {
           </div>
         </nav>
 
-        {/* ── Questions ── */}
+        {/* Questions */}
         <div
           id="questions"
           style={{ display: "flex", flexDirection: "column", gap: "3rem" }}
@@ -364,9 +349,10 @@ export default function JavaScriptOutputQuestionsPage() {
                   <h2
                     style={{
                       fontSize: "1.25rem",
-                      fontWeight: 900,
-                      color: "white",
+                      fontWeight: 700,
+                      color: C.text,
                       margin: 0,
+                      letterSpacing: "-0.015em",
                     }}
                   >
                     {cat}
@@ -378,12 +364,11 @@ export default function JavaScriptOutputQuestionsPage() {
                   </p>
                 </div>
               </div>
-
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "1rem",
+                  gap: "0.875rem",
                 }}
               >
                 {questions.map((q) => {
@@ -405,7 +390,7 @@ export default function JavaScriptOutputQuestionsPage() {
                       globalIndex={globalIndex}
                       freeLimit={FREE_PREVIEW}
                       quizHref="/output-quiz"
-                      accent={C.accent2}
+                      accent={C.amber}
                       badgeLabel={`#${String(globalIndex + 1).padStart(2, "0")}`}
                     />
                   );
@@ -415,36 +400,37 @@ export default function JavaScriptOutputQuestionsPage() {
           ))}
         </div>
 
-        {/* ── Upgrade CTA ── */}
+        {/* Upgrade CTA */}
         <section
           style={{
             marginTop: "3rem",
             padding: "2rem 2.5rem",
             textAlign: "center",
-            background:
-              "linear-gradient(135deg, rgba(124,106,247,0.1), rgba(247,199,106,0.07))",
-            border: "1px solid rgba(124,106,247,0.2)",
-            borderRadius: "1.5rem",
+            background: C.amberSubtle,
+            border: `1px solid ${C.amberBorder}`,
+            borderRadius: "0.875rem",
           }}
         >
           <div style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>🔒</div>
           <h2
             style={{
               fontSize: "1.375rem",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "0.5rem",
+              letterSpacing: "-0.02em",
             }}
           >
             {totalCount - FREE_PREVIEW} more questions with progress tracking
           </h2>
           <p
             style={{
-              color: "rgba(255,255,255,0.6)",
+              color: C.muted,
               marginBottom: "1.5rem",
               maxWidth: "30rem",
               marginInline: "auto",
               fontSize: "0.9375rem",
+              lineHeight: 1.7,
             }}
           >
             Free accounts get 5 tracked questions. Pro unlocks all {totalCount}+
@@ -464,11 +450,11 @@ export default function JavaScriptOutputQuestionsPage() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                padding: "0.875rem 1.75rem",
-                background: C.accent2,
-                color: "#0a0a10",
-                borderRadius: "0.875rem",
-                fontWeight: 800,
+                padding: "0.75rem 1.625rem",
+                background: C.amber,
+                color: C.text,
+                borderRadius: "0.625rem",
+                fontWeight: 600,
                 textDecoration: "none",
                 fontSize: "0.9375rem",
               }}
@@ -481,11 +467,11 @@ export default function JavaScriptOutputQuestionsPage() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                padding: "0.875rem 1.75rem",
-                border: `1px solid ${C.accent}55`,
+                padding: "0.75rem 1.625rem",
+                border: `1px solid ${C.border}`,
                 color: C.accent,
-                borderRadius: "0.875rem",
-                fontWeight: 700,
+                borderRadius: "0.625rem",
+                fontWeight: 500,
                 textDecoration: "none",
                 fontSize: "0.9375rem",
               }}
@@ -495,14 +481,17 @@ export default function JavaScriptOutputQuestionsPage() {
           </div>
         </section>
 
-        {/* ── Related ── */}
+        {/* Related */}
         <section style={{ marginTop: "2.5rem" }}>
           <h2
             style={{
-              fontSize: "1.125rem",
-              fontWeight: 800,
-              color: "white",
+              fontSize: "1.0625rem",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "1rem",
+              paddingBottom: "0.75rem",
+              borderBottom: `1px solid ${C.border}`,
+              letterSpacing: "-0.01em",
             }}
           >
             Related Resources
@@ -514,7 +503,7 @@ export default function JavaScriptOutputQuestionsPage() {
               lineHeight: 2,
             }}
           >
-            <li>
+            <li style={{ color: C.muted }}>
               <Link
                 href="/javascript-tricky-questions"
                 style={{ color: C.accent }}
@@ -523,7 +512,7 @@ export default function JavaScriptOutputQuestionsPage() {
                 explained
               </Link>
             </li>
-            <li>
+            <li style={{ color: C.muted }}>
               <Link
                 href="/javascript-interview-questions"
                 style={{ color: C.accent }}
@@ -531,7 +520,7 @@ export default function JavaScriptOutputQuestionsPage() {
                 150+ JavaScript Interview Questions with Answers
               </Link>
             </li>
-            <li>
+            <li style={{ color: C.muted }}>
               <Link
                 href="/javascript-interview-cheatsheet"
                 style={{ color: C.accent }}
@@ -548,7 +537,7 @@ export default function JavaScriptOutputQuestionsPage() {
             paddingTop: "1.5rem",
             borderTop: `1px solid ${C.border}`,
             fontSize: "0.8125rem",
-            color: "rgba(255,255,255,0.3)",
+            color: C.muted,
             textAlign: "center",
           }}
         >

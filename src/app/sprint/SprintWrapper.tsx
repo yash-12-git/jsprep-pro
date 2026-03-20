@@ -7,15 +7,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { css } from "@emotion/react";
 import SprintClient from "./SprintClient";
 import * as Shared from "@/styles/shared";
+import { C } from "@/styles/tokens";
 
 const bg = css`
   min-height: 100vh;
-  background: #07070e;
-  background-image: radial-gradient(
-    rgba(255, 255, 255, 0.025) 1px,
-    transparent 1px
-  );
-  background-size: 28px 28px;
+  background: ${C.bg};
 `;
 
 export default function SprintWrapper() {

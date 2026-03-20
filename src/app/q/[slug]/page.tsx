@@ -15,14 +15,13 @@ import {
   SITE,
 } from "@/lib/seo/seo";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
+import { C } from "@/styles/tokens";
 
 interface Props {
   params: { slug: string };
 }
 
 export const revalidate = 3600;
-
-// ─── Static generation ────────────────────────────────────────────────────────
 
 export async function generateStaticParams() {
   const slugs = await getPublishedQuestionSlugs().catch(() => [] as string[]);
@@ -32,7 +31,6 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const q = await getQuestionBySlug(params.slug);
   if (!q) return {};
-
   const diff = DIFF_LABEL[q.difficulty] ?? "Core";
   const typeLabel =
     q.type === "output"
@@ -40,7 +38,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       : q.type === "debug"
         ? "Debug Challenge"
         : "Interview Question";
-
   return pageMeta({
     title: `${q.title} — JavaScript ${typeLabel}`,
     description: `${diff} JavaScript ${typeLabel.toLowerCase()}: ${q.title} — Detailed answer with code examples and interview tips. Part of the ${q.category} category.`,
@@ -54,35 +51,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-// ─── Simple markdown → HTML (no external dep) ────────────────────────────────
-// Handles the answer format used by output/debug questions:
-// "**Explanation:** ...\n\n**Key Insight:** ..."
-
 function markdownToHtml(text: string): string {
   if (!text) return "";
-  // Already HTML (theory questions have <p>, <pre> etc)
   if (text.trim().startsWith("<")) return text;
-
-  return (
-    text
-      // Bold
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      // Inline code
-      .replace(/`([^`]+)`/g, "<code>$1</code>")
-      // Code blocks
-      .replace(/```[\w]*\n([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
-      // Double newline → paragraph break
-      .split(/\n\n+/)
-      .map((p) => p.trim())
-      .filter(Boolean)
-      .map((p) =>
-        p.startsWith("<pre") ? p : `<p>${p.replace(/\n/g, "<br/>")}</p>`,
-      )
-      .join("\n")
-  );
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/```[\w]*\n([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
+    .split(/\n\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) =>
+      p.startsWith("<pre") ? p : `<p>${p.replace(/\n/g, "<br/>")}</p>`,
+    )
+    .join("\n");
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function QuestionPage({ params }: Props) {
   const question = await getQuestionBySlug(params.slug);
@@ -94,8 +77,6 @@ export default async function QuestionPage({ params }: Props) {
   const isDebug = question.type === "debug";
   const isTheory = question.type === "theory";
 
-  // Related questions: fetch by type (uses existing index), filter category in JS
-  // Avoids needing a 4-field composite index (status+type+category+order)
   const { questions: allTypeQs } = await getQuestions({
     filters: { status: "published", type: question.type },
     pageSize: 100,
@@ -109,12 +90,8 @@ export default async function QuestionPage({ params }: Props) {
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")
     .trim();
-
   const jsonLd = faqSchema([
-    {
-      question: question.title,
-      answer: plainAnswer.slice(0, 500),
-    },
+    { question: question.title, answer: plainAnswer.slice(0, 500) },
   ]);
 
   const typeLabel = isOutput
@@ -132,6 +109,15 @@ export default async function QuestionPage({ params }: Props) {
     : isOutput
       ? "Output Quiz"
       : "Debug Lab";
+
+  // Vertical accent bar colour per question type
+  const accentBar = (colour: string) => ({
+    width: 3,
+    height: 18,
+    borderRadius: 2,
+    background: colour,
+    display: "inline-block" as const,
+  });
 
   return (
     <>
@@ -162,14 +148,14 @@ export default async function QuestionPage({ params }: Props) {
           maxWidth: "50rem",
           margin: "0 auto",
           padding: "2.5rem 1.25rem 5rem",
-          color: "#c8c8d8",
+          color: C.text,
         }}
       >
-        {/* ── Breadcrumb ── */}
+        {/* Breadcrumb */}
         <nav
           style={{
             fontSize: "0.8rem",
-            color: "rgba(255,255,255,0.35)",
+            color: C.muted,
             marginBottom: "2rem",
             display: "flex",
             alignItems: "center",
@@ -177,23 +163,21 @@ export default async function QuestionPage({ params }: Props) {
             flexWrap: "wrap",
           }}
         >
-          <Link href="/" style={{ color: "#7c6af7", textDecoration: "none" }}>
+          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
             JSPrep Pro
           </Link>
-          <span>›</span>
+          <span style={{ color: C.borderStrong }}>›</span>
           <Link
             href={categoryPath}
-            style={{ color: "#7c6af7", textDecoration: "none" }}
+            style={{ color: C.accent, textDecoration: "none" }}
           >
             {categoryLabel}
           </Link>
-          <span>›</span>
-          <span style={{ color: "rgba(255,255,255,0.5)" }}>
-            {question.title.slice(0, 45)}…
-          </span>
+          <span style={{ color: C.borderStrong }}>›</span>
+          <span style={{ color: C.muted }}>{question.title.slice(0, 45)}…</span>
         </nav>
 
-        {/* ── Question header ── */}
+        {/* Question header */}
         <header style={{ marginBottom: "2.5rem" }}>
           <div
             style={{
@@ -204,30 +188,32 @@ export default async function QuestionPage({ params }: Props) {
               flexWrap: "wrap",
             }}
           >
+            {/* Diff badge — dm tokens already come from DIFF_STYLE (semantic) */}
             <span
               style={{
                 fontSize: "0.6875rem",
-                fontWeight: 800,
+                fontWeight: 600,
                 letterSpacing: "0.06em",
                 textTransform: "uppercase",
                 padding: "3px 10px",
                 borderRadius: 20,
                 background: dm.bg,
                 color: dm.color,
-                border: `1px solid ${dm.color}33`,
+                border: `1px solid ${dm.border}`,
               }}
             >
               {DIFF_LABEL[question.difficulty] ?? "Core"}
             </span>
+            {/* Category badge */}
             <span
               style={{
                 fontSize: "0.6875rem",
-                fontWeight: 700,
-                color: "#7c6af7",
-                background: "rgba(124,106,247,0.1)",
+                fontWeight: 500,
+                color: C.accentText,
+                background: C.accentSubtle,
                 padding: "3px 10px",
                 borderRadius: 20,
-                border: "1px solid rgba(124,106,247,0.2)",
+                border: `1px solid ${C.border}`,
               }}
             >
               {question.category}
@@ -235,7 +221,7 @@ export default async function QuestionPage({ params }: Props) {
             <span
               style={{
                 fontSize: "0.6875rem",
-                color: "rgba(255,255,255,0.3)",
+                color: C.muted,
                 marginLeft: "auto",
               }}
             >
@@ -246,8 +232,8 @@ export default async function QuestionPage({ params }: Props) {
           <h1
             style={{
               fontSize: "clamp(1.375rem, 3.5vw, 2rem)",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               lineHeight: 1.3,
               marginBottom: "1rem",
               letterSpacing: "-0.02em",
@@ -263,9 +249,9 @@ export default async function QuestionPage({ params }: Props) {
                 alignItems: "flex-start",
                 gap: "0.625rem",
                 padding: "0.875rem 1rem",
-                background: "rgba(247,199,106,0.07)",
-                border: "1px solid rgba(247,199,106,0.2)",
-                borderRadius: "0.875rem",
+                background: C.amberSubtle,
+                border: `1px solid ${C.amberBorder}`,
+                borderRadius: "0.75rem",
               }}
             >
               <span style={{ fontSize: "1rem", flexShrink: 0, marginTop: 1 }}>
@@ -275,10 +261,10 @@ export default async function QuestionPage({ params }: Props) {
                 <p
                   style={{
                     fontSize: "0.75rem",
-                    fontWeight: 800,
+                    fontWeight: 700,
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
-                    color: "#f7c76a",
+                    color: C.amber,
                     marginBottom: "0.25rem",
                   }}
                 >
@@ -287,7 +273,7 @@ export default async function QuestionPage({ params }: Props) {
                 <p
                   style={{
                     fontSize: "0.875rem",
-                    color: "rgba(255,255,255,0.6)",
+                    color: C.muted,
                     margin: 0,
                     lineHeight: 1.6,
                   }}
@@ -299,43 +285,36 @@ export default async function QuestionPage({ params }: Props) {
           )}
         </header>
 
-        {/* ── Code block (output + debug questions) ── */}
+        {/* Code block (output + debug) */}
         {(isOutput || isDebug) && question.code && (
           <section style={{ marginBottom: "2rem" }}>
             <h2
               style={{
                 fontSize: "1rem",
-                fontWeight: 800,
-                color: "white",
+                fontWeight: 700,
+                color: C.text,
                 marginBottom: "1rem",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
               }}
             >
-              <span
-                style={{
-                  width: 3,
-                  height: 18,
-                  borderRadius: 2,
-                  background: isOutput ? "#f7c76a" : "#f76a6a",
-                  display: "inline-block",
-                }}
-              />
+              <span style={accentBar(isOutput ? C.amber : C.red)} />
               {isDebug
                 ? "Buggy Code — Can you spot the issue?"
                 : "What does this output?"}
             </h2>
             <pre
               style={{
-                background: "#0d0d14",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "0.875rem",
-                padding: "1.25rem 1.5rem",
+                background: C.codeBg,
+                border: `1px solid ${C.border}`,
+                borderLeft: `3px solid ${isOutput ? C.amber : C.red}`,
+                borderRadius: "0.75rem",
+                padding: "1.125rem 1.375rem",
                 overflowX: "auto",
                 fontSize: "0.875rem",
                 lineHeight: 1.7,
-                color: "#c8c8d8",
+                color: C.codeText,
                 margin: 0,
               }}
             >
@@ -350,40 +329,32 @@ export default async function QuestionPage({ params }: Props) {
           </section>
         )}
 
-        {/* ── Expected output (output questions only) ── */}
+        {/* Expected output (output only) */}
         {isOutput && question.expectedOutput && (
           <section style={{ marginBottom: "2rem" }}>
             <h2
               style={{
                 fontSize: "1rem",
-                fontWeight: 800,
-                color: "white",
+                fontWeight: 700,
+                color: C.text,
                 marginBottom: "1rem",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
               }}
             >
-              <span
-                style={{
-                  width: 3,
-                  height: 18,
-                  borderRadius: 2,
-                  background: "#6af7c0",
-                  display: "inline-block",
-                }}
-              />
+              <span style={accentBar(C.green)} />
               Correct Output
             </h2>
             <pre
               style={{
-                background: "rgba(106,247,192,0.05)",
-                border: "1px solid rgba(106,247,192,0.2)",
-                borderRadius: "0.875rem",
+                background: C.greenSubtle,
+                border: `1px solid ${C.greenBorder}`,
+                borderRadius: "0.75rem",
                 padding: "1rem 1.25rem",
                 fontSize: "0.9375rem",
                 fontFamily: "'JetBrains Mono', monospace",
-                color: "#6af7c0",
+                color: C.green,
                 margin: 0,
               }}
             >
@@ -392,41 +363,34 @@ export default async function QuestionPage({ params }: Props) {
           </section>
         )}
 
-        {/* ── Fixed code (debug questions only) ── */}
+        {/* Fixed code (debug only) */}
         {isDebug && question.fixedCode && (
           <section style={{ marginBottom: "2rem" }}>
             <h2
               style={{
                 fontSize: "1rem",
-                fontWeight: 800,
-                color: "white",
+                fontWeight: 700,
+                color: C.text,
                 marginBottom: "1rem",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
               }}
             >
-              <span
-                style={{
-                  width: 3,
-                  height: 18,
-                  borderRadius: 2,
-                  background: "#6af7c0",
-                  display: "inline-block",
-                }}
-              />
+              <span style={accentBar(C.green)} />
               Fixed Code
             </h2>
             <pre
               style={{
-                background: "rgba(106,247,192,0.04)",
-                border: "1px solid rgba(106,247,192,0.15)",
-                borderRadius: "0.875rem",
-                padding: "1.25rem 1.5rem",
+                background: C.greenSubtle,
+                border: `1px solid ${C.greenBorder}`,
+                borderLeft: `3px solid ${C.green}`,
+                borderRadius: "0.75rem",
+                padding: "1.125rem 1.375rem",
                 overflowX: "auto",
                 fontSize: "0.875rem",
                 lineHeight: 1.7,
-                color: "#c8c8d8",
+                color: C.codeText,
                 margin: 0,
               }}
             >
@@ -441,28 +405,20 @@ export default async function QuestionPage({ params }: Props) {
           </section>
         )}
 
-        {/* ── Answer / Explanation ── */}
+        {/* Answer / Explanation */}
         <section style={{ marginBottom: "3rem" }}>
           <h2
             style={{
               fontSize: "1rem",
-              fontWeight: 800,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "1.25rem",
               display: "flex",
               alignItems: "center",
               gap: "0.5rem",
             }}
           >
-            <span
-              style={{
-                width: 3,
-                height: 18,
-                borderRadius: 2,
-                background: "#7c6af7",
-                display: "inline-block",
-              }}
-            />
+            <span style={accentBar(C.accent)} />
             {isDebug
               ? "Bug Explained"
               : isOutput
@@ -476,7 +432,7 @@ export default async function QuestionPage({ params }: Props) {
           />
         </section>
 
-        {/* ── AI Evaluator (theory only — makes sense for open-ended answers) ── */}
+        {/* Inline AI evaluator (theory only) */}
         {isTheory && (
           <InlineEvaluator
             question={question.title}
@@ -485,15 +441,17 @@ export default async function QuestionPage({ params }: Props) {
           />
         )}
 
-        {/* ── Related questions ── */}
+        {/* Related questions */}
         {related.length > 0 && (
           <section style={{ marginBottom: "3rem" }}>
             <h2
               style={{
                 fontSize: "0.9375rem",
-                fontWeight: 800,
-                color: "white",
+                fontWeight: 600,
+                color: C.text,
                 marginBottom: "0.875rem",
+                paddingBottom: "0.625rem",
+                borderBottom: `1px solid ${C.border}`,
               }}
             >
               More {question.category}{" "}
@@ -520,42 +478,36 @@ export default async function QuestionPage({ params }: Props) {
                       display: "flex",
                       alignItems: "center",
                       gap: "0.75rem",
-                      padding: "0.875rem 1rem",
-                      background: "#0e0e16",
-                      border: "1px solid rgba(255,255,255,0.07)",
-                      borderRadius: "0.875rem",
+                      padding: "0.75rem 1rem",
+                      background: C.bgSubtle,
+                      border: `1px solid ${C.border}`,
+                      borderRadius: "0.75rem",
                       textDecoration: "none",
+                      transition: "border-color 0.12s ease",
                     }}
                   >
                     <span
                       style={{
                         fontSize: "0.625rem",
-                        fontWeight: 800,
+                        fontWeight: 600,
                         textTransform: "uppercase",
                         letterSpacing: "0.05em",
                         padding: "2px 7px",
                         borderRadius: 12,
                         background: rdm.bg,
                         color: rdm.color,
+                        border: `1px solid ${rdm.border}`,
                         flexShrink: 0,
                       }}
                     >
                       {DIFF_LABEL[r.difficulty] ?? "Core"}
                     </span>
                     <span
-                      style={{
-                        fontSize: "0.875rem",
-                        color: "rgba(255,255,255,0.75)",
-                        flex: 1,
-                      }}
+                      style={{ fontSize: "0.875rem", color: C.text, flex: 1 }}
                     >
                       {r.title}
                     </span>
-                    <span
-                      style={{ color: "rgba(255,255,255,0.2)", flexShrink: 0 }}
-                    >
-                      →
-                    </span>
+                    <span style={{ color: C.muted, flexShrink: 0 }}>→</span>
                   </Link>
                 );
               })}
@@ -563,13 +515,13 @@ export default async function QuestionPage({ params }: Props) {
           </section>
         )}
 
-        {/* ── Bottom CTA ── */}
+        {/* Bottom CTA */}
         <div
           style={{
-            padding: "1.5rem",
-            background: "rgba(124,106,247,0.06)",
-            border: "1px solid rgba(124,106,247,0.15)",
-            borderRadius: "1rem",
+            padding: "1.375rem",
+            background: C.accentSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.875rem",
             textAlign: "center",
             marginBottom: "2rem",
           }}
@@ -577,8 +529,8 @@ export default async function QuestionPage({ params }: Props) {
           <p
             style={{
               fontSize: "0.9375rem",
-              fontWeight: 700,
-              color: "white",
+              fontWeight: 600,
+              color: C.text,
               marginBottom: "0.5rem",
             }}
           >
@@ -591,7 +543,7 @@ export default async function QuestionPage({ params }: Props) {
           <p
             style={{
               fontSize: "0.8125rem",
-              color: "rgba(255,255,255,0.45)",
+              color: C.muted,
               marginBottom: "1rem",
             }}
           >
@@ -613,13 +565,13 @@ export default async function QuestionPage({ params }: Props) {
               display: "inline-flex",
               alignItems: "center",
               gap: "0.5rem",
-              padding: "0.625rem 1.25rem",
-              background: "linear-gradient(135deg, #7c6af7, #a78bfa)",
-              color: "white",
+              padding: "0.5625rem 1.125rem",
+              background: C.accent,
+              color: "#ffffff",
               textDecoration: "none",
-              borderRadius: "0.75rem",
+              borderRadius: "0.625rem",
               fontSize: "0.875rem",
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           >
             {isOutput
@@ -631,14 +583,16 @@ export default async function QuestionPage({ params }: Props) {
         </div>
       </div>
 
+      {/* ─── Answer body prose — light theme ─────────────────────────────────── */}
       <style>{`
-        .answer-body p { color: rgba(255,255,255,0.75); margin-bottom: 1rem; }
-        .answer-body strong { color: white; }
+        .answer-body p { color: ${C.text}; margin-bottom: 1rem; line-height: 1.8; }
+        .answer-body strong { color: ${C.text}; font-weight: 600; }
         .answer-body pre {
-          background: #0d0d14;
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 0.875rem;
-          padding: 1.25rem 1.5rem;
+          background: ${C.codeBg};
+          border: 1px solid ${C.border};
+          border-left: 3px solid ${C.accent};
+          border-radius: 0.75rem;
+          padding: 1.125rem 1.375rem;
           overflow-x: auto;
           margin: 1.25rem 0;
           font-size: 0.875rem;
@@ -646,25 +600,33 @@ export default async function QuestionPage({ params }: Props) {
         }
         .answer-body code {
           font-family: 'JetBrains Mono', 'Fira Code', monospace;
-          color: #a5f3fc;
+          color: ${C.codeText};
         }
-        .answer-body pre code { color: #c8c8d8; }
+        .answer-body :not(pre) > code {
+          background: ${C.codeInlineBg};
+          border: 1px solid ${C.border};
+          padding: 0.125rem 0.35rem;
+          border-radius: 0.25rem;
+          font-size: 0.85em;
+        }
+        .answer-body pre code { color: ${C.codeText}; background: none; border: none; padding: 0; }
         .answer-body .tip {
-          background: rgba(124,106,247,0.08);
-          border-left: 3px solid #7c6af7;
+          background: ${C.accentSubtle};
+          border-left: 3px solid ${C.accent};
           padding: 0.875rem 1rem;
           border-radius: 0 0.75rem 0.75rem 0;
           margin: 1.25rem 0;
           font-size: 0.875rem;
-          color: rgba(255,255,255,0.7);
+          color: ${C.accentText};
         }
         .answer-body ul, .answer-body ol {
           padding-left: 1.5rem;
-          color: rgba(255,255,255,0.7);
+          color: ${C.muted};
           margin-bottom: 1rem;
           line-height: 1.8;
         }
-        .answer-body h3 { color: white; font-size: 1rem; margin: 1.5rem 0 0.5rem; }
+        .answer-body li { color: ${C.text}; }
+        .answer-body h3 { color: ${C.text}; font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
       `}</style>
     </>
   );

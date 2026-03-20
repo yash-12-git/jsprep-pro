@@ -1,9 +1,11 @@
 /** @jsxImportSource @emotion/react */
 "use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { css } from "@emotion/react";
 import {
   Zap,
   BookOpen,
@@ -20,11 +22,39 @@ import {
   Newspaper,
   Layers,
   ArrowRight,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import * as S from "./styles";
+import { useTheme } from "@/contexts/ThemeContext";
 
-// Marketing nav links shown to logged-out visitors
+// ─── Theme toggle button ──────────────────────────────────────────────────────
+// Defined outside Navbar so Emotion doesn't recreate the css`` on every render.
+const themeToggleBtn = (isDark: boolean) => css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid ${isDark ? "rgba(255,255,255,0.12)" : "#e9e9e7"};
+  background: ${isDark ? "rgba(255,255,255,0.05)" : "transparent"};
+  color: ${isDark ? "rgba(255,255,255,0.55)" : "#787774"};
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+  flex-shrink: 0;
+  &:hover {
+    background: ${isDark ? "rgba(255,255,255,0.1)" : "#f1f1ef"};
+    border-color: ${isDark ? "rgba(255,255,255,0.2)" : "#d3d3cf"};
+    color: ${isDark ? "#ffffff" : "#37352f"};
+  }
+`;
+
+// Marketing nav links for logged-out visitors
 const MARKETING_LINKS = [
   { href: "/#features", label: "Features" },
   { href: "/#practice", label: "Practice" },
@@ -35,39 +65,37 @@ const MARKETING_LINKS = [
 
 export default function Navbar() {
   const { user, progress, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
+  
   const path = usePathname();
+
   const [aiMenuOpen, setAiMenuOpen] = useState(false);
   const [learnMenuOpen, setLearnMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
   const menuRef = useRef<HTMLDivElement>(null);
   const learnRef = useRef<HTMLDivElement>(null);
 
+  // Close dropdowns on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node))
         setAiMenuOpen(false);
-      }
-      if (learnRef.current && !learnRef.current.contains(e.target as Node)) {
+      if (learnRef.current && !learnRef.current.contains(e.target as Node))
         setLearnMenuOpen(false);
-      }
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // Close mobile menu on navigation
   useEffect(() => {
     setMobileOpen(false);
   }, [path]);
 
   const mainLinks = [
     { href: "/dashboard", label: "Questions", icon: BookOpen },
-    {
-      href: "/sprint",
-      label: "Sprint",
-      icon: Zap,
-      pro: false,
-      highlight: true,
-    },
+    { href: "/sprint", label: "Sprint", icon: Zap, highlight: true },
     { href: "/output-quiz", label: "Output", icon: Code2 },
     { href: "/debug-lab", label: "Debug", icon: Bug },
     { href: "/analytics", label: "Analytics", icon: BarChart2, pro: true },
@@ -124,10 +152,15 @@ export default function Navbar() {
   const isLearnActive = learnLinks.some((l) => path.startsWith(l.href));
   const isAiActive = aiLinks.some((l) => path === l.href);
 
+  // Icon colours that look right on both themes
+  const learnIconColor = isDark ? "#22a08a" : "#0f7b6c";
+  const aiIconColor = isDark ? "#4ea1f3" : "#1a6fc4";
+
   return (
     <>
       <nav css={S.nav}>
         <div css={S.navInner}>
+          {/* Logo */}
           <Link href="/" css={S.logoLink}>
             <div css={S.logoBadge}>JS</div>
             <span css={S.logoText}>
@@ -135,7 +168,7 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Learn dropdown — always visible, no auth required */}
+          {/* Learn dropdown — always visible */}
           <div css={S.learnDropdownWrapper} ref={learnRef}>
             <button
               css={[
@@ -162,7 +195,7 @@ export default function Navbar() {
                     onClick={() => setLearnMenuOpen(false)}
                   >
                     <div css={S.learnIconBadge}>
-                      <Icon size={13} color="#6af7c0" />
+                      <Icon size={13} color={learnIconColor} />
                     </div>
                     <div>
                       <div css={S.learnDropdownLabel}>{label}</div>
@@ -174,6 +207,7 @@ export default function Navbar() {
             )}
           </div>
 
+          {/* Auth main links */}
           {user && (
             <div css={S.desktopLinks}>
               {mainLinks.map(
@@ -209,6 +243,7 @@ export default function Navbar() {
                 ),
               )}
 
+              {/* AI Tools dropdown */}
               <div css={S.aiDropdownWrapper} ref={menuRef}>
                 <button
                   css={[S.aiDropdownTrigger, isAiActive && S.navLinkAiActive]}
@@ -233,7 +268,7 @@ export default function Navbar() {
                         onClick={() => setAiMenuOpen(false)}
                       >
                         <div css={S.aiIconBadge}>
-                          <Icon size={13} color="#a78bfa" />
+                          <Icon size={13} color={aiIconColor} />
                         </div>
                         <div>
                           <div css={S.aiDropdownLabel}>{label}</div>
@@ -247,7 +282,7 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Marketing nav — only for logged-out visitors */}
+          {/* Marketing links — logged-out only */}
           {!user && (
             <div css={S.marketingLinks}>
               {MARKETING_LINKS.map(({ href, label }) => (
@@ -258,12 +293,25 @@ export default function Navbar() {
             </div>
           )}
 
+          {/* Right side */}
           <div css={S.rightSide}>
+            {/* ── Theme toggle ──────────────────────────────────────────────── */}
+            <button
+              css={themeToggleBtn(isDark)}
+              onClick={toggleTheme}
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={
+                isDark ? "Switch to light mode" : "Switch to dark mode"
+              }
+            >
+              {isDark ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+
             {user ? (
               <>
                 {progress?.isPro && (
                   <div css={S.proPill}>
-                    <Zap size={11} color="#7c6af7" />
+                    <Zap size={11} />
                     <span css={S.proPillText}>PRO</span>
                   </div>
                 )}
@@ -306,6 +354,7 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* Mobile menu */}
       {user && mobileOpen && (
         <div css={S.mobileMenu}>
           <div css={S.mobileMenuInner}>
@@ -336,25 +385,13 @@ export default function Navbar() {
                   {pro && !progress?.isPro && (
                     <span css={S.mobileProBadge}>PRO</span>
                   )}
-                  {highlight && (
-                    <span
-                      css={S.mobileProBadge}
-                      style={{
-                        background: "rgba(247,199,106,0.15)",
-                        color: "#f7c76a",
-                        borderColor: "rgba(247,199,106,0.25)",
-                      }}
-                    >
-                      NEW
-                    </span>
-                  )}
+                  {highlight && <span css={S.mobileProBadge}>NEW</span>}
                 </Link>
               ),
             )}
 
             <hr css={S.mobileDivider} />
             <p css={S.mobileSectionLabel}>Learn</p>
-
             {learnLinks.map(({ href, label, icon: Icon, desc }) => (
               <Link
                 key={href}
@@ -365,7 +402,7 @@ export default function Navbar() {
                 ]}
               >
                 <div css={S.mobileAiItemIcon}>
-                  <Icon size={14} color="#6af7c0" />
+                  <Icon size={14} color={learnIconColor} />
                 </div>
                 <div css={S.mobileNavItemContent}>
                   <span>{label}</span>
@@ -376,7 +413,6 @@ export default function Navbar() {
 
             <hr css={S.mobileDivider} />
             <p css={S.mobileSectionLabel}>AI Tools</p>
-
             {aiLinks.map(({ href, label, icon: Icon, desc }) => (
               <Link
                 key={href}
@@ -387,7 +423,7 @@ export default function Navbar() {
                 ]}
               >
                 <div css={S.mobileAiItemIcon}>
-                  <Icon size={14} color="#a78bfa" />
+                  <Icon size={14} color={aiIconColor} />
                 </div>
                 <div css={S.mobileNavItemContent}>
                   <span>{label}</span>
@@ -399,6 +435,27 @@ export default function Navbar() {
 
             <hr css={S.mobileDivider} />
 
+            {/* Mobile theme toggle row */}
+            <button
+              css={[
+                S.mobileNavLink,
+                css`
+                  justify-content: flex-start;
+                  gap: 0.75rem;
+                `,
+              ]}
+              onClick={() => {
+                toggleTheme();
+                setMobileOpen(false);
+              }}
+              style={{ width: "100%", border: "none", cursor: "pointer" }}
+            >
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+              {isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            </button>
+
+            <hr css={S.mobileDivider} />
+
             <button
               css={S.mobileLogoutBtn}
               onClick={() => {
@@ -406,8 +463,7 @@ export default function Navbar() {
                 setMobileOpen(false);
               }}
             >
-              <LogOut size={16} />
-              Sign out
+              <LogOut size={16} /> Sign out
             </button>
           </div>
         </div>

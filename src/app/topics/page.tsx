@@ -3,7 +3,7 @@ import Link from "next/link";
 import { pageMeta, breadcrumbSchema } from "@/lib/seo/seo";
 
 import type { Topic } from "@/types/topic";
-import { TOPIC_DIFF_COLOR } from "@/styles/tokens";
+import { C, TOPIC_DIFF_COLOR } from "@/styles/tokens";
 import { getPublishedTopics } from "@/lib/cachedQueries";
 
 export const revalidate = 3600;
@@ -21,58 +21,61 @@ export const metadata: Metadata = pageMeta({
   ],
 });
 
+// ─── Category accent colours ──────────────────────────────────────────────────
+// Uses Notion's own category colour palette — calm, distinguishable, AA-contrast
+// safe on a white background.
 const CATEGORY_META: Record<
   string,
   { emoji: string; accent: string; description: string }
 > = {
   "Core JS": {
     emoji: "🧱",
-    accent: "#60a5fa",
+    accent: C.accent, // blue
     description: "Scope, hoisting, execution context, type coercion",
   },
   Functions: {
     emoji: "⚙️",
-    accent: "#a78bfa",
+    accent: "#9065b0", // muted grape
     description: "Closures, arrow functions, currying, HOFs",
   },
   "Async JS": {
     emoji: "⚡",
-    accent: "#6af7c0",
+    accent: C.green, // teal-green
     description: "Event loop, promises, async/await, timers",
   },
   Objects: {
     emoji: "🔷",
-    accent: "#f59e0b",
+    accent: C.amber, // warm amber
     description: "Prototypes, classes, property descriptors",
   },
   Arrays: {
     emoji: "📋",
-    accent: "#34d399",
+    accent: "#0d7377", // teal
     description: "map, filter, reduce, destructuring, immutability",
   },
   "Modern JS": {
     emoji: "✨",
-    accent: "#f472b6",
+    accent: "#ad1a72", // Notion pink/magenta
     description: "ES6+, modules, generators, proxy, Map/Set",
   },
   Performance: {
     emoji: "🚀",
-    accent: "#fb923c",
+    accent: C.orange, // orange-amber
     description: "Debounce, throttle, memory leaks, rendering",
   },
   "DOM & Events": {
     emoji: "🖥️",
-    accent: "#38bdf8",
+    accent: "#2383e2", // blue (same as accent)
     description: "Event delegation, observers, rendering pipeline",
   },
   "Error Handling": {
     emoji: "🛡️",
-    accent: "#f87171",
+    accent: C.red, // muted red
     description: "try/catch, custom errors, async error patterns",
   },
   "Browser APIs": {
     emoji: "🌐",
-    accent: "#c084fc",
+    accent: "#9065b0", // muted grape
     description: "Fetch, Web Workers, Service Workers, storage",
   },
 };
@@ -106,7 +109,11 @@ export default async function TopicsPage() {
   const totalTopics = topics.length;
 
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: C.bg,
+      }}
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -122,31 +129,33 @@ export default async function TopicsPage() {
           maxWidth: "58rem",
           margin: "0 auto",
           padding: "2.5rem 1.25rem 5rem",
-          color: "#c8c8d8",
+          color: C.text
         }}
       >
+        {/* Breadcrumb */}
         <nav
           style={{
             fontSize: "0.8125rem",
-            color: "rgba(255,255,255,0.4)",
+            color: C.muted,
             marginBottom: "2rem",
           }}
         >
-          <Link href="/" style={{ color: "#7c6af7", textDecoration: "none" }}>
+          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
             JSPrep Pro
           </Link>
-          <span style={{ margin: "0 0.375rem" }}>›</span>
-          <span>Topics</span>
+          <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
+          <span style={{ color: C.muted }}>Topics</span>
         </nav>
 
+        {/* Page header */}
         <header style={{ marginBottom: "3rem" }}>
           <p
             style={{
               fontSize: "0.75rem",
-              fontWeight: 800,
-              letterSpacing: "0.1em",
+              fontWeight: 700,
+              letterSpacing: "0.09em",
               textTransform: "uppercase",
-              color: "#7c6af7",
+              color: C.accentText,
               marginBottom: "0.625rem",
             }}
           >
@@ -155,10 +164,10 @@ export default async function TopicsPage() {
           <h1
             style={{
               fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "0.875rem",
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.025em",
             }}
           >
             JavaScript Interview Topics
@@ -166,7 +175,7 @@ export default async function TopicsPage() {
           <p
             style={{
               fontSize: "1rem",
-              color: "rgba(255,255,255,0.5)",
+              color: C.muted,
               lineHeight: 1.75,
               maxWidth: "42rem",
               marginBottom: "1.75rem",
@@ -176,7 +185,9 @@ export default async function TopicsPage() {
             page includes a cheat sheet, interview tips you won't find on MDN,
             and practice questions.
           </p>
-          <div style={{ display: "flex", gap: "1.75rem", flexWrap: "wrap" }}>
+
+          {/* Stat row */}
+          <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
             {[
               { n: totalTopics, label: "Topics" },
               { n: "90+", label: "Questions" },
@@ -189,9 +200,10 @@ export default async function TopicsPage() {
                 <span
                   style={{
                     fontSize: "1.5rem",
-                    fontWeight: 900,
-                    color: "white",
+                    fontWeight: 700,
+                    color: C.text,
                     lineHeight: 1,
+                    letterSpacing: "-0.02em",
                   }}
                 >
                   {n}
@@ -199,8 +211,8 @@ export default async function TopicsPage() {
                 <span
                   style={{
                     fontSize: "0.75rem",
-                    color: "rgba(255,255,255,0.35)",
-                    marginTop: 2,
+                    color: C.muted,
+                    marginTop: 3,
                   }}
                 >
                   {label}
@@ -210,29 +222,31 @@ export default async function TopicsPage() {
           </div>
         </header>
 
+        {/* Level legend */}
         <div
           style={{
             display: "flex",
             gap: "0.75rem",
             flexWrap: "wrap",
             marginBottom: "2.5rem",
-            padding: "0.875rem 1.25rem",
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.06)",
-            borderRadius: "0.875rem",
+            padding: "0.75rem 1.125rem",
+            background: C.bgSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.75rem",
             alignItems: "center",
           }}
         >
           <span
             style={{
               fontSize: "0.6875rem",
-              color: "rgba(255,255,255,0.3)",
-              fontWeight: 700,
+              color: C.muted,
+              fontWeight: 600,
               marginRight: 4,
               letterSpacing: "0.06em",
+              textTransform: "uppercase",
             }}
           >
-            LEVEL:
+            Level:
           </span>
           {Object.entries(TOPIC_DIFF_COLOR).map(([diff, color]) => (
             <span
@@ -240,18 +254,19 @@ export default async function TopicsPage() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 5,
-                fontSize: "0.75rem",
-                color: "rgba(255,255,255,0.5)",
+                gap: 6,
+                fontSize: "0.8125rem",
+                color: C.muted,
               }}
             >
               <span
                 style={{
-                  width: 8,
-                  height: 8,
+                  width: 7,
+                  height: 7,
                   borderRadius: "50%",
                   background: color,
                   display: "inline-block",
+                  flexShrink: 0,
                 }}
               />
               {diff}
@@ -259,37 +274,40 @@ export default async function TopicsPage() {
           ))}
         </div>
 
+        {/* Topic sections */}
         <main style={{ display: "flex", flexDirection: "column", gap: "3rem" }}>
           {CATEGORY_ORDER.map((cat) => {
-            const topics = groups[cat];
-            if (!topics?.length) return null;
+            const catTopics = groups[cat];
+            if (!catTopics?.length) return null;
             const meta = CATEGORY_META[cat] ?? {
               emoji: "📌",
-              accent: "#7c6af7",
+              accent: C.accent,
               description: "",
             };
             return (
               <section key={cat}>
+                {/* Category header */}
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "0.875rem",
-                    marginBottom: "1.25rem",
+                    marginBottom: "1.125rem",
                     paddingBottom: "0.875rem",
-                    borderBottom: `1px solid ${meta.accent}20`,
+                    borderBottom: `1px solid ${C.border}`,
                   }}
                 >
                   <span
                     style={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: 10,
-                      background: `${meta.accent}12`,
+                      width: 36,
+                      height: 36,
+                      borderRadius: 8,
+                      background: C.bgSubtle,
+                      border: `1px solid ${C.border}`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: "1.125rem",
+                      fontSize: "1rem",
                       flexShrink: 0,
                     }}
                   >
@@ -298,9 +316,9 @@ export default async function TopicsPage() {
                   <div style={{ flex: 1 }}>
                     <h2
                       style={{
-                        color: "white",
-                        fontSize: "1.0625rem",
-                        fontWeight: 800,
+                        color: C.text,
+                        fontSize: "1rem",
+                        fontWeight: 600,
                         margin: 0,
                         marginBottom: 2,
                       }}
@@ -309,9 +327,10 @@ export default async function TopicsPage() {
                     </h2>
                     <p
                       style={{
-                        color: "rgba(255,255,255,0.35)",
+                        color: C.muted,
                         fontSize: "0.8125rem",
                         margin: 0,
+                        lineHeight: 1.5,
                       }}
                     >
                       {meta.description}
@@ -320,27 +339,29 @@ export default async function TopicsPage() {
                   <span
                     style={{
                       fontSize: "0.6875rem",
-                      fontWeight: 700,
+                      fontWeight: 500,
                       color: meta.accent,
-                      background: `${meta.accent}15`,
+                      background: C.bgSubtle,
+                      border: `1px solid ${C.border}`,
                       padding: "3px 10px",
                       borderRadius: 20,
                       flexShrink: 0,
                     }}
                   >
-                    {topics.length} topic{topics.length !== 1 ? "s" : ""}
+                    {catTopics.length} topic{catTopics.length !== 1 ? "s" : ""}
                   </span>
                 </div>
 
+                {/* Topic cards grid */}
                 <div
                   style={{
                     display: "grid",
                     gridTemplateColumns:
                       "repeat(auto-fill, minmax(255px, 1fr))",
-                    gap: "0.75rem",
+                    gap: "0.625rem",
                   }}
                 >
-                  {topics.map((topic) => (
+                  {catTopics.map((topic) => (
                     <Link
                       key={topic.slug}
                       href={`/${topic.slug}`}
@@ -352,22 +373,23 @@ export default async function TopicsPage() {
                     >
                       <div
                         style={{
-                          background: "#0d0d14",
-                          border: "1px solid rgba(255,255,255,0.07)",
-                          borderRadius: "0.875rem",
-                          padding: "1.125rem 1.25rem",
+                          background: C.bg,
+                          border: `1px solid ${C.border}`,
+                          borderRadius: "0.75rem",
+                          padding: "1rem 1.125rem",
                           height: "100%",
                           boxSizing: "border-box",
                           display: "flex",
                           flexDirection: "column",
-                          gap: "0.625rem",
+                          gap: "0.5rem",
+                          transition: "border-color 0.15s ease",
                         }}
                       >
                         <h3
                           style={{
-                            color: "white",
+                            color: C.text,
                             fontSize: "0.9375rem",
-                            fontWeight: 700,
+                            fontWeight: 600,
                             margin: 0,
                             lineHeight: 1.4,
                           }}
@@ -378,8 +400,8 @@ export default async function TopicsPage() {
                         </h3>
                         <p
                           style={{
-                            color: "rgba(255,255,255,0.38)",
-                            fontSize: "0.7875rem",
+                            color: C.muted,
+                            fontSize: "0.8125rem",
                             margin: 0,
                             lineHeight: 1.55,
                             flex: 1,
@@ -393,15 +415,17 @@ export default async function TopicsPage() {
                             alignItems: "center",
                             gap: "0.5rem",
                             marginTop: "auto",
+                            paddingTop: "0.5rem",
+                            borderTop: `1px solid ${C.border}`,
                           }}
                         >
                           <span
                             style={{
-                              width: 7,
-                              height: 7,
+                              width: 6,
+                              height: 6,
                               borderRadius: "50%",
                               background:
-                                TOPIC_DIFF_COLOR[topic.difficulty] ?? "#7c6af7",
+                                TOPIC_DIFF_COLOR[topic.difficulty] ?? C.accent,
                               display: "inline-block",
                               flexShrink: 0,
                             }}
@@ -409,15 +433,16 @@ export default async function TopicsPage() {
                           <span
                             style={{
                               fontSize: "0.6875rem",
-                              fontWeight: 700,
-                              color: TOPIC_DIFF_COLOR[topic.difficulty] ?? "#7c6af7",
+                              fontWeight: 500,
+                              color:
+                                TOPIC_DIFF_COLOR[topic.difficulty] ?? C.accent,
                             }}
                           >
                             {topic.difficulty}
                           </span>
                           <span
                             style={{
-                              color: "rgba(255,255,255,0.2)",
+                              color: C.borderStrong,
                               fontSize: "0.625rem",
                             }}
                           >
@@ -426,7 +451,7 @@ export default async function TopicsPage() {
                           <span
                             style={{
                               fontSize: "0.6875rem",
-                              color: "rgba(255,255,255,0.3)",
+                              color: C.muted,
                             }}
                           >
                             {topic.questionCount} Qs
@@ -436,7 +461,6 @@ export default async function TopicsPage() {
                               marginLeft: "auto",
                               fontSize: "0.875rem",
                               color: meta.accent,
-                              fontWeight: 700,
                             }}
                           >
                             →
@@ -451,12 +475,13 @@ export default async function TopicsPage() {
           })}
         </main>
 
+        {/* Bottom CTA */}
         <section
           style={{
             marginTop: "3.5rem",
-            background: "rgba(124,106,247,0.07)",
-            border: "1px solid rgba(124,106,247,0.2)",
-            borderRadius: "1.25rem",
+            background: C.accentSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "1rem",
             padding: "2.25rem 2rem",
             textAlign: "center",
           }}
@@ -464,16 +489,17 @@ export default async function TopicsPage() {
           <h2
             style={{
               fontSize: "1.375rem",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "0.5rem",
+              letterSpacing: "-0.02em",
             }}
           >
             Reading isn't enough
           </h2>
           <p
             style={{
-              color: "rgba(255,255,255,0.45)",
+              color: C.muted,
               marginBottom: "1.5rem",
               fontSize: "0.9375rem",
               lineHeight: 1.7,
@@ -493,11 +519,11 @@ export default async function TopicsPage() {
             <Link
               href="/auth"
               style={{
-                padding: "0.75rem 1.75rem",
-                background: "#7c6af7",
-                color: "white",
-                borderRadius: "0.875rem",
-                fontWeight: 800,
+                padding: "0.6875rem 1.625rem",
+                background: C.accent,
+                color: "#ffffff",
+                borderRadius: "0.625rem",
+                fontWeight: 600,
                 textDecoration: "none",
                 fontSize: "0.9375rem",
                 display: "inline-block",
@@ -508,12 +534,12 @@ export default async function TopicsPage() {
             <Link
               href="/blog"
               style={{
-                padding: "0.75rem 1.5rem",
-                background: "rgba(255,255,255,0.05)",
-                color: "rgba(255,255,255,0.7)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "0.875rem",
-                fontWeight: 700,
+                padding: "0.6875rem 1.5rem",
+                background: C.bg,
+                color: C.muted,
+                border: `1px solid ${C.border}`,
+                borderRadius: "0.625rem",
+                fontWeight: 500,
                 textDecoration: "none",
                 fontSize: "0.9375rem",
                 display: "inline-block",
@@ -524,6 +550,6 @@ export default async function TopicsPage() {
           </div>
         </section>
       </div>
-    </>
+    </div>
   );
 }

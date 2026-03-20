@@ -8,9 +8,7 @@ import { C, RADIUS } from "@/styles/tokens";
 import type { SprintConfig } from "../types";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
 
-const float = keyframes`0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}`;
-const glow = keyframes`0%,100%{opacity:0.4}50%{opacity:0.8}`;
-const fadeUp = keyframes`from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}`;
+const fadeUp = keyframes`from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}`;
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -21,48 +19,13 @@ const page = css`
   align-items: center;
   justify-content: center;
   padding: 2rem 1.25rem;
-  position: relative;
-  overflow: hidden;
-`;
-
-const glowBall1 = css`
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(124, 106, 247, 0.12) 0%,
-    transparent 70%
-  );
-  top: -100px;
-  left: -100px;
-  pointer-events: none;
-  animation: ${glow} 4s ease infinite;
-`;
-
-const glowBall2 = css`
-  position: fixed;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(247, 199, 106, 0.08) 0%,
-    transparent 70%
-  );
-  bottom: -80px;
-  right: -80px;
-  pointer-events: none;
-  animation: ${glow} 5s ease infinite 1.5s;
+  background: ${C.bg};
 `;
 
 const inner = css`
   width: 100%;
-  max-width: 560px;
-  animation: ${fadeUp} 0.5s ease;
-  position: relative;
-  z-index: 1;
+  max-width: 520px;
+  animation: ${fadeUp} 0.45s ease;
 `;
 
 const badge = css`
@@ -70,36 +33,34 @@ const badge = css`
   align-items: center;
   gap: 0.375rem;
   font-size: 0.6875rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: ${C.accent};
-  background: rgba(124, 106, 247, 0.12);
-  border: 1px solid rgba(124, 106, 247, 0.25);
+  letter-spacing: 0.09em;
+  color: ${C.accentText};
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
   padding: 4px 12px;
   border-radius: 20px;
   margin-bottom: 1.25rem;
 `;
 
 const headline = css`
-  font-size: clamp(2rem, 6vw, 3rem);
-  font-weight: 900;
-  color: white;
-  line-height: 1.1;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 700;
+  color: ${C.text};
+  line-height: 1.15;
   letter-spacing: -0.03em;
   margin-bottom: 0.75rem;
 `;
 
-const accent = css`
-  background: linear-gradient(135deg, ${C.accent}, #a78bfa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+const accentSpan = css`
+  color: ${C.accent};
 `;
 
 const tagline = css`
-  font-size: 1.0625rem;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.55;
+  font-size: 1rem;
+  color: ${C.muted};
+  line-height: 1.65;
   margin-bottom: 2rem;
 `;
 
@@ -111,32 +72,32 @@ const statsRow = css`
 `;
 
 const statCard = css`
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: ${RADIUS.xl};
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   padding: 0.875rem;
   text-align: center;
 `;
 
 const statIcon = css`
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   margin-bottom: 0.375rem;
 `;
 
 const statLabel = css`
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.35);
-  font-weight: 600;
+  color: ${C.muted};
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 `;
 
-// ─── Question count selector ──────────────────────────────────────────────────
+// ─── Count selector ───────────────────────────────────────────────────────────
 
 const sectionLabel = css`
   font-size: 0.75rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.35);
+  color: ${C.muted};
   text-transform: uppercase;
   letter-spacing: 0.07em;
   margin-bottom: 0.625rem;
@@ -156,39 +117,31 @@ const countOption = (active: boolean, isPro: boolean, locked: boolean) => css`
   align-items: center;
   justify-content: center;
   padding: 0.875rem 0.5rem;
-  border-radius: ${RADIUS.xl};
-  border: 1px solid
-    ${active
-      ? C.accent
-      : locked
-        ? "rgba(255,255,255,0.05)"
-        : "rgba(255,255,255,0.09)"};
-  background: ${active
-    ? "rgba(124,106,247,0.12)"
-    : locked
-      ? "rgba(0,0,0,0.2)"
-      : "rgba(255,255,255,0.03)"};
+  border-radius: ${RADIUS.lg};
+  border: 1px solid ${active ? C.accent : locked ? C.border : C.border};
+  background: ${active ? C.accentSubtle : locked ? C.bgSubtle : C.bg};
   cursor: ${locked ? "not-allowed" : "pointer"};
-  transition: all 0.15s;
+  transition: all 0.12s ease;
   opacity: ${locked ? 0.5 : 1};
   ${!active &&
   !locked &&
-  "&:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); }"}
+  `&:hover { border-color: ${C.accent}; background: ${C.accentSubtle}; }`}
 `;
 
 const countNum = (active: boolean) => css`
   font-size: 1.5rem;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
-  color: ${active ? "#c4b5fd" : "rgba(255,255,255,0.7)"};
+  color: ${active ? C.accentText : C.text};
+  letter-spacing: -0.02em;
 `;
 
 const countSub = css`
   font-size: 0.6rem;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.3);
+  color: ${C.muted};
   margin-top: 0.25rem;
 `;
 
@@ -196,13 +149,13 @@ const lockIcon = css`
   position: absolute;
   top: 4px;
   right: 6px;
-  color: rgba(255, 255, 255, 0.25);
+  color: ${C.muted};
 `;
 
 const proBadge = css`
   font-size: 0.55rem;
-  font-weight: 800;
-  color: ${C.accent2};
+  font-weight: 700;
+  color: ${C.amber};
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-top: 0.125rem;
@@ -211,9 +164,9 @@ const proBadge = css`
 // ─── Mode info ────────────────────────────────────────────────────────────────
 
 const modeInfo = css`
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: ${RADIUS.xl};
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   padding: 1rem;
   margin-bottom: 1.75rem;
 `;
@@ -223,7 +176,7 @@ const modeRow = css`
   align-items: center;
   gap: 0.625rem;
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: ${C.muted};
   padding: 0.25rem 0;
 `;
 
@@ -239,25 +192,25 @@ const modeDot = (color: string) => css`
 
 const startBtn = css`
   width: 100%;
-  padding: 1rem;
-  border-radius: ${RADIUS.xl};
-  font-size: 1.0625rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, ${C.accent}, #9b8bff);
+  padding: 0.875rem;
+  border-radius: ${RADIUS.lg};
+  font-size: 1rem;
+  font-weight: 700;
+  background: ${C.accent};
   border: none;
-  color: white;
+  color: #ffffff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.625rem;
   letter-spacing: -0.01em;
-  transition: all 0.2s;
-  box-shadow: 0 4px 24px rgba(124, 106, 247, 0.3);
-  animation: ${float} 3s ease infinite;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(124, 106, 247, 0.45);
+    opacity: 0.88;
+    transform: translateY(-1px);
   }
   &:active {
     transform: translateY(0);
@@ -268,9 +221,9 @@ const upgradeNote = css`
   text-align: center;
   margin-top: 1rem;
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: ${C.muted};
   a {
-    color: ${C.accent2};
+    color: ${C.accent};
     text-decoration: none;
     &:hover {
       text-decoration: underline;
@@ -316,12 +269,10 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
     <div css={page}>
       {showPaywall && (
         <PaywallBanner
-          reason={`Free users can attempt 5-question warmup. Upgrade for all!`}
+          reason="Free users can attempt 5-question warmup. Upgrade for all!"
           onClose={() => setShowPaywall(false)}
         />
       )}
-      <div css={glowBall1} />
-      <div css={glowBall2} />
 
       <div css={inner}>
         <div css={badge}>
@@ -331,7 +282,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
         <h1 css={headline}>
           Are you truly
           <br />
-          <span css={accent}>interview ready?</span>
+          <span css={accentSpan}>interview ready?</span>
         </h1>
 
         <p css={tagline}>
@@ -345,11 +296,12 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
             <div css={statIcon}>
               <Shuffle
                 size={18}
-                style={{ color: C.accent, margin: "0 auto" }}
+                color={C.accent}
+                style={{ margin: "0 auto" }}
               />
             </div>
             <div
-              style={{ fontWeight: 800, color: "white", fontSize: "0.875rem" }}
+              style={{ fontWeight: 600, color: C.text, fontSize: "0.875rem" }}
             >
               Mixed
             </div>
@@ -357,10 +309,10 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
           </div>
           <div css={statCard}>
             <div css={statIcon}>
-              <Timer size={18} style={{ color: C.accent2, margin: "0 auto" }} />
+              <Timer size={18} color={C.amber} style={{ margin: "0 auto" }} />
             </div>
             <div
-              style={{ fontWeight: 800, color: "white", fontSize: "0.875rem" }}
+              style={{ fontWeight: 600, color: C.text, fontSize: "0.875rem" }}
             >
               {durationMins} min
             </div>
@@ -368,10 +320,10 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
           </div>
           <div css={statCard}>
             <div css={statIcon}>
-              <Brain size={18} style={{ color: C.accent3, margin: "0 auto" }} />
+              <Brain size={18} color={C.green} style={{ margin: "0 auto" }} />
             </div>
             <div
-              style={{ fontWeight: 800, color: "white", fontSize: "0.875rem" }}
+              style={{ fontWeight: 600, color: C.text, fontSize: "0.875rem" }}
             >
               AI
             </div>
@@ -397,8 +349,8 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
                 <div
                   style={{
                     fontSize: "0.6rem",
-                    fontWeight: 700,
-                    color: active ? "#c4b5fd" : "rgba(255,255,255,0.3)",
+                    fontWeight: 600,
+                    color: active ? C.accentText : C.muted,
                     marginTop: "0.125rem",
                     textTransform: "uppercase",
                     letterSpacing: "0.04em",
@@ -415,23 +367,22 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
         {/* Mode info */}
         <div css={modeInfo}>
           <div css={modeRow}>
-            <div css={modeDot("#c4b5fd")} />
-            <Brain size={12} style={{ color: "#c4b5fd" }} />
+            <div css={modeDot(C.accentText)} />
+            <Brain size={12} color={C.accentText} />
             Theory: AI evaluates your verbal answer +10 / +3 pts
           </div>
           <div css={modeRow}>
-            <div css={modeDot(C.accent3)} />
-            <Code2 size={12} style={{ color: C.accent3 }} />
+            <div css={modeDot(C.green)} />
+            <Code2 size={12} color={C.green} />
             Output: Predict the console.log exactly +10 / +3 pts
           </div>
           <div css={modeRow}>
-            <div css={modeDot(C.danger)} />
-            <Bug size={12} style={{ color: C.danger }} />
+            <div css={modeDot(C.red)} />
+            <Bug size={12} color={C.red} />
             Debug: Spot the bug, self-mark your answer +10 / +3 pts
           </div>
         </div>
 
-        {/* Start */}
         <button
           css={startBtn}
           onClick={() => onStart({ questionCount: selected })}

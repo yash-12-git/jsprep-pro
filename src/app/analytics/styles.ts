@@ -3,25 +3,29 @@ import { C, RADIUS } from "@/styles/tokens";
 
 export const title = css`
   font-size: 1.5rem;
-  font-weight: 900;
+  font-weight: 700;
+  color: ${C.text};
+  letter-spacing: -0.02em;
   margin-bottom: 2rem;
 `;
 
 export const statsGrid = css`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
   @media (min-width: 640px) {
     grid-template-columns: repeat(4, 1fr);
   }
 `;
 
-export const statIconBox = (bg: string) => css`
+// Icon box uses a neutral subtle bg — colour comes from the icon itself
+export const statIconBox = (_bg: string) => css`
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 0.5rem;
-  background: ${bg};
+  border-radius: ${RADIUS.md};
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,15 +33,21 @@ export const statIconBox = (bg: string) => css`
 `;
 
 export const section = css`
-  background: ${C.card};
+  background: ${C.bg};
   border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xxl};
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  border-radius: ${RADIUS.lg};
+  padding: 1.375rem;
+  margin-bottom: 1.25rem;
+  transition: border-color 0.12s ease;
+  &:hover {
+    border-color: ${C.borderStrong};
+  }
 `;
 
 export const sectionTitle = css`
-  font-weight: 900;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: ${C.text};
   margin-bottom: 0.25rem;
 `;
 
@@ -45,6 +55,7 @@ export const sectionSub = css`
   font-size: 0.75rem;
   color: ${C.muted};
   margin-bottom: 1.25rem;
+  line-height: 1.5;
 `;
 
 export const overallRow = css`
@@ -55,21 +66,22 @@ export const overallRow = css`
 `;
 
 export const overallPct = css`
-  font-size: 1.5rem;
-  font-weight: 900;
+  font-size: 1.375rem;
+  font-weight: 700;
   color: ${C.accent};
+  letter-spacing: -0.02em;
 `;
 
 export const categoryRow = css`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.875rem;
 `;
 
 export const categoryItem = css`
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 0.3125rem;
 `;
 
 export const categoryLabelRow = css`
@@ -79,16 +91,17 @@ export const categoryLabelRow = css`
 `;
 
 export const categoryName = css`
-  font-weight: 600;
-  color: white;
+  font-weight: 500;
+  color: ${C.text};
 `;
 
 export const categoryCount = css`
   color: ${C.muted};
+  font-variant-numeric: tabular-nums;
 `;
 
 export const barFill = (pct: number, color: string) => css`
-  height: 0.5rem;
+  height: 0.375rem;
   width: ${pct}%;
   background: ${color};
   border-radius: 9999px;
@@ -96,8 +109,8 @@ export const barFill = (pct: number, color: string) => css`
 `;
 
 export const barTrack = css`
-  height: 0.5rem;
-  background: ${C.surface};
+  height: 0.375rem;
+  background: ${C.border};
   border-radius: 9999px;
   overflow: hidden;
 `;
@@ -105,19 +118,25 @@ export const barTrack = css`
 export const emptyState = css`
   text-align: center;
   color: ${C.muted};
+  font-size: 0.875rem;
   padding: 2rem;
+  line-height: 1.6;
 `;
 
-// ─── Sprint History ───────────────────────────────────────────────────────────
+// ─── Sprint history ───────────────────────────────────────────────────────────
 
 export const sprintRow = css`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.875rem 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0.75rem;
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
+  transition: border-color 0.12s ease;
+  &:hover {
+    border-color: ${C.borderStrong};
+  }
 `;
 
 export const sprintRowTop = css`
@@ -132,6 +151,7 @@ export const sprintDate = css`
   color: ${C.muted};
   flex-shrink: 0;
   min-width: 6.5rem;
+  font-variant-numeric: tabular-nums;
 `;
 
 export const sprintScoreBlock = css`
@@ -143,8 +163,8 @@ export const sprintScoreBlock = css`
 
 export const sprintScoreNum = css`
   font-size: 1.125rem;
-  font-weight: 900;
-  color: white;
+  font-weight: 700;
+  color: ${C.text};
   letter-spacing: -0.02em;
 `;
 
@@ -155,13 +175,15 @@ export const sprintScoreMax = css`
 
 export const sprintAccuracy = (pct: number) => css`
   font-size: 0.75rem;
-  font-weight: 800;
-  color: ${pct >= 80 ? C.accent3 : pct >= 50 ? C.accent : C.accent2};
+  font-weight: 600;
+  color: ${pct >= 80 ? C.green : pct >= 50 ? C.accent : C.amber};
   background: ${pct >= 80
-    ? `${C.accent3}18`
+    ? C.greenSubtle
     : pct >= 50
-      ? `${C.accent}18`
-      : `${C.accent2}18`};
+      ? C.accentSubtle
+      : C.amberSubtle};
+  border: 1px solid
+    ${pct >= 80 ? C.greenBorder : pct >= 50 ? C.border : C.amberBorder};
   padding: 1px 7px;
   border-radius: 10px;
 `;
@@ -180,12 +202,12 @@ export const sprintTagRow = css`
 
 export const sprintTag = (variant: "strength" | "weak") => css`
   font-size: 0.6rem;
-  font-weight: 700;
+  font-weight: 600;
   padding: 1px 7px;
   border-radius: 10px;
   ${variant === "strength"
-    ? `color: ${C.accent3}; background: ${C.accent3}18;`
-    : `color: ${C.accent2}; background: ${C.accent2}18;`}
+    ? `color: ${C.green};  background: ${C.greenSubtle};  border: 1px solid ${C.greenBorder};`
+    : `color: ${C.amber};  background: ${C.amberSubtle};  border: 1px solid ${C.amberBorder};`}
 `;
 
 export const sprintSummaryRow = css`
@@ -193,9 +215,9 @@ export const sprintSummaryRow = css`
   align-items: center;
   gap: 1.5rem;
   padding: 0.75rem 1rem;
-  background: rgba(124, 106, 247, 0.06);
-  border: 1px solid rgba(124, 106, 247, 0.15);
-  border-radius: 0.75rem;
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   margin-bottom: 1rem;
   flex-wrap: wrap;
 `;
@@ -208,14 +230,15 @@ export const sprintSummaryItem = css`
 
 export const sprintSummaryLabel = css`
   font-size: 0.6rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: ${C.muted};
 `;
 
 export const sprintSummaryValue = css`
-  font-size: 1.125rem;
-  font-weight: 900;
-  color: white;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: ${C.text};
+  letter-spacing: -0.02em;
 `;

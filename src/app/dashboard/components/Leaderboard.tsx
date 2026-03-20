@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
+
 import { css } from "@emotion/react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -8,10 +9,10 @@ import {
   getWeeklyLeaderboard,
   type LeaderboardEntry,
 } from "@/lib/userProgress";
+import { C, RADIUS } from "@/styles/tokens";
+import Link from "next/link";
 
-// ─── Module-level cache — shared across all mounts, 1-hour TTL ─────────────
-// Without this: every tab switch and re-mount fires 10 Firestore reads.
-// With this: reads happen at most once per hour per browser session.
+// ─── Module-level cache — 1-hour TTL ─────────────────────────────────────────
 let _leaderboardCache: {
   entries: LeaderboardEntry[];
   fetchedAt: number;
@@ -29,8 +30,32 @@ async function getCachedLeaderboard(topN: number): Promise<LeaderboardEntry[]> {
   _leaderboardCache = { entries, fetchedAt: Date.now() };
   return entries;
 }
-import { C, RADIUS } from "@/styles/tokens";
-import Link from "next/link";
+
+// ─── Rank medal colours — kept intentional (gold/silver/bronze are universal) ─
+const RANK_GOLD = "#b45309"; // amber-700 — dark enough on white
+const RANK_SILVER = "#6b7280"; // gray-500
+const RANK_BRONZE = "#92400e"; // amber-800
+
+function rankTextColor(rank: number): string {
+  if (rank === 1) return RANK_GOLD;
+  if (rank === 2) return RANK_SILVER;
+  if (rank === 3) return RANK_BRONZE;
+  return C.muted;
+}
+
+function rankBg(rank: number): string {
+  if (rank === 1) return C.amberSubtle;
+  if (rank === 2) return C.bgSubtle;
+  if (rank === 3) return C.bgSubtle;
+  return "transparent";
+}
+
+function rankBorder(rank: number): string {
+  if (rank === 1) return C.amberBorder;
+  if (rank === 2) return C.border;
+  if (rank === 3) return C.border;
+  return C.border;
+}
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -50,43 +75,34 @@ const title = css`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9375rem;
-  font-weight: 800;
-  color: white;
+  font-weight: 600;
+  color: ${C.text};
 `;
 
 const resetLabel = css`
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: ${C.muted};
 `;
 
 const list = css`
   display: flex;
   flex-direction: column;
-  gap: 0.5625rem;
+  gap: 0.375rem;
 `;
 
 const row = (rank: number, isCurrentUser: boolean) => css`
   display: flex;
   align-items: center;
   gap: 0.875rem;
-  padding: 0.875rem 1.125rem;
-  background: ${isCurrentUser ? "rgba(124,106,247,0.1)" : C.card};
-  border: 1px solid
-    ${isCurrentUser
-      ? "rgba(124,106,247,0.3)"
-      : rank <= 3
-        ? rankBorder(rank)
-        : C.border};
-  border-radius: 1rem;
-  transition: border-color 0.15s;
+  padding: 0.75rem 1rem;
+  background: ${isCurrentUser ? C.accentSubtle : C.bg};
+  border: 1px solid ${isCurrentUser ? C.accent : rankBorder(rank)};
+  border-radius: ${RADIUS.lg};
+  transition: border-color 0.12s ease;
+  &:hover {
+    border-color: ${isCurrentUser ? C.accent : C.borderStrong};
+  }
 `;
-
-function rankBorder(rank: number) {
-  if (rank === 1) return "rgba(247,199,106,0.35)";
-  if (rank === 2) return "rgba(192,192,192,0.25)";
-  if (rank === 3) return "rgba(205,127,50,0.25)";
-  return C.border;
-}
 
 const rankBadge = (rank: number) => css`
   width: 1.5rem;
@@ -97,34 +113,24 @@ const rankBadge = (rank: number) => css`
   justify-content: center;
   flex-shrink: 0;
   font-size: ${rank <= 3 ? "0.875rem" : "0.6875rem"};
-  font-weight: 800;
-  background: ${rank === 1
-    ? "rgba(247,199,106,0.15)"
-    : rank === 2
-      ? "rgba(192,192,192,0.1)"
-      : rank === 3
-        ? "rgba(205,127,50,0.1)"
-        : "rgba(255,255,255,0.04)"};
-  color: ${rank === 1
-    ? "#f7c76a"
-    : rank === 2
-      ? "#c0c0c0"
-      : rank === 3
-        ? "#cd7f32"
-        : "rgba(255,255,255,0.3)"};
+  font-weight: 700;
+  background: ${rankBg(rank)};
+  color: ${rankTextColor(rank)};
+  border: 1px solid ${rank <= 3 ? rankBorder(rank) : C.border};
 `;
 
 const avatar = css`
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(124, 106, 247, 0.2);
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
-  font-weight: 700;
-  color: #c4b5fd;
+  font-weight: 600;
+  color: ${C.accentText};
   flex-shrink: 0;
   overflow: hidden;
 `;
@@ -136,8 +142,8 @@ const nameArea = css`
 
 const displayName = css`
   font-size: 0.8125rem;
-  font-weight: 700;
-  color: white;
+  font-weight: 500;
+  color: ${C.text};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -150,19 +156,20 @@ const nameRow = css`
 `;
 
 const proBadge = css`
-  font-size: 0.5625rem;
-  font-weight: 800;
+  font-size: 0.5rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #7c6af7;
-  background: rgba(124, 106, 247, 0.15);
+  color: ${C.accentText};
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
   padding: 1px 5px;
-  border-radius: 4px;
+  border-radius: ${RADIUS.sm};
 `;
 
 const metaLine = css`
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: ${C.muted};
   margin-top: 1px;
   display: flex;
   align-items: center;
@@ -174,57 +181,61 @@ const xpBadge = css`
   align-items: center;
   gap: 0.25rem;
   font-size: 0.8125rem;
-  font-weight: 800;
-  color: #f7c76a;
+  font-weight: 700;
+  color: ${C.amber};
   flex-shrink: 0;
 `;
 
 const emptyState = css`
   text-align: center;
   padding: 2rem 1rem;
-  background: ${C.card};
+  background: ${C.bgSubtle};
   border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xl};
+  border-radius: ${RADIUS.lg};
 `;
 
 const emptyTitle = css`
   font-size: 0.875rem;
-  font-weight: 700;
-  color: white;
+  font-weight: 600;
+  color: ${C.text};
   margin-bottom: 0.375rem;
 `;
 
 const emptyDesc = css`
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: ${C.muted};
   margin-bottom: 1rem;
+  line-height: 1.5;
 `;
 
 const ctaLink = css`
   display: inline-flex;
-  padding: 0.5rem 1.25rem;
-  background: #7c6af7;
-  color: white;
-  border-radius: 0.625rem;
-  font-weight: 700;
+  padding: 0.4375rem 1.125rem;
+  background: ${C.accent};
+  color: #ffffff;
+  border-radius: ${RADIUS.md};
+  font-weight: 600;
   font-size: 0.8125rem;
   text-decoration: none;
+  transition: opacity 0.12s ease;
+  &:hover {
+    opacity: 0.88;
+  }
 `;
 
 const skeletonRow = css`
   height: 52px;
-  background: ${C.card};
+  background: ${C.bgSubtle};
   border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xl};
+  border-radius: ${RADIUS.lg};
   animation: pulse 1.5s ease-in-out infinite;
-
   @keyframes pulse {
     0%,
     100% {
       opacity: 1;
     }
     50% {
-      opacity: 0.4;
+      opacity: 0.5;
     }
   }
 `;
@@ -232,11 +243,10 @@ const skeletonRow = css`
 const weekNote = css`
   text-align: center;
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: ${C.muted};
   margin-top: 0.625rem;
+  line-height: 1.5;
 `;
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const RANK_EMOJI = ["🥇", "🥈", "🥉"];
 
@@ -247,8 +257,6 @@ function getNextMonday(): string {
   d.setDate(d.getDate() + daysUntil);
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 interface Props {
   currentUid?: string;
@@ -268,7 +276,7 @@ export default function Leaderboard({ currentUid }: Props) {
     <div css={wrapper}>
       <div css={header}>
         <div css={title}>
-          <Trophy size={15} color="#f7c76a" />
+          <Trophy size={15} color={C.amber} />
           Top Learners This Week
         </div>
         <span css={resetLabel}>Resets {getNextMonday()}</span>
@@ -323,10 +331,10 @@ export default function Leaderboard({ currentUid }: Props) {
                       {isCurrentUser ? "You" : entry.displayName}
                     </span>
                     {entry.isPro && <span css={proBadge}>PRO</span>}
-                    {rank === 1 && <Crown size={11} color="#f7c76a" />}
+                    {rank === 1 && <Crown size={11} color={C.amber} />}
                   </div>
                   <div css={metaLine}>
-                    <Flame size={9} color="#f97316" />
+                    <Flame size={9} color={C.orange} />
                     {entry.streakDays}d streak
                     <span>·</span>
                     {entry.masteredCount} mastered
@@ -339,8 +347,8 @@ export default function Leaderboard({ currentUid }: Props) {
                   <span
                     style={{
                       fontSize: "0.625rem",
-                      color: "rgba(255,255,255,0.35)",
-                      fontWeight: 600,
+                      color: C.muted,
+                      fontWeight: 500,
                     }}
                   >
                     XP

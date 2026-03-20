@@ -31,8 +31,8 @@ export const spinner = css`
 export const spinnerDot = css`
   width: 2rem;
   height: 2rem;
-  border: 2px solid ${C.accent};
-  border-top-color: transparent;
+  border: 2px solid ${C.border};
+  border-top-color: ${C.accent};
   border-radius: 9999px;
   animation: spin 0.7s linear infinite;
 `;
@@ -40,26 +40,23 @@ export const spinnerDot = css`
 export const card = css`
   background: ${C.card};
   border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xxl};
+  border-radius: ${RADIUS.xl};
 `;
 
 export const progressBarTrack = css`
-  height: 0.5rem;
+  height: 0.375rem;
   background: ${C.surface};
   border-radius: 9999px;
   overflow: hidden;
   flex: 1;
 `;
 
-export const progressBarFill = (
-  pct: number,
-  gradient = `linear-gradient(90deg, ${C.accent}, ${C.accent3})`,
-) => css`
+export const progressBarFill = (pct: number, color = C.accent) => css`
   height: 100%;
   width: ${pct}%;
-  background: ${gradient};
+  background: ${color};
   border-radius: 9999px;
-  transition: width 0.5s ease;
+  transition: width 0.4s ease;
 `;
 
 export const categoryScroll = css`
@@ -74,50 +71,55 @@ export const categoryScroll = css`
   }
 `;
 
-export const categoryChip = (active: boolean, activeColor = C.accent) => css`
+export const categoryChip = (
+  active: boolean,
+  activeColor: string = C.accent,
+) => css`
   flex-shrink: 0;
-  padding: 0.375rem 1rem;
+  padding: 0.3125rem 0.875rem;
   border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   border: 1px solid ${active ? activeColor : C.border};
-  background: ${active ? activeColor : "transparent"};
-  color: ${active ? "white" : C.muted};
+  background: ${active ? C.accentSubtle : "transparent"};
+  color: ${active ? activeColor : C.muted};
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
   &:hover {
     border-color: ${activeColor};
-    color: white;
+    color: ${activeColor};
+    background: ${C.accentSubtle};
   }
 `;
 
 export const diffBadge = (level: "easy" | "medium" | "hard") => {
   const map = {
     easy: {
-      bg: `rgba(106, 247, 192, 0.1)`,
-      color: C.accent3,
-      border: `rgba(106, 247, 192, 0.2)`,
+      bg: C.greenSubtle,
+      color: C.green,
+      border: C.greenBorder,
     },
     medium: {
-      bg: `rgba(247, 199, 106, 0.1)`,
-      color: C.accent2,
-      border: `rgba(247, 199, 106, 0.2)`,
+      bg: C.amberSubtle,
+      color: C.amber,
+      border: C.amberBorder,
     },
     hard: {
-      bg: `rgba(247, 106, 106, 0.1)`,
-      color: C.danger,
-      border: `rgba(247, 106, 106, 0.2)`,
+      bg: C.redSubtle,
+      color: C.red,
+      border: C.redBorder,
     },
   };
   const t = map[level];
   return css`
     font-size: 0.625rem;
-    font-weight: 700;
+    font-weight: 600;
     padding: 0.125rem 0.5rem;
     border-radius: 9999px;
     border: 1px solid ${t.border};
     background: ${t.bg};
     color: ${t.color};
+    letter-spacing: 0.02em;
   `;
 };
 
@@ -126,37 +128,41 @@ export const proBadgeSmall = css`
   font-weight: 700;
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
-  background: rgba(247, 199, 106, 0.15);
-  color: ${C.accent2};
+  background: ${C.amberSubtle};
+  color: ${C.amber};
+  border: 1px solid ${C.amberBorder};
+  letter-spacing: 0.04em;
 `;
 
 export const iconBox = (color: string, size = "2.25rem") => css`
   width: ${size};
   height: ${size};
   border-radius: ${RADIUS.lg};
-  background: ${color}1a;
-  border: 1px solid ${color}33;
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: ${color};
 `;
 
 export const infoBox = (color: string) => css`
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  background: ${color}1a;
-  border: 1px solid ${color}33;
-  border-radius: ${RADIUS.xl};
-  padding: 1rem;
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  border-left: 3px solid ${color};
+  border-radius: ${RADIUS.lg};
+  padding: 0.875rem 1rem;
 `;
 
 export const sectionLabel = (color = C.accent) => css`
   font-size: 0.625rem;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: ${color};
 `;
 
@@ -164,18 +170,19 @@ export const actionBtn = (color: string, active = false) => css`
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.5rem;
+  padding: 0.3125rem 0.75rem;
+  border-radius: ${RADIUS.md};
   font-size: 0.75rem;
-  font-weight: 700;
-  border: 1px solid ${active ? color + "66" : C.border};
-  background: ${active ? color + "33" : "transparent"};
+  font-weight: 500;
+  border: 1px solid ${active ? color : C.border};
+  background: ${active ? C.accentSubtle : "transparent"};
   color: ${active ? color : C.muted};
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
   &:hover {
-    border-color: ${color + "80"};
-    color: ${active ? color : "white"};
+    border-color: ${color};
+    color: ${color};
+    background: ${C.accentSubtle};
   }
   &:disabled {
     opacity: 0.4;
@@ -183,23 +190,25 @@ export const actionBtn = (color: string, active = false) => css`
   }
 `;
 
-export const primaryBtn = (color = C.accent) => css`
+export const primaryBtn = (color: string = C.accent) => css`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  padding: 0.75rem;
-  border-radius: ${RADIUS.xl};
-  font-size: 0.75rem;
-  font-weight: 700;
-  background: ${color}33;
-  border: 1px solid ${color}4d;
-  color: ${color};
+  padding: 0.625rem 1rem;
+  border-radius: ${RADIUS.lg};
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: ${color};
+  border: 1px solid ${color};
+  color: #ffffff;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    opacity 0.12s ease,
+    background 0.12s ease;
   &:hover {
-    background: ${color}4d;
+    opacity: 0.88;
   }
   &:disabled {
     opacity: 0.4;
@@ -212,56 +221,62 @@ export const ghostBtn = css`
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  padding: 0.625rem 1rem;
-  border-radius: ${RADIUS.xl};
-  font-size: 0.75rem;
-  font-weight: 700;
+  padding: 0.5rem 0.875rem;
+  border-radius: ${RADIUS.lg};
+  font-size: 0.8125rem;
+  font-weight: 500;
   border: 1px solid ${C.border};
   color: ${C.muted};
   background: transparent;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
   &:hover {
-    color: white;
-    border-color: rgba(255, 255, 255, 0.2);
+    color: ${C.text};
+    border-color: ${C.borderStrong};
+    background: ${C.bgHover};
   }
 `;
 
-export const textarea = (focusColor = C.accent) => css`
+export const textarea = (focusColor: string = C.accent) => css`
   width: 100%;
-  background: ${C.surface};
+  background: ${C.bg};
   border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xl};
+  border-radius: ${RADIUS.lg};
   padding: 0.75rem 1rem;
   font-family: "JetBrains Mono", monospace;
-  font-size: 0.75rem;
-  color: white;
+  font-size: 0.8125rem;
+  color: ${C.text};
   outline: none;
   resize: none;
-  transition: border-color 0.15s ease;
-  line-height: 1.8;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+  line-height: 1.75;
   &::placeholder {
-    color: ${C.muted};
+    color: ${C.placeholder};
   }
   &:focus {
-    border-color: ${focusColor}80;
+    border-color: ${focusColor};
+    box-shadow: 0 0 0 2px ${C.accentSubtle};
   }
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    background: ${C.bgSubtle};
   }
 `;
 
-export const codeBlock = (borderColor = C.border) => css`
+export const codeBlock = (borderColor: string = C.border) => css`
   margin: 0;
-  background: #0d0d14;
+  background: ${C.codeBg};
   border: 1px solid ${borderColor};
-  border-radius: ${RADIUS.xl};
+  border-radius: ${RADIUS.lg};
   padding: 1rem;
   font-family: "JetBrains Mono", monospace;
   font-size: 0.6875rem;
+  color: ${C.codeText};
   overflow: auto;
-  line-height: 1.7;
+  line-height: 1.75;
 `;
 
 export const divider = css`
@@ -270,15 +285,7 @@ export const divider = css`
   margin: 0.5rem 0;
 `;
 
-export const glow = (color: string) => css`
-  position: fixed;
-  border-radius: 9999px;
-  background: ${color};
-  filter: blur(80px);
-  pointer-events: none;
-`;
-
-// ─── Page header (output-quiz, debug-lab pattern) ─────────────────────────────
+// ─── Page header ──────────────────────────────────────────────────────────────
 export const pageHeader = css`
   margin-bottom: 2rem;
 `;
@@ -291,13 +298,16 @@ export const pageHeaderTop = css`
 `;
 
 export const pageTitleText = css`
-  font-size: 1.5rem;
-  font-weight: 900;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: ${C.text};
+  letter-spacing: -0.02em;
 `;
 
 export const pageSubtitleText = css`
   color: ${C.muted};
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
 `;
 
 export const pageProgressRow = css`
@@ -307,32 +317,37 @@ export const pageProgressRow = css`
   margin-top: 1rem;
 `;
 
-export const pageProgressCount = (color = C.accent) => css`
+export const pageProgressCount = (color: string = C.accent) => css`
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
   color: ${color};
   white-space: nowrap;
 `;
 
-// ─── Stat cards (analytics, quiz results, homepage) ───────────────────────────
+// ─── Stat cards ───────────────────────────────────────────────────────────────
 export const statCard = css`
   background: ${C.card};
   border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xxl};
+  border-radius: ${RADIUS.xl};
   padding: 1.25rem;
+  transition: border-color 0.12s ease;
+  &:hover {
+    border-color: ${C.borderStrong};
+  }
 `;
 
 export const statNum = (color: string) => css`
   font-size: 1.5rem;
-  font-weight: 900;
+  font-weight: 700;
   color: ${color};
   margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
 `;
 
 export const statLabel = css`
   font-size: 0.6875rem;
   color: ${C.muted};
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 `;

@@ -5,13 +5,12 @@ import {
   faqSchema,
   breadcrumbSchema,
   catToSlug,
-  KEYWORDS
+  KEYWORDS,
 } from "@/lib/seo/seo";
 import PracticeCTA from "./PracticeCTA";
 import HeroCTA from "./HeroCTA";
 import { getPublishedCategories, getQuestions } from "@/lib/cachedQueries";
-
-// ─── Static metadata (server component) ──────────────────────────────────────
+import { C } from "@/styles/tokens";
 
 export const metadata: Metadata = pageMeta({
   title: "150+ JavaScript Interview Questions With Answers (2025)",
@@ -28,8 +27,6 @@ export const metadata: Metadata = pageMeta({
   ],
 });
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function stripHtml(html: string): string {
   return html
     .replace(/<[^>]*>/g, "")
@@ -37,8 +34,6 @@ function stripHtml(html: string): string {
     .trim()
     .slice(0, 300);
 }
-
-// ─── Page component ───────────────────────────────────────────────────────────
 
 export const revalidate = 3600;
 
@@ -62,7 +57,6 @@ export default async function JavaScriptInterviewQuestionsPage() {
 
   return (
     <>
-      {/* JSON-LD structured data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqSchema(faqItems) }}
@@ -85,39 +79,40 @@ export default async function JavaScriptInterviewQuestionsPage() {
           maxWidth: "56rem",
           margin: "0 auto",
           padding: "2.5rem 1.25rem",
-          color: "#c8c8d8",
+          color: C.text,
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        {/* ── Breadcrumb ── */}
+        {/* Breadcrumb */}
         <nav
           style={{
             fontSize: "0.8125rem",
-            color: "rgba(255,255,255,0.4)",
+            color: C.muted,
             marginBottom: "2rem",
           }}
         >
-          <Link href="/" style={{ color: "#7c6af7", textDecoration: "none" }}>
+          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
             JSPrep Pro
           </Link>
-          <span style={{ margin: "0 0.5rem" }}>›</span>
-          <span>JavaScript Interview Questions</span>
+          <span style={{ margin: "0 0.5rem", color: C.borderStrong }}>›</span>
+          <span style={{ color: C.muted }}>JavaScript Interview Questions</span>
         </nav>
 
-        {/* ── Hero ── */}
+        {/* Hero */}
         <header style={{ marginBottom: "2.5rem" }}>
           <h1
             style={{
               fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               lineHeight: 1.15,
               marginBottom: "1rem",
+              letterSpacing: "-0.025em",
             }}
           >
             150+ JavaScript Interview Questions
             <br />
-            <span style={{ color: "#7c6af7" }}>
+            <span style={{ color: C.accent }}>
               With Answers & Code Examples
             </span>
           </h1>
@@ -127,10 +122,11 @@ export default async function JavaScriptInterviewQuestionsPage() {
               lineHeight: 1.75,
               marginBottom: "1rem",
               maxWidth: "44rem",
+              color: C.text,
             }}
           >
             The most comprehensive collection of{" "}
-            <strong style={{ color: "white" }}>
+            <strong style={{ color: C.text }}>
               JavaScript interview questions
             </strong>{" "}
             for frontend developers in 2025. Covers everything from basic JS
@@ -140,7 +136,7 @@ export default async function JavaScriptInterviewQuestionsPage() {
           <p
             style={{
               fontSize: "0.9375rem",
-              color: "rgba(255,255,255,0.55)",
+              color: C.muted,
               marginBottom: "1.5rem",
             }}
           >
@@ -148,8 +144,6 @@ export default async function JavaScriptInterviewQuestionsPage() {
             {categories.length} categories &nbsp;·&nbsp; ✅ Code examples in
             every answer &nbsp;·&nbsp; ✅ Updated 2025
           </p>
-
-          {/* CTA */}
           <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
             <HeroCTA />
             <a
@@ -157,11 +151,11 @@ export default async function JavaScriptInterviewQuestionsPage() {
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                padding: "0.75rem 1.5rem",
-                border: "1px solid rgba(255,255,255,0.12)",
-                color: "white",
-                borderRadius: "0.875rem",
-                fontWeight: 600,
+                padding: "0.5625rem 1.25rem",
+                border: `1px solid ${C.border}`,
+                color: C.muted,
+                borderRadius: "0.625rem",
+                fontWeight: 500,
                 textDecoration: "none",
                 fontSize: "0.9375rem",
               }}
@@ -171,21 +165,21 @@ export default async function JavaScriptInterviewQuestionsPage() {
           </div>
         </header>
 
-        {/* ── Table of Contents ── */}
+        {/* Table of Contents */}
         <section
           style={{
-            background: "#111118",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: "1rem",
-            padding: "1.5rem",
+            background: C.bgSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.875rem",
+            padding: "1.375rem",
             marginBottom: "2.5rem",
           }}
         >
           <h2
             style={{
-              fontSize: "1rem",
-              fontWeight: 800,
-              color: "white",
+              fontSize: "0.9375rem",
+              fontWeight: 600,
+              color: C.text,
               marginBottom: "1rem",
             }}
           >
@@ -206,13 +200,13 @@ export default async function JavaScriptInterviewQuestionsPage() {
               >
                 <a
                   href={`#${slug}`}
-                  style={{ color: "#7c6af7", textDecoration: "none" }}
+                  style={{ color: C.accent, textDecoration: "none" }}
                 >
                   {cat}
                 </a>
                 <span
                   style={{
-                    color: "rgba(255,255,255,0.3)",
+                    color: C.muted,
                     marginLeft: "0.375rem",
                     fontSize: "0.75rem",
                   }}
@@ -224,50 +218,50 @@ export default async function JavaScriptInterviewQuestionsPage() {
           </ol>
         </section>
 
-        {/* ── Intro paragraph for SEO ── */}
+        {/* Intro */}
         <section
           style={{
             marginBottom: "3rem",
             lineHeight: 1.85,
             fontSize: "0.9375rem",
+            color: C.text,
           }}
         >
           <h2
             style={{
               fontSize: "1.25rem",
-              fontWeight: 800,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "0.875rem",
+              letterSpacing: "-0.015em",
             }}
           >
             How to Use This Guide
           </h2>
-          <p style={{ marginBottom: "0.875rem" }}>
+          <p style={{ marginBottom: "0.875rem", color: C.text }}>
             This guide covers the most frequently asked{" "}
-            <strong style={{ color: "white" }}>
-              JavaScript interview questions
-            </strong>{" "}
-            across all experience levels — from junior developers with 0–1 years
-            of experience to senior engineers. Each answer includes a clear
+            <strong>JavaScript interview questions</strong> across all
+            experience levels — from junior developers with 0–1 years of
+            experience to senior engineers. Each answer includes a clear
             explanation, working code examples, and common gotchas that
             interviewers specifically test for.
           </p>
-          <p style={{ marginBottom: "0.875rem" }}>
+          <p style={{ marginBottom: "0.875rem", color: C.text }}>
             The questions are organized by topic so you can focus on your weak
             areas first. We recommend using the{" "}
-            <Link href="/dashboard" style={{ color: "#7c6af7" }}>
+            <Link href="/dashboard" style={{ color: C.accent }}>
               interactive practice platform
             </Link>{" "}
             to test yourself rather than just reading — active recall improves
             retention by up to 50%.
           </p>
-          <p>
+          <p style={{ color: C.text }}>
             For each concept, we also have{" "}
-            <Link href="/output-quiz" style={{ color: "#7c6af7" }}>
+            <Link href="/output-quiz" style={{ color: C.accent }}>
               output prediction challenges
             </Link>{" "}
             (predict what a code snippet logs) and a{" "}
-            <Link href="/debug-lab" style={{ color: "#7c6af7" }}>
+            <Link href="/debug-lab" style={{ color: C.accent }}>
               debug lab
             </Link>{" "}
             where you fix real buggy code — the closest thing to an actual
@@ -275,7 +269,7 @@ export default async function JavaScriptInterviewQuestionsPage() {
           </p>
         </section>
 
-        {/* ── Questions by Category ── */}
+        {/* Questions by category */}
         <main id="questions">
           {questionsByCategory.map(({ cat, slug, questions: catQs }) => (
             <section key={cat} id={slug} style={{ marginBottom: "4rem" }}>
@@ -289,14 +283,15 @@ export default async function JavaScriptInterviewQuestionsPage() {
                   gap: "0.5rem",
                   marginBottom: "1.5rem",
                   paddingBottom: "0.75rem",
-                  borderBottom: "1px solid rgba(255,255,255,0.08)",
+                  borderBottom: `1px solid ${C.border}`,
                 }}
               >
                 <h2
                   style={{
-                    fontSize: "1.5rem",
-                    fontWeight: 900,
-                    color: "white",
+                    fontSize: "1.375rem",
+                    fontWeight: 700,
+                    color: C.text,
+                    letterSpacing: "-0.015em",
                   }}
                 >
                   {cat} Interview Questions
@@ -305,16 +300,15 @@ export default async function JavaScriptInterviewQuestionsPage() {
                   href={`/questions/${slug}`}
                   style={{
                     fontSize: "0.8125rem",
-                    color: "#7c6af7",
+                    color: C.accent,
                     textDecoration: "none",
-                    fontWeight: 700,
+                    fontWeight: 500,
                   }}
                 >
                   Practice {cat} questions →
                 </Link>
               </div>
 
-              {/* Questions */}
               {catQs.map((q, i) => (
                 <article
                   key={q.id}
@@ -324,18 +318,19 @@ export default async function JavaScriptInterviewQuestionsPage() {
                 >
                   <h3
                     itemProp="name"
+                    id={`q-${q.id ?? q.slug}`}
                     style={{
                       fontSize: "1.0625rem",
-                      fontWeight: 700,
-                      color: "white",
+                      fontWeight: 600,
+                      color: C.text,
                       marginBottom: "1rem",
                       lineHeight: 1.4,
+                      letterSpacing: "-0.01em",
                     }}
-                    id={`q-${q.id ?? q.slug}`}
                   >
                     <span
                       style={{
-                        color: "#7c6af7",
+                        color: C.accent,
                         marginRight: "0.5rem",
                         fontSize: "0.875rem",
                       }}
@@ -347,9 +342,9 @@ export default async function JavaScriptInterviewQuestionsPage() {
                     <p
                       style={{
                         fontSize: "0.8125rem",
-                        color: "#6af7c0",
-                        background: "rgba(106,247,192,0.06)",
-                        border: "1px solid rgba(106,247,192,0.15)",
+                        color: C.green,
+                        background: C.greenSubtle,
+                        border: `1px solid ${C.greenBorder}`,
                         borderRadius: "0.5rem",
                         padding: "0.5rem 0.875rem",
                         marginBottom: "0.875rem",
@@ -385,8 +380,8 @@ export default async function JavaScriptInterviewQuestionsPage() {
                         href={`/questions/${slug}`}
                         style={{
                           fontSize: "0.75rem",
-                          color: "rgba(255,255,255,0.5)",
-                          border: "1px solid rgba(255,255,255,0.1)",
+                          color: C.muted,
+                          border: `1px solid ${C.border}`,
                           padding: "0.25rem 0.75rem",
                           borderRadius: "0.375rem",
                           textDecoration: "none",
@@ -402,13 +397,12 @@ export default async function JavaScriptInterviewQuestionsPage() {
           ))}
         </main>
 
-        {/* ── Platform CTA ── */}
+        {/* Platform CTA */}
         <section
           style={{
-            background:
-              "linear-gradient(135deg, rgba(124,106,247,0.15), rgba(106,247,192,0.08))",
-            border: "1px solid rgba(124,106,247,0.3)",
-            borderRadius: "1.25rem",
+            background: C.accentSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.875rem",
             padding: "2.5rem",
             textAlign: "center",
             marginBottom: "3rem",
@@ -417,19 +411,20 @@ export default async function JavaScriptInterviewQuestionsPage() {
           <h2
             style={{
               fontSize: "1.625rem",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "0.75rem",
+              letterSpacing: "-0.02em",
             }}
           >
             Don't Just Read — Practice
           </h2>
           <p
             style={{
-              color: "rgba(255,255,255,0.6)",
-              marginBottom: "1.5rem",
+              color: C.muted,
               maxWidth: "36rem",
               margin: "0 auto 1.5rem",
+              lineHeight: 1.7,
             }}
           >
             Reading answers is passive. JSPrep Pro makes you actively recall
@@ -439,14 +434,17 @@ export default async function JavaScriptInterviewQuestionsPage() {
           <HeroCTA />
         </section>
 
-        {/* ── Related resources ── */}
+        {/* Related resources */}
         <section style={{ marginBottom: "3rem" }}>
           <h2
             style={{
-              fontSize: "1.125rem",
-              fontWeight: 800,
-              color: "white",
+              fontSize: "1.0625rem",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "1rem",
+              letterSpacing: "-0.01em",
+              paddingBottom: "0.75rem",
+              borderBottom: `1px solid ${C.border}`,
             }}
           >
             Related Resources
@@ -458,77 +456,70 @@ export default async function JavaScriptInterviewQuestionsPage() {
               lineHeight: 2,
             }}
           >
-            <li>
-              <Link
-                href="/javascript-interview-cheatsheet"
-                style={{ color: "#7c6af7" }}
-              >
-                JavaScript Interview Cheat Sheet (Printable PDF)
-              </Link>
-            </li>
-            <li>
-              <Link href="/questions/core-js" style={{ color: "#7c6af7" }}>
-                Core JavaScript Questions
-              </Link>
-            </li>
-            <li>
-              <Link href="/questions/async-js" style={{ color: "#7c6af7" }}>
-                Async JavaScript Questions (Promises, async/await)
-              </Link>
-            </li>
-            <li>
-              <Link href="/output-quiz" style={{ color: "#7c6af7" }}>
-                JavaScript Output Prediction Quiz
-              </Link>
-            </li>
-            <li>
-              <Link href="/debug-lab" style={{ color: "#7c6af7" }}>
-                JavaScript Debug Lab
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/blog/event-loop-explained"
-                style={{ color: "#7c6af7" }}
-              >
-                JavaScript Event Loop Explained Visually
-              </Link>
-            </li>
+            {[
+              {
+                href: "/javascript-interview-cheatsheet",
+                text: "JavaScript Interview Cheat Sheet (Printable PDF)",
+              },
+              { href: "/questions/core-js", text: "Core JavaScript Questions" },
+              {
+                href: "/questions/async-js",
+                text: "Async JavaScript Questions (Promises, async/await)",
+              },
+              {
+                href: "/output-quiz",
+                text: "JavaScript Output Prediction Quiz",
+              },
+              { href: "/debug-lab", text: "JavaScript Debug Lab" },
+              {
+                href: "/blog/event-loop-explained",
+                text: "JavaScript Event Loop Explained Visually",
+              },
+            ].map(({ href, text }) => (
+              <li key={href} style={{ color: C.muted }}>
+                <Link
+                  href={href}
+                  style={{ color: C.accent, textDecoration: "none" }}
+                >
+                  {text}
+                </Link>
+              </li>
+            ))}
           </ul>
         </section>
 
-        {/* ── Footer note ── */}
+        {/* Footer */}
         <footer
           style={{
-            borderTop: "1px solid rgba(255,255,255,0.08)",
+            borderTop: `1px solid ${C.border}`,
             paddingTop: "1.5rem",
             fontSize: "0.8125rem",
-            color: "rgba(255,255,255,0.3)",
+            color: C.muted,
             textAlign: "center",
           }}
         >
           <p>
             © 2025 JSPrep Pro · Last updated January 2025 ·{" "}
-            <Link href="/" style={{ color: "rgba(124,106,247,0.7)" }}>
+            <Link href="/" style={{ color: C.accentText }}>
               Home
             </Link>{" "}
             ·{" "}
-            <Link href="/dashboard" style={{ color: "rgba(124,106,247,0.7)" }}>
+            <Link href="/dashboard" style={{ color: C.accentText }}>
               Practice Platform
             </Link>
           </p>
         </footer>
       </div>
 
-      {/* Inline CSS for answer HTML content */}
+      {/* ─── Answer prose — light theme ──────────────────────────────────────── */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        #questions p { margin: 0 0 0.75rem; }
+        #questions p { margin: 0 0 0.75rem; color: ${C.text}; }
         #questions pre {
-          background: #0a0a14;
-          border: 1px solid rgba(255,255,255,0.1);
-          border-left: 3px solid #7c6af7;
+          background: ${C.codeBg};
+          border: 1px solid ${C.border};
+          border-left: 3px solid ${C.accent};
           border-radius: 0.625rem;
           padding: 0.875rem 1rem;
           overflow-x: auto;
@@ -536,31 +527,28 @@ export default async function JavaScriptInterviewQuestionsPage() {
           font-family: 'JetBrains Mono', monospace;
           font-size: 0.8125rem;
           line-height: 1.7;
-          color: #e2e8f0;
+          color: ${C.codeText};
         }
-        #questions code {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.8125rem;
-        }
+        #questions code { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; }
         #questions p > code, #questions li > code {
-          background: rgba(255,255,255,0.07);
-          border: 1px solid rgba(255,255,255,0.1);
+          background: ${C.codeInlineBg};
+          border: 1px solid ${C.border};
           padding: 0.125rem 0.35rem;
           border-radius: 0.25rem;
-          color: #6af7c0;
+          color: ${C.codeText};
           font-size: 0.8em;
         }
         #questions ul, #questions ol { padding-left: 1.5rem; margin: 0 0 0.875rem; }
-        #questions li { margin-bottom: 0.375rem; line-height: 1.7; }
-        #questions strong { color: white; }
+        #questions li { margin-bottom: 0.375rem; line-height: 1.7; color: ${C.text}; }
+        #questions strong { color: ${C.text}; font-weight: 600; }
         #questions .tip {
-          background: rgba(124,106,247,0.1);
-          border-left: 3px solid #7c6af7;
+          background: ${C.accentSubtle};
+          border-left: 3px solid ${C.accent};
           border-radius: 0 0.5rem 0.5rem 0;
           padding: 0.5rem 0.875rem;
           margin: 0.75rem 0;
           font-size: 0.875rem;
-          color: #c8c8d8;
+          color: ${C.accentText};
         }
       `,
         }}

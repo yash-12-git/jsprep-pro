@@ -1,27 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
-/**
- * TheoryCard — unified card for dashboard AND topic pages.
- *
- * Auth state (isPro, isLoggedIn, loading) is read from useAuth() INSIDE this
- * component. Parents never thread auth props down.
- *
- * DESIGN:
- *   Mastered  = "I know this topic." Pro-only. Shows paywall for free/logged-out.
- *               onMastered omitted → button hidden (topic pages).
- *
- *   Bookmark  = "I want to revisit this." Pro-only. Independent of mastered —
- *               a question CAN be both mastered AND bookmarked simultaneously.
- *               onBookmark omitted → button hidden (topic pages).
- *
- *   AI panel  = Pro-only. State lives entirely inside this card.
- *
- * Parent props:
- *   Dashboard : q, index, isMastered, isBookmarked, onMastered, onBookmark
- *   Topic page: q, index  (+ isOpen/onToggle for controlled accordion)
- */
-
 import { useState } from "react";
 import {
   ChevronDown,
@@ -80,7 +59,6 @@ export default function TheoryCard({
   const toggle = onToggle ?? (() => setInternalOpen((o) => !o));
   const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
 
-  // ── Auth gate — used for every Pro action ─────────────────────────────────
   function requirePro(reason: string, action: () => void) {
     if (authLoading) return;
     if (!isLoggedIn) {
@@ -97,18 +75,16 @@ export default function TheoryCard({
 
   function handleMastered() {
     requirePro(
-      "Progress tracking is a Pro feature. Upgrade to mark questions as mastered and measure your growth.",
+      "Progress tracking is a Pro feature. Upgrade to mark questions as mastered.",
       () => onMastered?.(),
     );
   }
-
   function handleBookmark() {
     requirePro(
       "Bookmarks are a Pro feature. Upgrade to save questions for quick review.",
       () => onBookmark?.(),
     );
   }
-
   function handleAIPanel(panel: "chat" | "eval") {
     requirePro(
       panel === "chat"
@@ -117,8 +93,6 @@ export default function TheoryCard({
       () => setActivePanel((prev) => (prev === panel ? null : panel)),
     );
   }
-
-  // ─────────────────────────────────────────────────────────────────────────
 
   return (
     <>
@@ -130,7 +104,7 @@ export default function TheoryCard({
       )}
 
       <div css={S.questionCard(isMastered ? "correct" : "idle", C.accent)}>
-        {/* ── Header ── */}
+        {/* Header */}
         <div css={S.cardHeader} onClick={toggle}>
           <span css={S.qNumber(C.accent)}>
             #{String(index + 1).padStart(2, "0")}
@@ -138,7 +112,7 @@ export default function TheoryCard({
 
           <div css={S.titleMeta}>
             <p css={S.titleRow}>
-              {isMastered && <span css={S.masteredCheck(C.accent3)}>✓</span>}
+              {isMastered && <span css={S.masteredCheck(C.green)}>✓</span>}
               {q.title}
             </p>
             <div css={S.badgeRow}>
@@ -147,7 +121,7 @@ export default function TheoryCard({
               </span>
               <span css={S.catBadge(C.accent)}>{q.category}</span>
               {q.isPro && !isPro && (
-                <span css={S.proBadge(C.accent2)}>
+                <span css={S.proBadge(C.amber)}>
                   <Zap size={7} /> PRO
                 </span>
               )}
@@ -156,36 +130,30 @@ export default function TheoryCard({
           </div>
 
           <div css={S.chevronWrapper(isOpen)}>
-            <ChevronDown size={16} color={C.muted} />
+            <ChevronDown size={16} />
           </div>
         </div>
 
-        {/* ── Body ── */}
+        {/* Body */}
         {isOpen && (
           <div css={S.cardBody}>
             {isMastered && (
-              <div css={S.masteredBanner(C.accent3)}>
-                <Star size={12} fill={C.accent3} /> Marked as mastered
+              <div css={S.masteredBanner(C.green)}>
+                <Star size={12} fill={C.green} color={C.green} /> Marked as
+                mastered
               </div>
             )}
-
-            {q.hint && (
-              <div css={S.hintBanner(C.accent3)}>💡 Hint: {q.hint}</div>
-            )}
+            {q.hint && <div css={S.hintBanner(C.green)}>💡 Hint: {q.hint}</div>}
 
             <div css={S.answerPad}>
               <MarkdownRenderer content={q.answer} />
             </div>
 
-            {/* ── Action row ── */}
+            {/* Action row */}
             <div css={S.actionRowTheory}>
-              {/* Mastered — Pro only, hidden when parent omits onMastered */}
               {onMastered && (
                 <button
-                  css={S.actionChip(
-                    isMastered ? C.accent3 : C.muted,
-                    isMastered,
-                  )}
+                  css={S.actionChip(isMastered ? C.green : C.muted, isMastered)}
                   onClick={handleMastered}
                   disabled={authLoading}
                 >
@@ -197,13 +165,10 @@ export default function TheoryCard({
                   {isMastered ? "Mastered ✓" : "Mark mastered"}
                 </button>
               )}
-
-              {/* Bookmark — Pro only, hidden when parent omits onBookmark.
-                  INDEPENDENT of mastered — both can be active at the same time. */}
               {onBookmark && (
                 <button
                   css={S.actionChip(
-                    isBookmarked ? C.accent2 : C.muted,
+                    isBookmarked ? C.amber : C.muted,
                     isBookmarked,
                   )}
                   onClick={handleBookmark}
@@ -217,8 +182,6 @@ export default function TheoryCard({
                   {isBookmarked ? "Saved ✓" : "Bookmark"}
                 </button>
               )}
-
-              {/* AI Tutor — Pro only */}
               <button
                 css={S.actionChip(
                   activePanel === "chat" ? C.accent : C.muted,
@@ -231,11 +194,9 @@ export default function TheoryCard({
                 {!authLoading && !isPro && isLoggedIn && <Lock size={10} />}
                 AI Tutor
               </button>
-
-              {/* Evaluate Me — Pro only */}
               <button
                 css={S.actionChip(
-                  activePanel === "eval" ? C.purple : C.muted,
+                  activePanel === "eval" ? C.accentText : C.muted,
                   activePanel === "eval",
                 )}
                 onClick={() => handleAIPanel("eval")}
@@ -245,19 +206,16 @@ export default function TheoryCard({
                 {!authLoading && !isPro && isLoggedIn && <Lock size={10} />}
                 Evaluate Me
               </button>
-
-              {/* Sign-in nudge — logged-out visitors only */}
               {!isLoggedIn && !authLoading && (
                 <a
                   href="/auth"
-                  css={[S.actionChip(C.accent2, false), S.noUnderline]}
+                  css={[S.actionChip(C.amber, false), S.noUnderline]}
                 >
                   <Zap size={11} /> Sign in for AI features
                 </a>
               )}
             </div>
 
-            {/* ── AI panels ── */}
             {activePanel === "chat" && (
               <AIChat
                 question={q.question ?? q.title}

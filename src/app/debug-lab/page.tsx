@@ -9,7 +9,7 @@ import PageGuard from "@/components/ui/PageGuard";
 import { Bug } from "lucide-react";
 import { DebugCard } from "@/components/ui/QuestionCards";
 import * as Shared from "@/styles/shared";
-import { C } from "@/styles/tokens";
+import { C, RADIUS } from "@/styles/tokens";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
 
 const FREE_DEBUG_LIMIT = 5;
@@ -52,11 +52,13 @@ export default function DebugLabPage() {
             onClose={() => setShowPaywall(false)}
           />
         )}
+
         <div css={Shared.pageWrapper}>
           <div css={Shared.pageHeader}>
             <div css={Shared.pageHeaderTop}>
-              <div css={Shared.iconBox(C.danger)}>
-                <Bug size={18} color={C.danger} />
+              {/* C.danger → C.red */}
+              <div css={Shared.iconBox(C.red)}>
+                <Bug size={18} color={C.red} />
               </div>
               <div>
                 <h1 css={Shared.pageTitleText}>Debug Lab</h1>
@@ -67,24 +69,20 @@ export default function DebugLabPage() {
             </div>
             <div css={Shared.pageProgressRow}>
               <div css={Shared.progressBarTrack}>
-                <div
-                  css={Shared.progressBarFill(
-                    pct,
-                    `linear-gradient(90deg, ${C.danger}, ${C.accent2})`,
-                  )}
-                />
+                <div css={Shared.progressBarFill(pct)} />
               </div>
-              <span css={Shared.pageProgressCount(C.danger)}>
+              <span css={Shared.pageProgressCount(C.red)}>
                 {solvedCount}/{questions.length} fixed
               </span>
             </div>
           </div>
 
+          {/* Category chips */}
           <div css={Shared.categoryScroll}>
             {["All", ...categories].map((cat) => (
               <button
                 key={cat}
-                css={Shared.categoryChip(activeCategory === cat, C.danger)}
+                css={Shared.categoryChip(activeCategory === cat, C.red)}
                 onClick={() => setActiveCategory(cat)}
               >
                 {cat}
@@ -92,17 +90,19 @@ export default function DebugLabPage() {
             ))}
           </div>
 
+          {/* Skeletons — visible on white */}
           {qLoading && (
             <div
-              css={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+              css={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
             >
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
                   css={{
                     height: "5rem",
-                    borderRadius: "1rem",
-                    background: C.card,
+                    borderRadius: RADIUS.lg,
+                    background: C.bgSubtle,
+                    border: `1px solid ${C.border}`,
                   }}
                 />
               ))}
@@ -111,7 +111,7 @@ export default function DebugLabPage() {
 
           {!qLoading && (
             <div
-              css={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+              css={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
             >
               {filtered.map((q, idx) => {
                 const globalIdx = questions.indexOf(q);

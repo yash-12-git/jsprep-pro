@@ -3,7 +3,7 @@
 
 import { css } from "@emotion/react";
 import { Flame, Zap } from "lucide-react";
-import { C, BP } from "@/styles/tokens";
+import { C, RADIUS, BP } from "@/styles/tokens";
 import type { UserProgress } from "@/lib/userProgress";
 
 interface Props {
@@ -32,10 +32,9 @@ const S = {
   `,
 
   greeting: css`
-    font-family: "Syne", sans-serif;
-    font-size: clamp(1.375rem, 5vw, 1.75rem);
-    font-weight: 800;
-    color: white;
+    font-size: clamp(1.25rem, 5vw, 1.625rem);
+    font-weight: 700;
+    color: ${C.text};
     letter-spacing: -0.02em;
     line-height: 1.2;
     margin-bottom: 0.25rem;
@@ -43,8 +42,9 @@ const S = {
 
   subLine: css`
     font-size: 0.8125rem;
-    color: rgba(255, 255, 255, 0.38);
-    font-weight: 500;
+    color: ${C.muted};
+    font-weight: 400;
+    line-height: 1.5;
   `,
 
   pills: css`
@@ -61,11 +61,11 @@ const S = {
     align-items: center;
     gap: 0.3rem;
     font-size: 0.75rem;
-    font-weight: 800;
-    color: #fb923c;
-    background: rgba(251, 146, 60, 0.1);
-    border: 1px solid rgba(251, 146, 60, 0.22);
-    padding: 0.3125rem 0.625rem;
+    font-weight: 600;
+    color: ${C.orange};
+    background: ${C.amberSubtle};
+    border: 1px solid ${C.amberBorder};
+    padding: 0.25rem 0.625rem;
     border-radius: 100px;
   `,
 
@@ -74,20 +74,20 @@ const S = {
     align-items: center;
     gap: 0.3rem;
     font-size: 0.625rem;
-    font-weight: 900;
+    font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #7c6af7;
-    background: rgba(124, 106, 247, 0.12);
-    border: 1px solid rgba(124, 106, 247, 0.25);
-    padding: 0.3125rem 0.625rem;
+    color: ${C.accentText};
+    background: ${C.accentSubtle};
+    border: 1px solid ${C.border};
+    padding: 0.25rem 0.625rem;
     border-radius: 100px;
   `,
 
   progressBlock: css`
-    background: rgba(255, 255, 255, 0.025);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 14px;
+    background: ${C.bgSubtle};
+    border: 1px solid ${C.border};
+    border-radius: ${RADIUS.lg};
     padding: 1rem 1.125rem;
   `,
 
@@ -100,26 +100,26 @@ const S = {
 
   progressLabel: css`
     font-size: 0.6875rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.45);
+    font-weight: 500;
+    color: ${C.muted};
   `,
 
   progressFraction: css`
     font-size: 0.75rem;
-    font-weight: 800;
-    color: white;
+    font-weight: 600;
+    color: ${C.text};
   `,
 
   progressPct: css`
     font-size: 0.6875rem;
-    font-weight: 700;
-    color: #6af7c0;
+    font-weight: 600;
+    color: ${C.green};
     margin-left: 0.3rem;
   `,
 
   track: css`
-    height: 6px;
-    background: rgba(255, 255, 255, 0.07);
+    height: 5px;
+    background: ${C.border};
     border-radius: 99px;
     overflow: hidden;
   `,
@@ -127,7 +127,7 @@ const S = {
   fill: (pct: number) => css`
     height: 100%;
     width: ${pct}%;
-    background: linear-gradient(90deg, #7c6af7, #6af7c0);
+    background: ${C.accent};
     border-radius: 99px;
     transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   `,
@@ -135,7 +135,7 @@ const S = {
   proNotice: css`
     margin-top: 0.5rem;
     font-size: 0.6875rem;
-    color: rgba(124, 106, 247, 0.6);
+    color: ${C.accentText};
   `,
 };
 
@@ -169,6 +169,7 @@ export default function DashboardHeader({
                   : "Building momentum"}
           </p>
         </div>
+
         <div css={S.pills}>
           {progress.streakDays > 0 && (
             <div css={S.streakPill}>
@@ -185,7 +186,7 @@ export default function DashboardHeader({
         </div>
       </div>
 
-      {/* Progress bar — only meaningful for Pro (they can actually track mastery) */}
+      {/* Progress bar */}
       <div css={S.progressBlock}>
         <div css={S.progressTopRow}>
           <span css={S.progressLabel}>
@@ -193,9 +194,7 @@ export default function DashboardHeader({
           </span>
           <span css={S.progressFraction}>
             {progress.isPro ? masteredCount : totalQuestions}
-            <span style={{ color: "rgba(255,255,255,0.25)" }}>
-              /{totalQuestions}
-            </span>
+            <span style={{ color: C.muted }}>/{totalQuestions}</span>
             {progress.isPro && <span css={S.progressPct}>{pct}%</span>}
           </span>
         </div>

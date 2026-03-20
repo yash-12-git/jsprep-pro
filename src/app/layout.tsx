@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { Syne } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
 import { QuestionsProvider } from "@/contexts/QuestionsContext";
 import { SITE, softwareSchema, websiteSchema, KEYWORDS } from "@/lib/seo/seo";
 import Navbar from "@/components/layout/Navbar";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
-const syne = Syne({ subsets: ["latin"], variable: "--font-syne" });
-
-// ─── Root metadata ─────────────────────────────────────────────────────────────
-// Every page can override these via generateMetadata()
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.domain),
@@ -57,10 +53,6 @@ export const metadata: Metadata = {
     description: SITE.description,
     images: [`${SITE.domain}/og-default.png`],
   },
-  verification: {
-    // google: 'your-google-verification-code',
-    // other: { 'msvalidate.01': 'your-bing-code' },
-  },
   alternates: {
     canonical: SITE.domain,
   },
@@ -74,17 +66,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: softwareSchema() }}
@@ -93,24 +74,22 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: websiteSchema() }}
         />
-
         <meta name="application-name" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-title" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#7c6af7" />
-
+        <meta name="theme-color" content="#ffffff" />
         <meta name="geo.region" content="IN" />
         <meta name="geo.placename" content="India" />
       </head>
-      <body
-        className={`${syne.variable} font-syne bg-bg text-white antialiased`}
-      >
-        <AuthProvider>
-          <QuestionsProvider>
-            <Navbar />
-            {children}
-          </QuestionsProvider>
-        </AuthProvider>
+      <body className="antialiased">
+        <ThemeProvider>
+          <AuthProvider>
+            <QuestionsProvider>
+              <Navbar />
+              {children}
+            </QuestionsProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

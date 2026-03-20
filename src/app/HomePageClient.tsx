@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUpgrade } from "@/hooks/useUpgrade";
+import { C } from "@/styles/tokens";
 
 import {
   aiBdg,
@@ -206,7 +207,7 @@ import {
   TOPICS,
 } from "@/data/homepageStaticData";
 
-// ── ProCTA — outside component to avoid remount on every render ───────────────
+// ── Inline ProCTA (separate component avoids remount on every render) ─────────
 function ProCTA({
   user,
   progress,
@@ -229,7 +230,7 @@ function ProCTA({
         <p
           style={{
             fontSize: "0.75rem",
-            color: "rgba(255,255,255,0.3)",
+            color: C.muted,
             textAlign: "center",
             marginTop: "0.625rem",
           }}
@@ -248,7 +249,7 @@ function ProCTA({
       <>
         <button css={proPayBtn} onClick={handleUpgrade} disabled={payLoading}>
           {payLoading ? (
-            "Opening payment..."
+            "Opening payment…"
           ) : (
             <>
               <Zap size={16} /> Upgrade to Pro →
@@ -258,7 +259,7 @@ function ProCTA({
         {payError && (
           <p
             style={{
-              color: "#f76a6a",
+              color: C.red,
               fontSize: "0.75rem",
               textAlign: "center",
               marginTop: "0.5rem",
@@ -278,7 +279,7 @@ function ProCTA({
       <p
         style={{
           fontSize: "0.75rem",
-          color: "rgba(255,255,255,0.3)",
+          color: C.muted,
           textAlign: "center",
           marginTop: "0.625rem",
         }}
@@ -315,7 +316,7 @@ export default function HomePageClient() {
           <p css={sub}>
             Land your next role with 195+ questions across theory, output
             prediction, and debugging — with AI scoring and a timed{" "}
-            <strong style={{ color: "#f7c76a" }}>Interview Sprint</strong> that
+            <strong style={{ color: C.amber }}>Interview Sprint</strong> that
             tells you exactly if you&apos;re ready.
           </p>
           <div css={ctas}>
@@ -330,15 +331,13 @@ export default function HomePageClient() {
 
         {/* ── FREE CALLOUT ─────────────────────────────────── */}
         <div css={freeBanner}>
-          <CheckCircle size={15} color="#6af7c0" style={{ flexShrink: 0 }} />
+          <CheckCircle size={15} color={C.green} style={{ flexShrink: 0 }} />
           <span
-            style={{ fontSize: "0.9375rem", color: "#6af7c0", fontWeight: 700 }}
+            style={{ fontSize: "0.9375rem", color: C.green, fontWeight: 600 }}
           >
             91 theory questions — completely free, forever.
           </span>
-          <span
-            style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.32)" }}
-          >
+          <span style={{ fontSize: "0.875rem", color: C.muted }}>
             No card. No trial. No paywall.
           </span>
         </div>
@@ -360,7 +359,7 @@ export default function HomePageClient() {
 
         {/* ── AI DEMO ──────────────────────────────────────── */}
         <div css={sec}>
-          <p css={eye("#7c6af7")}>AI Answer Evaluator</p>
+          <p css={eye(C.accent)}>AI Answer Evaluator</p>
           <h2 css={sh2}>Know exactly where you stand</h2>
           <p css={ssub}>
             Type your answer. Get scored 1–10 with specific gaps, not "great
@@ -368,9 +367,9 @@ export default function HomePageClient() {
           </p>
           <div css={demoShell}>
             <div css={demoBar}>
-              <div css={dd("#f76a6a")} />
-              <div css={dd("#f7c76a")} />
-              <div css={dd("#6af7c0")} />
+              <div css={dd(C.red)} />
+              <div css={dd(C.amber)} />
+              <div css={dd(C.green)} />
               <span css={demoTitle}>JSPrep Pro · Answer Evaluator</span>
             </div>
             <div css={demoInner}>
@@ -400,7 +399,7 @@ export default function HomePageClient() {
                   <span
                     style={{
                       fontSize: "0.75rem",
-                      color: "rgba(255,255,255,0.3)",
+                      color: C.muted,
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -408,24 +407,25 @@ export default function HomePageClient() {
                   </span>
                 </div>
                 <div css={demoFb}>
-                  <span style={{ color: "#6af7c0", fontWeight: 700 }}>
+                  <span style={{ color: C.green, fontWeight: 600 }}>
                     ✓ Correct on scope retention and persistence.
                   </span>{" "}
-                  But you're missing the key mechanic — closures work because of{" "}
-                  <span style={{ color: "white", fontWeight: 700 }}>
+                  But you&apos;re missing the key mechanic — closures work
+                  because of{" "}
+                  <span style={{ color: C.text, fontWeight: 600 }}>
                     lexical scoping
                   </span>
                   . The function retains a{" "}
-                  <span style={{ color: "white", fontWeight: 700 }}>
+                  <span style={{ color: C.text, fontWeight: 600 }}>
                     reference
                   </span>{" "}
                   to variables (not a copy), which is why the var-in-loop bug
                   exists. A senior answer would also mention the{" "}
-                  <span style={{ color: "white", fontWeight: 700 }}>
+                  <span style={{ color: C.text, fontWeight: 600 }}>
                     module pattern
                   </span>{" "}
                   or{" "}
-                  <span style={{ color: "white", fontWeight: 700 }}>
+                  <span style={{ color: C.text, fontWeight: 600 }}>
                     React hooks
                   </span>{" "}
                   as real-world usage.
@@ -439,7 +439,7 @@ export default function HomePageClient() {
 
         {/* ── INTERVIEW SPRINT ─────────────────────────────── */}
         <div css={sec} id="sprint">
-          <p css={eye("#f7c76a")}>⚡ New: Interview Sprint</p>
+          <p css={eye(C.amber)}>⚡ New: Interview Sprint</p>
           <h2 css={sh2}>The fastest way to know if you&apos;re ready</h2>
           <p css={ssub}>
             A timed mixed-question challenge. Theory + output + debugging. AI
@@ -479,13 +479,13 @@ export default function HomePageClient() {
           <div css={sprintDemo}>
             <div css={sprintHUD}>
               <div css={sprintHUDLeft}>
-                <Zap size={12} style={{ color: "#f7c76a" }} />
+                <Zap size={12} style={{ color: C.amber }} />
                 <span css={sprintHUDScoreNum}>70</span>
                 <span css={sprintHUDScoreLabel}>pts</span>
               </div>
               <div css={sprintHUDProgress}>
                 <div css={sprintHUDMeta}>
-                  <span style={{ fontWeight: 700, color: "white" }}>
+                  <span style={{ fontWeight: 600, color: C.text }}>
                     Q5 / 10
                   </span>
                   <span>40% complete</span>
@@ -558,13 +558,13 @@ console.log({} + [])`}</pre>
                 <div css={sprintQueue}>
                   <div css={sprintQueueLabel}>Up next</div>
                   <div css={sprintQueueItem}>
-                    <span css={sprintQueueDot("#f76a6a")} />
+                    <span css={sprintQueueDot(C.red)} />
                     <span css={sprintQueueText}>
                       🐛 Find the bug in this async/await chain
                     </span>
                   </div>
                   <div css={sprintQueueItem}>
-                    <span css={sprintQueueDot("#c4b5fd")} />
+                    <span css={sprintQueueDot(C.accentText)} />
                     <span css={sprintQueueText}>
                       📖 Explain the JavaScript event loop
                     </span>
@@ -582,13 +582,13 @@ console.log({} + [])`}</pre>
               </div>
               <div css={sprintResultDivider} />
               <div css={sprintResultRight}>
-                <div css={sprintInsightRow("#6af7c0")}>
+                <div css={sprintInsightRow(C.green)}>
                   <CheckCircle size={10} />
                   <span>
                     <strong>Strong:</strong> Closures · Hoisting · Scope
                   </span>
                 </div>
-                <div css={sprintInsightRow("#f7c76a")}>
+                <div css={sprintInsightRow(C.amber)}>
                   <Target size={10} />
                   <span>
                     <strong>Review:</strong> Event Loop · Promises
@@ -616,7 +616,7 @@ console.log({} + [])`}</pre>
 
         {/* ── 3 MODES ──────────────────────────────────────── */}
         <div css={sec} id="practice">
-          <p css={eye("#6af7c0")}>Three Practice Modes</p>
+          <p css={eye(C.green)}>Three Practice Modes</p>
           <h2 css={sh2}>How real interviews test you</h2>
           <p css={ssub}>
             Most prep sites are theory-only. Real JS interviews use all three.
@@ -643,7 +643,7 @@ console.log({} + [])`}</pre>
 
         {/* ── BEYOND QUESTIONS ─────────────────────────────── */}
         <div css={sec}>
-          <p css={eye("#f7c76a")}>Beyond Questions</p>
+          <p css={eye(C.amber)}>Beyond Questions</p>
           <h2 css={sh2}>A full interview prep ecosystem</h2>
           <p css={ssub}>
             Not just a list of Q&As — habits, accountability, and depth.
@@ -671,7 +671,7 @@ console.log({} + [])`}</pre>
             <div css={lbCard}>
               <div css={lbHead}>
                 <div css={lbHeadT}>
-                  <Trophy size={14} color="#f7c76a" /> Top Learners This Week
+                  <Trophy size={14} color={C.amber} /> Top Learners This Week
                 </div>
                 <span css={lbReset}>Resets Monday</span>
               </div>
@@ -702,8 +702,8 @@ console.log({} + [])`}</pre>
             <p
               style={{
                 fontSize: "0.9375rem",
-                fontWeight: 800,
-                color: "white",
+                fontWeight: 600,
+                color: C.text,
                 marginBottom: "1.375rem",
                 textAlign: "center",
               }}
@@ -735,11 +735,11 @@ console.log({} + [])`}</pre>
                   <div css={whyEmoji}>{emoji}</div>
                   <div css={whyLabel}>{label}</div>
                   <div css={whyBefore}>
-                    <span style={{ color: "#f76a6a", flexShrink: 0 }}>✗</span>
+                    <span style={{ color: C.red, flexShrink: 0 }}>✗</span>
                     {before}
                   </div>
                   <div css={whyAfter}>
-                    <span style={{ color: "#6af7c0", flexShrink: 0 }}>✓</span>
+                    <span style={{ color: C.green, flexShrink: 0 }}>✓</span>
                     {after}
                   </div>
                 </div>
@@ -752,7 +752,7 @@ console.log({} + [])`}</pre>
 
         {/* ── TESTIMONIALS ─────────────────────────────────── */}
         <div css={sec}>
-          <p css={eye("#f7c76a")}>Real developers. Real offers.</p>
+          <p css={eye(C.amber)}>Real developers. Real offers.</p>
           <h2 css={sh2}>They prepped here. They got in.</h2>
           <p css={ssub}>
             Not "I liked the UI." — Developers, interviews, outcomes.
@@ -763,7 +763,7 @@ console.log({} + [])`}</pre>
                 <div>
                   <div css={tStars}>
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={13} fill="#f7c76a" color="#f7c76a" />
+                      <Star key={i} size={13} fill={C.amber} color={C.amber} />
                     ))}
                   </div>
                   <span css={tMark}>"</span>
@@ -783,7 +783,7 @@ console.log({} + [])`}</pre>
 
         {/* ── TOPIC CARDS ──────────────────────────────────── */}
         <div css={sec}>
-          <p css={eye("#a78bfa")}>36 Topic Deep-Dives</p>
+          <p css={eye(C.accentText)}>36 Topic Deep-Dives</p>
           <h2 css={sh2}>Every concept, interview-ready</h2>
           <p css={ssub}>
             Each topic has a mental model, full explanation, cheat sheet, and
@@ -810,7 +810,7 @@ console.log({} + [])`}</pre>
 
         {/* ── AI TOOLS ─────────────────────────────────────── */}
         <div css={sec}>
-          <p css={eye("#7c6af7")}>6 AI Features</p>
+          <p css={eye(C.accent)}>6 AI Features</p>
           <h2 css={sh2}>Your AI interview coach</h2>
           <p css={ssub}>
             Not a chatbot you switch to. AI is inside every question, every
@@ -836,7 +836,7 @@ console.log({} + [])`}</pre>
 
         {/* ── PRICING ──────────────────────────────────────── */}
         <div css={sec} id="pricing">
-          <p css={eye("#6af7c0")}>Pricing</p>
+          <p css={eye(C.green)}>Pricing</p>
           <h2 css={sh2}>Simple. Transparent.</h2>
           <p css={ssub}>
             Start free with 91 real questions and AI feedback from day one.
@@ -851,7 +851,7 @@ console.log({} + [])`}</pre>
                   <li key={f} css={pFeat}>
                     <CheckCircle
                       size={13}
-                      color="#6af7c0"
+                      color={C.green}
                       style={{ flexShrink: 0, marginTop: 1 }}
                     />
                     {f}
@@ -865,7 +865,8 @@ console.log({} + [])`}</pre>
 
             <div css={priceCPro}>
               <div css={popularTag}>POPULAR</div>
-              <div css={[pTier, { color: "#c4b5fd" }]}>Pro</div>
+              {/* "Pro" tier label — C.accentText replaces "#c4b5fd" light purple */}
+              <div css={[pTier, { color: C.accentText }]}>Pro</div>
               <div css={pPrice}>
                 ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}
                 <span css={pPer}>/month</span>
@@ -876,7 +877,7 @@ console.log({} + [])`}</pre>
                   <li key={f} css={pFeat}>
                     <CheckCircle
                       size={13}
-                      color="#7c6af7"
+                      color={C.accent}
                       style={{ flexShrink: 0, marginTop: 1 }}
                     />
                     {f}

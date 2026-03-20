@@ -11,7 +11,7 @@ export interface FilterState {
   category: string;
   difficulty: Difficulty | "all";
   type: QuestionType | "all";
-  showBookmarked: boolean; // when true, only show bookmarked questions
+  showBookmarked: boolean;
 }
 
 interface Props {
@@ -20,23 +20,23 @@ interface Props {
   onChange: (f: FilterState) => void;
   totalShown: number;
   totalAll: number;
-  bookmarkCount: number; // how many questions are currently bookmarked
+  bookmarkCount: number;
   loading?: boolean;
 }
 
 const DIFF_LABELS: Record<string, string> = {
   all: "All Levels",
-  beginner: "🟢 Beginner",
-  core: "🔵 Core",
-  advanced: "🟡 Advanced",
-  expert: "🔴 Expert",
+  beginner: "Beginner",
+  core: "Core",
+  advanced: "Advanced",
+  expert: "Expert",
 };
 
 const DIFF_COLORS: Record<string, string> = {
-  beginner: C.accent3,
+  beginner: C.green,
   core: C.accent,
-  advanced: C.accent2,
-  expert: C.danger,
+  advanced: C.amber,
+  expert: C.red,
 };
 
 const S = {
@@ -48,17 +48,17 @@ const S = {
     display: flex;
     align-items: center;
     gap: 0.625rem;
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-radius: 12px;
-    padding: 0.625rem 1rem;
+    background: ${C.bg};
+    border: 1px solid ${C.border};
+    border-radius: ${RADIUS.lg};
+    padding: 0.5rem 0.875rem;
     margin-bottom: 0.875rem;
     transition:
-      border-color 0.18s ease,
-      background 0.18s ease;
+      border-color 0.12s ease,
+      box-shadow 0.12s ease;
     &:focus-within {
-      border-color: rgba(124, 106, 247, 0.4);
-      background: rgba(124, 106, 247, 0.04);
+      border-color: ${C.accent};
+      box-shadow: 0 0 0 2px ${C.accentSubtle};
     }
   `,
 
@@ -68,28 +68,28 @@ const S = {
     border: none;
     outline: none;
     font-size: 0.875rem;
-    color: white;
+    color: ${C.text};
     &::placeholder {
-      color: rgba(255, 255, 255, 0.28);
+      color: ${C.placeholder};
     }
   `,
 
   clearBtn: css`
-    color: rgba(255, 255, 255, 0.3);
+    color: ${C.muted};
     cursor: pointer;
     background: none;
     border: none;
     padding: 0;
     display: flex;
-    transition: color 0.15s;
+    transition: color 0.12s ease;
     &:hover {
-      color: rgba(255, 255, 255, 0.7);
+      color: ${C.text};
     }
   `,
 
   row: css`
     display: flex;
-    gap: 0.4375rem;
+    gap: 0.375rem;
     overflow-x: auto;
     scrollbar-width: none;
     margin-bottom: 0.5rem;
@@ -102,19 +102,20 @@ const S = {
 
   chip: (active: boolean, activeColor: string) => css`
     flex-shrink: 0;
-    padding: 0.3125rem 0.875rem;
+    padding: 0.25rem 0.75rem;
     border-radius: 100px;
     font-size: 0.6875rem;
-    font-weight: 700;
-    border: 1px solid ${active ? activeColor + "66" : "rgba(255,255,255,0.08)"};
-    background: ${active ? activeColor + "18" : "transparent"};
-    color: ${active ? activeColor : "rgba(255,255,255,0.38)"};
+    font-weight: 500;
+    border: 1px solid ${active ? activeColor : C.border};
+    background: ${active ? C.accentSubtle : "transparent"};
+    color: ${active ? activeColor : C.muted};
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.12s ease;
     white-space: nowrap;
     &:hover {
-      border-color: ${activeColor + "55"};
-      color: ${active ? activeColor : "rgba(255,255,255,0.75)"};
+      border-color: ${activeColor};
+      color: ${activeColor};
+      background: ${C.accentSubtle};
     }
   `,
 
@@ -123,31 +124,35 @@ const S = {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    padding: 0.3125rem 0.875rem;
+    padding: 0.25rem 0.75rem;
     border-radius: 100px;
     font-size: 0.6875rem;
-    font-weight: 700;
-    border: 1px solid ${active ? C.accent2 + "66" : "rgba(255,255,255,0.08)"};
-    background: ${active ? C.accent2 + "18" : "transparent"};
-    color: ${active ? C.accent2 : "rgba(255,255,255,0.38)"};
+    font-weight: 500;
+    border: 1px solid ${active ? C.amber : C.border};
+    background: ${active ? C.amberSubtle : "transparent"};
+    color: ${active ? C.amber : C.muted};
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.12s ease;
     white-space: nowrap;
     &:hover {
-      border-color: ${C.accent2 + "55"};
-      color: ${C.accent2};
+      border-color: ${C.amber};
+      color: ${C.amber};
+      background: ${C.amberSubtle};
     }
   `,
 
   resultCount: css`
     font-size: 0.6875rem;
-    color: rgba(255, 255, 255, 0.28);
+    color: ${C.muted};
     margin-bottom: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
   `,
 
   activeCount: css`
-    color: ${C.accent};
-    font-weight: 700;
+    color: ${C.text};
+    font-weight: 600;
   `,
 };
 
@@ -199,9 +204,8 @@ export default function CategoryFilter({
         )}
       </div>
 
-      {/* Top row: Bookmark filter + Category chips */}
+      {/* Bookmark + Category row */}
       <div css={S.row}>
-        {/* Bookmark filter — shows count badge when there are bookmarks */}
         <button
           css={S.bookmarkChip(filters.showBookmarked)}
           onClick={() => set({ showBookmarked: !filters.showBookmarked })}
@@ -210,7 +214,6 @@ export default function CategoryFilter({
           <Bookmark size={10} />
           Saved{bookmarkCount > 0 ? ` (${bookmarkCount})` : ""}
         </button>
-
         {["All", ...categories].map((cat) => (
           <button
             key={cat}
@@ -225,7 +228,7 @@ export default function CategoryFilter({
         ))}
       </div>
 
-      {/* Difficulty chips */}
+      {/* Difficulty row — emoji removed, plain text labels */}
       <div css={S.row}>
         {Object.entries(DIFF_LABELS).map(([val, label]) => (
           <button
@@ -243,33 +246,38 @@ export default function CategoryFilter({
         ))}
       </div>
 
-      {/* Result count + clear all */}
+      {/* Result count + clear */}
       <div css={S.resultCount}>
         {loading ? (
-          "Loading…"
+          <span>Loading…</span>
         ) : (
           <>
             {filters.showBookmarked ? (
               <>
-                <span css={S.activeCount}>{totalShown}</span> saved question
-                {totalShown !== 1 ? "s" : ""}
+                <span css={S.activeCount}>{totalShown}</span>
+                &nbsp;saved question{totalShown !== 1 ? "s" : ""}
               </>
             ) : (
               <>
-                Showing <span css={S.activeCount}>{totalShown}</span> of{" "}
-                {totalAll} questions
+                Showing&nbsp;<span css={S.activeCount}>{totalShown}</span>
+                &nbsp;of {totalAll} questions
               </>
             )}
             {hasActiveFilter && (
               <button
                 css={[
                   S.clearBtn,
-                  {
-                    display: "inline-flex",
-                    marginLeft: "0.625rem",
-                    fontSize: "0.6875rem",
-                    color: C.accent,
-                  },
+                  css`
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.2rem;
+                    margin-left: 0.5rem;
+                    font-size: 0.6875rem;
+                    color: ${C.accent};
+                    &:hover {
+                      color: ${C.accentHover};
+                    }
+                  `,
                 ]}
                 onClick={() => onChange(defaultFilters())}
               >

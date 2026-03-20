@@ -7,19 +7,12 @@
 // Everything else on the page is static server-rendered HTML.
 
 import Link from "next/link";
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight, Zap, Calendar } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  btnP,
-  btnO,
-  ctas,
-  freeBanner,
-  qotdBtn,
-  lbCta,
-} from "@/app/page.styles";
-import { CheckCircle, Calendar } from "lucide-react";
+import { C } from "@/styles/tokens";
+import { btnP, btnO, ctas, qotdBtn, lbCta } from "@/app/page.styles";
 
-// ── Hero CTA pair ─────────────────────────────────────────────
+// ── Hero CTA pair ─────────────────────────────────────────────────────────────
 export function HeroCTAs() {
   const { user } = useAuth();
   const ctaHref = user ? "/dashboard" : "/auth";
@@ -37,7 +30,7 @@ export function HeroCTAs() {
   );
 }
 
-// ── Sprint start button ───────────────────────────────────────
+// ── Sprint start button ───────────────────────────────────────────────────────
 export function SprintStartBtn({
   css: sprintStartBtn,
   css2: sprintCTASub,
@@ -63,47 +56,47 @@ export function SprintStartBtn({
   );
 }
 
-// ── QOTD button ───────────────────────────────────────────────
+// ── QOTD button ───────────────────────────────────────────────────────────────
 export function QOTDBtn() {
   const { user } = useAuth();
-  const ctaHref = user ? "/dashboard" : "/auth";
   return (
-    <Link href={ctaHref} css={qotdBtn}>
+    <Link href={user ? "/dashboard" : "/auth"} css={qotdBtn}>
       <Calendar size={14} /> Try today's question
     </Link>
   );
 }
 
-// ── Leaderboard join CTA ──────────────────────────────────────
+// ── Leaderboard join CTA ──────────────────────────────────────────────────────
 export function LeaderboardCTA() {
   const { user } = useAuth();
-  const ctaHref = user ? "/dashboard" : "/auth";
   return (
-    <Link href={ctaHref} css={lbCta}>
+    <Link href={user ? "/dashboard" : "/auth"} css={lbCta}>
       Join the leaderboard — earn XP →
     </Link>
   );
 }
 
-// ── Free tier button ──────────────────────────────────────────
+// ── Free tier button ──────────────────────────────────────────────────────────
 export function FreeTierBtn({ pBtnF }: { pBtnF: any }) {
   const { user } = useAuth();
-  const ctaHref = user ? "/dashboard" : "/auth";
   const ctaLabel = user ? "Go to Dashboard" : "Get Started Free";
   return (
-    <Link href={ctaHref} css={pBtnF}>
+    <Link href={user ? "/dashboard" : "/auth"} css={pBtnF}>
       {ctaLabel}
     </Link>
   );
 }
 
-// ── Bottom CTA ────────────────────────────────────────────────
+// ── Bottom CTA ────────────────────────────────────────────────────────────────
 export function BottomCTA({ btnP: btnPStyle }: { btnP: any }) {
   const { user } = useAuth();
-  const ctaHref = user ? "/dashboard" : "/auth";
   const ctaLabel = user ? "Go to Dashboard" : "Start Free — No Card Needed";
   return (
-    <Link href={ctaHref} css={btnPStyle} style={{ display: "inline-flex" }}>
+    <Link
+      href={user ? "/dashboard" : "/auth"}
+      css={btnPStyle}
+      style={{ display: "inline-flex" }}
+    >
       {ctaLabel} <ArrowRight size={16} />
     </Link>
   );

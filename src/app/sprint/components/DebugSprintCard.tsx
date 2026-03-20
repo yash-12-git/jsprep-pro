@@ -13,14 +13,15 @@ const fadeIn = keyframes`from{opacity:0;transform:translateY(6px)}to{opacity:1;t
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const card = css`
-  background: ${C.card};
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: ${RADIUS.xxl};
+  background: ${C.bg};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   overflow: hidden;
   animation: ${fadeIn} 0.3s ease;
 `;
+
 const body = css`
-  padding: 1.5rem 1.5rem 1rem;
+  padding: 1.375rem 1.375rem 1rem;
 `;
 
 const typeTag = css`
@@ -28,28 +29,33 @@ const typeTag = css`
   align-items: center;
   gap: 0.3rem;
   font-size: 0.6875rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #f76a6a;
-  background: rgba(247, 106, 106, 0.1);
+  color: ${C.red};
+  background: ${C.redSubtle};
+  border: 1px solid ${C.redBorder};
   padding: 3px 10px;
   border-radius: 20px;
 `;
+
 const title = css`
-  font-size: 1.125rem;
-  font-weight: 800;
-  color: #f0f0f8;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: ${C.text};
   line-height: 1.45;
   margin: 0.875rem 0 0.375rem;
+  letter-spacing: -0.01em;
 `;
+
 const hint = css`
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.38);
+  color: ${C.muted};
   margin-bottom: 1rem;
   line-height: 1.5;
 `;
-const label = (color = "rgba(255,255,255,0.3)") => css`
+
+const label = (color: string = C.muted) => css`
   font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -57,42 +63,48 @@ const label = (color = "rgba(255,255,255,0.3)") => css`
   color: ${color};
   margin-bottom: 0.4rem;
 `;
+
 const codeBlock = css`
-  background: #0a0a14;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: ${C.codeBg};
+  border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   padding: 1rem 1.125rem;
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 0.8125rem;
   line-height: 1.7;
-  color: #c8d8e8;
+  color: ${C.codeText};
   overflow-x: auto;
   white-space: pre;
   margin-bottom: 1rem;
 `;
+
 const textarea = (state: "idle" | "submitted") => css`
   width: 100%;
   box-sizing: border-box;
-  background: #0a0a14;
-  border: 1px solid
-    ${state === "submitted"
-      ? "rgba(255,255,255,0.15)"
-      : "rgba(124,106,247,0.3)"};
+  background: ${C.bg};
+  border: 1px solid ${state === "submitted" ? C.border : C.accent};
   border-radius: ${RADIUS.lg};
   padding: 1rem 1.125rem;
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 0.8125rem;
   line-height: 1.7;
-  color: #c8d8e8;
+  color: ${C.text};
   resize: vertical;
   outline: none;
   margin-bottom: 1rem;
-  transition: border-color 0.15s;
-  &:focus {
-    border-color: rgba(124, 106, 247, 0.6);
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+  &::placeholder {
+    color: ${C.placeholder};
   }
-  ${state === "submitted" ? "opacity: 0.7; cursor: default;" : ""}
+  &:focus {
+    border-color: ${C.accent};
+    box-shadow: 0 0 0 2px ${C.accentSubtle};
+  }
+  ${state === "submitted" ? "opacity: 0.6; cursor: default;" : ""}
 `;
+
 const compRow = css`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -103,175 +115,169 @@ const compRow = css`
     grid-template-columns: 1fr;
   }
 `;
+
 const compPanel = (color: string, bg: string) => css`
   background: ${bg};
   border: 1px solid ${color}30;
   border-radius: ${RADIUS.lg};
   padding: 0.875rem 1rem;
 `;
+
 const compPre = css`
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 0.75rem;
   line-height: 1.7;
-  color: #c8d8e8;
+  color: ${C.codeText};
   white-space: pre-wrap;
   word-break: break-all;
   margin: 0;
 `;
+
 const bugNote = css`
-  background: rgba(247, 106, 106, 0.06);
-  border: 1px solid rgba(247, 106, 106, 0.15);
+  background: ${C.redSubtle};
+  border: 1px solid ${C.redBorder};
   border-radius: ${RADIUS.md};
   padding: 0.75rem 1rem;
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: ${C.text};
   line-height: 1.6;
   margin-bottom: 1rem;
   animation: ${fadeIn} 0.3s ease;
 `;
+
 const divider = css`
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
+  background: ${C.border};
 `;
 
 const actionsRow = css`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
+  padding: 0.875rem 1.375rem;
   gap: 0.75rem;
   flex-wrap: wrap;
 `;
+
 const submitBtn = (disabled: boolean) => css`
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.625rem 1.375rem;
+  padding: 0.5625rem 1.25rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 800;
+  font-weight: 600;
   cursor: ${disabled ? "not-allowed" : "pointer"};
-  background: ${disabled ? "rgba(124,106,247,0.08)" : "rgba(124,106,247,0.15)"};
-  border: 1px solid
-    ${disabled ? "rgba(124,106,247,0.15)" : "rgba(124,106,247,0.4)"};
-  color: ${disabled ? "rgba(124,106,247,0.4)" : "#c4b5fd"};
-  transition: all 0.15s;
-  ${!disabled ? "&:hover{ background: rgba(124,106,247,0.25); }" : ""}
+  background: ${disabled ? C.bgSubtle : C.accent};
+  border: 1px solid ${disabled ? C.border : C.accent};
+  color: ${disabled ? C.muted : "#ffffff"};
+  transition: opacity 0.12s ease;
+  ${!disabled ? "&:hover{ opacity: 0.88; }" : ""}
 `;
-const resetBtn = css`
+
+const ghostBtn = css`
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
   padding: 0.5rem 0.875rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  color: rgba(255, 255, 255, 0.35);
-  transition: all 0.15s;
+  border: 1px solid ${C.border};
+  color: ${C.muted};
+  transition: all 0.12s ease;
   &:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.6);
+    border-color: ${C.borderStrong};
+    color: ${C.text};
+    background: ${C.bgHover};
   }
 `;
-const skipBtn = css`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem 0.875rem;
-  border-radius: ${RADIUS.lg};
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  color: rgba(255, 255, 255, 0.35);
-  transition: all 0.15s;
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.6);
-  }
-`;
+
 const selfMarkRow = css`
   display: flex;
   gap: 0.625rem;
   flex-wrap: wrap;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.875rem 1.375rem;
+  border-top: 1px solid ${C.border};
   animation: ${fadeIn} 0.25s ease;
 `;
+
 const selfMarkLabel = css`
   width: 100%;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 0.375rem;
+  color: ${C.muted};
+  margin-bottom: 0.25rem;
 `;
+
 const gotItBtn = css`
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.5625rem 1.125rem;
+  padding: 0.5rem 1rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  background: rgba(106, 247, 192, 0.12);
-  border: 1px solid rgba(106, 247, 192, 0.25);
-  color: ${C.accent3};
-  transition: all 0.15s;
+  background: ${C.greenSubtle};
+  border: 1px solid ${C.greenBorder};
+  color: ${C.green};
+  transition: opacity 0.12s ease;
   &:hover {
-    background: rgba(106, 247, 192, 0.2);
+    opacity: 0.8;
   }
 `;
+
 const missedItBtn = css`
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.5625rem 1.125rem;
+  padding: 0.5rem 1rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  background: rgba(247, 106, 106, 0.1);
-  border: 1px solid rgba(247, 106, 106, 0.2);
-  color: #f76a6a;
-  transition: all 0.15s;
+  background: ${C.redSubtle};
+  border: 1px solid ${C.redBorder};
+  color: ${C.red};
+  transition: opacity 0.12s ease;
   &:hover {
-    background: rgba(247, 106, 106, 0.18);
+    opacity: 0.8;
   }
 `;
+
 const nextBtn = css`
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.625rem 1.5rem;
+  padding: 0.5625rem 1.375rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   background: ${C.accent};
   border: none;
-  color: white;
-  transition: all 0.15s;
+  color: #ffffff;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
   &:hover {
-    background: #9b8bff;
+    opacity: 0.88;
     transform: translateY(-1px);
   }
 `;
+
 const resultBanner = (outcome: "correct" | "attempted") => css`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: ${outcome === "correct"
-    ? "rgba(106,247,192,0.05)"
-    : "rgba(247,106,106,0.04)"};
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.75rem 1.375rem;
+  background: ${outcome === "correct" ? C.greenSubtle : C.redSubtle};
+  border-top: 1px solid ${outcome === "correct" ? C.greenBorder : C.redBorder};
   font-size: 0.875rem;
-  font-weight: 700;
-  color: ${outcome === "correct" ? C.accent3 : C.danger};
+  font-weight: 600;
+  color: ${outcome === "correct" ? C.green : C.red};
   animation: ${fadeIn} 0.2s ease;
 `;
 
@@ -301,13 +307,11 @@ export default function DebugSprintCard({ q, onComplete }: Props) {
     if (!hasEdited) return;
     setPhase("comparing");
   }
-
   function reset() {
     setUserCode(brokenCode);
     setPhase("editing");
     setFinalOutcome(null);
   }
-
   function mark(o: "correct" | "attempted") {
     setFinalOutcome(o);
   }
@@ -323,13 +327,11 @@ export default function DebugSprintCard({ q, onComplete }: Props) {
             : "Compare your fix to the correct solution — then self-mark."}
         </p>
 
-        {/* ── Phase: editing — show buggy code + textarea ── */}
         {phase === "editing" && (
           <>
-            <div css={label()}>🔴 Buggy Code</div>
+            <div css={label(C.red)}>🔴 Buggy Code</div>
             <pre css={codeBlock}>{brokenCode}</pre>
-
-            <div css={label("rgba(124,106,247,0.7)")}>✏️ Your Fix</div>
+            <div css={label(C.accentText)}>✏️ Your Fix</div>
             <textarea
               css={textarea("idle")}
               value={userCode}
@@ -355,27 +357,26 @@ export default function DebugSprintCard({ q, onComplete }: Props) {
           </>
         )}
 
-        {/* ── Phase: comparing — show both side by side ── */}
         {phase === "comparing" && (
           <>
             {bugDesc && (
               <div css={bugNote}>
-                <strong style={{ color: "#f76a6a" }}>Bug: </strong>
+                <strong style={{ color: C.red }}>Bug: </strong>
                 {bugDesc}
               </div>
             )}
             <div css={compRow}>
-              <div css={compPanel("#c4b5fd", "rgba(124,106,247,0.05)")}>
+              <div css={compPanel(C.accentText, C.accentSubtle)}>
                 <div
-                  css={label("rgba(196,181,253,0.7)")}
+                  css={label(C.accentText)}
                   style={{ marginBottom: "0.5rem" }}
                 >
                   Your fix
                 </div>
                 <pre css={compPre}>{userCode}</pre>
               </div>
-              <div css={compPanel("#6af7c0", "rgba(106,247,192,0.04)")}>
-                <div css={label("#6af7c0")} style={{ marginBottom: "0.5rem" }}>
+              <div css={compPanel(C.green, C.greenSubtle)}>
+                <div css={label(C.green)} style={{ marginBottom: "0.5rem" }}>
                   ✅ Correct fix
                 </div>
                 <pre css={compPre}>
@@ -389,7 +390,6 @@ export default function DebugSprintCard({ q, onComplete }: Props) {
 
       <div css={divider} />
 
-      {/* ── Final outcome banner ── */}
       {finalOutcome ? (
         <>
           <div css={resultBanner(finalOutcome)}>
@@ -411,7 +411,6 @@ export default function DebugSprintCard({ q, onComplete }: Props) {
           </div>
         </>
       ) : phase === "comparing" ? (
-        /* ── Self-mark after seeing both ── */
         <div css={selfMarkRow}>
           <div css={selfMarkLabel}>
             Does your fix match the correct solution?
@@ -424,15 +423,14 @@ export default function DebugSprintCard({ q, onComplete }: Props) {
           </button>
         </div>
       ) : (
-        /* ── Editing actions ── */
         <div css={actionsRow}>
           <div style={{ display: "flex", gap: "0.5rem" }}>
             {hasEdited && (
-              <button css={resetBtn} onClick={reset}>
+              <button css={ghostBtn} onClick={reset}>
                 <RotateCcw size={12} /> Reset
               </button>
             )}
-            <button css={skipBtn} onClick={() => onComplete("skipped")}>
+            <button css={ghostBtn} onClick={() => onComplete("skipped")}>
               Skip
             </button>
           </div>

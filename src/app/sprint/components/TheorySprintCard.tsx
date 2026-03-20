@@ -15,8 +15,6 @@ import { C, RADIUS } from "@/styles/tokens";
 import type { Question } from "@/types/question";
 import type { SprintOutcome } from "../types";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface EvalResult {
   score: number;
   grade: string;
@@ -25,26 +23,21 @@ interface EvalResult {
   missing: string[];
   betterAnswer: string;
 }
-
 interface Props {
   q: Question;
   questionNumber: number;
   totalQuestions: number;
-  /** Called when user submits an answer and we have a result (or they skip) */
   onComplete: (outcome: SprintOutcome, aiScore?: number) => void;
 }
 
-// ─── Animations ───────────────────────────────────────────────────────────────
-
 const fadeIn = keyframes`from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); }`;
-const pulse = keyframes`0%,100% { opacity:1 } 50% { opacity:0.6 }`;
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const card = css`
-  background: ${C.card};
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: ${RADIUS.xxl};
+  background: ${C.bg};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   overflow: hidden;
   animation: ${fadeIn} 0.3s ease;
 `;
@@ -54,23 +47,24 @@ const typeTag = css`
   align-items: center;
   gap: 0.3rem;
   font-size: 0.6875rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #c4b5fd;
-  background: rgba(124, 106, 247, 0.12);
-  padding: 3px 10px 3px 8px;
+  color: ${C.accentText};
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
+  padding: 3px 10px;
   border-radius: 20px;
 `;
 
 const questionBody = css`
-  padding: 1.5rem 1.5rem 0.75rem;
+  padding: 1.375rem 1.375rem 0.75rem;
 `;
 
 const questionTitle = css`
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #f0f0f8;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: ${C.text};
   line-height: 1.45;
   letter-spacing: -0.02em;
   margin: 0.875rem 0 0.75rem;
@@ -83,42 +77,40 @@ const metaRow = css`
   flex-wrap: wrap;
 `;
 
-const diffBadge = (color: string, bg: string) => css`
+const diffBadge = (color: string, bg: string, border: string) => css`
   display: inline-flex;
   align-items: center;
   font-size: 0.6rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: ${color};
   background: ${bg};
+  border: 1px solid ${border};
   padding: 2px 8px;
   border-radius: 10px;
 `;
 
 const catBadge = css`
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
-  font-weight: 600;
+  color: ${C.muted};
+  font-weight: 500;
 `;
 
 const divider = css`
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
-  margin: 0;
+  background: ${C.border};
 `;
 
-// ─── Answer phase ─────────────────────────────────────────────────────────────
-
 const answerPhase = css`
-  padding: 1.25rem 1.5rem;
+  padding: 1.125rem 1.375rem;
   animation: ${fadeIn} 0.25s ease;
 `;
 
 const answerLabel = css`
   font-size: 0.75rem;
   font-weight: 700;
-  color: #f7c76a;
+  color: ${C.amber};
   text-transform: uppercase;
   letter-spacing: 0.07em;
   margin-bottom: 0.625rem;
@@ -130,23 +122,26 @@ const answerLabel = css`
 const textarea = css`
   width: 100%;
   box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: ${C.bg};
+  border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   padding: 0.875rem;
   font-size: 0.9375rem;
-  color: #e0e0f0;
+  color: ${C.text};
   line-height: 1.65;
   font-family: inherit;
   outline: none;
   min-height: 120px;
   resize: vertical;
-  transition: border-color 0.2s;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
   &::placeholder {
-    color: rgba(255, 255, 255, 0.22);
+    color: ${C.placeholder};
   }
   &:focus {
-    border-color: rgba(247, 199, 106, 0.35);
+    border-color: ${C.amber};
+    box-shadow: 0 0 0 2px ${C.amberSubtle};
   }
 `;
 
@@ -155,17 +150,17 @@ const submitBtn = (active: boolean) => css`
   align-items: center;
   gap: 0.375rem;
   margin-top: 0.75rem;
-  padding: 0.625rem 1.25rem;
+  padding: 0.5625rem 1.125rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 700;
-  background: ${active ? "#f7c76a" : "rgba(255,255,255,0.06)"};
-  color: ${active ? "#111" : "rgba(255,255,255,0.25)"};
-  border: none;
+  font-weight: 600;
+  background: ${active ? C.accent : C.bgSubtle};
+  color: ${active ? "#ffffff" : C.muted};
+  border: 1px solid ${active ? C.accent : C.border};
   cursor: ${active ? "pointer" : "not-allowed"};
-  transition: all 0.15s;
+  transition: opacity 0.12s ease;
   flex-shrink: 0;
-  ${active && "&:hover { background: #ffd96a; transform: translateY(-1px); }"}
+  ${active && "&:hover { opacity: 0.88; }"}
 `;
 
 const evalWrap = css`
@@ -176,42 +171,44 @@ const scoreCard = css`
   display: flex;
   gap: 1rem;
   align-items: flex-start;
-  background: rgba(0, 0, 0, 0.25);
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   padding: 1rem;
   margin-bottom: 1rem;
 `;
 
 const scoreNum = (n: number) => css`
-  font-size: 2.5rem;
-  font-weight: 900;
+  font-size: 2.25rem;
+  font-weight: 700;
   line-height: 1;
-  color: ${n >= 7 ? "#6af7c0" : n >= 5 ? "#f7c76a" : "#f76a6a"};
+  letter-spacing: -0.03em;
+  color: ${n >= 7 ? C.green : n >= 5 ? C.amber : C.red};
   flex-shrink: 0;
 `;
 
 const gradeText = (g: string) => css`
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-top: 0.25rem;
   color: ${g === "A"
-    ? "#6af7c0"
+    ? C.green
     : g === "B"
-      ? "#a5f3fc"
+      ? C.accent
       : g === "C"
-        ? "#f7c76a"
-        : "#f76a6a"};
+        ? C.amber
+        : C.red};
 `;
 
 const verdict = css`
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: ${C.muted};
   line-height: 1.5;
 `;
 
 const barTrack = css`
   height: 4px;
-  background: rgba(255, 255, 255, 0.07);
+  background: ${C.border};
   border-radius: 9999px;
   overflow: hidden;
   margin: 0.5rem 0;
@@ -219,7 +216,7 @@ const barTrack = css`
 const barFill = (n: number) => css`
   height: 100%;
   width: ${n * 10}%;
-  background: ${n >= 7 ? "#6af7c0" : n >= 5 ? "#f7c76a" : "#f76a6a"};
+  background: ${n >= 7 ? C.green : n >= 5 ? C.amber : C.red};
   border-radius: 9999px;
   transition: width 0.6s ease;
 `;
@@ -229,7 +226,7 @@ const feedSection = css`
 `;
 const feedTitle = (c: string) => css`
   font-size: 0.625rem;
-  font-weight: 800;
+  font-weight: 700;
   color: ${c};
   margin-bottom: 0.375rem;
   text-transform: uppercase;
@@ -239,7 +236,7 @@ const feedItem = css`
   display: flex;
   gap: 0.375rem;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: ${C.muted};
   margin-bottom: 0.25rem;
   line-height: 1.5;
 `;
@@ -250,35 +247,34 @@ const betterToggle = css`
   gap: 0.25rem;
   margin-top: 0.75rem;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: ${C.muted};
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
+  transition: color 0.12s ease;
   &:hover {
-    color: rgba(255, 255, 255, 0.65);
+    color: ${C.text};
   }
 `;
 const betterBox = css`
   margin-top: 0.5rem;
   padding: 0.875rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: ${C.muted};
   line-height: 1.7;
   animation: ${fadeIn} 0.2s ease;
 `;
-
-// ─── Actions row ─────────────────────────────────────────────────────────────
 
 const actionsRow = css`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.875rem 1.375rem;
+  border-top: 1px solid ${C.border};
   gap: 0.75rem;
   flex-wrap: wrap;
 `;
@@ -287,17 +283,17 @@ const tryBtn = css`
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.625rem 1.25rem;
+  padding: 0.5625rem 1.125rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  background: rgba(247, 199, 106, 0.12);
-  border: 1px solid rgba(247, 199, 106, 0.25);
-  color: #f7c76a;
-  transition: all 0.15s;
+  background: ${C.amberSubtle};
+  border: 1px solid ${C.amberBorder};
+  color: ${C.amber};
+  transition: opacity 0.12s ease;
   &:hover {
-    background: rgba(247, 199, 106, 0.2);
+    opacity: 0.8;
   }
 `;
 
@@ -305,18 +301,19 @@ const skipBtn = css`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.625rem 1rem;
+  padding: 0.5rem 0.875rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  color: rgba(255, 255, 255, 0.35);
-  transition: all 0.15s;
+  border: 1px solid ${C.border};
+  color: ${C.muted};
+  transition: all 0.12s ease;
   &:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.6);
+    border-color: ${C.borderStrong};
+    color: ${C.text};
+    background: ${C.bgHover};
   }
 `;
 
@@ -324,44 +321,68 @@ const nextBtn = css`
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.625rem 1.5rem;
+  padding: 0.5625rem 1.375rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   background: ${C.accent};
   border: none;
-  color: white;
-  transition: all 0.15s;
+  color: #ffffff;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
   &:hover {
-    background: #9b8bff;
+    opacity: 0.88;
     transform: translateY(-1px);
   }
 `;
 
-const loadingDot = css`
-  animation: ${pulse} 1s ease infinite;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-`;
-
 // ─── Diff meta ────────────────────────────────────────────────────────────────
-
-const DIFF_META: Record<string, { color: string; bg: string; label: string }> =
-  {
-    beginner: { color: C.accent3, bg: `${C.accent3}1a`, label: "Beginner" },
-    core: { color: C.accent3, bg: `${C.accent3}1a`, label: "Core" },
-    easy: { color: C.accent3, bg: `${C.accent3}1a`, label: "Easy" },
-    advanced: { color: C.accent2, bg: `${C.accent2}1a`, label: "Advanced" },
-    medium: { color: C.accent2, bg: `${C.accent2}1a`, label: "Medium" },
-    expert: { color: C.danger, bg: `${C.danger}1a`, label: "Expert" },
-    hard: { color: C.danger, bg: `${C.danger}1a`, label: "Hard" },
-  };
+const DIFF_META: Record<
+  string,
+  { color: string; bg: string; border: string; label: string }
+> = {
+  beginner: {
+    color: C.green,
+    bg: C.greenSubtle,
+    border: C.greenBorder,
+    label: "Beginner",
+  },
+  core: {
+    color: C.green,
+    bg: C.greenSubtle,
+    border: C.greenBorder,
+    label: "Core",
+  },
+  easy: {
+    color: C.green,
+    bg: C.greenSubtle,
+    border: C.greenBorder,
+    label: "Easy",
+  },
+  advanced: {
+    color: C.amber,
+    bg: C.amberSubtle,
+    border: C.amberBorder,
+    label: "Advanced",
+  },
+  medium: {
+    color: C.amber,
+    bg: C.amberSubtle,
+    border: C.amberBorder,
+    label: "Medium",
+  },
+  expert: {
+    color: C.red,
+    bg: C.redSubtle,
+    border: C.redBorder,
+    label: "Expert",
+  },
+  hard: { color: C.red, bg: C.redSubtle, border: C.redBorder, label: "Hard" },
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
-
 export default function TheorySprintCard({ q, onComplete }: Props) {
   const [phase, setPhase] = useState<
     "read" | "answering" | "evaluating" | "done"
@@ -398,7 +419,6 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
       setResult(parsed);
       setPhase("done");
     } catch {
-      // fallback — treat as attempted
       setResult({
         score: 3,
         grade: "C",
@@ -413,32 +433,28 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
 
   function handleNext() {
     if (!result) return;
-    const outcome: SprintOutcome = result.score >= 7 ? "correct" : "attempted";
-    onComplete(outcome, result.score);
+    onComplete(result.score >= 7 ? "correct" : "attempted", result.score);
   }
 
   return (
     <div css={card}>
-      {/* ── Question ── */}
       <div css={questionBody}>
         <div css={typeTag}>📖 Theory</div>
         <p css={questionTitle}>{q.title}</p>
         <div css={metaRow}>
-          <span css={diffBadge(dm.color, dm.bg)}>{dm.label}</span>
+          <span css={diffBadge(dm.color, dm.bg, dm.border)}>{dm.label}</span>
           <span css={catBadge}>{q.category}</span>
         </div>
       </div>
 
       <div css={divider} />
 
-      {/* ── Answer phase ── */}
       {(phase === "answering" ||
         phase === "evaluating" ||
         phase === "done") && (
         <div css={answerPhase}>
           <div css={answerLabel}>
-            <Zap size={12} />
-            Answer as you would in an interview
+            <Zap size={12} /> Answer as you would in an interview
           </div>
 
           {phase !== "done" ? (
@@ -478,12 +494,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                     <>Submit Answer</>
                   )}
                 </button>
-                <span
-                  style={{
-                    fontSize: "0.7rem",
-                    color: "rgba(255,255,255,0.22)",
-                  }}
-                >
+                <span style={{ fontSize: "0.7rem", color: C.muted }}>
                   ⌘ + Enter to submit
                 </span>
               </div>
@@ -491,7 +502,6 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
           ) : (
             result && (
               <div css={evalWrap}>
-                {/* keep textarea visible but read-only */}
                 <textarea
                   css={[
                     textarea,
@@ -504,16 +514,10 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                   value={userAnswer}
                   readOnly
                 />
-
                 <div css={scoreCard}>
                   <div>
                     <div css={scoreNum(result.score)}>{result.score}</div>
-                    <div
-                      css={css`
-                        font-size: 0.6875rem;
-                        color: rgba(255, 255, 255, 0.3);
-                      `}
-                    >
+                    <div style={{ fontSize: "0.6875rem", color: C.muted }}>
                       /10
                     </div>
                     <div css={gradeText(result.grade)}>{result.grade}</div>
@@ -525,7 +529,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                     <div css={verdict}>{result.verdict}</div>
                     {result.strengths?.length > 0 && (
                       <div css={feedSection}>
-                        <div css={feedTitle("#6af7c0")}>✓ Covered</div>
+                        <div css={feedTitle(C.green)}>✓ Covered</div>
                         {result.strengths.map((s, i) => (
                           <div key={i} css={feedItem}>
                             <CheckCircle
@@ -533,7 +537,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                               style={{
                                 marginTop: 3,
                                 flexShrink: 0,
-                                color: "#6af7c0",
+                                color: C.green,
                               }}
                             />
                             {s}
@@ -543,7 +547,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                     )}
                     {result.missing?.length > 0 && (
                       <div css={feedSection}>
-                        <div css={feedTitle("#f76a6a")}>✗ Missing</div>
+                        <div css={feedTitle(C.red)}>✗ Missing</div>
                         {result.missing.map((m, i) => (
                           <div key={i} css={feedItem}>
                             <XCircle
@@ -551,7 +555,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                               style={{
                                 marginTop: 3,
                                 flexShrink: 0,
-                                color: "#f76a6a",
+                                color: C.red,
                               }}
                             />
                             {m}
@@ -585,7 +589,6 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
         </div>
       )}
 
-      {/* ── Actions ── */}
       <div css={actionsRow}>
         {phase === "read" && (
           <>

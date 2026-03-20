@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { pageMeta, faqSchema, breadcrumbSchema, SITE } from "@/lib/seo/seo";
+import { pageMeta, breadcrumbSchema } from "@/lib/seo/seo";
 import DownloadPDFButton from "./DownloadPdfButton";
+import { C } from "@/styles/tokens";
 
 export const metadata: Metadata = pageMeta({
   title: "JavaScript Interview Cheat Sheet 2025 (Printable PDF)",
@@ -19,10 +20,15 @@ export const metadata: Metadata = pageMeta({
   ],
 });
 
+// ─── Section accent colours — semantic tokens ─────────────────────────────────
+// Each section keeps a distinct hue for visual hierarchy; we use the full
+// Notion-safe token set so there are no raw neon values in the file.
 const SECTIONS = [
   {
     title: "Closures",
-    color: "#7c6af7",
+    color: C.accent,
+    bg: C.accentSubtle,
+    border: C.border,
     points: [
       "A closure is a function that retains access to its outer scope after the outer function returns.",
       "Created every time a function is created, at function creation time.",
@@ -42,7 +48,9 @@ c.val(); // 2`,
   },
   {
     title: "Event Loop",
-    color: "#6af7c0",
+    color: C.green,
+    bg: C.greenSubtle,
+    border: C.greenBorder,
     points: [
       "JavaScript is single-threaded with a non-blocking event loop.",
       "Call stack → Microtasks (all) → Next macrotask → Microtasks → ...",
@@ -57,7 +65,9 @@ console.log('4');
   },
   {
     title: "Promises & async/await",
-    color: "#f7c76a",
+    color: C.amber,
+    bg: C.amberSubtle,
+    border: C.amberBorder,
     points: [
       "Promise states: pending → fulfilled / rejected. Immutable once settled.",
       "Combinators: Promise.all (all resolve), .race (first settles), .allSettled (all done), .any (first resolves).",
@@ -76,7 +86,9 @@ const [a, b] = await Promise.all([
   },
   {
     title: "this Keyword",
-    color: "#f76a6a",
+    color: C.red,
+    bg: C.redSubtle,
+    border: C.redBorder,
     points: [
       "this is determined by HOW a function is called, not where defined.",
       "Global: window (browser) or undefined (strict mode).",
@@ -94,7 +106,9 @@ fn.call(obj); // 42`,
   },
   {
     title: "Prototypal Inheritance",
-    color: "#a78bfa",
+    color: C.accentText,
+    bg: C.accentSubtle,
+    border: C.border,
     points: [
       "Every object has [[Prototype]]. Lookup walks chain until null.",
       "Object.create(proto) — creates object with proto as prototype.",
@@ -110,7 +124,9 @@ dog.speak(); // walks chain → '...'`,
   },
   {
     title: "var / let / const",
-    color: "#6af7c0",
+    color: C.green,
+    bg: C.greenSubtle,
+    border: C.greenBorder,
     points: [
       "var: function-scoped, hoisted (initialized as undefined), redeclarable.",
       "let: block-scoped, hoisted but in Temporal Dead Zone, not redeclarable.",
@@ -125,7 +141,9 @@ z = []; // ❌ TypeError`,
   },
   {
     title: "Array Methods",
-    color: "#f7c76a",
+    color: C.amber,
+    bg: C.amberSubtle,
+    border: C.amberBorder,
     points: [
       "map — transform each element, returns new array of same length.",
       "filter — keep matching elements, returns smaller array.",
@@ -140,7 +158,9 @@ nums.find(n => n > 3);     // 4`,
   },
   {
     title: "Hoisting",
-    color: "#f76a6a",
+    color: C.red,
+    bg: C.redSubtle,
+    border: C.redBorder,
     points: [
       "function declarations: fully hoisted (callable before declaration).",
       "var declarations: hoisted, initialized as undefined.",
@@ -158,7 +178,9 @@ let x = 5;`,
   },
   {
     title: "Destructuring & Spread",
-    color: "#7c6af7",
+    color: C.accent,
+    bg: C.accentSubtle,
+    border: C.border,
     points: [
       "Array destructuring: const [a, b] = [1, 2];",
       "Object destructuring: const { name, age = 0 } = person;",
@@ -177,7 +199,9 @@ const merged = { ...defaults, ...overrides };`,
   },
   {
     title: "Debounce vs Throttle",
-    color: "#f97316",
+    color: C.orange,
+    bg: C.amberSubtle,
+    border: C.amberBorder,
     points: [
       "Debounce: fires AFTER the user stops triggering. Best for: search, resize, form validation.",
       "Throttle: fires at most once per interval. Best for: scroll, mousemove.",
@@ -215,22 +239,24 @@ export default function CheatsheetPage() {
           maxWidth: "64rem",
           margin: "0 auto",
           padding: "2.5rem 1.25rem",
-          color: "#c8c8d8",
+          color: C.text,
         }}
       >
         {/* Breadcrumb */}
         <nav
           style={{
             fontSize: "0.8125rem",
-            color: "rgba(255,255,255,0.4)",
+            color: C.muted,
             marginBottom: "2rem",
           }}
         >
-          <Link href="/" style={{ color: "#7c6af7", textDecoration: "none" }}>
+          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
             JSPrep Pro
           </Link>
-          <span style={{ margin: "0 0.375rem" }}>›</span>
-          <span>JavaScript Interview Cheat Sheet</span>
+          <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
+          <span style={{ color: C.muted }}>
+            JavaScript Interview Cheat Sheet
+          </span>
         </nav>
 
         {/* Hero */}
@@ -238,10 +264,10 @@ export default function CheatsheetPage() {
           <div
             style={{
               fontSize: "0.75rem",
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "#7c6af7",
+              color: C.accentText,
               marginBottom: "0.625rem",
             }}
           >
@@ -250,15 +276,16 @@ export default function CheatsheetPage() {
           <h1
             style={{
               fontSize: "clamp(1.75rem, 5vw, 3rem)",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               lineHeight: 1.15,
               marginBottom: "0.875rem",
+              letterSpacing: "-0.025em",
             }}
           >
             JavaScript Interview
             <br />
-            <span style={{ color: "#7c6af7" }}>Cheat Sheet 2025</span>
+            <span style={{ color: C.accent }}>Cheat Sheet 2025</span>
           </h1>
           <p
             style={{
@@ -266,7 +293,7 @@ export default function CheatsheetPage() {
               maxWidth: "40rem",
               margin: "0 auto 1.5rem",
               lineHeight: 1.75,
-              color: "rgba(255,255,255,0.6)",
+              color: C.muted,
             }}
           >
             A complete quick-reference for every JavaScript concept you need to
@@ -286,9 +313,9 @@ export default function CheatsheetPage() {
               href="/auth"
               style={{
                 fontSize: "0.875rem",
-                color: "rgba(124,106,247,0.7)",
+                color: C.accentText,
                 textDecoration: "none",
-                fontWeight: 600,
+                fontWeight: 500,
               }}
             >
               Or practice these concepts interactively →
@@ -296,7 +323,7 @@ export default function CheatsheetPage() {
           </div>
         </header>
 
-        {/* Topics covered */}
+        {/* Topic anchor chips */}
         <div
           style={{
             display: "flex",
@@ -314,11 +341,11 @@ export default function CheatsheetPage() {
                 fontSize: "0.75rem",
                 padding: "0.25rem 0.875rem",
                 borderRadius: "9999px",
-                border: `1px solid ${s.color}33`,
-                background: s.color + "0f",
+                border: `1px solid ${s.border}`,
+                background: s.bg,
                 color: s.color,
                 textDecoration: "none",
-                fontWeight: 700,
+                fontWeight: 600,
               }}
             >
               {s.title}
@@ -332,7 +359,7 @@ export default function CheatsheetPage() {
             display: "grid",
             gridTemplateColumns:
               "repeat(auto-fill, minmax(min(100%, 30rem), 1fr))",
-            gap: "1.5rem",
+            gap: "1.25rem",
             marginBottom: "3rem",
           }}
         >
@@ -341,24 +368,25 @@ export default function CheatsheetPage() {
               key={section.title}
               id={section.title.toLowerCase().replace(/\s+/g, "-")}
               style={{
-                background: "#111118",
-                border: `1px solid ${section.color}22`,
+                background: C.bg,
+                border: `1px solid ${section.border}`,
                 borderTop: `3px solid ${section.color}`,
-                borderRadius: "1rem",
-                padding: "1.5rem",
+                borderRadius: "0.75rem",
+                padding: "1.375rem",
                 pageBreakInside: "avoid",
                 breakInside: "avoid",
               }}
             >
               <h2
                 style={{
-                  fontSize: "1.0625rem",
-                  fontWeight: 900,
+                  fontSize: "1rem",
+                  fontWeight: 700,
                   color: section.color,
                   marginBottom: "1rem",
                   display: "flex",
                   alignItems: "center",
                   gap: "0.5rem",
+                  letterSpacing: "-0.01em",
                 }}
               >
                 {section.title}
@@ -375,7 +403,7 @@ export default function CheatsheetPage() {
                 {section.points.map((point, i) => (
                   <li
                     key={i}
-                    style={{ marginBottom: "0.375rem" }}
+                    style={{ marginBottom: "0.375rem", color: C.text }}
                     dangerouslySetInnerHTML={{ __html: point }}
                   />
                 ))}
@@ -383,15 +411,15 @@ export default function CheatsheetPage() {
 
               <pre
                 style={{
-                  background: "#080810",
-                  border: `1px solid rgba(255,255,255,0.07)`,
-                  borderLeft: `3px solid ${section.color}66`,
-                  borderRadius: "0.625rem",
+                  background: C.codeBg,
+                  border: `1px solid ${C.border}`,
+                  borderLeft: `3px solid ${section.color}`,
+                  borderRadius: "0.5rem",
                   padding: "0.875rem",
                   overflowX: "auto",
                   fontSize: "0.725rem",
                   lineHeight: 1.7,
-                  color: "#e2e8f0",
+                  color: C.codeText,
                   fontFamily: "'JetBrains Mono', monospace",
                   margin: 0,
                 }}
@@ -402,22 +430,23 @@ export default function CheatsheetPage() {
           ))}
         </main>
 
-        {/* More to study */}
+        {/* What's not covered */}
         <section
           style={{
-            background: "#111118",
-            border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: "1rem",
+            background: C.bgSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.875rem",
             padding: "2rem",
             marginBottom: "2.5rem",
           }}
         >
           <h2
             style={{
-              fontSize: "1.125rem",
-              fontWeight: 800,
-              color: "white",
+              fontSize: "1.0625rem",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "1rem",
+              letterSpacing: "-0.01em",
             }}
           >
             What's Not Covered Here
@@ -426,7 +455,7 @@ export default function CheatsheetPage() {
             style={{
               fontSize: "0.9375rem",
               marginBottom: "1rem",
-              color: "rgba(255,255,255,0.6)",
+              color: C.muted,
               lineHeight: 1.75,
             }}
           >
@@ -462,10 +491,10 @@ export default function CheatsheetPage() {
                 text: 'All "this" keyword interview questions',
               },
             ].map(({ href, text }) => (
-              <li key={href}>
+              <li key={href} style={{ color: C.muted }}>
                 <Link
                   href={href}
-                  style={{ color: "#7c6af7", textDecoration: "none" }}
+                  style={{ color: C.accent, textDecoration: "none" }}
                 >
                   {text}
                 </Link>
@@ -474,13 +503,12 @@ export default function CheatsheetPage() {
           </ul>
         </section>
 
-        {/* CTA */}
+        {/* Bottom CTA */}
         <section
           style={{
-            background:
-              "linear-gradient(135deg, rgba(124,106,247,0.15), rgba(106,247,192,0.08))",
-            border: "1px solid rgba(124,106,247,0.25)",
-            borderRadius: "1.25rem",
+            background: C.accentSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "1rem",
             padding: "2.5rem",
             textAlign: "center",
           }}
@@ -488,20 +516,21 @@ export default function CheatsheetPage() {
           <h2
             style={{
               fontSize: "1.5rem",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "0.75rem",
+              letterSpacing: "-0.02em",
             }}
           >
             Ready to Test Yourself?
           </h2>
           <p
             style={{
-              color: "rgba(255,255,255,0.55)",
-              marginBottom: "1.5rem",
+              color: C.muted,
               maxWidth: "36rem",
               margin: "0 auto 1.5rem",
               fontSize: "0.9375rem",
+              lineHeight: 1.7,
             }}
           >
             This cheat sheet gives you the concepts. JSPrep Pro makes you
@@ -512,11 +541,11 @@ export default function CheatsheetPage() {
             href="/auth"
             style={{
               display: "inline-flex",
-              padding: "0.875rem 2rem",
-              background: "#7c6af7",
-              color: "white",
-              borderRadius: "0.875rem",
-              fontWeight: 800,
+              padding: "0.75rem 1.875rem",
+              background: C.accent,
+              color: "#ffffff",
+              borderRadius: "0.625rem",
+              fontWeight: 600,
               textDecoration: "none",
               fontSize: "1rem",
             }}
@@ -526,25 +555,17 @@ export default function CheatsheetPage() {
         </section>
       </div>
 
-      {/* Print / PDF styles */}
+      {/* ─── Print / PDF styles ────────────────────────────────────────────────── */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
         code { font-family: 'JetBrains Mono', 'Courier New', monospace; }
 
         @media print {
-          /* ── Hide site chrome ── */
-          .no-print,
-          nav, header,
-          footer,
-          [class*="navbar"],
-          [class*="Navbar"] { display: none !important; }
+          .no-print, nav, header, footer,
+          [class*="navbar"], [class*="Navbar"] { display: none !important; }
 
-          /* ── Page setup ── */
-          @page {
-            size: A4;
-            margin: 1.5cm 1.4cm;
-          }
+          @page { size: A4; margin: 1.5cm 1.4cm; }
 
           html, body {
             background: white !important;
@@ -554,7 +575,6 @@ export default function CheatsheetPage() {
             print-color-adjust: exact;
           }
 
-          /* ── Layout: 2 column grid ── */
           body > * > main,
           div[style*="max-width"] {
             display: block !important;
@@ -570,11 +590,10 @@ export default function CheatsheetPage() {
             margin: 0 !important;
           }
 
-          /* ── Section cards ── */
           section {
             background: white !important;
             border: 1.5px solid #ddd !important;
-            border-top: 3px solid #7c6af7 !important;
+            border-top: 3px solid #2383e2 !important;
             border-radius: 6px !important;
             padding: 0.7rem !important;
             break-inside: avoid !important;
@@ -582,69 +601,48 @@ export default function CheatsheetPage() {
             margin: 0 !important;
           }
 
-          /* ── Typography ── */
-          h1 {
-            font-size: 20pt !important;
-            color: #111 !important;
-            text-align: center;
-            margin-bottom: 0.25rem !important;
-          }
+          h1 { font-size: 20pt !important; color: #111 !important; text-align: center; margin-bottom: 0.25rem !important; }
           h2 {
-            font-size: 10pt !important;
-            color: #7c6af7 !important;
-            margin: 0 0 0.4rem !important;
-            padding-bottom: 0.25rem;
+            font-size: 10pt !important; color: #2383e2 !important;
+            margin: 0 0 0.4rem !important; padding-bottom: 0.25rem;
             border-bottom: 1px solid #eee;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            text-transform: uppercase; letter-spacing: 0.04em;
           }
-          p { color: #333 !important; font-size: 9pt !important; line-height: 1.5; margin: 0 0 0.25rem; }
+          p { color: #37352f !important; font-size: 9pt !important; line-height: 1.5; margin: 0 0 0.25rem; }
           ul { padding-left: 1rem; margin: 0 0 0.4rem; }
-          li { color: #333 !important; font-size: 8.5pt !important; line-height: 1.5; margin-bottom: 2px; }
+          li { color: #37352f !important; font-size: 8.5pt !important; line-height: 1.5; margin-bottom: 2px; }
 
-          /* ── Code blocks ── */
           pre {
-            background: #f4f4f8 !important;
-            border: 1px solid #ddd !important;
+            background: #f7f7f5 !important;
+            border: 1px solid #e9e9e7 !important;
             border-radius: 4px !important;
             padding: 0.4rem 0.6rem !important;
             font-size: 7.5pt !important;
-            color: #222 !important;
+            color: #37352f !important;
             overflow: visible !important;
             white-space: pre-wrap !important;
             margin: 0.25rem 0 !important;
           }
           code {
-            background: #f0f0f5 !important;
-            color: #5b21b6 !important;
-            padding: 1px 3px !important;
-            border-radius: 2px !important;
-            font-size: 7.5pt !important;
+            background: #efefee !important; color: #37352f !important;
+            padding: 1px 3px !important; border-radius: 2px !important; font-size: 7.5pt !important;
           }
-          pre code { background: none !important; color: #222 !important; padding: 0 !important; }
+          pre code { background: none !important; color: #37352f !important; padding: 0 !important; }
 
-          /* ── Decorative badges / chips — keep colours ── */
           span[style*="border-radius: 9999px"],
           span[style*="borderRadius: 9999px"] {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
 
-          /* ── Footer watermark ── */
           body::after {
             content: "jsprep.pro — JavaScript Interview Cheat Sheet 2025";
-            display: block;
-            text-align: center;
-            font-size: 7pt;
-            color: #999;
-            margin-top: 1rem;
-            border-top: 1px solid #eee;
-            padding-top: 0.5rem;
+            display: block; text-align: center;
+            font-size: 7pt; color: #787774;
+            margin-top: 1rem; border-top: 1px solid #e9e9e7; padding-top: 0.5rem;
           }
 
-          /* ── Hide non-content sections ── */
-          section:last-of-type,
-          header,
+          section:last-of-type, header,
           nav[aria-label],
           [data-print-hide="true"] { display: none !important; }
         }

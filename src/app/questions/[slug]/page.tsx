@@ -9,15 +9,14 @@ import {
   catToSlug,
   SITE,
 } from "@/lib/seo/seo";
-
 import type { Question } from "@/types/question";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
+import { C, RADIUS } from "@/styles/tokens";
 
 interface Props {
   params: { slug: string };
 }
 
-// ─── Slug helper — must match /q/[slug]/page.tsx ──────────────────────────────
 function toSlug(text: string): string {
   return text
     .toLowerCase()
@@ -29,7 +28,6 @@ function toSlug(text: string): string {
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
-  // Only theory categories — output/debug categories have their own dedicated pages
   const { questions } = await getQuestions({
     filters: { status: "published", type: "theory" },
     pageSize: 300,
@@ -39,7 +37,6 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // Only match theory categories
   const { questions: qs } = await getQuestions({
     filters: { status: "published", type: "theory" },
     pageSize: 300,
@@ -59,11 +56,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryQuestionsPage({ params }: Props) {
-  // Only theory questions live at /questions/[slug]
   const { questions: allTheory } = await getQuestions({
     filters: { status: "published", type: "theory" },
     pageSize: 300,
   }).catch(() => ({ questions: [] }));
+
   const theoryCats = [...new Set(allTheory.map((q: any) => q.category))];
   const cat = theoryCats.find((c: string) => catToSlug(c) === params.slug);
   if (!cat) notFound();
@@ -83,11 +80,28 @@ export default async function CategoryQuestionsPage({ params }: Props) {
       .slice(0, 300),
   }));
 
+  // Semantic diff badge — uses C tokens
   const diffBadge = (difficulty: string) => {
     if (difficulty === "advanced" || difficulty === "expert")
-      return { label: "Advanced", color: "#f7c76a" };
-    if (difficulty === "core") return { label: "Core", color: "#7c6af7" };
-    return { label: "Beginner", color: "#6af7c0" };
+      return {
+        label: "Advanced",
+        color: C.amber,
+        bg: C.amberSubtle,
+        border: C.amberBorder,
+      };
+    if (difficulty === "core")
+      return {
+        label: "Core",
+        color: C.accent,
+        bg: C.accentSubtle,
+        border: C.border,
+      };
+    return {
+      label: "Beginner",
+      color: C.green,
+      bg: C.greenSubtle,
+      border: C.greenBorder,
+    };
   };
 
   return (
@@ -115,38 +129,40 @@ export default async function CategoryQuestionsPage({ params }: Props) {
           maxWidth: "56rem",
           margin: "0 auto",
           padding: "2.5rem 1.25rem",
-          color: "#c8c8d8",
+          color: C.text,
         }}
       >
+        {/* Breadcrumb */}
         <nav
           style={{
             fontSize: "0.8125rem",
-            color: "rgba(255,255,255,0.4)",
+            color: C.muted,
             marginBottom: "2rem",
           }}
         >
-          <Link href="/" style={{ color: "#7c6af7", textDecoration: "none" }}>
+          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
             JSPrep Pro
           </Link>
-          <span style={{ margin: "0 0.375rem" }}>›</span>
+          <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
           <Link
             href="/javascript-interview-questions"
-            style={{ color: "#7c6af7", textDecoration: "none" }}
+            style={{ color: C.accent, textDecoration: "none" }}
           >
             JS Interview Questions
           </Link>
-          <span style={{ margin: "0 0.375rem" }}>›</span>
-          <span>{cat}</span>
+          <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
+          <span style={{ color: C.muted }}>{cat}</span>
         </nav>
 
+        {/* Header */}
         <header style={{ marginBottom: "2.5rem" }}>
           <div
             style={{
               fontSize: "0.75rem",
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: "#7c6af7",
+              color: C.accentText,
               marginBottom: "0.625rem",
             }}
           >
@@ -155,15 +171,16 @@ export default async function CategoryQuestionsPage({ params }: Props) {
           <h1
             style={{
               fontSize: "clamp(1.625rem, 4vw, 2.5rem)",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               lineHeight: 1.2,
               marginBottom: "0.875rem",
+              letterSpacing: "-0.025em",
             }}
           >
             {cat} Interview Questions
             <br />
-            <span style={{ color: "#7c6af7" }}>
+            <span style={{ color: C.accent }}>
               With Answers & Code Examples
             </span>
           </h1>
@@ -172,13 +189,12 @@ export default async function CategoryQuestionsPage({ params }: Props) {
               fontSize: "1rem",
               lineHeight: 1.75,
               maxWidth: "42rem",
+              color: C.muted,
               marginBottom: "1.5rem",
             }}
           >
             {catQuestions.length} carefully curated{" "}
-            <strong style={{ color: "white" }}>
-              {cat} interview questions
-            </strong>{" "}
+            <strong style={{ color: C.text }}>{cat} interview questions</strong>{" "}
             with working code examples and real interview gotchas.
           </p>
           <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
@@ -188,11 +204,11 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                padding: "0.625rem 1.25rem",
-                background: "#7c6af7",
-                color: "white",
-                borderRadius: "0.75rem",
-                fontWeight: 800,
+                padding: "0.5625rem 1.125rem",
+                background: C.accent,
+                color: "#ffffff",
+                borderRadius: "0.625rem",
+                fontWeight: 600,
                 textDecoration: "none",
                 fontSize: "0.9rem",
               }}
@@ -205,10 +221,10 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                padding: "0.625rem 1.25rem",
-                border: "1px solid rgba(255,255,255,0.1)",
-                color: "rgba(255,255,255,0.7)",
-                borderRadius: "0.75rem",
+                padding: "0.5625rem 1.125rem",
+                border: `1px solid ${C.border}`,
+                color: C.muted,
+                borderRadius: "0.625rem",
                 textDecoration: "none",
                 fontSize: "0.9rem",
               }}
@@ -218,37 +234,38 @@ export default async function CategoryQuestionsPage({ params }: Props) {
           </div>
         </header>
 
+        {/* Difficulty summary row */}
         <div
           style={{
             display: "flex",
             gap: "1.5rem",
             flexWrap: "wrap",
-            padding: "1rem 1.25rem",
-            background: "#111118",
-            border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: "0.875rem",
+            padding: "0.875rem 1.125rem",
+            background: C.bgSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.75rem",
             marginBottom: "2.5rem",
             fontSize: "0.8125rem",
           }}
         >
           <span>
-            <strong style={{ color: "white" }}>{catQuestions.length}</strong>{" "}
-            <span style={{ color: "rgba(255,255,255,0.5)" }}>questions</span>
+            <strong style={{ color: C.text }}>{catQuestions.length}</strong>{" "}
+            <span style={{ color: C.muted }}>questions</span>
           </span>
           <span>
-            <strong style={{ color: "#6af7c0" }}>
+            <strong style={{ color: C.green }}>
               {catQuestions.filter((q) => q.difficulty === "beginner").length}
             </strong>{" "}
-            <span style={{ color: "rgba(255,255,255,0.5)" }}>beginner</span>
+            <span style={{ color: C.muted }}>beginner</span>
           </span>
           <span>
-            <strong style={{ color: "#7c6af7" }}>
+            <strong style={{ color: C.accent }}>
               {catQuestions.filter((q) => q.difficulty === "core").length}
             </strong>{" "}
-            <span style={{ color: "rgba(255,255,255,0.5)" }}>core</span>
+            <span style={{ color: C.muted }}>core</span>
           </span>
           <span>
-            <strong style={{ color: "#f7c76a" }}>
+            <strong style={{ color: C.amber }}>
               {
                 catQuestions.filter(
                   (q: Question) =>
@@ -256,14 +273,14 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                 ).length
               }
             </strong>{" "}
-            <span style={{ color: "rgba(255,255,255,0.5)" }}>advanced</span>
+            <span style={{ color: C.muted }}>advanced</span>
           </span>
         </div>
 
+        {/* Questions */}
         <main>
           {catQuestions.map((q: Question, i: number) => {
             const diff = diffBadge(q.difficulty);
-            const qSlug = q.slug;
             const plainAnswer = (q.answer ?? "")
               .replace(/<[^>]*>/g, "")
               .replace(/\s+/g, " ")
@@ -279,15 +296,16 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                   paddingBottom: "3rem",
                   borderBottom:
                     i < catQuestions.length - 1
-                      ? "1px solid rgba(255,255,255,0.06)"
+                      ? `1px solid ${C.border}`
                       : "none",
                 }}
               >
+                {/* Badge row */}
                 <div
                   style={{
                     display: "flex",
                     alignItems: "flex-start",
-                    gap: "0.75rem",
+                    gap: "0.5rem",
                     marginBottom: "0.875rem",
                     flexWrap: "wrap",
                   }}
@@ -295,11 +313,11 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                   <span
                     style={{
                       fontSize: "0.6875rem",
-                      fontWeight: 800,
+                      fontWeight: 600,
                       letterSpacing: "0.06em",
-                      background: "rgba(124,106,247,0.12)",
-                      border: "1px solid rgba(124,106,247,0.25)",
-                      color: "#7c6af7",
+                      background: C.accentSubtle,
+                      border: `1px solid ${C.border}`,
+                      color: C.accentText,
                       padding: "0.125rem 0.5rem",
                       borderRadius: "0.3125rem",
                     }}
@@ -309,9 +327,9 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                   <span
                     style={{
                       fontSize: "0.6875rem",
-                      fontWeight: 700,
-                      background: diff.color + "15",
-                      border: `1px solid ${diff.color}30`,
+                      fontWeight: 600,
+                      background: diff.bg,
+                      border: `1px solid ${diff.border}`,
                       color: diff.color,
                       padding: "0.125rem 0.5rem",
                       borderRadius: "0.3125rem",
@@ -325,10 +343,11 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                   itemProp="name"
                   style={{
                     fontSize: "1.125rem",
-                    fontWeight: 800,
-                    color: "white",
+                    fontWeight: 600,
+                    color: C.text,
                     marginBottom: "1rem",
                     lineHeight: 1.4,
+                    letterSpacing: "-0.01em",
                   }}
                 >
                   {q.title}
@@ -338,9 +357,9 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                   <div
                     style={{
                       fontSize: "0.8125rem",
-                      color: "#6af7c0",
-                      background: "rgba(106,247,192,0.06)",
-                      border: "1px solid rgba(106,247,192,0.15)",
+                      color: C.green,
+                      background: C.greenSubtle,
+                      border: `1px solid ${C.greenBorder}`,
                       borderRadius: "0.5rem",
                       padding: "0.5rem 0.875rem",
                       marginBottom: "1rem",
@@ -362,7 +381,7 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                   />
                 </div>
 
-                {/* ── Practice → /q/[slug], never /auth ── */}
+                {/* Practice link */}
                 <div
                   style={{
                     marginTop: "1.25rem",
@@ -373,22 +392,22 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                   }}
                 >
                   <Link
-                    href={`/q/${qSlug}`}
+                    href={`/q/${q.slug}`}
                     style={{
                       fontSize: "0.75rem",
-                      color: "#7c6af7",
-                      border: "1px solid rgba(124,106,247,0.3)",
+                      color: C.accent,
+                      border: `1px solid ${C.border}`,
                       padding: "0.3125rem 0.875rem",
                       borderRadius: "0.375rem",
                       textDecoration: "none",
-                      fontWeight: 700,
+                      fontWeight: 500,
+                      background: C.accentSubtle,
                     }}
                   >
                     Practice this question →
                   </Link>
                 </div>
 
-                {/* ── Inline AI evaluator — auth-aware ── */}
                 <InlineEvaluator
                   question={q.title}
                   idealAnswer={plainAnswer}
@@ -399,13 +418,17 @@ export default async function CategoryQuestionsPage({ params }: Props) {
           })}
         </main>
 
+        {/* Related topics */}
         <section style={{ marginTop: "1rem", marginBottom: "3rem" }}>
           <h2
             style={{
-              fontSize: "1.125rem",
-              fontWeight: 800,
-              color: "white",
+              fontSize: "1.0625rem",
+              fontWeight: 600,
+              color: C.text,
               marginBottom: "1rem",
+              letterSpacing: "-0.01em",
+              paddingBottom: "0.75rem",
+              borderBottom: `1px solid ${C.border}`,
             }}
           >
             Other JavaScript Interview Topics
@@ -419,12 +442,12 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                   href={`/questions/${slug}`}
                   style={{
                     fontSize: "0.8125rem",
-                    color: "#7c6af7",
-                    border: "1px solid rgba(124,106,247,0.25)",
+                    color: C.accent,
+                    border: `1px solid ${C.border}`,
                     padding: "0.375rem 0.875rem",
                     borderRadius: "0.5rem",
                     textDecoration: "none",
-                    background: "rgba(124,106,247,0.06)",
+                    background: C.accentSubtle,
                   }}
                 >
                   {c} →
@@ -433,11 +456,12 @@ export default async function CategoryQuestionsPage({ params }: Props) {
           </div>
         </section>
 
+        {/* Bottom CTA */}
         <section
           style={{
-            background: "rgba(124,106,247,0.08)",
-            border: "1px solid rgba(124,106,247,0.2)",
-            borderRadius: "1.25rem",
+            background: C.accentSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.875rem",
             padding: "2rem",
             textAlign: "center",
             marginBottom: "2rem",
@@ -446,18 +470,20 @@ export default async function CategoryQuestionsPage({ params }: Props) {
           <h2
             style={{
               fontSize: "1.375rem",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "0.625rem",
+              letterSpacing: "-0.02em",
             }}
           >
             Ready to practice {cat}?
           </h2>
           <p
             style={{
-              color: "rgba(255,255,255,0.55)",
+              color: C.muted,
               marginBottom: "1.25rem",
               fontSize: "0.9375rem",
+              lineHeight: 1.7,
             }}
           >
             Get AI feedback on your answers, predict code output, and fix real
@@ -467,12 +493,13 @@ export default async function CategoryQuestionsPage({ params }: Props) {
             href="/auth"
             style={{
               display: "inline-flex",
-              padding: "0.75rem 1.75rem",
-              background: "#7c6af7",
-              color: "white",
-              borderRadius: "0.875rem",
-              fontWeight: 800,
+              padding: "0.625rem 1.625rem",
+              background: C.accent,
+              color: "#ffffff",
+              borderRadius: "0.625rem",
+              fontWeight: 600,
               textDecoration: "none",
+              fontSize: "0.9375rem",
             }}
           >
             Start Free Practice →
@@ -480,17 +507,64 @@ export default async function CategoryQuestionsPage({ params }: Props) {
         </section>
       </div>
 
+      {/* ─── Answer body prose — light theme ─────────────────────────────────── */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        .answer-body p { margin: 0 0 0.75rem; line-height: 1.8; font-size: 0.9375rem; }
-        .answer-body pre { background: #0a0a14; border: 1px solid rgba(255,255,255,0.1); border-left: 3px solid #7c6af7; border-radius: 0.625rem; padding: 0.875rem 1rem; overflow-x: auto; margin: 0.875rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; line-height: 1.7; color: #e2e8f0; }
-        .answer-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; }
-        .answer-body p > code, .answer-body li > code { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); padding: 0.125rem 0.35rem; border-radius: 0.25rem; color: #6af7c0; font-size: 0.8em; }
-        .answer-body ul, .answer-body ol { padding-left: 1.5rem; margin: 0 0 0.875rem; }
-        .answer-body li { margin-bottom: 0.375rem; line-height: 1.75; }
-        .answer-body strong { color: white; }
-        .answer-body .tip { background: rgba(124,106,247,0.08); border-left: 3px solid #7c6af7; border-radius: 0 0.5rem 0.5rem 0; padding: 0.5rem 0.875rem; margin: 0.75rem 0; font-size: 0.875rem; }
+        .answer-body p {
+          margin: 0 0 0.75rem;
+          line-height: 1.8;
+          font-size: 0.9375rem;
+          color: ${C.text};
+        }
+        .answer-body pre {
+          background: ${C.codeBg};
+          border: 1px solid ${C.border};
+          border-left: 3px solid ${C.accent};
+          border-radius: 0.625rem;
+          padding: 0.875rem 1rem;
+          overflow-x: auto;
+          margin: 0.875rem 0;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.8125rem;
+          line-height: 1.7;
+          color: ${C.codeText};
+        }
+        .answer-body code {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.8125rem;
+        }
+        .answer-body p > code,
+        .answer-body li > code {
+          background: ${C.codeInlineBg};
+          border: 1px solid ${C.border};
+          padding: 0.125rem 0.35rem;
+          border-radius: 0.25rem;
+          color: ${C.codeText};
+          font-size: 0.8em;
+        }
+        .answer-body ul, .answer-body ol {
+          padding-left: 1.5rem;
+          margin: 0 0 0.875rem;
+        }
+        .answer-body li {
+          margin-bottom: 0.375rem;
+          line-height: 1.75;
+          color: ${C.text};
+        }
+        .answer-body strong {
+          color: ${C.text};
+          font-weight: 600;
+        }
+        .answer-body .tip {
+          background: ${C.accentSubtle};
+          border-left: 3px solid ${C.accent};
+          border-radius: 0 0.5rem 0.5rem 0;
+          padding: 0.5rem 0.875rem;
+          margin: 0.75rem 0;
+          font-size: 0.875rem;
+          color: ${C.accentText};
+        }
       `,
         }}
       />

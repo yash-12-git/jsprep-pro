@@ -27,37 +27,25 @@ const DIFF_COLORS: Record<
   string,
   { bg: string; color: string; border: string }
 > = {
-  beginner: {
-    bg: `${C.accent3}12`,
-    color: C.accent3,
-    border: `${C.accent3}33`,
-  },
-  core: { bg: `${C.accent}12`, color: C.accent, border: `${C.accent}33` },
-  advanced: {
-    bg: `${C.accent2}12`,
-    color: C.accent2,
-    border: `${C.accent2}33`,
-  },
-  expert: { bg: `${C.danger}12`, color: C.danger, border: `${C.danger}33` },
+  beginner: { bg: C.greenSubtle, color: C.green, border: C.greenBorder },
+  core: { bg: C.accentSubtle, color: C.accent, border: C.border },
+  advanced: { bg: C.amberSubtle, color: C.amber, border: C.amberBorder },
+  expert: { bg: C.redSubtle, color: C.red, border: C.redBorder },
 };
 
 const S = {
   card: (mastered: boolean, open: boolean) => css`
-    background: ${C.card};
-    border: 1px solid
-      ${mastered
-        ? C.accent3 + "44"
-        : open
-          ? C.accent + "33"
-          : "rgba(255,255,255,0.07)"};
-    border-radius: ${RADIUS.xxl};
+    background: ${C.bg};
+    border: 1px solid ${mastered ? C.greenBorder : C.border};
+    border-left: 3px solid
+      ${mastered ? C.green : open ? C.accent : "transparent"};
+    border-radius: ${RADIUS.lg};
     overflow: hidden;
     transition:
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
+      border-color 0.15s ease,
+      border-left-color 0.15s ease;
     &:hover {
-      border-color: ${mastered ? C.accent3 + "66" : C.accent + "33"};
-      ${mastered ? `box-shadow: 0 0 0 1px ${C.accent3}22;` : ""}
+      border-color: ${mastered ? C.greenBorder : C.borderStrong};
     }
   `,
 
@@ -65,20 +53,24 @@ const S = {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
-    padding: 1rem 1.25rem;
+    padding: 0.875rem 1rem;
     cursor: pointer;
     user-select: none;
+    transition: background 0.12s ease;
+    &:hover {
+      background: ${C.bgHover};
+    }
   `,
 
   qNum: css`
     font-family: "JetBrains Mono", monospace;
     font-size: 0.625rem;
     font-weight: 600;
-    color: ${C.accent};
-    background: ${C.accent}14;
-    border: 1px solid ${C.accent}30;
+    color: ${C.accentText};
+    background: ${C.accentSubtle};
+    border: 1px solid ${C.border};
     padding: 0.125rem 0.5rem;
-    border-radius: 0.375rem;
+    border-radius: ${RADIUS.sm};
     flex-shrink: 0;
     margin-top: 0.1875rem;
     letter-spacing: 0.03em;
@@ -93,7 +85,7 @@ const S = {
     font-weight: 600;
     font-size: 0.875rem;
     line-height: 1.45;
-    color: white;
+    color: ${C.text};
     margin-bottom: 0.4375rem;
   `,
 
@@ -105,9 +97,9 @@ const S = {
 
   tag: (bg: string, color: string, border: string) => css`
     font-size: 0.5625rem;
-    font-weight: 700;
+    font-weight: 600;
     padding: 0.125rem 0.4375rem;
-    border-radius: 0.3125rem;
+    border-radius: ${RADIUS.sm};
     background: ${bg};
     color: ${color};
     border: 1px solid ${border};
@@ -117,35 +109,35 @@ const S = {
   chevron: (open: boolean) => css`
     flex-shrink: 0;
     color: ${C.muted};
-    transition: transform 0.25s ease;
+    transition: transform 0.22s ease;
     transform: rotate(${open ? "180deg" : "0deg"});
     margin-top: 0.1875rem;
   `,
 
   body: css`
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid ${C.border};
   `,
 
   hintBox: css`
-    margin: 0.875rem 1.25rem 0;
+    margin: 0.875rem 1rem 0;
     padding: 0.5rem 0.875rem;
-    background: ${C.accent3}0f;
-    border: 1px solid ${C.accent3}30;
-    border-radius: 0.5rem;
+    background: ${C.greenSubtle};
+    border: 1px solid ${C.greenBorder};
+    border-radius: ${RADIUS.md};
     font-size: 0.75rem;
-    color: ${C.accent3};
+    color: ${C.green};
     line-height: 1.5;
   `,
 
   answerWrap: css`
-    padding: 0.875rem 1.25rem 0.25rem;
+    padding: 0.875rem 1rem 0.25rem;
   `,
 
   proLabel: css`
     display: flex;
     align-items: center;
     gap: 0.375rem;
-    padding: 0.75rem 1.25rem;
+    padding: 0.75rem 1rem;
     font-size: 0.75rem;
     color: ${C.muted};
   `,
@@ -154,26 +146,26 @@ const S = {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    background: ${C.accent2}18;
-    border: 1px solid ${C.accent2}44;
-    color: ${C.accent2};
+    background: ${C.amberSubtle};
+    border: 1px solid ${C.amberBorder};
+    color: ${C.amber};
     font-size: 0.5625rem;
-    font-weight: 900;
+    font-weight: 700;
     padding: 0.125rem 0.4rem;
-    border-radius: 0.25rem;
+    border-radius: ${RADIUS.sm};
     letter-spacing: 0.05em;
     flex-shrink: 0;
   `,
 
   masteredBanner: css`
-    margin: 0 1.25rem 0.625rem;
+    margin: 0 1rem 0.625rem;
     padding: 0.375rem 0.75rem;
-    background: ${C.accent3}0f;
-    border: 1px solid ${C.accent3}25;
-    border-radius: 0.5rem;
+    background: ${C.greenSubtle};
+    border: 1px solid ${C.greenBorder};
+    border-radius: ${RADIUS.md};
     font-size: 0.6875rem;
-    color: ${C.accent3};
-    font-weight: 700;
+    color: ${C.green};
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 0.375rem;
@@ -225,7 +217,7 @@ export default function QuestionCard({
         <div css={S.meta}>
           <p css={S.title}>
             {isMastered && (
-              <span style={{ color: C.accent3, marginRight: "0.3rem" }}>✓</span>
+              <span style={{ color: C.green, marginRight: "0.3rem" }}>✓</span>
             )}
             {question.title}
           </p>
@@ -233,9 +225,7 @@ export default function QuestionCard({
             <span css={S.tag(diffStyle.bg, diffStyle.color, diffStyle.border)}>
               {question.difficulty}
             </span>
-            <span
-              css={S.tag(`${C.accent}12`, `${C.accent}99`, `${C.accent}22`)}
-            >
+            <span css={S.tag(C.bgSubtle, C.muted, C.border)}>
               {question.category}
             </span>
             {question.isPro && !isPro && (
@@ -256,30 +246,20 @@ export default function QuestionCard({
         <div css={S.body}>
           {isMastered && (
             <div css={S.masteredBanner}>
-              <Star size={12} fill={C.accent3} />
+              <Star size={12} fill={C.green} color={C.green} />
               Marked as mastered
             </div>
           )}
 
-          {/* PRO + tags only visible when expanded */}
           {(question.isPro || question.tags.length > 0) && (
-            <div
-              css={[S.tags, { padding: "0.5rem 1.25rem 0", flexWrap: "wrap" }]}
-            >
+            <div css={[S.tags, { padding: "0.5rem 1rem 0", flexWrap: "wrap" }]}>
               {question.isPro && (
                 <span css={S.proBadge}>
                   <Zap size={8} /> PRO
                 </span>
               )}
               {question.tags.slice(0, 3).map((t) => (
-                <span
-                  key={t}
-                  css={S.tag(
-                    "rgba(255,255,255,0.04)",
-                    C.muted,
-                    "rgba(255,255,255,0.08)",
-                  )}
-                >
+                <span key={t} css={S.tag(C.bgSubtle, C.muted, C.border)}>
                   {t}
                 </span>
               ))}

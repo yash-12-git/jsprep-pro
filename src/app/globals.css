@@ -2,102 +2,264 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   THEME TOKENS — all colours live here, nowhere else
+   ============================================================ */
 :root {
-  --font-syne: "Syne", sans-serif;
+  /* --- Fonts --- */
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* --- Surface --- */
+  --bg-base: #ffffff;          /* page background             */
+  --bg-subtle: #f7f7f5;        /* sidebar, cards, panels      */
+  --bg-hover: #f1f1ef;         /* hover states on rows/items  */
+  --bg-active: #ebebea;        /* pressed / selected          */
+
+  /* --- Border --- */
+  --border-default: #e9e9e7;   /* standard dividers           */
+  --border-strong: #d3d3cf;    /* inputs, focused outlines    */
+
+  /* --- Text --- */
+  --text-primary: #37352f;     /* headings, body              */
+  --text-secondary: #787774;   /* captions, metadata          */
+  --text-placeholder: #b0aeab; /* input placeholders          */
+  --text-disabled: #c9c8c5;
+
+  /* --- Accent (Notion blue) --- */
+  --accent: #2383e2;           /* links, primary buttons      */
+  --accent-hover: #1a6fc4;
+  --accent-subtle: #e8f1fb;    /* tinted backgrounds          */
+  --accent-text: #1a6fc4;      /* accent-coloured labels      */
+
+  /* --- Code / Syntax --- */
+  --code-bg: #f7f7f5;
+  --code-border: #e9e9e7;
+  --code-text: #37352f;
+  --code-inline-bg: #efefee;
+
+  /* --- Feedback (tip / callout) --- */
+  --tip-bg: #edf3fb;
+  --tip-border: #2383e2;
+  --tip-text: #1a6fc4;
+
+  /* --- Scrollbar --- */
+  --scrollbar-track: #f7f7f5;
+  --scrollbar-thumb: #d3d3cf;
+  --scrollbar-thumb-hover: #a0a09c;
 }
 
+/* ============================================================
+   RESET / BASE
+   ============================================================ */
 * {
   box-sizing: border-box;
 }
 
 body {
-  background: #0a0a0f;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Code blocks */
+/* ============================================================
+   CODE BLOCKS
+   ============================================================ */
 pre {
-  background: #0d0d14;
-  border: 1px solid #2a2a3a;
-  border-radius: 10px;
-  padding: 16px 18px;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 6px;
+  padding: 14px 16px;
   overflow-x: auto;
   margin: 14px 0;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
-  line-height: 1.8;
-  color: #b0b0d0;
+  line-height: 1.75;
+  color: var(--code-text);
 }
 
 code {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
 }
 
+/* ============================================================
+   TIP / CALLOUT
+   ============================================================ */
 .tip {
-  background: rgba(124, 106, 247, 0.08);
-  border-left: 3px solid #7c6af7;
+  background: var(--tip-bg);
+  border-left: 3px solid var(--tip-border);
   padding: 10px 14px;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 6px 6px 0;
   margin-top: 14px;
   font-size: 13px;
-  color: #9a8cf7;
+  color: var(--tip-text);
 }
 
+/* ============================================================
+   ANSWER PROSE
+   ============================================================ */
 .answer p {
-  color: #c8c8d8;
+  color: var(--text-primary);
   font-size: 14px;
   line-height: 1.8;
   margin-bottom: 12px;
 }
+
 .answer ul {
   padding-left: 20px;
   margin-bottom: 12px;
 }
+
 .answer li {
-  color: #c8c8d8;
+  color: var(--text-primary);
   font-size: 14px;
   line-height: 1.8;
   margin-bottom: 4px;
 }
+
 .answer strong {
-  color: #e8e8f0;
+  color: var(--text-primary);
+  font-weight: 600;
 }
+
 .answer code {
-  background: rgba(124, 106, 247, 0.15);
+  background: var(--code-inline-bg);
+  color: var(--code-text);
   padding: 1px 5px;
   border-radius: 4px;
   font-size: 12px;
+  border: 1px solid var(--code-border);
 }
 
-/* Scrollbar */
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #111118;
+  background: var(--scrollbar-track);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #2a2a3a;
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #7c6af7;
+  background: var(--scrollbar-thumb-hover);
 }
 
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
 @layer utilities {
-  .font-syne {
-    font-family: var(--font-syne), sans-serif;
-  }
   .font-mono {
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--font-mono);
+  }
+  .font-sans {
+    font-family: var(--font-sans);
   }
 }
 
-/* Global animations — used by Loader2 spinner across all pages */
+/* ============================================================
+   GLOBAL ANIMATIONS
+   ============================================================ */
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
+}
+
+
+/*
+ * ─── global.css dark theme additions ──────────────────────────────────────────
+ * ThemeContext sets data-theme="dark" on <html> — these vars do the rest.
+ */
+:root {
+  --color-bg:           #ffffff;
+  --color-bg-subtle:    #f7f7f5;
+  --color-bg-hover:     #f1f1ef;
+  --color-bg-active:    #ebebea;
+  --color-border:       #e9e9e7;
+  --color-border-strong:#d3d3cf;
+  --color-text:         #37352f;
+  --color-muted:        #787774;
+  --color-placeholder:  #b0aeab;
+  --color-accent:       #2383e2;
+  --color-accent-hover: #1a6fc4;
+  --color-accent-subtle:#e8f1fb;
+  --color-accent-text:  #1a6fc4;
+  --color-code-bg:      #f7f7f5;
+  --color-code-text:    #37352f;
+  --color-code-inline-bg: #efefee;
+  --color-green:        #0f7b6c;
+  --color-green-subtle: #edf6f4;
+  --color-green-border: #c4e4df;
+  --color-amber:        #c9750c;
+  --color-amber-subtle: #fdf4e4;
+  --color-amber-border: #f5ddb0;
+  --color-red:          #d44c47;
+  --color-red-subtle:   #fdecea;
+  --color-red-border:   #f5c0bd;
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] {
+  --color-bg:           #191919;
+  --color-bg-subtle:    #1f1f1e;
+  --color-bg-hover:     #262625;
+  --color-bg-active:    #2e2e2c;
+  --color-border:       #2c2c2b;
+  --color-border-strong:#3a3a38;
+  --color-text:         #e8e6e3;
+  --color-muted:        #a1a09c;
+  --color-placeholder:  #7a7976;
+  --color-accent:       #4ea1f3;
+  --color-accent-hover: #3a8be0;
+  --color-accent-subtle:#1e2f44;
+  --color-accent-text:  #4ea1f3;
+  --color-code-bg:      #1e1e1d;
+  --color-code-text:    #e8e6e3;
+  --color-code-inline-bg: #2a2a28;
+  --color-green:        #22a08a;
+  --color-green-subtle: #1a2f2b;
+  --color-green-border: #2f5f57;
+  --color-amber:        #e0a03a;
+  --color-amber-subtle: #332714;
+  --color-amber-border: #6b5124;
+  --color-red:          #e06a65;
+  --color-red-subtle:   #3a1f1e;
+  --color-red-border:   #6a2e2b;
+}
+
+[data-theme="dark"] body {
+  background-color: #191919;
+  color: #e8e6e3;
+}
+
+[data-theme="dark"] ::selection {
+  background: #1e2f44;
+  color: #4ea1f3;
+}
+
+/* Scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar-track { background: #191919; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #3a3a38;
+  border-radius: 9999px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #4a4a48; }
+
+/* Native inputs inside dark theme */
+[data-theme="dark"] input[type="date"],
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] textarea {
+  color-scheme: dark;
 }

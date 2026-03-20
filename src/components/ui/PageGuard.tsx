@@ -3,6 +3,7 @@
 
 import * as Shared from "@/styles/shared";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
+import { C } from "@/styles/tokens";
 
 interface PageGuardProps {
   loading: boolean;
@@ -45,5 +46,14 @@ export default function PageGuard({
       </>
     );
   }
-  return <>{children}</>;
+  return (
+    <div
+      style={{
+        backgroundColor: C.bg,
+        minHeight: "100vh",
+      }}
+    >
+      {children}
+    </div>
+  );
 }

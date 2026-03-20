@@ -118,6 +118,7 @@ export default function MockInterviewPage() {
     >
       <>
         <div css={Shared.pageWrapper}>
+          {/* Back button */}
           <button
             css={{
               display: "flex",
@@ -125,22 +126,26 @@ export default function MockInterviewPage() {
               gap: "0.25rem",
               color: C.muted,
               fontSize: "0.875rem",
+              fontWeight: 500,
               background: "none",
               border: "none",
               cursor: "pointer",
               marginBottom: "1.5rem",
-              "&:hover": { color: "white" },
+              transition: "color 0.12s ease",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = C.muted)}
             onClick={() => router.push("/dashboard")}
           >
             <ChevronLeft size={16} /> Back to Questions
           </button>
 
+          {/* ── Intro ── */}
           {phase === "intro" && (
             <div css={S.startCard}>
               <div css={S.header}>
                 <div css={S.iconBox}>
-                  <Mic size={24} color={C.purple} />
+                  <Mic size={24} color={C.accent} />
                 </div>
                 <h1 css={S.title}>AI Mock Interview</h1>
                 <p css={S.subtitle}>
@@ -153,7 +158,8 @@ export default function MockInterviewPage() {
                 <p
                   css={{
                     fontSize: "0.875rem",
-                    fontWeight: 700,
+                    fontWeight: 600,
+                    color: C.text,
                     marginBottom: "1rem",
                   }}
                 >
@@ -171,7 +177,7 @@ export default function MockInterviewPage() {
                     <div key={tip} css={S.topicItem}>
                       <CheckCircle
                         size={13}
-                        color={C.accent3}
+                        color={C.green}
                         style={{ flexShrink: 0 }}
                       />
                       {tip}
@@ -189,6 +195,7 @@ export default function MockInterviewPage() {
             </div>
           )}
 
+          {/* ── Interview / Done ── */}
           {(phase === "interview" || phase === "done") && (
             <div>
               <div
@@ -199,7 +206,14 @@ export default function MockInterviewPage() {
                   marginBottom: "1rem",
                 }}
               >
-                <h2 css={{ fontWeight: 900, fontSize: "1.125rem" }}>
+                <h2
+                  css={{
+                    fontWeight: 700,
+                    fontSize: "1.125rem",
+                    color: C.text,
+                    letterSpacing: "-0.01em",
+                  }}
+                >
                   Mock Interview
                 </h2>
                 <div
@@ -230,12 +244,12 @@ export default function MockInterviewPage() {
                     <div key={i} css={S.messageRow(msg.role === "user")}>
                       <div css={S.avatar(msg.role === "user")}>
                         {msg.role === "assistant" ? (
-                          <Mic size={13} color={C.purple} />
+                          <Mic size={13} color={C.accent} />
                         ) : (
                           <span
                             css={{
                               fontSize: "0.625rem",
-                              fontWeight: 700,
+                              fontWeight: 600,
                               color: C.muted,
                             }}
                           >
@@ -251,12 +265,12 @@ export default function MockInterviewPage() {
                   {aiLoading && (
                     <div css={S.messageRow(false)}>
                       <div css={S.avatar(false)}>
-                        <Mic size={13} color={C.purple} />
+                        <Mic size={13} color={C.accent} />
                       </div>
                       <div css={S.bubble(false)}>
                         <Loader2
                           size={14}
-                          color={C.purple}
+                          color={C.accent}
                           css={{ animation: "spin 1s linear infinite" }}
                         />
                       </div>
@@ -285,7 +299,7 @@ export default function MockInterviewPage() {
                       onClick={sendAnswer}
                       disabled={!input.trim() || aiLoading}
                     >
-                      <Send size={14} color={C.purple} />
+                      <Send size={14} color={C.accentText} />
                     </button>
                   </div>
                 )}
@@ -299,7 +313,7 @@ export default function MockInterviewPage() {
                       padding: "1.5rem",
                       textAlign: "center",
                       marginTop: "1rem",
-                      borderColor: `${C.accent3}4d`,
+                      borderColor: C.greenBorder,
                     },
                   ]}
                 >
@@ -308,8 +322,9 @@ export default function MockInterviewPage() {
                   </div>
                   <p
                     css={{
-                      fontWeight: 900,
+                      fontWeight: 700,
                       fontSize: "1.125rem",
+                      color: C.text,
                       marginBottom: "0.5rem",
                     }}
                   >

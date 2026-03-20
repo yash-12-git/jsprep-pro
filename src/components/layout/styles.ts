@@ -1,24 +1,5 @@
 import { css } from "@emotion/react";
-
-// ─── Tokens ───────────────────────────────────────────────────────────────────
-// Keep colours in one place so a theme change is a one-line edit
-const C = {
-  accent: "#7c6af7",
-  accent2: "#f7c76a",
-  accent3: "#6af7c0",
-  danger: "#f76a6a",
-  purple: "#a78bfa",
-  bg: "#0a0a10",
-  card: "#111118",
-  surface: "#16161f",
-  border: "rgba(255,255,255,0.07)",
-  muted: "rgba(255,255,255,0.45)",
-};
-
-const BREAKPOINTS = {
-  md: "768px",
-  sm: "640px",
-};
+import { C, BP, RADIUS } from "@/styles/tokens";
 
 // ─── Nav shell ────────────────────────────────────────────────────────────────
 
@@ -26,17 +7,20 @@ export const nav = css`
   position: sticky;
   top: 0;
   z-index: 50;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(7, 7, 14, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid ${C.border};
+  background: ${C.bg};
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 4px 6px rgba(55, 53, 47, 0.04),
+    0 12px 32px rgba(55, 53, 47, 0.1);
 `;
 
 export const navInner = css`
   max-width: 1152px;
   margin: 0 auto;
   padding: 0 1.25rem;
-  height: 3.75rem;
+  height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -48,35 +32,34 @@ export const navInner = css`
 export const logoLink = css`
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  font-weight: 700;
+  gap: 0.5rem;
+  font-weight: 600;
   font-size: 1rem;
   text-decoration: none;
-  color: white;
+  color: ${C.text};
   flex-shrink: 0;
 `;
 
 export const logoBadge = css`
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.5rem;
-  background: linear-gradient(135deg, #7c6af7 0%, #6b59e8 100%);
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: ${RADIUS.md};
+  background: ${C.accent};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.6875rem;
-  font-weight: 900;
-  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #ffffff;
   letter-spacing: 0.02em;
-  box-shadow: 0 4px 12px rgba(124, 106, 247, 0.4);
 `;
 
 export const logoText = css`
-  font-family: "Syne", sans-serif;
-  font-size: 1.0625rem;
-  font-weight: 800;
+  font-size: 1rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
-  @media (max-width: ${BREAKPOINTS.sm}) {
+  color: ${C.text};
+  @media (max-width: ${BP.sm}) {
     display: none;
   }
 `;
@@ -91,24 +74,24 @@ export const marketingLinks = css`
   display: none;
   align-items: center;
   gap: 0.25rem;
-  @media (min-width: ${BREAKPOINTS.md}) {
+  @media (min-width: ${BP.md}) {
     display: flex;
   }
 `;
 
 export const marketingLink = css`
   padding: 0.375rem 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: ${RADIUS.md};
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  color: ${C.muted};
   text-decoration: none;
   transition:
-    color 0.15s ease,
-    background 0.15s ease;
+    color 0.12s ease,
+    background 0.12s ease;
   &:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.06);
+    color: ${C.text};
+    background: ${C.bgHover};
   }
 `;
 
@@ -123,20 +106,18 @@ export const getStartedBtn = css`
   align-items: center;
   gap: 0.375rem;
   background: ${C.accent};
-  color: white;
+  color: #ffffff;
   font-size: 0.8125rem;
-  font-weight: 700;
-  padding: 0.5rem 1rem;
-  border-radius: 0.625rem;
+  font-weight: 600;
+  padding: 0.4375rem 0.875rem;
+  border-radius: ${RADIUS.md};
   text-decoration: none;
-  box-shadow: 0 4px 14px rgba(124, 106, 247, 0.35);
-  transition: all 0.15s ease;
   white-space: nowrap;
+  transition: opacity 0.12s ease;
   &:hover {
-    background: #6b59e8;
-    box-shadow: 0 6px 18px rgba(124, 106, 247, 0.45);
+    opacity: 0.88;
   }
-  @media (max-width: ${BREAKPOINTS.sm}) {
+  @media (max-width: ${BP.sm}) {
     display: none;
   }
 `;
@@ -149,8 +130,7 @@ export const desktopLinks = css`
   gap: 0.125rem;
   flex: 1;
   justify-content: center;
-
-  @media (min-width: ${BREAKPOINTS.md}) {
+  @media (min-width: ${BP.md}) {
     display: flex;
   }
 `;
@@ -160,56 +140,56 @@ export const navLink = css`
   align-items: center;
   gap: 0.375rem;
   padding: 0.375rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  border-radius: ${RADIUS.md};
+  font-size: 0.8125rem;
+  font-weight: 500;
   color: ${C.muted};
   text-decoration: none;
-  transition:
-    color 0.15s ease,
-    background 0.15s ease;
   white-space: nowrap;
-
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
   &:hover {
-    color: white;
-    background: ${C.surface};
+    color: ${C.text};
+    background: ${C.bgHover};
   }
 `;
 
 export const navLinkActive = css`
   color: ${C.accent};
-  background: rgba(124, 106, 247, 0.15);
-
+  background: ${C.accentSubtle};
   &:hover {
     color: ${C.accent};
-    background: rgba(124, 106, 247, 0.2);
+    background: ${C.accentSubtle};
   }
 `;
 
 export const navLinkAiActive = css`
-  color: ${C.purple};
-  background: rgba(167, 139, 250, 0.15);
-
+  color: ${C.accentText};
+  background: ${C.accentSubtle};
   &:hover {
-    color: ${C.purple};
+    color: ${C.accentText};
+    background: ${C.accentSubtle};
   }
 `;
 
 export const navLinkHighlight = css`
-  color: ${C.accent2};
+  color: ${C.amber};
   &:hover {
-    color: ${C.accent2};
-    background: rgba(247, 199, 106, 0.08);
+    color: ${C.amber};
+    background: ${C.amberSubtle};
   }
 `;
 
 export const newBadge = css`
   font-size: 0.5rem;
-  background: rgba(247, 199, 106, 0.15);
-  color: ${C.accent2};
-  padding: 0.125rem 0.25rem;
-  border-radius: 0.25rem;
+  background: ${C.amberSubtle};
+  color: ${C.amber};
+  border: 1px solid ${C.amberBorder};
+  padding: 0.125rem 0.3125rem;
+  border-radius: ${RADIUS.sm};
   font-weight: 700;
+  letter-spacing: 0.04em;
 `;
 
 // ─── AI Tools dropdown ────────────────────────────────────────────────────────
@@ -223,37 +203,38 @@ export const aiDropdownTrigger = css`
   align-items: center;
   gap: 0.375rem;
   padding: 0.375rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  border-radius: ${RADIUS.md};
+  font-size: 0.8125rem;
+  font-weight: 500;
   color: ${C.muted};
   background: transparent;
   border: none;
   cursor: pointer;
   transition:
-    color 0.15s ease,
-    background 0.15s ease;
-
+    color 0.12s ease,
+    background 0.12s ease;
   &:hover {
-    color: white;
-    background: ${C.surface};
+    color: ${C.text};
+    background: ${C.bgHover};
   }
 `;
 
 export const chevron = (open: boolean) => css`
-  transition: transform 0.2s ease;
+  transition: transform 0.18s ease;
   transform: rotate(${open ? "180deg" : "0deg"});
 `;
 
 export const aiDropdownMenu = css`
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 0.375rem);
   left: 0;
-  width: 13rem;
-  background: ${C.card};
+  width: 13.5rem;
+  background: ${C.bg};
   border: 1px solid ${C.border};
-  border-radius: 0.75rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-radius: ${RADIUS.lg};
+  box-shadow:
+    0 4px 6px rgba(55, 53, 47, 0.04),
+    0 12px 32px rgba(55, 53, 47, 0.1);
   overflow: hidden;
   z-index: 50;
 `;
@@ -264,38 +245,42 @@ export const aiDropdownItem = css`
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   text-decoration: none;
-  color: white;
-  transition: background 0.15s ease;
-
+  color: ${C.text};
+  transition: background 0.12s ease;
   &:hover {
-    background: ${C.surface};
+    background: ${C.bgHover};
   }
 `;
 
 export const aiDropdownItemActive = css`
-  background: ${C.surface};
+  background: ${C.bgSubtle};
 `;
 
 export const aiIconBadge = css`
   width: 1.75rem;
   height: 1.75rem;
-  background: rgba(167, 139, 250, 0.12);
-  border-radius: 0.5rem;
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.md};
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   margin-top: 0.125rem;
+  color: ${C.accentText};
 `;
 
 export const aiDropdownLabel = css`
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 500;
+  color: ${C.text};
 `;
 
 export const aiDropdownDesc = css`
   font-size: 0.6875rem;
   color: ${C.muted};
+  margin-top: 0.125rem;
+  line-height: 1.5;
 `;
 
 // ─── Right side (avatar, streak, etc.) ───────────────────────────────────────
@@ -311,12 +296,11 @@ export const proPill = css`
   display: none;
   align-items: center;
   gap: 0.25rem;
-  background: rgba(124, 106, 247, 0.12);
-  border: 1px solid rgba(124, 106, 247, 0.25);
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
-
-  @media (min-width: ${BREAKPOINTS.sm}) {
+  @media (min-width: ${BP.sm}) {
     display: flex;
   }
 `;
@@ -324,27 +308,27 @@ export const proPill = css`
 export const proPillText = css`
   font-size: 0.625rem;
   font-weight: 700;
-  color: ${C.accent};
+  color: ${C.accentText};
+  letter-spacing: 0.04em;
 `;
 
 export const streakPill = css`
   display: none;
   align-items: center;
   gap: 0.25rem;
-  background: ${C.surface};
+  background: ${C.bgSubtle};
   border: 1px solid ${C.border};
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
-
-  @media (min-width: ${BREAKPOINTS.sm}) {
+  @media (min-width: ${BP.sm}) {
     display: flex;
   }
 `;
 
 export const streakText = css`
   font-size: 0.625rem;
-  font-weight: 700;
-  color: white;
+  font-weight: 600;
+  color: ${C.text};
 `;
 
 export const avatar = css`
@@ -352,23 +336,25 @@ export const avatar = css`
   height: 1.75rem;
   border-radius: 9999px;
   flex-shrink: 0;
+  border: 1.5px solid ${C.border};
 `;
 
 export const logoutBtn = css`
   display: none;
   padding: 0.375rem;
-  border-radius: 0.5rem;
+  border-radius: ${RADIUS.md};
   background: transparent;
   border: none;
   cursor: pointer;
   color: ${C.muted};
-  transition: color 0.15s ease;
-
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
   &:hover {
-    color: ${C.danger};
+    color: ${C.red};
+    background: ${C.redSubtle};
   }
-
-  @media (min-width: ${BREAKPOINTS.md}) {
+  @media (min-width: ${BP.md}) {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -378,11 +364,13 @@ export const logoutBtn = css`
 export const proBadge = css`
   margin-left: auto;
   font-size: 0.625rem;
-  background: rgba(247, 199, 106, 0.15);
-  color: ${C.accent2};
+  background: ${C.amberSubtle};
+  color: ${C.amber};
+  border: 1px solid ${C.amberBorder};
   padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
+  border-radius: ${RADIUS.sm};
   font-weight: 700;
+  letter-spacing: 0.04em;
 `;
 
 export const hamburgerBtn = css`
@@ -390,34 +378,37 @@ export const hamburgerBtn = css`
   align-items: center;
   justify-content: center;
   padding: 0.375rem;
-  border-radius: 0.5rem;
+  border-radius: ${RADIUS.md};
   background: transparent;
   border: none;
   cursor: pointer;
   color: ${C.muted};
-  transition: color 0.15s ease;
-
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
   &:hover {
-    color: white;
+    color: ${C.text};
+    background: ${C.bgHover};
   }
-
-  @media (min-width: ${BREAKPOINTS.md}) {
+  @media (min-width: ${BP.md}) {
     display: none;
   }
 `;
 
 export const signInBtn = css`
-  background: ${C.accent};
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  background: transparent;
+  color: ${C.muted};
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.4375rem 0.875rem;
+  border-radius: ${RADIUS.md};
   text-decoration: none;
-  transition: background 0.15s ease;
-
+  border: 1px solid ${C.border};
+  transition: all 0.12s ease;
   &:hover {
-    background: rgba(124, 106, 247, 0.85);
+    color: ${C.text};
+    border-color: ${C.borderStrong};
+    background: ${C.bgHover};
   }
 `;
 
@@ -427,14 +418,11 @@ export const mobileMenu = css`
   position: fixed;
   inset: 3.5rem 0 0 0;
   z-index: 40;
-  background: rgba(10, 10, 16, 0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: ${C.bg};
   border-bottom: 1px solid ${C.border};
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 24px rgba(55, 53, 47, 0.08);
   overflow-y: auto;
-
-  @media (min-width: ${BREAKPOINTS.md}) {
+  @media (min-width: ${BP.md}) {
     display: none;
   }
 `;
@@ -442,7 +430,7 @@ export const mobileMenu = css`
 export const mobileMenuInner = css`
   max-width: 32rem;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -452,57 +440,59 @@ export const mobileNavLink = css`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.muted};
   text-decoration: none;
   transition:
-    color 0.15s ease,
-    background 0.15s ease;
-
+    color 0.12s ease,
+    background 0.12s ease;
   &:hover {
-    color: white;
-    background: ${C.surface};
+    color: ${C.text};
+    background: ${C.bgHover};
   }
 `;
 
 export const mobileNavLinkActive = css`
   color: ${C.accent};
-  background: rgba(124, 106, 247, 0.15);
+  background: ${C.accentSubtle};
 `;
 
 export const mobileNavLinkAiActive = css`
-  color: ${C.purple};
-  background: rgba(167, 139, 250, 0.15);
+  color: ${C.accentText};
+  background: ${C.accentSubtle};
 `;
 
 export const mobileDivider = css`
   border: none;
   border-top: 1px solid ${C.border};
-  margin: 0.5rem 0;
+  margin: 0.375rem 0;
 `;
 
 export const mobileSectionLabel = css`
   font-size: 0.625rem;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: ${C.muted};
-  padding: 0 1rem;
+  padding: 0 0.875rem;
+  margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 `;
 
 export const mobileAiItemIcon = css`
   width: 1.75rem;
   height: 1.75rem;
-  background: rgba(167, 139, 250, 0.1);
-  border-radius: 0.5rem;
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.md};
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: ${C.accentText};
 `;
 
 export const mobileNavItemContent = css`
@@ -514,15 +504,18 @@ export const mobileNavItemDesc = css`
   font-size: 0.6875rem;
   color: ${C.muted};
   font-weight: 400;
+  margin-top: 0.0625rem;
+  line-height: 1.4;
 `;
 
 export const mobileProBadge = css`
   margin-left: auto;
   font-size: 0.5625rem;
-  background: rgba(247, 199, 106, 0.15);
-  color: ${C.accent2};
+  background: ${C.amberSubtle};
+  color: ${C.amber};
+  border: 1px solid ${C.amberBorder};
   padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
+  border-radius: ${RADIUS.sm};
   font-weight: 700;
 `;
 
@@ -530,20 +523,22 @@ export const mobileLogoutBtn = css`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.muted};
   background: transparent;
   border: none;
   cursor: pointer;
   width: 100%;
   text-align: left;
-  transition: color 0.15s ease;
-
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
   &:hover {
-    color: ${C.danger};
+    color: ${C.red};
+    background: ${C.redSubtle};
   }
 `;
 
@@ -558,34 +553,35 @@ export const learnDropdownTrigger = css`
   align-items: center;
   gap: 0.3125rem;
   padding: 0.375rem 0.625rem;
-  border-radius: 0.5rem;
+  border-radius: ${RADIUS.md};
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.muted};
   background: transparent;
   border: none;
   cursor: pointer;
-  transition:
-    color 0.15s ease,
-    background 0.15s ease;
   white-space: nowrap;
-
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
   &:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.06);
+    color: ${C.text};
+    background: ${C.bgHover};
   }
 `;
 
 export const learnDropdownMenu = css`
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 0.375rem);
   right: 0;
-  width: 13rem;
-  background: #13131c;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.875rem;
-  padding: 0.5rem;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  width: 13.5rem;
+  background: ${C.bg};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
+  padding: 0.375rem;
+  box-shadow:
+    0 4px 6px rgba(55, 53, 47, 0.04),
+    0 12px 32px rgba(55, 53, 47, 0.1);
   z-index: 100;
 `;
 
@@ -593,32 +589,32 @@ export const learnDropdownItem = css`
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.625rem 0.75rem;
-  border-radius: 0.625rem;
+  padding: 0.5625rem 0.75rem;
+  border-radius: ${RADIUS.md};
   font-size: 0.8125rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  color: ${C.muted};
   text-decoration: none;
   transition:
     background 0.12s ease,
     color 0.12s ease;
-
   &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: white;
+    background: ${C.bgHover};
+    color: ${C.text};
   }
 `;
 
 export const learnDropdownItemActive = css`
-  background: rgba(124, 106, 247, 0.12);
-  color: #c4b5fd;
+  background: ${C.accentSubtle};
+  color: ${C.accentText};
 `;
 
 export const learnIconBadge = css`
   width: 1.625rem;
   height: 1.625rem;
-  border-radius: 0.4375rem;
-  background: rgba(124, 106, 247, 0.15);
+  border-radius: ${RADIUS.sm};
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -627,19 +623,20 @@ export const learnIconBadge = css`
 
 export const learnDropdownLabel = css`
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: inherit;
   display: block;
 `;
 
 export const learnDropdownDesc = css`
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: ${C.muted};
   display: block;
   margin-top: 1px;
+  line-height: 1.4;
 `;
 
 export const learnNavLinkActive = css`
-  color: #6af7c0;
-  background: rgba(106, 247, 192, 0.08);
+  color: ${C.green};
+  background: ${C.greenSubtle};
 `;

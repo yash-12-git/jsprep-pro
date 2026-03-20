@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import PaywallBanner from "./PaywallBanner/page";
+import { C, RADIUS } from "@/styles/tokens";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 interface EvalResult {
   score: number;
   grade: string;
@@ -24,20 +24,20 @@ interface EvalResult {
   missing: string[];
   betterAnswer: string;
 }
-
 interface Props {
   question: string;
-  idealAnswer: string; // plain text (HTML stripped before passing)
-  label?: string; // override heading text
+  idealAnswer: string;
+  label?: string;
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
+
 const wrap = css`
   margin-top: 1.25rem;
-  border: 1px solid rgba(247, 199, 106, 0.2);
-  border-radius: 1rem;
+  border: 1px solid ${C.amberBorder};
+  border-radius: ${RADIUS.lg};
   overflow: hidden;
-  background: rgba(247, 199, 106, 0.04);
+  background: ${C.amberSubtle};
 `;
 
 const triggerBtn = css`
@@ -50,35 +50,38 @@ const triggerBtn = css`
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s;
+  transition: background 0.12s ease;
   &:hover {
-    background: rgba(247, 199, 106, 0.06);
+    background: ${C.bgHover};
   }
 `;
+
 const triggerIcon = css`
   width: 1.625rem;
   height: 1.625rem;
   border-radius: 50%;
   flex-shrink: 0;
-  background: rgba(247, 199, 106, 0.15);
-  border: 1px solid rgba(247, 199, 106, 0.25);
+  background: ${C.bg};
+  border: 1px solid ${C.amberBorder};
   display: flex;
   align-items: center;
   justify-content: center;
 `;
+
 const triggerLabel = css`
   font-size: 0.875rem;
-  font-weight: 800;
-  color: #f7c76a;
+  font-weight: 600;
+  color: ${C.amber};
   flex: 1;
 `;
 const triggerSub = css`
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: ${C.muted};
 `;
+
 const chevronStyle = (open: boolean) => css`
-  color: rgba(255, 255, 255, 0.3);
-  transition: transform 0.2s;
+  color: ${C.muted};
+  transition: transform 0.18s ease;
   transform: rotate(${open ? "180deg" : "0deg"});
   flex-shrink: 0;
 `;
@@ -87,49 +90,48 @@ const body = css`
   padding: 0 1.125rem 1.125rem;
 `;
 
-// Auth states
 const signInBox = css`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.875rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
+  background: ${C.bgSubtle};
 `;
 const signInText = css`
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: ${C.muted};
 `;
-const signInBtn = css`
+const signInLink = css`
   display: flex;
   align-items: center;
   gap: 0.375rem;
   padding: 0.4375rem 0.875rem;
-  background: #7c6af7;
-  color: white;
-  border-radius: 0.5rem;
+  background: ${C.accent};
+  color: #ffffff;
+  border-radius: ${RADIUS.md};
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background 0.15s;
+  transition: opacity 0.12s ease;
   &:hover {
-    background: #6d5ce8;
+    opacity: 0.88;
   }
 `;
 
 const proGateBox = css`
   padding: 1rem;
-  border: 1px solid rgba(124, 106, 247, 0.2);
-  border-radius: 0.875rem;
-  background: rgba(124, 106, 247, 0.06);
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
+  background: ${C.bgSubtle};
 `;
 const proGateText = css`
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: ${C.muted};
   margin-bottom: 0.875rem;
   line-height: 1.55;
 `;
@@ -137,122 +139,129 @@ const proUpgradeBtn = css`
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  background: #7c6af7;
-  color: white;
-  border-radius: 0.625rem;
+  padding: 0.4375rem 0.875rem;
+  background: ${C.accent};
+  color: #ffffff;
+  border-radius: ${RADIUS.md};
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: opacity 0.12s ease;
   &:hover {
-    background: #6d5ce8;
+    opacity: 0.88;
   }
 `;
 
-// Evaluator
-const textarea = css`
+const textareaStyle = css`
   display: block;
   width: 100%;
   box-sizing: border-box;
   resize: vertical;
   min-height: 96px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0.625rem;
+  background: ${C.bg};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   padding: 0.75rem 0.875rem;
   font-size: 0.875rem;
-  color: #c8c8d8;
+  color: ${C.text};
   line-height: 1.65;
   font-family: inherit;
   outline: none;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
   &::placeholder {
-    color: rgba(255, 255, 255, 0.22);
+    color: ${C.placeholder};
   }
   &:focus {
-    border-color: rgba(247, 199, 106, 0.35);
+    border-color: ${C.amber};
+    box-shadow: 0 0 0 2px ${C.amberSubtle};
   }
 `;
+
 const evalBtn = (active: boolean) => css`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
   margin-top: 0.625rem;
-  padding: 0.5625rem 1.125rem;
-  border-radius: 0.625rem;
-  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: ${RADIUS.md};
+  border: 1px solid ${active ? C.accent : C.border};
   cursor: ${active ? "pointer" : "default"};
   font-size: 0.8125rem;
-  font-weight: 700;
-  transition: all 0.15s;
-  background: ${active ? "#f7c76a" : "rgba(255,255,255,0.06)"};
-  color: ${active ? "#111" : "rgba(255,255,255,0.2)"};
+  font-weight: 600;
+  background: ${active ? C.accent : C.bgSubtle};
+  color: ${active ? "#ffffff" : C.muted};
+  transition: opacity 0.12s ease;
   &:hover {
-    background: ${active ? "#f5be50" : "rgba(255,255,255,0.06)"};
+    opacity: ${active ? 0.88 : 1};
   }
 `;
 
-// Results
 const resultWrap = css`
   margin-top: 0.875rem;
 `;
+
 const scoreRow = css`
   display: flex;
   gap: 0.875rem;
   align-items: flex-start;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 0.75rem;
+  background: ${C.bg};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   padding: 0.875rem;
   margin-bottom: 0.875rem;
 `;
+
 const scoreNum = (n: number) => css`
   font-size: 2rem;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
-  color: ${n >= 8 ? "#6af7c0" : n >= 5 ? "#f7c76a" : "#f76a6a"};
+  letter-spacing: -0.03em;
+  color: ${n >= 8 ? C.green : n >= 5 ? C.amber : C.red};
 `;
 const scoreDenom = css`
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.3);
-  font-weight: 600;
+  color: ${C.muted};
+  font-weight: 500;
 `;
 const gradeLabel = (g: string) => css`
   font-size: 0.6875rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-top: 3px;
   letter-spacing: 0.04em;
   color: ${g === "A"
-    ? "#6af7c0"
+    ? C.green
     : g === "B"
-      ? "#a5f3fc"
+      ? C.accent
       : g === "C"
-        ? "#f7c76a"
-        : "#f76a6a"};
+        ? C.amber
+        : C.red};
 `;
 const verdictText = css`
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: ${C.muted};
   line-height: 1.5;
   margin-bottom: 0.5rem;
 `;
 const barTrack = css`
   height: 4px;
-  background: rgba(255, 255, 255, 0.07);
+  background: ${C.border};
   border-radius: 9999px;
 `;
 const barFill = (n: number) => css`
   height: 100%;
   border-radius: 9999px;
   width: ${n * 10}%;
-  background: ${n >= 8 ? "#6af7c0" : n >= 5 ? "#f7c76a" : "#f76a6a"};
+  background: ${n >= 8 ? C.green : n >= 5 ? C.amber : C.red};
   transition: width 0.6s ease;
 `;
 
 const feedHead = (c: string) => css`
   font-size: 0.6875rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: ${c};
@@ -262,7 +271,7 @@ const feedItem = css`
   display: flex;
   gap: 0.375rem;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.62);
+  color: ${C.muted};
   line-height: 1.5;
   margin-bottom: 0.25rem;
 `;
@@ -272,12 +281,13 @@ const betterToggle = css`
   gap: 0.25rem;
   margin-top: 0.75rem;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: ${C.muted};
   background: none;
   border: none;
   cursor: pointer;
+  transition: color 0.12s ease;
   &:hover {
-    color: rgba(255, 255, 255, 0.6);
+    color: ${C.text};
   }
 `;
 const betterBox = css`
@@ -285,25 +295,27 @@ const betterBox = css`
   padding: 0.75rem;
   font-size: 0.8rem;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0.625rem;
+  color: ${C.muted};
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.md};
 `;
 const tryAgainBtn = css`
   margin-top: 0.625rem;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: ${C.muted};
   background: none;
   border: none;
   cursor: pointer;
   text-decoration: underline;
+  transition: color 0.12s ease;
   &:hover {
-    color: rgba(255, 255, 255, 0.6);
+    color: ${C.text};
   }
 `;
 
 // ─── Component ────────────────────────────────────────────────────────────────
+
 export default function InlineEvaluator({
   question,
   idealAnswer,
@@ -372,7 +384,7 @@ export default function InlineEvaluator({
           }}
         >
           <div css={triggerIcon}>
-            <Target size={12} color="#f7c76a" />
+            <Target size={12} color={C.amber} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div css={triggerLabel}>{label ?? "Evaluate with AI"}</div>
@@ -389,10 +401,7 @@ export default function InlineEvaluator({
               <ChevronDown size={15} />
             </div>
           ) : (
-            <Lock
-              size={14}
-              style={{ color: "rgba(255,255,255,0.25)", flexShrink: 0 }}
-            />
+            <Lock size={14} style={{ color: C.muted, flexShrink: 0 }} />
           )}
         </button>
 
@@ -405,7 +414,7 @@ export default function InlineEvaluator({
                 <span css={signInText}>
                   Sign in to test your answer with AI scoring
                 </span>
-                <Link href="/auth" css={signInBtn}>
+                <Link href="/auth" css={signInLink}>
                   <Zap size={12} /> Sign in free
                 </Link>
               </div>
@@ -435,17 +444,18 @@ export default function InlineEvaluator({
             {user && progress?.isPro && !result && (
               <>
                 <p
-                  style={{
+                  css={{
                     fontSize: "0.8rem",
-                    color: "rgba(255,255,255,0.4)",
+                    color: C.muted,
                     marginBottom: "0.625rem",
+                    lineHeight: 1.5,
                   }}
                 >
                   Answer as if you're in a real interview — don't look at the
                   answer above.
                 </p>
                 <textarea
-                  css={textarea}
+                  css={textareaStyle}
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
                   placeholder="Type your answer here…"
@@ -494,26 +504,21 @@ export default function InlineEvaluator({
 
                 {result.strengths.length > 0 && (
                   <>
-                    <div css={feedHead("#6af7c0")}>✓ What you got right</div>
+                    <div css={feedHead(C.green)}>✓ What you got right</div>
                     {result.strengths.map((s, i) => (
                       <div key={i} css={feedItem}>
-                        <span style={{ color: "#6af7c0", flexShrink: 0 }}>
-                          •
-                        </span>
+                        <span style={{ color: C.green, flexShrink: 0 }}>•</span>
                         {s}
                       </div>
                     ))}
                   </>
                 )}
-
                 {result.missing.length > 0 && (
                   <>
-                    <div css={feedHead("#f76a6a")}>✗ What you missed</div>
+                    <div css={feedHead(C.red)}>✗ What you missed</div>
                     {result.missing.map((m, i) => (
                       <div key={i} css={feedItem}>
-                        <span style={{ color: "#f76a6a", flexShrink: 0 }}>
-                          •
-                        </span>
+                        <span style={{ color: C.red, flexShrink: 0 }}>•</span>
                         {m}
                       </div>
                     ))}
@@ -548,7 +553,7 @@ export default function InlineEvaluator({
                     <div
                       style={{
                         fontSize: "0.75rem",
-                        color: "#6af7c0",
+                        color: C.green,
                         display: "flex",
                         alignItems: "center",
                         gap: "0.25rem",

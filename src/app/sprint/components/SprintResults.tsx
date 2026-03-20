@@ -19,13 +19,14 @@ import { C, RADIUS } from "@/styles/tokens";
 import type { SprintSummary } from "../types";
 
 // ─── Animations ───────────────────────────────────────────────────────────────
-
-const fadeUp = keyframes`from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}`;
+const fadeUp = keyframes`from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}`;
 const fadeIn = keyframes`from{opacity:0}to{opacity:1}`;
 const pop = keyframes`0%{transform:scale(0.7);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}`;
-const countUp = keyframes`from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}`;
+const countUp = keyframes`from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}`;
 
 // ─── Grade system ─────────────────────────────────────────────────────────────
+// Grade colours are intentionally kept vibrant — they appear on the
+// white result hero and as fills in the canvas share-card image.
 
 interface GradeInfo {
   grade: string;
@@ -44,10 +45,10 @@ function getGrade(accuracy: number): GradeInfo {
       grade: "S",
       label: "Elite Performance",
       sub: "You're interview-ready.",
-      color: "#fbbf24",
-      glow: "rgba(251,191,36,0.35)",
-      bg: "rgba(251,191,36,0.08)",
-      border: "rgba(251,191,36,0.3)",
+      color: C.amber,
+      glow: `${C.amber}55`,
+      bg: C.amberSubtle,
+      border: C.amberBorder,
       shareMsg: "S-tier JavaScript interview performance",
     };
   if (accuracy >= 75)
@@ -55,10 +56,10 @@ function getGrade(accuracy: number): GradeInfo {
       grade: "A",
       label: "Strong Result",
       sub: "Well above average.",
-      color: "#a78bfa",
-      glow: "rgba(167,139,250,0.3)",
-      bg: "rgba(167,139,250,0.08)",
-      border: "rgba(167,139,250,0.3)",
+      color: C.accent,
+      glow: `${C.accent}44`,
+      bg: C.accentSubtle,
+      border: C.border,
       shareMsg: "Strong JavaScript interview score",
     };
   if (accuracy >= 60)
@@ -66,10 +67,10 @@ function getGrade(accuracy: number): GradeInfo {
       grade: "B",
       label: "Solid Effort",
       sub: "On the right track.",
-      color: "#60a5fa",
-      glow: "rgba(96,165,250,0.25)",
-      bg: "rgba(96,165,250,0.07)",
-      border: "rgba(96,165,250,0.25)",
+      color: "#0d7377",
+      glow: "rgba(13,115,119,0.2)",
+      bg: C.greenSubtle,
+      border: C.greenBorder,
       shareMsg: "Solid JavaScript sprint result",
     };
   if (accuracy >= 40)
@@ -77,20 +78,20 @@ function getGrade(accuracy: number): GradeInfo {
       grade: "C",
       label: "Getting There",
       sub: "Keep the reps up.",
-      color: "#34d399",
-      glow: "rgba(52,211,153,0.2)",
-      bg: "rgba(52,211,153,0.06)",
-      border: "rgba(52,211,153,0.2)",
+      color: C.green,
+      glow: `${C.green}33`,
+      bg: C.greenSubtle,
+      border: C.greenBorder,
       shareMsg: "JavaScript interview practice in progress",
     };
   return {
     grade: "D",
     label: "Early Days",
     sub: "Every rep counts.",
-    color: "#fb923c",
-    glow: "rgba(251,146,60,0.2)",
-    bg: "rgba(251,146,60,0.06)",
-    border: "rgba(251,146,60,0.2)",
+    color: C.orange,
+    glow: `${C.orange}33`,
+    bg: C.amberSubtle,
+    border: C.amberBorder,
     shareMsg: "Starting my JavaScript interview prep",
   };
 }
@@ -118,8 +119,7 @@ function getCategoryStats(results: SprintSummary["results"]) {
     .sort((a, b) => b.pct - a.pct);
 }
 
-// ─── Canvas image builder ─────────────────────────────────────────────────────
-
+// ─── Canvas share-card — intentionally stays dark/bold ───────────────────────
 function rx(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -157,8 +157,6 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
   cv.width = W;
   cv.height = H;
   const ctx = cv.getContext("2d")!;
-
-  // bg
   ctx.fillStyle = "#08080f";
   ctx.fillRect(0, 0, W, H);
   const grd = ctx.createRadialGradient(200, 200, 0, 200, 200, 600);
@@ -166,7 +164,6 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
   grd.addColorStop(1, "transparent");
   ctx.fillStyle = grd;
   ctx.fillRect(0, 0, W, H);
-  // dot grid
   ctx.fillStyle = "rgba(255,255,255,0.035)";
   for (let x = 60; x < W; x += 60)
     for (let y = 60; y < H; y += 60) {
@@ -174,17 +171,12 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
       ctx.arc(x, y, 1.5, 0, Math.PI * 2);
       ctx.fill();
     }
-
-  // left panel ──────────────────────────
-  // badge
   ctx.fillStyle = "rgba(255,255,255,0.07)";
   rx(ctx, 72, 66, 200, 32, 16);
   ctx.fill();
   ctx.font = "700 12px system-ui";
   ctx.fillStyle = g.color;
   ctx.fillText("⚡  JSPREP PRO", 90, 88);
-
-  // grade circle
   ctx.save();
   ctx.shadowColor = g.glow;
   ctx.shadowBlur = 45;
@@ -201,8 +193,6 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
   ctx.textAlign = "center";
   ctx.fillText(g.grade, 124, 183);
   ctx.textAlign = "left";
-
-  // big score
   const scoreGrd = ctx.createLinearGradient(72, 260, 72, 390);
   scoreGrd.addColorStop(0, "#ffffff");
   scoreGrd.addColorStop(1, g.color);
@@ -216,8 +206,6 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
   ctx.font = "700 18px system-ui";
   ctx.fillStyle = g.color;
   ctx.fillText(g.label, 72, 415);
-
-  // stats
   const stats = [
     { label: "Accuracy", val: `${accuracy}%` },
     {
@@ -239,13 +227,10 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
     ctx.fillStyle = "rgba(255,255,255,0.35)";
     ctx.fillText(s.label.toUpperCase(), x + 14, 503);
   });
-
-  // right panel ──────────────────────────
   const RX = 770;
   ctx.font = "700 11px system-ui";
   ctx.fillStyle = "rgba(255,255,255,0.3)";
   ctx.fillText("CATEGORY PERFORMANCE", RX, 98);
-
   const cats = getCategoryStats(results).slice(0, 5);
   cats.forEach((c, i) => {
     const y = 120 + i * 68;
@@ -265,7 +250,6 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
     rx(ctx, RX, y + 10, Math.max(6, (370 * c.pct) / 100), 6, 3);
     ctx.fill();
   });
-
   const insY = 120 + cats.length * 68 + 18;
   if (strengths.length > 0) {
     ctx.font = "700 11px system-ui";
@@ -287,8 +271,6 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
       ctx.fillText(`• ${w}`, RX + 200, insY + 18 + i * 20);
     });
   }
-
-  // footer strip
   ctx.fillStyle = "rgba(255,255,255,0.04)";
   ctx.fillRect(0, 612, W, 63);
   ctx.font = "700 15px system-ui";
@@ -303,16 +285,13 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
     651,
   );
   ctx.textAlign = "left";
-
   return cv.toDataURL("image/png");
 }
 
 // ─── Accuracy arc ─────────────────────────────────────────────────────────────
-
 function AccuracyArc({ pct, color }: { pct: number; color: string }) {
   const r = 44,
     circ = 2 * Math.PI * r;
-  const offset = circ * (1 - pct / 100);
   return (
     <div
       style={{
@@ -333,7 +312,7 @@ function AccuracyArc({ pct, color }: { pct: number; color: string }) {
           cy="50"
           r={r}
           fill="none"
-          stroke="rgba(255,255,255,0.07)"
+          stroke={C.border}
           strokeWidth="9"
         />
         <circle
@@ -345,7 +324,7 @@ function AccuracyArc({ pct, color }: { pct: number; color: string }) {
           strokeWidth="9"
           strokeLinecap="round"
           strokeDasharray={circ}
-          strokeDashoffset={offset}
+          strokeDashoffset={circ * (1 - pct / 100)}
           style={{
             transition:
               "stroke-dashoffset 1s cubic-bezier(0.34,1.56,0.64,1) 0.5s",
@@ -353,7 +332,7 @@ function AccuracyArc({ pct, color }: { pct: number; color: string }) {
         />
       </svg>
       <div
-        style={{ fontSize: "0.8125rem", fontWeight: 800, color, marginTop: -4 }}
+        style={{ fontSize: "0.8125rem", fontWeight: 700, color, marginTop: -4 }}
       >
         {pct}%
       </div>
@@ -362,7 +341,7 @@ function AccuracyArc({ pct, color }: { pct: number; color: string }) {
           fontSize: "0.55rem",
           textTransform: "uppercase",
           letterSpacing: "0.07em",
-          color: "rgba(255,255,255,0.3)",
+          color: C.muted,
         }}
       >
         accuracy
@@ -372,7 +351,6 @@ function AccuracyArc({ pct, color }: { pct: number; color: string }) {
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-
 interface Props {
   summary: SprintSummary;
   onRetry: () => void;
@@ -409,9 +387,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
-    } catch {
-      /* noop */
-    }
+    } catch {}
   }
   function downloadCard() {
     if (!mounted) return;
@@ -428,6 +404,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
       display: flex;
       flex-direction: column;
       align-items: center;
+      background: ${C.bg};
     `,
     wrap: css`
       width: 100%;
@@ -437,26 +414,12 @@ export default function SprintResults({ summary, onRetry }: Props) {
       gap: 1rem;
     `,
 
-    // Hero
     hero: css`
-      position: relative;
-      overflow: hidden;
       background: ${g.bg};
       border: 1px solid ${g.border};
-      border-radius: 1.5rem;
-      padding: 1.75rem 1.75rem 1.5rem;
+      border-radius: ${RADIUS.xl};
+      padding: 1.75rem;
       animation: ${fadeUp} 0.5s ease both;
-      box-shadow: 0 0 70px ${g.glow};
-    `,
-    heroBg: css`
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: radial-gradient(
-        ellipse 55% 45% at 85% 15%,
-        ${g.glow} 0%,
-        transparent 70%
-      );
     `,
     gradeRow: css`
       display: flex;
@@ -465,33 +428,31 @@ export default function SprintResults({ summary, onRetry }: Props) {
       margin-bottom: 1.375rem;
     `,
     gradeBadge: css`
-      width: 76px;
-      height: 76px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       flex-shrink: 0;
       border: 2px solid ${g.border};
-      background: ${g.bg};
+      background: ${C.bg};
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.375rem;
-      font-weight: 900;
+      font-size: 2.25rem;
+      font-weight: 700;
       color: ${g.color};
-      letter-spacing: -0.04em;
-      box-shadow: 0 0 32px ${g.glow};
       animation: ${pop} 0.55s ease 0.1s both;
     `,
     h1: css`
-      font-size: 1.4375rem;
-      font-weight: 900;
-      color: white;
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: ${C.text};
       letter-spacing: -0.02em;
       margin-bottom: 0.2rem;
       animation: ${fadeUp} 0.4s ease 0.15s both;
     `,
     sub: css`
       font-size: 0.875rem;
-      color: rgba(255, 255, 255, 0.4);
+      color: ${C.muted};
       animation: ${fadeUp} 0.4s ease 0.2s both;
     `,
     scoreRow: css`
@@ -501,25 +462,23 @@ export default function SprintResults({ summary, onRetry }: Props) {
       margin-bottom: 1.375rem;
     `,
     bigScore: css`
-      font-size: 3.25rem;
-      font-weight: 900;
+      font-size: 3rem;
+      font-weight: 700;
       letter-spacing: -0.04em;
       line-height: 1;
-      background: linear-gradient(135deg, ${g.color}, #ffffff 80%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: ${g.color};
       animation: ${countUp} 0.5s ease 0.25s both;
     `,
     maxScore: css`
       font-size: 1.125rem;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.28);
+      font-weight: 500;
+      color: ${C.muted};
       margin-bottom: 0.3rem;
     `,
     ptsLbl: css`
       font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.3);
-      font-weight: 600;
+      color: ${C.muted};
+      font-weight: 500;
       margin-top: 0.25rem;
     `,
     statsGrid: css`
@@ -527,32 +486,31 @@ export default function SprintResults({ summary, onRetry }: Props) {
       grid-template-columns: repeat(3, 1fr);
       gap: 0.75rem;
       padding-top: 1.25rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      border-top: 1px solid ${C.border};
       animation: ${fadeIn} 0.5s ease 0.35s both;
     `,
     statBox: css`
       .val {
-        font-size: 1.1875rem;
-        font-weight: 900;
-        color: white;
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: ${C.text};
         letter-spacing: -0.02em;
       }
       .lbl {
         font-size: 0.6rem;
-        font-weight: 700;
+        font-weight: 600;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.28);
+        color: ${C.muted};
         margin-top: 0.2rem;
       }
       text-align: center;
     `,
 
-    // Category
     panel: css`
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 1.25rem;
+      background: ${C.bgSubtle};
+      border: 1px solid ${C.border};
+      border-radius: ${RADIUS.lg};
       padding: 1.25rem;
       animation: ${fadeUp} 0.5s ease 0.25s both;
     `,
@@ -561,7 +519,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: rgba(255, 255, 255, 0.32);
+      color: ${C.muted};
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
@@ -569,24 +527,23 @@ export default function SprintResults({ summary, onRetry }: Props) {
     `,
     catName: css`
       font-size: 0.8125rem;
-      color: rgba(255, 255, 255, 0.65);
-      font-weight: 600;
+      color: ${C.muted};
+      font-weight: 500;
     `,
     catPct: css`
       font-size: 0.75rem;
-      font-weight: 800;
-      color: white;
+      font-weight: 700;
+      color: ${C.text};
     `,
     barTrack: css`
       height: 4px;
-      background: rgba(255, 255, 255, 0.06);
+      background: ${C.border};
       border-radius: 2px;
       margin-top: 0.375rem;
       margin-bottom: 0.625rem;
       overflow: hidden;
     `,
 
-    // Insight grid
     insightGrid: css`
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -599,12 +556,12 @@ export default function SprintResults({ summary, onRetry }: Props) {
     insightBox: (col: string, bg: string, border: string) => css`
       background: ${bg};
       border: 1px solid ${border};
-      border-radius: 1rem;
+      border-radius: ${RADIUS.lg};
       padding: 1rem;
     `,
     insightHead: (col: string) => css`
       font-size: 0.6rem;
-      font-weight: 800;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: ${col};
@@ -615,23 +572,22 @@ export default function SprintResults({ summary, onRetry }: Props) {
     `,
     insightChip: css`
       font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.55);
+      color: ${C.muted};
       padding: 0.2rem 0;
       display: flex;
       align-items: center;
       gap: 0.35rem;
       &:not(:last-child) {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        border-bottom: 1px solid ${C.border};
         margin-bottom: 0.25rem;
         padding-bottom: 0.25rem;
       }
     `,
 
-    // Breakdown
     bkCard: css`
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 1.25rem;
+      background: ${C.bg};
+      border: 1px solid ${C.border};
+      border-radius: ${RADIUS.lg};
       overflow: hidden;
       animation: ${fadeUp} 0.5s ease 0.35s both;
     `,
@@ -640,60 +596,55 @@ export default function SprintResults({ summary, onRetry }: Props) {
       align-items: center;
       gap: 0.625rem;
       padding: 0.5625rem 1.125rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid ${C.border};
       &:last-child {
         border: none;
       }
-      ${o === "correct" ? "background:rgba(106,247,192,0.02);" : ""}
+      ${o === "correct" ? `background:${C.greenSubtle};` : ""}
     `,
     typeChip: (t: string) => css`
       font-size: 0.5rem;
-      font-weight: 800;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       padding: 2px 6px;
       border-radius: 6px;
       flex-shrink: 0;
       ${t === "theory"
-        ? "background:rgba(196,181,253,0.15);color:#c4b5fd;"
+        ? `background:${C.accentSubtle};color:${C.accentText};`
         : t === "output"
-          ? "background:rgba(106,247,192,0.15);color:#6af7c0;"
-          : "background:rgba(247,106,106,0.15);color:#f76a6a;"}
+          ? `background:${C.greenSubtle};color:${C.green};`
+          : `background:${C.redSubtle};color:${C.red};`}
     `,
     bkTitle: css`
       flex: 1;
       font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.55);
+      color: ${C.muted};
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     `,
     bkPts: (p: number) => css`
       font-size: 0.7rem;
-      font-weight: 800;
+      font-weight: 700;
       flex-shrink: 0;
-      color: ${p >= 10
-        ? "#6af7c0"
-        : p > 0
-          ? "#f7c76a"
-          : "rgba(255,255,255,0.2)"};
+      color: ${p >= 10 ? C.green : p > 0 ? C.amber : C.muted};
     `,
 
-    // Share
     shareCard: css`
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 1.25rem;
+      background: ${C.bgSubtle};
+      border: 1px solid ${C.border};
+      border-radius: ${RADIUS.lg};
       padding: 1.25rem;
       animation: ${fadeUp} 0.5s ease 0.4s both;
     `,
     sharePreview: css`
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 0.875rem;
+      background: ${C.bg};
+      border: 1px solid ${C.border};
+      border-radius: ${RADIUS.md};
       padding: 0.875rem 1rem;
       font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.4);
+      color: ${C.muted};
       line-height: 1.65;
       font-style: italic;
       margin-bottom: 1rem;
@@ -712,18 +663,18 @@ export default function SprintResults({ summary, onRetry }: Props) {
       align-items: center;
       justify-content: center;
       gap: 0.4375rem;
-      padding: 0.6875rem 0.875rem;
-      border-radius: 0.875rem;
+      padding: 0.625rem 0.875rem;
+      border-radius: ${RADIUS.md};
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 600;
       cursor: pointer;
       background: ${bg};
       border: 1px solid ${border};
       color: ${col};
-      transition: all 0.15s;
+      transition: all 0.12s ease;
       white-space: nowrap;
       &:hover {
-        filter: brightness(1.15);
+        opacity: 0.85;
         transform: translateY(-1px);
       }
       &:active {
@@ -736,22 +687,21 @@ export default function SprintResults({ summary, onRetry }: Props) {
       align-items: center;
       justify-content: center;
       gap: 0.4375rem;
-      padding: 0.6875rem;
-      border-radius: 0.875rem;
+      padding: 0.625rem;
+      border-radius: ${RADIUS.md};
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 600;
       cursor: pointer;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      color: rgba(255, 255, 255, 0.55);
-      transition: all 0.15s;
+      background: ${C.bg};
+      border: 1px solid ${C.border};
+      color: ${C.muted};
+      transition: all 0.12s ease;
       &:hover {
-        background: rgba(255, 255, 255, 0.08);
-        color: white;
+        border-color: ${C.borderStrong};
+        color: ${C.text};
       }
     `,
 
-    // CTA row
     ctaRow: css`
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -763,41 +713,41 @@ export default function SprintResults({ summary, onRetry }: Props) {
     `,
     retryBtn: css`
       padding: 0.875rem;
-      border-radius: 1rem;
+      border-radius: ${RADIUS.lg};
       font-size: 0.875rem;
-      font-weight: 800;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.6);
+      font-weight: 600;
+      background: ${C.bgSubtle};
+      border: 1px solid ${C.border};
+      color: ${C.muted};
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      transition: all 0.15s;
+      transition: all 0.12s ease;
       &:hover {
-        background: rgba(255, 255, 255, 0.09);
-        color: white;
+        border-color: ${C.borderStrong};
+        color: ${C.text};
+        background: ${C.bgHover};
       }
     `,
     practiceBtn: css`
       padding: 0.875rem;
-      border-radius: 1rem;
+      border-radius: ${RADIUS.lg};
       font-size: 0.875rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #7c6af7, #a78bfa);
+      font-weight: 600;
+      background: ${C.accent};
       border: none;
-      color: white;
+      color: #ffffff;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
       text-decoration: none;
-      transition: all 0.15s;
+      transition: opacity 0.12s ease;
       &:hover {
-        filter: brightness(1.1);
-        transform: translateY(-1px);
+        opacity: 0.88;
       }
     `,
   };
@@ -805,59 +755,53 @@ export default function SprintResults({ summary, onRetry }: Props) {
   return (
     <div css={S.page}>
       <div css={S.wrap}>
-        {/* ── Hero card ── */}
+        {/* Hero */}
         <div css={S.hero}>
-          <div css={S.heroBg} />
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <div css={S.gradeRow}>
-              <div css={S.gradeBadge}>{g.grade}</div>
-              <div>
-                <div css={S.h1}>{g.label}</div>
-                <div css={S.sub}>{g.sub}</div>
+          <div css={S.gradeRow}>
+            <div css={S.gradeBadge}>{g.grade}</div>
+            <div>
+              <div css={S.h1}>{g.label}</div>
+              <div css={S.sub}>{g.sub}</div>
+            </div>
+          </div>
+          <div css={S.scoreRow}>
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: "0.375rem",
+                }}
+              >
+                <span css={S.bigScore}>{score}</span>
+                <span css={S.maxScore}>/{maxScore}</span>
               </div>
+              <div css={S.ptsLbl}>points scored</div>
             </div>
-
-            <div css={S.scoreRow}>
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    gap: "0.375rem",
-                  }}
-                >
-                  <span css={S.bigScore}>{score}</span>
-                  <span css={S.maxScore}>/{maxScore}</span>
-                </div>
-                <div css={S.ptsLbl}>points scored</div>
+            <AccuracyArc pct={accuracy} color={g.color} />
+          </div>
+          <div css={S.statsGrid}>
+            {[
+              { val: `${correct}/${results.length}`, lbl: "Correct" },
+              { val: String(results.length), lbl: "Questions" },
+              { val: formatTime(timeUsedSecs), lbl: "Time used" },
+            ].map((s) => (
+              <div key={s.lbl} css={S.statBox}>
+                <div className="val">{s.val}</div>
+                <div className="lbl">{s.lbl}</div>
               </div>
-              <AccuracyArc pct={accuracy} color={g.color} />
-            </div>
-
-            <div css={S.statsGrid}>
-              {[
-                { val: `${correct}/${results.length}`, lbl: "Correct" },
-                { val: String(results.length), lbl: "Questions" },
-                { val: formatTime(timeUsedSecs), lbl: "Time used" },
-              ].map((s) => (
-                <div key={s.lbl} css={S.statBox}>
-                  <div className="val">{s.val}</div>
-                  <div className="lbl">{s.lbl}</div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* ── Category bars ── */}
+        {/* Category bars */}
         {catStats.length > 0 && (
           <div css={S.panel}>
             <div css={S.panelHead}>
               <Target size={11} /> Category Breakdown
             </div>
             {catStats.map((c) => {
-              const col =
-                c.pct >= 80 ? "#6af7c0" : c.pct >= 50 ? "#f7c76a" : "#f76a6a";
+              const col = c.pct >= 80 ? C.green : c.pct >= 50 ? C.amber : C.red;
               return (
                 <div key={c.cat}>
                   <div
@@ -890,26 +834,19 @@ export default function SprintResults({ summary, onRetry }: Props) {
           </div>
         )}
 
-        {/* ── Insights ── */}
+        {/* Insights */}
         {(strengths.length > 0 || weakAreas.length > 0) && (
           <div css={S.insightGrid}>
             {strengths.length > 0 && (
-              <div
-                css={S.insightBox(
-                  "#6af7c0",
-                  "rgba(106,247,192,0.05)",
-                  "rgba(106,247,192,0.15)",
-                )}
-              >
-                <div css={S.insightHead("#6af7c0")}>
-                  <TrendingUp size={10} />
-                  Strengths
+              <div css={S.insightBox(C.green, C.greenSubtle, C.greenBorder)}>
+                <div css={S.insightHead(C.green)}>
+                  <TrendingUp size={10} /> Strengths
                 </div>
                 {strengths.map((s, i) => (
                   <div key={i} css={S.insightChip}>
                     <CheckCircle
                       size={10}
-                      style={{ color: "#6af7c0", flexShrink: 0 }}
+                      style={{ color: C.green, flexShrink: 0 }}
                     />
                     {s}
                   </div>
@@ -917,22 +854,15 @@ export default function SprintResults({ summary, onRetry }: Props) {
               </div>
             )}
             {weakAreas.length > 0 && (
-              <div
-                css={S.insightBox(
-                  "#f7c76a",
-                  "rgba(247,199,106,0.05)",
-                  "rgba(247,199,106,0.15)",
-                )}
-              >
-                <div css={S.insightHead("#f7c76a")}>
-                  <AlertTriangle size={10} />
-                  Focus On
+              <div css={S.insightBox(C.amber, C.amberSubtle, C.amberBorder)}>
+                <div css={S.insightHead(C.amber)}>
+                  <AlertTriangle size={10} /> Focus On
                 </div>
                 {weakAreas.map((w, i) => (
                   <div key={i} css={S.insightChip}>
                     <AlertTriangle
                       size={10}
-                      style={{ color: "#f7c76a", flexShrink: 0 }}
+                      style={{ color: C.amber, flexShrink: 0 }}
                     />
                     {w}
                   </div>
@@ -942,25 +872,24 @@ export default function SprintResults({ summary, onRetry }: Props) {
           </div>
         )}
 
-        {/* ── Question breakdown ── */}
+        {/* Question breakdown */}
         <div css={S.bkCard}>
           <div
             css={S.panelHead}
             style={{
               padding: "0.875rem 1.125rem",
-              borderBottom: "1px solid rgba(255,255,255,0.06)",
+              borderBottom: `1px solid ${C.border}`,
               margin: 0,
             }}
           >
-            <Target size={11} />
-            Question Breakdown
+            <Target size={11} /> Question Breakdown
           </div>
           {display.map((r, i) => (
             <div key={r.questionId} css={S.bkRow(r.outcome)}>
               <span
                 style={{
                   fontSize: "0.6rem",
-                  color: "rgba(255,255,255,0.2)",
+                  color: C.muted,
                   width: 18,
                   flexShrink: 0,
                 }}
@@ -970,18 +899,12 @@ export default function SprintResults({ summary, onRetry }: Props) {
               {r.outcome === "correct" ? (
                 <CheckCircle
                   size={13}
-                  style={{ color: "#6af7c0", flexShrink: 0 }}
+                  style={{ color: C.green, flexShrink: 0 }}
                 />
               ) : r.outcome === "attempted" ? (
-                <XCircle
-                  size={13}
-                  style={{ color: "#f7c76a", flexShrink: 0 }}
-                />
+                <XCircle size={13} style={{ color: C.amber, flexShrink: 0 }} />
               ) : (
-                <Minus
-                  size={13}
-                  style={{ color: "rgba(255,255,255,0.2)", flexShrink: 0 }}
-                />
+                <Minus size={13} style={{ color: C.muted, flexShrink: 0 }} />
               )}
               <span css={S.typeChip(r.type)}>{r.type}</span>
               <span css={S.bkTitle}>{r.category}</span>
@@ -997,9 +920,9 @@ export default function SprintResults({ summary, onRetry }: Props) {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: "rgba(255,255,255,0.3)",
+                color: C.muted,
                 fontSize: "0.75rem",
-                fontWeight: 600,
+                fontWeight: 500,
               }}
             >
               {showAll ? "↑ Show less" : `+ ${results.length - 7} more`}
@@ -1007,20 +930,18 @@ export default function SprintResults({ summary, onRetry }: Props) {
           )}
         </div>
 
-        {/* ── Share ── */}
+        {/* Share */}
         <div css={S.shareCard}>
           <div css={S.panelHead} style={{ marginBottom: "1rem" }}>
             <span style={{ fontSize: "0.875rem" }}>📣</span> Share your result
           </div>
           <div css={S.sharePreview}>{shareText}</div>
-
           <div css={S.shareBtns}>
-            {/* LinkedIn */}
             <button
               css={S.sBtn(
-                "rgba(10,102,194,0.15)",
-                "#93c5fd",
-                "rgba(10,102,194,0.35)",
+                "rgba(10,102,194,0.08)",
+                "#1d6fa8",
+                "rgba(10,102,194,0.2)",
               )}
               onClick={() =>
                 window.open(
@@ -1040,14 +961,8 @@ export default function SprintResults({ summary, onRetry }: Props) {
               </svg>
               Share on LinkedIn
             </button>
-
-            {/* X */}
             <button
-              css={S.sBtn(
-                "rgba(255,255,255,0.06)",
-                "rgba(255,255,255,0.75)",
-                "rgba(255,255,255,0.12)",
-              )}
+              css={S.sBtn(C.bgSubtle, C.text, C.border)}
               onClick={() =>
                 window.open(
                   twitterUrl,
@@ -1066,14 +981,8 @@ export default function SprintResults({ summary, onRetry }: Props) {
               </svg>
               Share on X
             </button>
-
-            {/* Download */}
             <button
-              css={S.sBtn(
-                "rgba(124,106,247,0.1)",
-                "#c4b5fd",
-                "rgba(124,106,247,0.25)",
-              )}
+              css={S.sBtn(C.accentSubtle, C.accentText, C.border)}
               onClick={downloadCard}
             >
               <svg
@@ -1092,13 +1001,11 @@ export default function SprintResults({ summary, onRetry }: Props) {
               </svg>
               Download Card
             </button>
-
-            {/* Copy */}
             <button css={S.copyFull} onClick={copyText}>
               {copied ? (
                 <>
-                  <Check size={13} style={{ color: "#6af7c0" }} />
-                  <span style={{ color: "#6af7c0" }}>Copied to clipboard!</span>
+                  <Check size={13} style={{ color: C.green }} />
+                  <span style={{ color: C.green }}>Copied to clipboard!</span>
                 </>
               ) : (
                 <>
@@ -1110,7 +1017,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
           </div>
         </div>
 
-        {/* ── Bottom actions ── */}
+        {/* Bottom actions */}
         <div css={S.ctaRow}>
           <button css={S.retryBtn} onClick={onRetry}>
             <RotateCcw size={14} /> New Sprint

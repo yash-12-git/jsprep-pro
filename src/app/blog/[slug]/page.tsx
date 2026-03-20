@@ -14,8 +14,8 @@ import {
   faqSchema,
 } from "@/lib/seo/seo";
 import { BLOG_FAQS } from "@/data/seo/blogFaqs";
+import { C, RADIUS } from "@/styles/tokens";
 
-// ─── ISR ─────────────────────────────────────────────────────────────────────
 export const revalidate = 3600;
 
 interface Props {
@@ -76,7 +76,6 @@ export default async function BlogPostPage({ params }: Props) {
   const post = await getBlogPostBySlug(params.slug);
   if (!post) notFound();
 
-  // Fetch related topics and other recent posts in parallel
   const [relatedTopics, allPosts] = await Promise.all([
     post.relatedTopicSlugs?.length
       ? getRelatedTopics(post.relatedTopicSlugs.slice(0, 4))
@@ -90,7 +89,11 @@ export default async function BlogPostPage({ params }: Props) {
   const blogFaq = blogFaqItems.length > 0 ? faqSchema(blogFaqItems) : null;
 
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: C.bg,
+      }}
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -124,30 +127,30 @@ export default async function BlogPostPage({ params }: Props) {
         style={{
           maxWidth: "52rem",
           margin: "0 auto",
-          padding: "2.5rem 1.25rem",
-          color: "#c8c8d8",
+          padding: "2.5rem 1.25rem 5rem",
+          color: C.text,
         }}
       >
         {/* Breadcrumb */}
         <nav
           style={{
             fontSize: "0.8125rem",
-            color: "rgba(255,255,255,0.4)",
+            color: C.muted,
             marginBottom: "2rem",
           }}
         >
-          <Link href="/" style={{ color: "#7c6af7", textDecoration: "none" }}>
+          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
             JSPrep Pro
           </Link>
-          <span style={{ margin: "0 0.375rem" }}>›</span>
+          <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
           <Link
             href="/blog"
-            style={{ color: "#7c6af7", textDecoration: "none" }}
+            style={{ color: C.accent, textDecoration: "none" }}
           >
             Blog
           </Link>
-          <span style={{ margin: "0 0.375rem" }}>›</span>
-          <span>{post.category}</span>
+          <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
+          <span style={{ color: C.muted }}>{post.category}</span>
         </nav>
 
         {/* Header */}
@@ -161,14 +164,15 @@ export default async function BlogPostPage({ params }: Props) {
               marginBottom: "0.875rem",
             }}
           >
+            {/* Category chip — keeps post.accentColor for per-post identity */}
             <span
               style={{
                 fontSize: "0.625rem",
-                fontWeight: 800,
-                letterSpacing: "0.08em",
+                fontWeight: 700,
+                letterSpacing: "0.07em",
                 textTransform: "uppercase",
-                background: `${post.accentColor}14`,
-                border: `1px solid ${post.accentColor}33`,
+                background: C.bgSubtle,
+                border: `1px solid ${C.border}`,
                 color: post.accentColor,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "0.25rem",
@@ -176,19 +180,19 @@ export default async function BlogPostPage({ params }: Props) {
             >
               {post.category}
             </span>
-            <span
-              style={{ fontSize: "0.6875rem", color: "rgba(255,255,255,0.35)" }}
-            >
+            <span style={{ fontSize: "0.6875rem", color: C.muted }}>
               {post.readTime} · Updated {post.modifiedAt}
             </span>
           </div>
+
           <h1
             style={{
               fontSize: "clamp(1.625rem,4vw,2.25rem)",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               lineHeight: 1.2,
               marginBottom: "1rem",
+              letterSpacing: "-0.025em",
             }}
           >
             {post.title}
@@ -196,21 +200,23 @@ export default async function BlogPostPage({ params }: Props) {
           <p
             style={{
               fontSize: "1rem",
-              color: "rgba(255,255,255,0.6)",
+              color: C.muted,
               lineHeight: 1.75,
+              margin: 0,
             }}
           >
             {post.excerpt}
           </p>
         </header>
 
-        {/* Practice CTA */}
+        {/* Inline practice CTA banner */}
         <div
           style={{
-            background: `${post.accentColor}0f`,
-            border: `1px solid ${post.accentColor}25`,
-            borderRadius: "0.875rem",
-            padding: "1rem 1.25rem",
+            background: C.accentSubtle,
+            border: `1px solid ${C.border}`,
+            borderLeft: `3px solid ${C.accent}`,
+            borderRadius: "0.625rem",
+            padding: "0.875rem 1.125rem",
             marginBottom: "2.5rem",
             display: "flex",
             alignItems: "center",
@@ -219,21 +225,15 @@ export default async function BlogPostPage({ params }: Props) {
             flexWrap: "wrap",
           }}
         >
-          <p
-            style={{
-              fontSize: "0.875rem",
-              color: "rgba(255,255,255,0.7)",
-              margin: 0,
-            }}
-          >
+          <p style={{ fontSize: "0.875rem", color: C.text, margin: 0 }}>
             💡 Practice these concepts interactively with AI feedback
           </p>
           <Link
             href="/auth"
             style={{
               fontSize: "0.8125rem",
-              color: post.accentColor,
-              fontWeight: 800,
+              color: C.accent,
+              fontWeight: 600,
               textDecoration: "none",
               whiteSpace: "nowrap",
             }}
@@ -252,7 +252,7 @@ export default async function BlogPostPage({ params }: Props) {
           <article className="blog-content">
             <p>
               Full article coming soon.{" "}
-              <Link href="/dashboard" style={{ color: "#7c6af7" }}>
+              <Link href="/dashboard" style={{ color: C.accent }}>
                 Practice in the app
               </Link>
               .
@@ -260,24 +260,24 @@ export default async function BlogPostPage({ params }: Props) {
           </article>
         )}
 
-        {/* Related Topics — only shown when linked from admin */}
+        {/* Related Topics */}
         {relatedTopics.length > 0 && (
           <section
             style={{
               margin: "2.5rem 0",
-              background: "rgba(167,139,250,0.06)",
-              border: "1px solid rgba(167,139,250,0.2)",
-              borderRadius: "1rem",
-              padding: "1.25rem 1.5rem",
+              background: C.bgSubtle,
+              border: `1px solid ${C.border}`,
+              borderRadius: "0.875rem",
+              padding: "1.125rem 1.375rem",
             }}
           >
             <div
               style={{
                 fontSize: "0.6875rem",
-                fontWeight: 800,
+                fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
-                color: "#a78bfa",
+                color: C.muted,
                 marginBottom: "0.875rem",
               }}
             >
@@ -288,7 +288,7 @@ export default async function BlogPostPage({ params }: Props) {
                 display: "grid",
                 gridTemplateColumns:
                   "repeat(auto-fill,minmax(min(100%,14rem),1fr))",
-                gap: "0.625rem",
+                gap: "0.5rem",
               }}
             >
               {relatedTopics.map((t) => (
@@ -298,28 +298,23 @@ export default async function BlogPostPage({ params }: Props) {
                   style={{
                     display: "block",
                     padding: "0.75rem 1rem",
-                    background: "rgba(167,139,250,0.08)",
-                    border: "1px solid rgba(167,139,250,0.15)",
-                    borderRadius: "0.625rem",
+                    background: C.bg,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.5rem",
                     textDecoration: "none",
                   }}
                 >
                   <div
                     style={{
                       fontSize: "0.8125rem",
-                      fontWeight: 700,
-                      color: "white",
+                      fontWeight: 500,
+                      color: C.text,
                       marginBottom: "0.25rem",
                     }}
                   >
                     {t.keyword.charAt(0).toUpperCase() + t.keyword.slice(1)}
                   </div>
-                  <div
-                    style={{
-                      fontSize: "0.6875rem",
-                      color: "rgba(255,255,255,0.4)",
-                    }}
-                  >
+                  <div style={{ fontSize: "0.6875rem", color: C.muted }}>
                     {t.questionCount} questions
                   </div>
                 </Link>
@@ -331,9 +326,9 @@ export default async function BlogPostPage({ params }: Props) {
         {/* Bottom CTA */}
         <section
           style={{
-            background: "rgba(124,106,247,0.08)",
-            border: "1px solid rgba(124,106,247,0.2)",
-            borderRadius: "1.25rem",
+            background: C.accentSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: "0.875rem",
             padding: "2rem",
             textAlign: "center",
             margin: "3rem 0",
@@ -342,18 +337,20 @@ export default async function BlogPostPage({ params }: Props) {
           <h2
             style={{
               fontSize: "1.25rem",
-              fontWeight: 900,
-              color: "white",
+              fontWeight: 700,
+              color: C.text,
               marginBottom: "0.5rem",
+              letterSpacing: "-0.02em",
             }}
           >
             Put This Into Practice
           </h2>
           <p
             style={{
-              color: "rgba(255,255,255,0.5)",
+              color: C.muted,
               marginBottom: "1.25rem",
               fontSize: "0.9375rem",
+              lineHeight: 1.7,
             }}
           >
             Reading articles is passive. JSPrep Pro makes you actively recall,
@@ -362,7 +359,7 @@ export default async function BlogPostPage({ params }: Props) {
           <div
             style={{
               display: "flex",
-              gap: "0.875rem",
+              gap: "0.75rem",
               justifyContent: "center",
               flexWrap: "wrap",
             }}
@@ -370,12 +367,13 @@ export default async function BlogPostPage({ params }: Props) {
             <Link
               href="/auth"
               style={{
-                padding: "0.75rem 1.5rem",
-                background: "#7c6af7",
-                color: "white",
-                borderRadius: "0.875rem",
-                fontWeight: 800,
+                padding: "0.625rem 1.375rem",
+                background: C.accent,
+                color: "#ffffff",
+                borderRadius: "0.625rem",
+                fontWeight: 600,
                 textDecoration: "none",
+                fontSize: "0.9375rem",
               }}
             >
               Start Free →
@@ -383,11 +381,13 @@ export default async function BlogPostPage({ params }: Props) {
             <Link
               href="/javascript-interview-questions"
               style={{
-                padding: "0.75rem 1.5rem",
-                border: "1px solid rgba(255,255,255,0.1)",
-                color: "rgba(255,255,255,0.7)",
-                borderRadius: "0.875rem",
+                padding: "0.625rem 1.375rem",
+                background: C.bg,
+                border: `1px solid ${C.border}`,
+                color: C.muted,
+                borderRadius: "0.625rem",
                 textDecoration: "none",
+                fontSize: "0.9375rem",
               }}
             >
               Browse All Questions
@@ -400,10 +400,13 @@ export default async function BlogPostPage({ params }: Props) {
           <section>
             <h2
               style={{
-                fontSize: "1.125rem",
-                fontWeight: 800,
-                color: "white",
+                fontSize: "1.0625rem",
+                fontWeight: 600,
+                color: C.text,
                 marginBottom: "1rem",
+                letterSpacing: "-0.01em",
+                paddingBottom: "0.75rem",
+                borderBottom: `1px solid ${C.border}`,
               }}
             >
               Related Articles
@@ -413,7 +416,7 @@ export default async function BlogPostPage({ params }: Props) {
                 display: "grid",
                 gridTemplateColumns:
                   "repeat(auto-fill,minmax(min(100%,16rem),1fr))",
-                gap: "1rem",
+                gap: "0.75rem",
               }}
             >
               {relatedPosts.map((p) => (
@@ -423,18 +426,19 @@ export default async function BlogPostPage({ params }: Props) {
                   style={{
                     textDecoration: "none",
                     display: "block",
-                    background: "#111118",
-                    border: "1px solid rgba(255,255,255,0.07)",
-                    borderRadius: "0.875rem",
-                    padding: "1.25rem",
+                    background: C.bg,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "0.75rem",
+                    padding: "1.125rem 1.25rem",
                   }}
                 >
+                  {/* Per-post accent colour kept for visual differentiation */}
                   <div
                     style={{
                       fontSize: "0.625rem",
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: p.accentColor,
-                      letterSpacing: "0.08em",
+                      letterSpacing: "0.07em",
                       textTransform: "uppercase",
                       marginBottom: "0.5rem",
                     }}
@@ -444,20 +448,15 @@ export default async function BlogPostPage({ params }: Props) {
                   <div
                     style={{
                       fontSize: "0.9rem",
-                      fontWeight: 700,
-                      color: "white",
-                      lineHeight: 1.4,
+                      fontWeight: 500,
+                      color: C.text,
+                      lineHeight: 1.45,
                       marginBottom: "0.5rem",
                     }}
                   >
                     {p.title}
                   </div>
-                  <div
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "rgba(255,255,255,0.4)",
-                    }}
-                  >
+                  <div style={{ fontSize: "0.75rem", color: C.muted }}>
                     {p.readTime}
                   </div>
                 </Link>
@@ -467,23 +466,96 @@ export default async function BlogPostPage({ params }: Props) {
         )}
       </div>
 
+      {/* ─── Blog prose styles — light theme ──────────────────────────────────── */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        .blog-content h1 { font-size: 1.625rem; font-weight: 900; color: white; margin: 2rem 0 1rem; line-height: 1.3; }
-        .blog-content h2 { font-size: 1.25rem; font-weight: 800; color: white; margin: 2rem 0 0.875rem; line-height: 1.3; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.07); }
-        .blog-content p { margin: 0 0 1rem; line-height: 1.85; font-size: 0.9375rem; }
-        .blog-content pre { background: #0a0a14; border: 1px solid rgba(255,255,255,0.09); border-left: 3px solid #7c6af7; border-radius: 0.75rem; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; font-family: 'JetBrains Mono',monospace; font-size: 0.8125rem; line-height: 1.75; color: #e2e8f0; }
-        .blog-content code { font-family: 'JetBrains Mono',monospace; font-size: 0.8125rem; }
-        .blog-content p > code, .blog-content li > code { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); padding: 0.125rem 0.375rem; border-radius: 0.25rem; color: #6af7c0; font-size: 0.8em; }
-        .blog-content ul { padding-left: 1.5rem; margin: 0 0 1rem; }
-        .blog-content li { margin-bottom: 0.5rem; line-height: 1.75; font-size: 0.9375rem; }
-        .blog-content strong { color: white; font-weight: 700; }
-        .blog-content em { color: #f7c76a; font-style: italic; }
-        .blog-content blockquote { border-left: 3px solid #7c6af7; padding: 0.5rem 1rem; margin: 1rem 0; background: rgba(124,106,247,0.06); border-radius: 0 0.5rem 0.5rem 0; color: rgba(255,255,255,0.7); font-style: italic; }
+        .blog-content {
+          color: ${C.text};
+          font-size: 0.9375rem;
+          line-height: 1.85;
+        }
+        .blog-content h1 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: ${C.text};
+          margin: 2rem 0 1rem;
+          line-height: 1.25;
+          letter-spacing: -0.02em;
+        }
+        .blog-content h2 {
+          font-size: 1.1875rem;
+          font-weight: 600;
+          color: ${C.text};
+          margin: 2rem 0 0.875rem;
+          line-height: 1.3;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid ${C.border};
+          letter-spacing: -0.01em;
+        }
+        .blog-content p {
+          margin: 0 0 1rem;
+          line-height: 1.85;
+          font-size: 0.9375rem;
+          color: ${C.text};
+        }
+        .blog-content pre {
+          background: ${C.codeBg};
+          border: 1px solid ${C.border};
+          border-left: 3px solid ${C.accent};
+          border-radius: 0.625rem;
+          padding: 1rem 1.25rem;
+          overflow-x: auto;
+          margin: 1.25rem 0;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.8125rem;
+          line-height: 1.75;
+          color: ${C.codeText};
+        }
+        .blog-content code {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.8125rem;
+          color: ${C.codeText};
+        }
+        .blog-content p > code,
+        .blog-content li > code {
+          background: ${C.codeInlineBg};
+          border: 1px solid ${C.border};
+          padding: 0.125rem 0.375rem;
+          border-radius: 0.25rem;
+          font-size: 0.8em;
+          color: ${C.codeText};
+        }
+        .blog-content ul {
+          padding-left: 1.5rem;
+          margin: 0 0 1rem;
+        }
+        .blog-content li {
+          margin-bottom: 0.5rem;
+          line-height: 1.75;
+          font-size: 0.9375rem;
+          color: ${C.text};
+        }
+        .blog-content strong {
+          color: ${C.text};
+          font-weight: 600;
+        }
+        .blog-content em {
+          color: ${C.amber};
+          font-style: italic;
+        }
+        .blog-content blockquote {
+          border-left: 3px solid ${C.accent};
+          padding: 0.5rem 1rem;
+          margin: 1.25rem 0;
+          background: ${C.accentSubtle};
+          border-radius: 0 0.5rem 0.5rem 0;
+          color: ${C.accentText};
+          font-style: italic;
+        }
       `,
         }}
       />
-    </>
+    </div>
   );
 }

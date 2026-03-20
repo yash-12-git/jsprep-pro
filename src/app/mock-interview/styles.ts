@@ -1,42 +1,53 @@
-import { css } from '@emotion/react'
-import { C, RADIUS } from '@/styles/tokens'
+import { css } from "@emotion/react";
+import { C, RADIUS } from "@/styles/tokens";
 
 export const header = css`
   margin-bottom: 2rem;
   text-align: center;
-`
+`;
 
 export const iconBox = css`
   width: 3.5rem;
   height: 3.5rem;
   border-radius: ${RADIUS.xl};
-  background: ${C.purple}1a;
-  border: 1px solid ${C.purple}33;
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1rem;
-`
+`;
 
 export const title = css`
-  font-size: 1.75rem;
-  font-weight: 900;
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: ${C.text};
+  letter-spacing: -0.02em;
   margin-bottom: 0.5rem;
-`
+`;
 
 export const subtitle = css`
   color: ${C.muted};
   font-size: 0.875rem;
   max-width: 28rem;
   margin: 0 auto;
-`
+  line-height: 1.65;
+`;
+
+export const startCard = css`
+  background: ${C.bg};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.xl};
+  padding: 2.5rem;
+  text-align: center;
+`;
 
 export const chatWindow = css`
-  background: ${C.card};
+  background: ${C.bg};
   border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xxl};
+  border-radius: ${RADIUS.xl};
   overflow: hidden;
-`
+`;
 
 export const messagesArea = css`
   height: 28rem;
@@ -46,78 +57,92 @@ export const messagesArea = css`
   flex-direction: column;
   gap: 1rem;
   scrollbar-width: thin;
-  scrollbar-color: ${C.border} transparent;
-`
+  scrollbar-color: ${C.borderStrong} transparent;
+  background: ${C.bg};
+`;
 
 export const messageRow = (isUser: boolean) => css`
   display: flex;
   gap: 0.75rem;
-  flex-direction: ${isUser ? 'row-reverse' : 'row'};
-`
+  flex-direction: ${isUser ? "row-reverse" : "row"};
+`;
 
 export const avatar = (isUser: boolean) => css`
   width: 2rem;
   height: 2rem;
   border-radius: 9999px;
-  background: ${isUser ? C.surface : C.purple + '1a'};
-  border: 1px solid ${isUser ? C.border : C.purple + '33'};
+  background: ${isUser ? C.bgActive : C.accentSubtle};
+  border: 1px solid ${C.border};
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   margin-top: 0.125rem;
-`
+`;
 
 export const bubble = (isUser: boolean) => css`
   max-width: 75%;
   font-size: 0.875rem;
-  line-height: 1.6;
-  border-radius: ${RADIUS.xl};
+  line-height: 1.65;
+  border-radius: ${RADIUS.lg};
   padding: 0.75rem 1rem;
-  background: ${isUser ? C.accent + '1a' : C.surface};
-  border: 1px solid ${isUser ? C.accent + '33' : C.border};
-  color: ${isUser ? 'white' : C.text};
+  background: ${isUser ? C.accentSubtle : C.bgSubtle};
+  border: 1px solid ${C.border};
+  color: ${C.text};
   white-space: pre-wrap;
-`
+`;
 
 export const inputArea = css`
   border-top: 1px solid ${C.border};
   padding: 1rem;
   display: flex;
   gap: 0.75rem;
-`
+  background: ${C.bg};
+`;
 
 export const input = css`
   flex: 1;
-  background: ${C.surface};
+  background: ${C.bg};
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   padding: 0.625rem 1rem;
   font-size: 0.875rem;
-  color: white;
+  color: ${C.text};
   outline: none;
   resize: none;
-  transition: border-color 0.15s ease;
-  &::placeholder { color: ${C.muted}; }
-  &:focus { border-color: ${C.purple}80; }
-`
+  font-family: inherit;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+  &::placeholder {
+    color: ${C.placeholder};
+  }
+  &:focus {
+    border-color: ${C.accent};
+    box-shadow: 0 0 0 2px ${C.accentSubtle};
+  }
+`;
 
 export const sendBtn = css`
   width: 2.5rem;
   height: 2.5rem;
   border-radius: ${RADIUS.lg};
-  background: ${C.purple}33;
-  border: 1px solid ${C.purple}4d;
-  color: ${C.purple};
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background 0.15s ease;
-  &:hover { background: ${C.purple}4d; }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
-`
+  transition: border-color 0.12s ease;
+  &:hover {
+    border-color: ${C.accent};
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
 
 export const turnCounter = css`
   text-align: center;
@@ -125,15 +150,7 @@ export const turnCounter = css`
   color: ${C.muted};
   padding: 0.75rem;
   border-top: 1px solid ${C.border};
-`
-
-export const startCard = css`
-  background: ${C.card};
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.xxl};
-  padding: 2.5rem;
-  text-align: center;
-`
+`;
 
 export const topicGrid = css`
   display: grid;
@@ -141,8 +158,10 @@ export const topicGrid = css`
   gap: 0.75rem;
   margin: 1.5rem 0;
   text-align: left;
-  @media (min-width: 640px) { grid-template-columns: repeat(3, 1fr); }
-`
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
 
 export const topicItem = css`
   display: flex;
@@ -150,4 +169,5 @@ export const topicItem = css`
   gap: 0.5rem;
   font-size: 0.8125rem;
   color: ${C.text};
-`
+  line-height: 1.4;
+`;

@@ -2,7 +2,7 @@
 "use client";
 
 import { css, keyframes } from "@emotion/react";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Loader2 } from "lucide-react";
 import { useAllQuestions } from "@/contexts/QuestionsContext";
 import { awardProgressXP } from "@/lib/userProgress";
@@ -22,6 +22,7 @@ import TheorySprintCard from "./components/TheorySprintCard";
 import OutputSprintCard from "./components/OutputSprintCard";
 import DebugSprintCard from "./components/DebugSprintCard";
 import SprintResults from "./components/SprintResults";
+import { C, RADIUS } from "@/styles/tokens";
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -32,12 +33,13 @@ const loadWrap = css`
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  color: rgba(255, 255, 255, 0.4);
+  background: ${C.bg};
+  color: ${C.muted};
 `;
 
 const runnerWrap = css`
   min-height: 100vh;
-  background: #07070e;
+  background: ${C.bg};
 `;
 
 const questionArea = css`
@@ -46,7 +48,7 @@ const questionArea = css`
   padding: 1.5rem 1.25rem 4rem;
 `;
 
-const fadeIn = keyframes`from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}`;
+const fadeIn = keyframes`from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}`;
 
 const questionMeta = css`
   display: flex;
@@ -58,16 +60,32 @@ const questionMeta = css`
 
 const qNumBadge = css`
   font-size: 0.6875rem;
-  font-weight: 800;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.05);
+  color: ${C.muted};
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
   padding: 3px 10px;
   border-radius: 20px;
 `;
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+const errorToast = css`
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: ${C.redSubtle};
+  border: 1px solid ${C.redBorder};
+  border-radius: ${RADIUS.md};
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  color: ${C.red};
+  z-index: 100;
+  white-space: nowrap;
+`;
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -84,11 +102,6 @@ function buildMix(
   debug: Question[],
   count: number,
 ): Question[] {
-  // Guarantee at least 1 of each type, then fill remainder proportionally
-  // count=5  → 1 debug, 1 output, 3 theory
-  // count=10 → 2 debug, 3 output, 5 theory
-  // count=15 → 3 debug, 4 output, 8 theory
-  // count=20 → 4 debug, 6 output, 10 theory
   const dMin = Math.max(1, Math.floor(count * 0.2));
   const oMin = Math.max(1, Math.floor(count * 0.3));
   const tMin = count - dMin - oMin;
@@ -102,7 +115,6 @@ function buildMix(
 
 function computeInsights(results: QuestionResult[]) {
   const catMap = new Map<string, { correct: number; total: number }>();
-
   for (const r of results) {
     if (r.outcome === "skipped") continue;
     const entry = catMap.get(r.category) ?? { correct: 0, total: 0 };
@@ -110,22 +122,20 @@ function computeInsights(results: QuestionResult[]) {
     if (r.outcome === "correct") entry.correct++;
     catMap.set(r.category, entry);
   }
-
   const cats = Array.from(catMap.entries())
     .filter(([, v]) => v.total >= 1)
     .map(([cat, v]) => ({ cat, pct: Math.round((v.correct / v.total) * 100) }))
     .sort((a, b) => b.pct - a.pct);
-
-  const strengths = cats
-    .filter((c) => c.pct >= 70)
-    .slice(0, 3)
-    .map((c) => c.cat);
-  const weakAreas = cats
-    .filter((c) => c.pct < 50)
-    .slice(-3)
-    .map((c) => c.cat);
-
-  return { strengths, weakAreas };
+  return {
+    strengths: cats
+      .filter((c) => c.pct >= 70)
+      .slice(0, 3)
+      .map((c) => c.cat),
+    weakAreas: cats
+      .filter((c) => c.pct < 50)
+      .slice(-3)
+      .map((c) => c.cat),
+  };
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -147,10 +157,9 @@ export default function SprintClient({ uid, isPro }: Props) {
   const [score, setScore] = useState(0);
   const [config, setConfig] = useState<SprintConfig | null>(null);
   const [summary, setSummary] = useState<SprintSummary | null>(null);
-  const startTimeRef = useRef<number>(0);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const startTimeRef = useRef<number>(0);
 
-  // ── Questions from global context (no extra Firestore reads) ─────────────────
   const {
     theoryQs: ctxTheoryQs,
     outputQs: ctxOutputQs,
@@ -158,26 +167,21 @@ export default function SprintClient({ uid, isPro }: Props) {
     loading: qLoading,
   } = useAllQuestions();
 
-  // ── Load questions ──────────────────────────────────────────────────────────
+  // ── Load and start ──────────────────────────────────────────────────────────
 
   function loadAndStart(cfg: SprintConfig) {
     setConfig(cfg);
     setLoadError(null);
-
     if (qLoading) {
-      // Questions still loading from context — wait and retry
       setLoadError(
         "Questions are still loading, please try again in a moment.",
       );
       return;
     }
-
     if (!ctxTheoryQs.length && !ctxOutputQs.length && !ctxDebugQs.length) {
       setLoadError("No questions found. Make sure questions are published.");
       return;
     }
-
-    // Mix from context — zero Firestore reads
     const mixed = buildMix(
       ctxTheoryQs,
       ctxOutputQs,
@@ -188,7 +192,6 @@ export default function SprintClient({ uid, isPro }: Props) {
       setLoadError("Not enough questions for a sprint. Please try again.");
       return;
     }
-
     setQuestions(mixed);
     setResults([]);
     setScore(0);
@@ -197,13 +200,12 @@ export default function SprintClient({ uid, isPro }: Props) {
     setPhase("active");
   }
 
-  // ── Handle question complete ────────────────────────────────────────────────
+  // ── Question complete ───────────────────────────────────────────────────────
 
   const handleQuestionComplete = useCallback(
     (outcome: SprintOutcome, aiScore?: number) => {
       const q = questions[currentIdx];
       if (!q) return;
-
       const points = SPRINT_POINTS[outcome];
       const result: QuestionResult = {
         questionId: q.id,
@@ -213,18 +215,13 @@ export default function SprintClient({ uid, isPro }: Props) {
         outcome,
         aiScore,
       };
-
       const newResults = [...results, result];
       const newScore = score + points;
       setResults(newResults);
       setScore(newScore);
-
-      const isLast = currentIdx >= questions.length - 1;
-      if (isLast) {
+      if (currentIdx >= questions.length - 1)
         finishSprint(newResults, newScore);
-      } else {
-        setCurrentIdx((i) => i + 1);
-      }
+      else setCurrentIdx((i) => i + 1);
     },
     [questions, currentIdx, results, score],
   );
@@ -261,7 +258,6 @@ export default function SprintClient({ uid, isPro }: Props) {
       questionCount: finalResults.length,
       completedAt: new Date().toISOString(),
     };
-
     setSummary(s);
     setPhase("results");
 
@@ -276,15 +272,9 @@ export default function SprintClient({ uid, isPro }: Props) {
         strengths,
         weakAreas,
         completedAt: s.completedAt,
-      }).catch(() => {
-        /* non-blocking */
-      });
-
-      // Award XP: 1 XP per point scored
+      }).catch(() => {});
       const xpEarned = Math.max(10, Math.floor(finalScore / 2));
-      awardProgressXP(uid, xpEarned, 0).catch(() => {
-        /* non-blocking */
-      });
+      awardProgressXP(uid, xpEarned, 0).catch(() => {});
     }
   }
 
@@ -304,25 +294,7 @@ export default function SprintClient({ uid, isPro }: Props) {
   if (phase === "lobby") {
     return (
       <>
-        {loadError && (
-          <div
-            style={{
-              position: "fixed",
-              top: 16,
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "rgba(247,106,106,0.15)",
-              border: "1px solid rgba(247,106,106,0.3)",
-              borderRadius: 8,
-              padding: "0.5rem 1rem",
-              fontSize: "0.8125rem",
-              color: "#f76a6a",
-              zIndex: 100,
-            }}
-          >
-            {loadError}
-          </div>
-        )}
+        {loadError && <div css={errorToast}>{loadError}</div>}
         <SprintLobby isPro={isPro} onStart={loadAndStart} uid={uid} />
       </>
     );
@@ -332,13 +304,16 @@ export default function SprintClient({ uid, isPro }: Props) {
     return (
       <div css={loadWrap}>
         <Loader2
-          size={28}
-          style={{ animation: "spin 1s linear infinite", color: "#7c6af7" }}
+          size={26}
+          color={C.accent}
+          style={{ animation: "spin 1s linear infinite" }}
         />
-        <span style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
-          Building your sprint...
+        <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: C.text }}>
+          Building your sprint…
         </span>
-        <span style={{ fontSize: "0.8125rem" }}>Mixing question types</span>
+        <span style={{ fontSize: "0.8125rem", color: C.muted }}>
+          Mixing question types
+        </span>
       </div>
     );
   }
@@ -347,8 +322,7 @@ export default function SprintClient({ uid, isPro }: Props) {
     return <SprintResults summary={summary} onRetry={handleRetry} />;
   }
 
-  // ── Active sprint ───────────────────────────────────────────────────────────
-
+  // Active sprint
   const totalSecs =
     (config?.questionCount ?? 10) <= 5
       ? 300
@@ -387,7 +361,6 @@ export default function SprintClient({ uid, isPro }: Props) {
             onComplete={handleQuestionComplete}
           />
         )}
-
         {currentQ.type === "output" && (
           <OutputSprintCard
             key={currentQ.id}
@@ -395,7 +368,6 @@ export default function SprintClient({ uid, isPro }: Props) {
             onComplete={handleQuestionComplete}
           />
         )}
-
         {currentQ.type === "debug" && (
           <DebugSprintCard
             key={currentQ.id}

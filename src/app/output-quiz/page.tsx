@@ -9,7 +9,7 @@ import PageGuard from "@/components/ui/PageGuard";
 import { Code2 } from "lucide-react";
 import { OutputCard } from "@/components/ui/QuestionCards";
 import * as Shared from "@/styles/shared";
-import { C } from "@/styles/tokens";
+import { C, RADIUS } from "@/styles/tokens";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
 
 const FREE_OUTPUT_LIMIT = 5;
@@ -52,13 +52,15 @@ export default function OutputQuizPage() {
             onClose={() => setShowPaywall(false)}
           />
         )}
+
         <div css={Shared.pageWrapper}>
           <div css={Shared.pageHeader}>
             <div css={Shared.pageHeaderTop}>
-              <div css={Shared.iconBox(C.accent2)}>
-                <Code2 size={18} color={C.accent2} />
+              {/* C.accent2 → C.amber */}
+              <div css={Shared.iconBox(C.amber)}>
+                <Code2 size={18} color={C.amber} />
               </div>
-              <div css={{}}>
+              <div>
                 <h1 css={Shared.pageTitleText}>What's the Output?</h1>
                 <p css={Shared.pageSubtitleText}>
                   Read the code → predict the output → progress saved
@@ -68,24 +70,21 @@ export default function OutputQuizPage() {
             </div>
             <div css={Shared.pageProgressRow}>
               <div css={Shared.progressBarTrack}>
-                <div
-                  css={Shared.progressBarFill(
-                    pct,
-                    `linear-gradient(90deg, ${C.accent2}, ${C.accent3})`,
-                  )}
-                />
+                {/* flat accent fill — no neon gradient */}
+                <div css={Shared.progressBarFill(pct)} />
               </div>
-              <span css={Shared.pageProgressCount(C.accent2)}>
+              <span css={Shared.pageProgressCount(C.amber)}>
                 {solvedCount}/{questions.length} solved
               </span>
             </div>
           </div>
 
+          {/* Category chips */}
           <div css={Shared.categoryScroll}>
             {["All", ...categories].map((cat) => (
               <button
                 key={cat}
-                css={Shared.categoryChip(activeCategory === cat, C.accent2)}
+                css={Shared.categoryChip(activeCategory === cat, C.amber)}
                 onClick={() => setActiveCategory(cat)}
               >
                 {cat}
@@ -93,17 +92,19 @@ export default function OutputQuizPage() {
             ))}
           </div>
 
+          {/* Skeletons — visible on white */}
           {qLoading && (
             <div
-              css={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+              css={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
             >
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
                   css={{
                     height: "5rem",
-                    borderRadius: "1rem",
-                    background: C.card,
+                    borderRadius: RADIUS.lg,
+                    background: C.bgSubtle,
+                    border: `1px solid ${C.border}`,
                   }}
                 />
               ))}
@@ -112,7 +113,7 @@ export default function OutputQuizPage() {
 
           {!qLoading && (
             <div
-              css={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+              css={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
             >
               {filtered.map((q, idx) => {
                 const globalIdx = questions.indexOf(q);

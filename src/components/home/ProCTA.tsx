@@ -13,11 +13,13 @@ import { CheckCircle, Zap, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUpgrade } from "@/hooks/useUpgrade";
 import { proActiveBtn, proPayBtn, pBtnP } from "@/app/page.styles";
+import { C } from "@/styles/tokens";
 
 export default function ProCTA() {
   const { user, progress } = useAuth();
   const { handleUpgrade, loading: payLoading, error: payError } = useUpgrade();
 
+  // ── Already Pro ───────────────────────────────────────────────────────────
   if (user && progress?.isPro) {
     return (
       <>
@@ -27,7 +29,7 @@ export default function ProCTA() {
         <p
           style={{
             fontSize: "0.75rem",
-            color: "rgba(255,255,255,0.3)",
+            color: C.muted,
             textAlign: "center",
             marginTop: "0.625rem",
           }}
@@ -42,12 +44,13 @@ export default function ProCTA() {
     );
   }
 
+  // ── Logged in, free ───────────────────────────────────────────────────────
   if (user) {
     return (
       <>
         <button css={proPayBtn} onClick={handleUpgrade} disabled={payLoading}>
           {payLoading ? (
-            "Opening payment..."
+            "Opening payment…"
           ) : (
             <>
               <Zap size={16} /> Upgrade to Pro →
@@ -57,7 +60,7 @@ export default function ProCTA() {
         {payError && (
           <p
             style={{
-              color: "#f76a6a",
+              color: C.red,
               fontSize: "0.75rem",
               textAlign: "center",
               marginTop: "0.5rem",
@@ -70,6 +73,7 @@ export default function ProCTA() {
     );
   }
 
+  // ── Logged out ────────────────────────────────────────────────────────────
   return (
     <>
       <Link href="/auth" css={pBtnP}>
@@ -78,7 +82,7 @@ export default function ProCTA() {
       <p
         style={{
           fontSize: "0.75rem",
-          color: "rgba(255,255,255,0.3)",
+          color: C.muted,
           textAlign: "center",
           marginTop: "0.625rem",
         }}

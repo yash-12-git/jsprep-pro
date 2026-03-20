@@ -6,49 +6,48 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAllQuestions } from "@/contexts/QuestionsContext";
 import { useUserProgress } from "@/hooks/useQuestions";
 import PageGuard from "@/components/ui/PageGuard";
-import { Flame, Brain, Code2, Bug, Zap } from "lucide-react";
+import { Flame, Brain, Code2, Bug } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import * as S from "./styles";
 import * as Shared from "@/styles/shared";
-import { C } from "@/styles/tokens";
+import { C, RADIUS } from "@/styles/tokens";
 
-// ─── Sprint doc shape (mirrors what SprintClient.tsx writes to Firestore) ─────
+// ─── Sprint doc shape ─────────────────────────────────────────────────────────
 interface SprintDoc {
   score: number;
   maxScore: number;
-  accuracy: number; // 0–100
+  accuracy: number;
   timeUsedSecs: number;
   questionCount: number;
   strengths: string[];
   weakAreas: string[];
-  completedAt: string; // ISO
+  completedAt: string;
 }
 
 export default function AnalyticsPage() {
   const { user, progress, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // ── Question data — shared from global context (0 extra Firestore reads) ───────
   const { theoryQs, outputQs, debugQs } = useAllQuestions();
   const { masteredIds, solvedIds } = useUserProgress({
     uid: user?.uid ?? null,
   });
 
-  // ── Sprint history from Firestore subcollection ──────────────────────────────
   const [sprints, setSprints] = useState<SprintDoc[]>([]);
   const [sprintsLoading, setSprintsLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     setSprintsLoading(true);
-    const ref = query(
-      collection(db, "users", user.uid, "sprints"),
-      orderBy("completedAt", "desc"),
-      limit(10),
-    );
-    getDocs(ref)
+    getDocs(
+      query(
+        collection(db, "users", user.uid, "sprints"),
+        orderBy("completedAt", "desc"),
+        limit(10),
+      ),
+    )
       .then((snap) => setSprints(snap.docs.map((d) => d.data() as SprintDoc)))
       .catch(() => setSprints([]))
       .finally(() => setSprintsLoading(false));
@@ -58,7 +57,7 @@ export default function AnalyticsPage() {
     if (!authLoading && !user) router.push("/auth");
   }, [user, authLoading, router]);
 
-  // ── Derived counts ────────────────────────────────────────────────────────────
+  // ── Counts ────────────────────────────────────────────────────────────────
   const masteredCount = masteredIds.length;
   const solvedOutputCount = outputQs.filter((q) =>
     solvedIds.includes(q.id),
@@ -83,7 +82,7 @@ export default function AnalyticsPage() {
       ? Math.round((solvedDebugCount / debugQs.length) * 100)
       : 0;
 
-  // ── Category breakdowns ───────────────────────────────────────────────────────
+  // ── Category breakdowns ───────────────────────────────────────────────────
   const catStats = [...new Set(theoryQs.map((q) => q.category))].map((cat) => {
     const qs = theoryQs.filter((q) => q.category === cat);
     const m = qs.filter((q) => masteredIds.includes(q.id)).length;
@@ -119,19 +118,18 @@ export default function AnalyticsPage() {
     },
   );
 
-  // ── Sprint aggregates ─────────────────────────────────────────────────────────
+  // ── Sprint aggregates ─────────────────────────────────────────────────────
   const sprintCount = sprints.length;
   const avgAccuracy =
     sprintCount > 0
-      ? Math.round(
-          sprints.reduce((sum, s) => sum + s.accuracy, 0) / sprintCount,
-        )
+      ? Math.round(sprints.reduce((s, r) => s + r.accuracy, 0) / sprintCount)
       : 0;
   const bestScore =
     sprintCount > 0 ? Math.max(...sprints.map((s) => s.score)) : 0;
 
+  // Semantic bar colour — no neon
   const barColor = (pct: number) =>
-    pct >= 80 ? C.accent3 : pct >= 50 ? C.accent : C.accent2;
+    pct >= 80 ? C.green : pct >= 50 ? C.accent : C.amber;
 
   const statCards = [
     {
@@ -139,28 +137,24 @@ export default function AnalyticsPage() {
       value: progress?.streakDays ?? 0,
       icon: Flame,
       color: C.orange,
-      bg: `${C.orange}1a`,
     },
     {
       label: "Theory",
       value: `${masteredCount}/${theoryQs.length}`,
       icon: Brain,
       color: C.accent,
-      bg: `${C.accent}1a`,
     },
     {
       label: "Output Quiz",
       value: `${solvedOutputCount}/${outputQs.length}`,
       icon: Code2,
-      color: C.accent2,
-      bg: `${C.accent2}1a`,
+      color: C.amber,
     },
     {
       label: "Debug Lab",
       value: `${solvedDebugCount}/${debugQs.length}`,
       icon: Bug,
-      color: C.danger,
-      bg: `${C.danger}1a`,
+      color: C.red,
     },
   ];
 
@@ -177,9 +171,9 @@ export default function AnalyticsPage() {
 
           {/* ── Stat cards ── */}
           <div css={S.statsGrid}>
-            {statCards.map(({ label, value, icon: Icon, color, bg }) => (
+            {statCards.map(({ label, value, icon: Icon, color }) => (
               <div key={label} css={Shared.statCard}>
-                <div css={S.statIconBox(bg)}>
+                <div css={S.statIconBox(color)}>
                   <Icon size={16} color={color} />
                 </div>
                 <div css={Shared.statNum(color)}>{value}</div>
@@ -188,7 +182,7 @@ export default function AnalyticsPage() {
             ))}
           </div>
 
-          {/* ── Overall Progress ── */}
+          {/* ── Overall progress ── */}
           <div css={S.section}>
             <div css={S.overallRow}>
               <div>
@@ -202,15 +196,10 @@ export default function AnalyticsPage() {
             <div
               css={[
                 Shared.progressBarTrack,
-                { height: "0.75rem", marginBottom: "1.5rem" },
+                { height: "0.5rem", marginBottom: "1.5rem" },
               ]}
             >
-              <div
-                css={Shared.progressBarFill(
-                  overallPct,
-                  `linear-gradient(90deg, ${C.accent}, ${C.accent2}, ${C.accent3})`,
-                )}
-              />
+              <div css={Shared.progressBarFill(overallPct)} />
             </div>
             <div css={S.categoryRow}>
               {[
@@ -226,14 +215,14 @@ export default function AnalyticsPage() {
                   pct: outputPct,
                   solved: solvedOutputCount,
                   total: outputQs.length,
-                  color: C.accent2,
+                  color: C.amber,
                 },
                 {
                   label: "🐛 Debug Lab",
                   pct: debugPct,
                   solved: solvedDebugCount,
                   total: debugQs.length,
-                  color: C.danger,
+                  color: C.red,
                 },
               ].map(({ label, pct, solved, total, color }) => (
                 <div key={label} css={S.categoryItem}>
@@ -293,7 +282,7 @@ export default function AnalyticsPage() {
               ),
           )}
 
-          {/* ── Sprint History ── */}
+          {/* ── Sprint history ── */}
           <div css={S.section}>
             <div
               style={{
@@ -316,13 +305,13 @@ export default function AnalyticsPage() {
                   href="/sprint"
                   style={{
                     fontSize: "0.8125rem",
-                    fontWeight: 700,
+                    fontWeight: 500,
                     color: C.accent,
                     textDecoration: "none",
                     padding: "0.375rem 0.75rem",
-                    borderRadius: "0.5rem",
-                    background: `${C.accent}12`,
-                    border: `1px solid ${C.accent}30`,
+                    borderRadius: RADIUS.md,
+                    background: C.accentSubtle,
+                    border: `1px solid ${C.border}`,
                   }}
                 >
                   Run another sprint →
@@ -330,7 +319,7 @@ export default function AnalyticsPage() {
               )}
             </div>
 
-            {/* Aggregate stats bar — only when there's data */}
+            {/* Aggregate summary row */}
             {sprintCount > 0 && (
               <div css={S.sprintSummaryRow}>
                 <div css={S.sprintSummaryItem}>
@@ -350,7 +339,7 @@ export default function AnalyticsPage() {
                 </div>
                 <div css={S.sprintSummaryItem}>
                   <span css={S.sprintSummaryLabel}>Best score</span>
-                  <span css={[S.sprintSummaryValue, { color: C.accent2 }]}>
+                  <span css={[S.sprintSummaryValue, { color: C.amber }]}>
                     {bestScore} pts
                   </span>
                 </div>
@@ -359,34 +348,26 @@ export default function AnalyticsPage() {
 
             {sprintsLoading ? (
               <div css={S.emptyState} style={{ padding: "1.5rem" }}>
-                Loading sprint history...
+                Loading sprint history…
               </div>
             ) : sprints.length > 0 ? (
               <div css={S.categoryRow}>
                 {sprints.map((s, i) => (
                   <div key={i} css={S.sprintRow}>
                     <div css={S.sprintRowTop}>
-                      {/* Date */}
                       <span css={S.sprintDate}>
                         {format(parseISO(s.completedAt), "MMM d, HH:mm")}
                       </span>
-
-                      {/* Score */}
                       <div css={S.sprintScoreBlock}>
                         <span css={S.sprintScoreNum}>{s.score}</span>
                         <span css={S.sprintScoreMax}>/{s.maxScore} pts</span>
                       </div>
-
-                      {/* Accuracy badge */}
                       <span css={S.sprintAccuracy(s.accuracy)}>
                         {s.accuracy}%
                       </span>
-
-                      {/* Q count */}
                       <span css={S.sprintQCount}>{s.questionCount}Q</span>
                     </div>
 
-                    {/* Strengths + weak areas as chips */}
                     {(s.strengths?.length > 0 || s.weakAreas?.length > 0) && (
                       <div css={S.sprintTagRow}>
                         {s.strengths?.slice(0, 3).map((cat) => (

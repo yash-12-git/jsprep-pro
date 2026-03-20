@@ -14,7 +14,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import * as Shared from "@/styles/shared";
-import { C } from "@/styles/tokens";
+import { C, RADIUS } from "@/styles/tokens";
 import * as S from "./styles";
 import type { Question } from "@/types/question";
 
@@ -27,7 +27,6 @@ interface Props {
   isRevealed: (id: string) => boolean;
   recordSolved: (id: string) => Promise<void>;
   recordRevealed: (id: string) => Promise<void>;
-  /** Locks the interactive body — hides code, shows upgrade prompt */
   isLocked?: boolean;
   onPaywall?: () => void;
   isPro: boolean;
@@ -42,20 +41,15 @@ export default function OutputCard({
   recordRevealed,
   isLocked = false,
   onPaywall,
-  isPro
+  isPro,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [answer, setAnswer] = useState("");
   const [localWrong, setLocalWrong] = useState(false);
-  // localRevealed: user clicked Reveal this session — show answer, but hideable
   const [localRevealed, setLocalRevealed] = useState(false);
-  // manuallyReset: overrides Firestore solved state so user can re-attempt
   const [manuallyReset, setManuallyReset] = useState(false);
   const [answerState, setAnswerState] = useState<AnswerState>("idle");
 
-  const toggle = (() => setIsOpen((o) => !o));
-
-  // Priority: manuallyReset > localRevealed > Firestore solved > Firestore revealed > local wrong > idle
   const state: AnswerState =
     !manuallyReset && (isSolved(q.id) || answerState === "correct")
       ? "correct"
@@ -73,9 +67,14 @@ export default function OutputCard({
     const correct = expectedOut.toLowerCase().trim();
     const match =
       ua === correct ||
-      ua.split("\n").join(",") === correct.split("\n").join(",");      
+      ua.split("\n").join(",") === correct.split("\n").join(",");
+
+    console.log(match , correct, ua, "line72");
+    console.log(isPro, answerState,!isSolved(q.id), "line73");
+    
+    
     if (match) {
-      !isSolved(q.id) && isPro && await recordSolved(q.id);
+      !isSolved(q.id) && isPro && (await recordSolved(q.id));
       setLocalWrong(false);
       setManuallyReset(false);
       setAnswerState("correct");
@@ -88,15 +87,13 @@ export default function OutputCard({
   function reveal() {
     setLocalRevealed(true);
     setLocalWrong(false);
-    // Fire-and-forget for tracking — doesn't lock the card permanently
-    if (!isSolved(q.id) && !isRevealed(q.id) && isPro) recordRevealed(q.id).catch(() => {});
+    if (!isSolved(q.id) && !isRevealed(q.id) && isPro)
+      recordRevealed(q.id).catch(() => {});
   }
-
   function hideAnswer() {
     setLocalRevealed(false);
     setManuallyReset(true);
   }
-
   function reset() {
     setAnswer("");
     setLocalWrong(false);
@@ -115,9 +112,9 @@ export default function OutputCard({
           : "idle";
 
   return (
-    <div css={S.questionCard(highlight, C.accent2)}>
-      <div css={S.cardHeader} onClick={toggle}>
-        <span css={S.qNumber(C.accent2)}>
+    <div css={S.questionCard(highlight, C.amber)}>
+      <div css={S.cardHeader} onClick={() => setIsOpen((o) => !o)}>
+        <span css={S.qNumber(C.amber)}>
           #{String(index + 1).padStart(2, "0")}
         </span>
         <div css={{ flex: 1, minWidth: 0 }}>
@@ -130,17 +127,19 @@ export default function OutputCard({
               marginBottom: "0.375rem",
             }}
           >
-            <p css={{ fontWeight: 700, fontSize: "0.875rem" }}>{q.title}</p>
+            <p css={{ fontWeight: 600, fontSize: "0.875rem", color: C.text }}>
+              {q.title}
+            </p>
             {isLocked && <Lock size={12} color={C.muted} />}
-            {state === "correct" && <CheckCircle size={14} color={C.accent3} />}
-            {state === "revealed" && <Eye size={14} color={C.accent2} />}
-            {state === "wrong" && <XCircle size={14} color={C.danger} />}
+            {state === "correct" && <CheckCircle size={14} color={C.green} />}
+            {state === "revealed" && <Eye size={14} color={C.amber} />}
+            {state === "wrong" && <XCircle size={14} color={C.red} />}
           </div>
           <div css={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             <span
               css={{
                 fontSize: "0.625rem",
-                fontWeight: 700,
+                fontWeight: 600,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
                 border: `1px solid ${ds.border}`,
@@ -153,12 +152,12 @@ export default function OutputCard({
             <span
               css={{
                 fontSize: "0.625rem",
-                fontWeight: 700,
+                fontWeight: 500,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
-                border: `1px solid ${C.accent}33`,
-                background: `${C.accent}1a`,
-                color: `${C.accent}cc`,
+                border: `1px solid ${C.border}`,
+                background: C.bgSubtle,
+                color: C.muted,
               }}
             >
               {q.category}
@@ -166,29 +165,35 @@ export default function OutputCard({
           </div>
         </div>
         <div css={S.chevronWrapper(isOpen)}>
-          <ChevronDown size={16} color={C.muted} />
+          <ChevronDown size={16} />
         </div>
       </div>
 
       {isOpen && (
         <div css={S.cardBody}>
-          {/* LOCKED: hide all content, show upgrade prompt */}
           {isLocked ? (
-            <div css={{ padding: "1.25rem" }}>
+            <div css={{ padding: "1rem" }}>
               <div css={S.lockedBox}>
                 <Lock size={14} color={C.muted} />
                 <div css={{ flex: 1 }}>
                   <p
                     css={{
                       fontSize: "0.875rem",
-                      color: "white",
-                      fontWeight: 700,
+                      color: C.text,
+                      fontWeight: 600,
                       marginBottom: "0.25rem",
                     }}
                   >
                     Unlock all output questions
                   </p>
-                  <p css={{ fontSize: "0.75rem", color: C.muted, margin: 0 }}>
+                  <p
+                    css={{
+                      fontSize: "0.75rem",
+                      color: C.muted,
+                      margin: 0,
+                      lineHeight: 1.5,
+                    }}
+                  >
                     Free tier includes the first 5. Pro unlocks all {q.category}{" "}
                     questions and more.
                   </p>
@@ -204,8 +209,7 @@ export default function OutputCard({
             </div>
           ) : (
             <>
-              {/* Code */}
-              <div css={{ padding: "1.25rem 1.25rem 0" }}>
+              <div css={{ padding: "1rem 1rem 0" }}>
                 <p css={S.sectionLabel()}>Code</p>
                 <pre css={Shared.codeBlock()}>
                   <code>{q.code}</code>
@@ -226,7 +230,6 @@ export default function OutputCard({
                     (one output per line)
                   </span>
                 </p>
-
                 <textarea
                   value={state === "correct" ? expectedOut : answer}
                   onChange={(e) => setAnswer(e.target.value)}
@@ -235,16 +238,14 @@ export default function OutputCard({
                     "Type the expected output...\nOne value per line"
                   }
                   rows={Math.max(3, expectedOut.split("\n").length + 1)}
-                  css={Shared.textarea(
-                    state === "wrong" ? C.danger : C.accent2,
-                  )}
+                  css={Shared.textarea(state === "wrong" ? C.red : C.amber)}
                   style={{ opacity: state === "correct" ? 0.6 : 1 }}
                 />
 
                 {state === "idle" && (
                   <div css={S.actionRow}>
                     <button
-                      css={Shared.primaryBtn(C.accent2)}
+                      css={Shared.primaryBtn(C.amber)}
                       onClick={checkAnswer}
                       disabled={!answer.trim()}
                     >
@@ -255,11 +256,10 @@ export default function OutputCard({
                     </button>
                   </div>
                 )}
-
                 {state === "wrong" && (
                   <div css={S.actionRow}>
                     <button
-                      css={Shared.primaryBtn(C.danger)}
+                      css={Shared.primaryBtn(C.red)}
                       onClick={checkAnswer}
                       disabled={!answer.trim()}
                     >
@@ -270,7 +270,6 @@ export default function OutputCard({
                     </button>
                   </div>
                 )}
-
                 {state === "revealed" && (
                   <div css={S.actionRow}>
                     <button
@@ -284,7 +283,6 @@ export default function OutputCard({
                     </button>
                   </div>
                 )}
-
                 {state === "correct" && (
                   <button css={S.resetLink} onClick={reset}>
                     <RotateCcw
@@ -296,9 +294,8 @@ export default function OutputCard({
                 )}
               </div>
 
-              {/* Answer + explanation */}
               {(state === "correct" || state === "revealed") && (
-                <div css={{ padding: "0 1.25rem 1.25rem" }}>
+                <div css={{ padding: "0 1rem 1rem" }}>
                   <div css={S.explanationBox}>
                     <div
                       css={{
@@ -310,8 +307,8 @@ export default function OutputCard({
                     >
                       {state === "correct" ? (
                         <>
-                          <CheckCircle size={14} color={C.accent3} />
-                          <span css={S.explanationTitle(C.accent3)}>
+                          <CheckCircle size={14} color={C.green} />
+                          <span css={S.explanationTitle(C.green)}>
                             Correct! 🎉
                           </span>
                         </>
@@ -321,8 +318,8 @@ export default function OutputCard({
                         </span>
                       )}
                     </div>
-                    <pre css={Shared.codeBlock(`${C.accent3}33`)}>
-                      <code css={{ color: C.accent3 }}>{expectedOut}</code>
+                    <pre css={Shared.codeBlock(C.greenBorder)}>
+                      <code css={{ color: C.green }}>{expectedOut}</code>
                     </pre>
                   </div>
                   {q.explanation && (
@@ -331,7 +328,7 @@ export default function OutputCard({
                       <p css={S.explanationText}>{q.explanation}</p>
                       {q.keyInsight && (
                         <div css={S.insightRow}>
-                          <p css={S.explanationTitle(C.accent2)}>
+                          <p css={S.explanationTitle(C.amber)}>
                             ⚡ Key Insight
                           </p>
                           <p css={S.explanationText}>{q.keyInsight}</p>

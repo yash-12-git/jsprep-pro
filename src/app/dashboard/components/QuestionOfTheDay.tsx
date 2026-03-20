@@ -1,7 +1,8 @@
 /** @jsxImportSource @emotion/react */
 "use client";
-import { css } from "@emotion/react";
+
 import { useState, useEffect } from "react";
+import { css } from "@emotion/react";
 import {
   CheckCircle,
   Flame,
@@ -14,7 +15,7 @@ import { useAllQuestions } from "@/contexts/QuestionsContext";
 import type { Question } from "@/types/question";
 import { C, RADIUS } from "@/styles/tokens";
 
-// ─── Deterministic daily pick ─────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 function getDayIndex() {
   return Math.floor(Date.now() / 86400000);
 }
@@ -29,7 +30,6 @@ function formatDate() {
   });
 }
 
-// ─── AI eval result shape ─────────────────────────────────────────────────────
 interface EvalResult {
   score: number;
   grade: string;
@@ -39,20 +39,43 @@ interface EvalResult {
   betterAnswer: string;
 }
 
+// ─── Diff meta ────────────────────────────────────────────────────────────────
+const DIFF: Record<
+  string,
+  { color: string; bg: string; border: string; label: string }
+> = {
+  core: {
+    color: C.accent,
+    bg: C.accentSubtle,
+    border: C.border,
+    label: "Core",
+  },
+  mid: {
+    color: C.amber,
+    bg: C.amberSubtle,
+    border: C.amberBorder,
+    label: "Mid",
+  },
+  adv: {
+    color: C.red,
+    bg: C.redSubtle,
+    border: C.redBorder,
+    label: "Advanced",
+  },
+};
+
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const wrap = css`
-  background: linear-gradient(
-    135deg,
-    rgba(124, 106, 247, 0.08) 0%,
-    rgba(106, 247, 192, 0.05) 100%
-  );
-  border: 1px solid rgba(124, 106, 247, 0.2);
-  border-radius: ${RADIUS.xxl};
+  background: ${C.bg};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   overflow: hidden;
   margin-bottom: 1.5rem;
 `;
+
 const wrapDone = css`
-  border-color: rgba(106, 247, 192, 0.25);
+  border-color: ${C.greenBorder};
+  background: ${C.greenSubtle};
 `;
 
 const topBar = css`
@@ -61,109 +84,124 @@ const topBar = css`
   gap: 0.5rem;
   padding: 0.875rem 1.125rem 0;
 `;
+
 const pill = css`
   display: flex;
   align-items: center;
   gap: 0.3rem;
   font-size: 0.6875rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #c4b5fd;
-  background: rgba(124, 106, 247, 0.15);
+  color: ${C.accentText};
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
   padding: 3px 10px;
   border-radius: 20px;
 `;
+
 const pillDone = css`
-  color: #6af7c0;
-  background: rgba(106, 247, 192, 0.12);
+  color: ${C.green};
+  background: ${C.greenSubtle};
+  border-color: ${C.greenBorder};
 `;
+
 const dateLabel = css`
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.28);
+  color: ${C.muted};
   margin-left: auto;
 `;
 
 const qWrap = css`
   padding: 0.75rem 1.125rem 0;
 `;
+
 const qText = css`
   font-size: 1rem;
-  font-weight: 800;
-  color: white;
+  font-weight: 600;
+  color: ${C.text};
   line-height: 1.45;
   margin-bottom: 0.5rem;
   letter-spacing: -0.01em;
 `;
-const diffBadge = (color: string, bg: string) => css`
+
+const diffBadge = (color: string, bg: string, border: string) => css`
   display: inline-flex;
   align-items: center;
   font-size: 0.6rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: ${color};
   background: ${bg};
+  border: 1px solid ${border};
   padding: 2px 8px;
   border-radius: 10px;
   margin-right: 0.375rem;
 `;
+
 const catBadge = css`
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.38);
-  font-weight: 600;
+  color: ${C.muted};
+  font-weight: 500;
 `;
 
 // answer reveal
 const answerSection = css`
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid ${C.border};
   padding: 0.875rem 1.125rem;
   margin-top: 0.75rem;
 `;
+
 const hintBox = css`
-  background: rgba(247, 199, 106, 0.07);
-  border: 1px solid rgba(247, 199, 106, 0.15);
-  border-radius: 0.625rem;
+  background: ${C.amberSubtle};
+  border: 1px solid ${C.amberBorder};
+  border-radius: ${RADIUS.md};
   padding: 0.625rem 0.875rem;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: ${C.amber};
   line-height: 1.6;
   margin-bottom: 0.875rem;
 `;
+
 const answerBody = css`
   font-size: 0.875rem;
   line-height: 1.75;
-  color: rgba(255, 255, 255, 0.72);
+  color: ${C.text};
   p {
     margin-bottom: 0.625rem;
+    color: ${C.text};
   }
   strong {
-    color: white;
+    color: ${C.text};
+    font-weight: 600;
   }
   pre {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 0.625rem;
+    background: ${C.codeBg};
+    border: 1px solid ${C.border};
+    border-left: 3px solid ${C.accent};
+    border-radius: ${RADIUS.md};
     padding: 0.875rem 1rem;
     overflow-x: auto;
     font-size: 0.8rem;
     margin: 0.625rem 0;
   }
   code {
-    font-family: "Fira Code", monospace;
-    color: #a5f3fc;
+    font-family: "JetBrains Mono", monospace;
+    color: ${C.codeText};
     font-size: 0.8rem;
   }
   pre code {
-    color: #c8c8d8;
+    color: ${C.codeText};
   }
   .tip {
-    background: rgba(124, 106, 247, 0.08);
-    border-left: 3px solid #7c6af7;
+    background: ${C.accentSubtle};
+    border-left: 3px solid ${C.accent};
     padding: 0.5rem 0.75rem;
-    border-radius: 0 0.5rem 0.5rem 0;
+    border-radius: 0 ${RADIUS.sm} ${RADIUS.sm} 0;
     margin: 0.625rem 0;
     font-size: 0.8rem;
+    color: ${C.accentText};
   }
 `;
 
@@ -173,80 +211,87 @@ const actionBar = css`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.125rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid ${C.border};
 `;
+
 const revealBtn = css`
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.625rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: ${RADIUS.md};
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
-  background: rgba(124, 106, 247, 0.12);
-  border: 1px solid rgba(124, 106, 247, 0.25);
-  color: #c4b5fd;
-  transition: background 0.15s;
+  background: transparent;
+  border: 1px solid ${C.border};
+  color: ${C.muted};
+  transition: all 0.12s ease;
   &:hover {
-    background: rgba(124, 106, 247, 0.22);
+    border-color: ${C.borderStrong};
+    color: ${C.text};
+    background: ${C.bgHover};
   }
 `;
+
 const doneBtn = css`
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.625rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: ${RADIUS.md};
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
-  background: rgba(106, 247, 192, 0.1);
-  border: 1px solid rgba(106, 247, 192, 0.22);
-  color: #6af7c0;
-  transition: background 0.15s;
+  background: ${C.greenSubtle};
+  border: 1px solid ${C.greenBorder};
+  color: ${C.green};
+  transition: opacity 0.12s ease;
   &:hover {
-    background: rgba(106, 247, 192, 0.18);
+    opacity: 0.8;
   }
 `;
+
 const tryAiBtn = css`
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.625rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: ${RADIUS.md};
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
-  background: rgba(247, 199, 106, 0.1);
-  border: 1px solid rgba(247, 199, 106, 0.22);
-  color: #f7c76a;
-  transition: background 0.15s;
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
+  color: ${C.accentText};
+  transition: border-color 0.12s ease;
   &:hover {
-    background: rgba(247, 199, 106, 0.18);
+    border-color: ${C.accent};
   }
 `;
+
 const donePill = css`
   display: flex;
   align-items: center;
   gap: 0.375rem;
   font-size: 0.8125rem;
-  font-weight: 700;
-  color: #6af7c0;
+  font-weight: 500;
+  color: ${C.green};
 `;
 
-// inline AI evaluator
+// inline evaluator
 const evalWrap = css`
   margin: 0 1.125rem 0.875rem;
-  background: rgba(247, 199, 106, 0.05);
-  border: 1px solid rgba(247, 199, 106, 0.15);
-  border-radius: ${RADIUS.xl};
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   padding: 1rem;
 `;
+
 const evalLabel = css`
   font-size: 0.75rem;
-  font-weight: 800;
-  color: #f7c76a;
+  font-weight: 700;
+  color: ${C.accentText};
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-bottom: 0.625rem;
@@ -254,156 +299,184 @@ const evalLabel = css`
   align-items: center;
   gap: 0.375rem;
 `;
+
 const textarea = css`
   width: 100%;
   box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0.625rem;
+  background: ${C.bg};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.md};
   padding: 0.75rem;
   resize: vertical;
   font-size: 0.875rem;
-  color: #c8c8d8;
+  color: ${C.text};
   line-height: 1.6;
   font-family: inherit;
   outline: none;
   min-height: 100px;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
   &::placeholder {
-    color: rgba(255, 255, 255, 0.25);
+    color: ${C.placeholder};
   }
   &:focus {
-    border-color: rgba(247, 199, 106, 0.35);
+    border-color: ${C.accent};
+    box-shadow: 0 0 0 2px ${C.accentSubtle};
   }
 `;
+
 const submitBtn = (active: boolean) => css`
   display: flex;
   align-items: center;
   gap: 0.375rem;
   margin-top: 0.625rem;
   padding: 0.5rem 1rem;
-  border-radius: 0.625rem;
+  border-radius: ${RADIUS.md};
   font-size: 0.8125rem;
-  font-weight: 700;
-  background: ${active ? "#f7c76a" : "rgba(255,255,255,0.06)"};
-  color: ${active ? "#111" : "rgba(255,255,255,0.25)"};
-  border: none;
+  font-weight: 600;
+  background: ${active ? C.accent : C.bgSubtle};
+  color: ${active ? "#ffffff" : C.muted};
+  border: 1px solid ${active ? C.accent : C.border};
   cursor: ${active ? "pointer" : "default"};
-  transition:
-    background 0.15s,
-    color 0.15s;
+  transition: opacity 0.12s ease;
+  &:hover {
+    opacity: ${active ? 0.88 : 1};
+  }
 `;
+
 const scoreCard = css`
   display: flex;
   gap: 1rem;
   align-items: flex-start;
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: 0.75rem;
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.lg};
   padding: 0.875rem;
   margin-top: 0.75rem;
 `;
+
 const scoreNum = (n: number) => css`
   font-size: 2rem;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
-  color: ${n >= 8 ? "#6af7c0" : n >= 6 ? "#f7c76a" : "#f76a6a"};
+  letter-spacing: -0.03em;
+  color: ${n >= 8 ? C.green : n >= 6 ? C.amber : C.red};
 `;
+
 const scoreDenom = css`
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.35);
-  font-weight: 600;
+  color: ${C.muted};
+  font-weight: 500;
 `;
+
 const gradeText = (g: string) => css`
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-top: 0.25rem;
   color: ${g === "A"
-    ? "#6af7c0"
+    ? C.green
     : g === "B"
-      ? "#a5f3fc"
+      ? C.accent
       : g === "C"
-        ? "#f7c76a"
-        : "#f76a6a"};
+        ? C.amber
+        : C.red};
 `;
+
 const verdict = css`
   font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: ${C.muted};
   line-height: 1.5;
   margin-bottom: 0.5rem;
 `;
+
 const barTrack = css`
-  height: 5px;
-  background: rgba(255, 255, 255, 0.07);
+  height: 4px;
+  background: ${C.border};
   border-radius: 9999px;
   overflow: hidden;
 `;
+
 const barFill = (n: number) => css`
   height: 100%;
   width: ${n * 10}%;
   border-radius: 9999px;
-  background: ${n >= 8 ? "#6af7c0" : n >= 6 ? "#f7c76a" : "#f76a6a"};
+  background: ${n >= 8 ? C.green : n >= 6 ? C.amber : C.red};
 `;
+
 const feedSection = css`
   margin-top: 0.75rem;
 `;
+
 const feedTitle = (c: string) => css`
   font-size: 0.6875rem;
-  font-weight: 800;
+  font-weight: 700;
   color: ${c};
   margin-bottom: 0.375rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 `;
+
 const feedItem = css`
   display: flex;
   gap: 0.375rem;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: ${C.muted};
   margin-bottom: 0.25rem;
   line-height: 1.5;
 `;
+
 const toggleBetterBtn = css`
   display: flex;
   align-items: center;
   gap: 0.25rem;
   margin-top: 0.75rem;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: ${C.muted};
   background: none;
   border: none;
   cursor: pointer;
+  transition: color 0.12s ease;
   &:hover {
-    color: rgba(255, 255, 255, 0.7);
+    color: ${C.text};
   }
 `;
+
 const betterBox = css`
   margin-top: 0.5rem;
   padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 0.625rem;
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  border-radius: ${RADIUS.md};
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: ${C.muted};
   line-height: 1.7;
 `;
+
 const tryAgainBtn = css`
   margin-top: 0.625rem;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: ${C.muted};
   background: none;
   border: none;
   cursor: pointer;
   text-decoration: underline;
+  transition: color 0.12s ease;
   &:hover {
-    color: rgba(255, 255, 255, 0.6);
+    color: ${C.text};
   }
 `;
 
-// ─── Diff meta ────────────────────────────────────────────────────────────────
-const DIFF: Record<string, { color: string; bg: string; label: string }> = {
-  core: { color: "#6af7c0", bg: "rgba(106,247,192,0.12)", label: "Core" },
-  mid: { color: "#f7c76a", bg: "rgba(247,199,106,0.12)", label: "Mid" },
-  adv: { color: "#f76a6a", bg: "rgba(247,106,106,0.12)", label: "Advanced" },
-};
+// ─── Skeleton placeholders ────────────────────────────────────────────────────
+const skeletonLine = (w: string, h = "1rem") =>
+  ({
+    height: h,
+    width: w,
+    borderRadius: "0.375rem",
+    background: C.bgSubtle,
+    border: `1px solid ${C.border}`,
+    marginBottom: "0.75rem",
+  }) as React.CSSProperties;
 
 interface Props {
   isPro: boolean;
@@ -412,7 +485,6 @@ interface Props {
 export default function QuestionOfTheDay({ isPro }: Props) {
   const key = getTodayKey();
   const [q, setQ] = useState<Question | null>(null);
-
   const [done, setDone] = useState(false);
   const [answerOpen, setAnswerOpen] = useState(false);
   const [evalOpen, setEvalOpen] = useState(false);
@@ -422,7 +494,6 @@ export default function QuestionOfTheDay({ isPro }: Props) {
   const [result, setResult] = useState<EvalResult | null>(null);
   const [showBetter, setShowBetter] = useState(false);
 
-  // Pick today's question from context — zero Firestore reads
   useEffect(() => {
     if (typeof window !== "undefined")
       setDone(localStorage.getItem(key) === "1");
@@ -439,33 +510,10 @@ export default function QuestionOfTheDay({ isPro }: Props) {
 
   if (!q)
     return (
-      <div css={[wrap, { padding: "1.5rem", marginBottom: "1.5rem" }]}>
-        <div
-          style={{
-            height: "0.875rem",
-            width: "7rem",
-            borderRadius: "100px",
-            background: "rgba(255,255,255,0.06)",
-            marginBottom: "1rem",
-          }}
-        />
-        <div
-          style={{
-            height: "1.5rem",
-            width: "85%",
-            borderRadius: "0.5rem",
-            background: "rgba(255,255,255,0.05)",
-            marginBottom: "0.5rem",
-          }}
-        />
-        <div
-          style={{
-            height: "1.5rem",
-            width: "65%",
-            borderRadius: "0.5rem",
-            background: "rgba(255,255,255,0.04)",
-          }}
-        />
+      <div css={[wrap, { padding: "1.25rem", marginBottom: "1.5rem" }]}>
+        <div style={skeletonLine("7rem", "0.75rem")} />
+        <div style={skeletonLine("85%", "1.25rem")} />
+        <div style={skeletonLine("65%", "1.25rem")} />
       </div>
     );
 
@@ -496,7 +544,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
       setResult(parsed);
       if (parsed.score >= 7) markDone();
     } catch {
-      // fail silently — keep textarea open
+      // fail silently
     } finally {
       setLoading(false);
     }
@@ -512,7 +560,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
 
   return (
     <div css={[wrap, done && wrapDone]}>
-      {/* ── Header ── */}
+      {/* Header */}
       <div css={topBar}>
         <div css={[pill, done && pillDone]}>
           {done ? (
@@ -528,13 +576,14 @@ export default function QuestionOfTheDay({ isPro }: Props) {
         <span css={dateLabel}>{formatDate()}</span>
       </div>
 
-      {/* ── Question ── */}
+      {/* Question */}
       <div css={qWrap}>
         <p css={qText}>{q.title}</p>
-        <span css={diffBadge(dm.color, dm.bg)}>{dm.label}</span>
+        <span css={diffBadge(dm.color, dm.bg, dm.border)}>{dm.label}</span>
         <span css={catBadge}>{q.category}</span>
       </div>
 
+      {/* Actions */}
       <div css={actionBar}>
         {done ? (
           <div css={donePill}>
@@ -542,7 +591,6 @@ export default function QuestionOfTheDay({ isPro }: Props) {
           </div>
         ) : (
           <>
-            {/* Primary action — takes all available space */}
             {!evalOpen ? (
               <button
                 css={[tryAiBtn, { flex: 1 }]}
@@ -561,23 +609,13 @@ export default function QuestionOfTheDay({ isPro }: Props) {
                 <Target size={13} /> Hide evaluator
               </button>
             )}
-            {/* Secondary — icon only on narrow screens */}
             <button
               css={revealBtn}
               onClick={() => setAnswerOpen((o) => !o)}
               title={answerOpen ? "Hide answer" : "Show answer"}
             >
               {answerOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-              <span
-                style={{
-                  display: "none",
-                  ["@media (min-width: 400px)" as string]: {
-                    display: "inline",
-                  },
-                }}
-              >
-                {answerOpen ? "Hide" : "Answer"}
-              </span>
+              {answerOpen ? "Hide" : "Answer"}
             </button>
             {!evalOpen && (
               <button css={doneBtn} onClick={markDone} title="I know this">
@@ -588,7 +626,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
         )}
       </div>
 
-      {/* ── Inline AI Evaluator ── */}
+      {/* Inline evaluator */}
       {evalOpen && (
         <div css={evalWrap}>
           <div css={evalLabel}>
@@ -644,10 +682,10 @@ export default function QuestionOfTheDay({ isPro }: Props) {
 
               {result.strengths.length > 0 && (
                 <div css={feedSection}>
-                  <div css={feedTitle("#6af7c0")}>✓ Got right</div>
+                  <div css={feedTitle(C.green)}>✓ Got right</div>
                   {result.strengths.map((s, i) => (
                     <div key={i} css={feedItem}>
-                      <span style={{ color: "#6af7c0", flexShrink: 0 }}>•</span>
+                      <span style={{ color: C.green, flexShrink: 0 }}>•</span>
                       {s}
                     </div>
                   ))}
@@ -656,10 +694,10 @@ export default function QuestionOfTheDay({ isPro }: Props) {
 
               {result.missing.length > 0 && (
                 <div css={feedSection}>
-                  <div css={feedTitle("#f76a6a")}>✗ Missed</div>
+                  <div css={feedTitle(C.red)}>✗ Missed</div>
                   {result.missing.map((m, i) => (
                     <div key={i} css={feedItem}>
-                      <span style={{ color: "#f76a6a", flexShrink: 0 }}>•</span>
+                      <span style={{ color: C.red, flexShrink: 0 }}>•</span>
                       {m}
                     </div>
                   ))}
@@ -701,7 +739,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
                   <div
                     style={{
                       fontSize: "0.75rem",
-                      color: "#6af7c0",
+                      color: C.green,
                       display: "flex",
                       alignItems: "center",
                       gap: "0.25rem",
@@ -725,7 +763,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
         </div>
       )}
 
-      {/* ── Full answer reveal ── */}
+      {/* Full answer reveal */}
       {answerOpen && (
         <div css={answerSection}>
           {q.hint && <div css={hintBox}>💡 {q.hint}</div>}

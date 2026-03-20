@@ -10,9 +10,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { pageMeta, faqSchema, breadcrumbSchema } from "@/lib/seo/seo";
-import { getTopicFaqs, TOPIC_FAQS } from "@/data/seo/topicFaqs";
+import { TOPIC_FAQS } from "@/data/seo/topicFaqs";
 import TopicQuestionList from "./TopicQuestionList";
-import { TOPIC_DIFF_BG, TOPIC_DIFF_COLOR } from "@/styles/tokens";
+import { C, TOPIC_DIFF_BG, TOPIC_DIFF_COLOR } from "@/styles/tokens";
 
 export const revalidate = 3600;
 
@@ -56,15 +56,52 @@ function Anchor({ id }: { id: string }) {
   return <div id={id} style={{ marginTop: -80, paddingTop: 80 }} />;
 }
 
+// ─── Section heading with left rule ──────────────────────────────────────────
+function SectionHeading({
+  color,
+  children,
+}: {
+  color: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        marginBottom: 16,
+      }}
+    >
+      <span
+        style={{
+          width: 3,
+          height: 20,
+          borderRadius: 2,
+          background: color,
+          display: "inline-block",
+          flexShrink: 0,
+        }}
+      />
+      <h2
+        style={{
+          color: C.text,
+          fontSize: 17,
+          fontWeight: 600,
+          margin: 0,
+          letterSpacing: "-0.01em",
+        }}
+      >
+        {children}
+      </h2>
+    </div>
+  );
+}
+
 export default async function TopicPage({ params }: Props) {
   const topic = await getTopicBySlug(params.topic);
   if (!topic) notFound();
 
-  // Only show questions explicitly tagged to this topic via topicSlug.
-  // No category fallback — that pulls in unrelated questions from the same broad category.
-  // Tag questions to topics in /admin/questions by setting the "Topic Page" field.
-  // Filter by topicSlug in Firestore — avoids fetching all 200 questions and filtering in JS.
-  // Requires composite index: status ASC + topicSlug ASC + order ASC (already in required indexes list)
   const { questions } = await getQuestions({
     filters: { status: "published", topicSlug: topic.slug },
     pageSize: 50,
@@ -111,7 +148,11 @@ export default async function TopicPage({ params }: Props) {
   ].filter(Boolean) as { id: string; label: string }[];
 
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: C.bg,
+      }}
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -134,27 +175,27 @@ export default async function TopicPage({ params }: Props) {
           maxWidth: 920,
           margin: "0 auto",
           padding: "32px 24px 100px",
-          color: "#c8c8d8",
+          color: C.text,
           fontFamily: "'DM Sans',system-ui,sans-serif",
         }}
       >
         {/* Breadcrumb */}
         <nav
           aria-label="Breadcrumb"
-          style={{ marginBottom: 28, fontSize: 13, color: "#6b7280" }}
+          style={{ marginBottom: 28, fontSize: 13, color: C.muted }}
         >
-          <Link href="/" style={{ color: "#6b7280", textDecoration: "none" }}>
+          <Link href="/" style={{ color: C.muted, textDecoration: "none" }}>
             Home
           </Link>
-          <span style={{ margin: "0 8px" }}>›</span>
+          <span style={{ margin: "0 8px", color: C.borderStrong }}>›</span>
           <Link
             href="/topics"
-            style={{ color: "#6b7280", textDecoration: "none" }}
+            style={{ color: C.muted, textDecoration: "none" }}
           >
             Topics
           </Link>
-          <span style={{ margin: "0 8px" }}>›</span>
-          <span style={{ color: "#a78bfa" }}>{topic.title}</span>
+          <span style={{ margin: "0 8px", color: C.borderStrong }}>›</span>
+          <span style={{ color: C.text }}>{topic.title}</span>
         </nav>
 
         {/* Hero */}
@@ -163,26 +204,28 @@ export default async function TopicPage({ params }: Props) {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
+              gap: 8,
               marginBottom: 14,
               flexWrap: "wrap",
             }}
           >
+            {/* Difficulty badge */}
             <span
               style={{
-                padding: "4px 12px",
+                padding: "3px 10px",
                 borderRadius: 20,
-                fontSize: 12,
-                fontWeight: 700,
+                fontSize: 11,
+                fontWeight: 600,
                 letterSpacing: "0.04em",
                 textTransform: "uppercase",
                 background: diffBg,
                 color: diffColor,
+                border: `1px solid ${diffColor}30`,
               }}
             >
               {topic.difficulty}
             </span>
-            <span style={{ color: "#6b7280", fontSize: 13 }}>
+            <span style={{ color: C.muted, fontSize: 13 }}>
               {questions.length} question{questions.length !== 1 ? "s" : ""}
             </span>
             {hasConceptHub && (
@@ -191,26 +234,27 @@ export default async function TopicPage({ params }: Props) {
                   padding: "3px 10px",
                   borderRadius: 20,
                   fontSize: 11,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   letterSpacing: "0.04em",
                   textTransform: "uppercase",
-                  background: "rgba(106,247,192,0.1)",
-                  color: "#6af7c0",
-                  border: "1px solid rgba(106,247,192,0.2)",
+                  background: C.greenSubtle,
+                  color: C.green,
+                  border: `1px solid ${C.greenBorder}`,
                 }}
               >
                 Full Guide
               </span>
             )}
           </div>
+
           <h1
             style={{
-              color: "#f1f0ff",
+              color: C.text,
               fontSize: "clamp(1.6rem,4vw,2.4rem)",
-              fontWeight: 800,
+              fontWeight: 700,
               lineHeight: 1.2,
               marginBottom: 14,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.025em",
             }}
           >
             {topic.title}
@@ -218,9 +262,10 @@ export default async function TopicPage({ params }: Props) {
           <p
             style={{
               fontSize: 16,
-              lineHeight: 1.7,
-              color: "#a0a0b8",
+              lineHeight: 1.75,
+              color: C.muted,
               maxWidth: 680,
+              margin: 0,
             }}
           >
             {topic.description}
@@ -231,10 +276,10 @@ export default async function TopicPage({ params }: Props) {
         {tocItems.length > 3 && (
           <nav
             style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              borderRadius: 12,
-              padding: "16px 20px",
+              background: C.bgSubtle,
+              border: `1px solid ${C.border}`,
+              borderRadius: 10,
+              padding: "14px 18px",
               marginBottom: 44,
             }}
           >
@@ -244,8 +289,8 @@ export default async function TopicPage({ params }: Props) {
                 fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
-                color: "#6b7280",
-                marginBottom: 12,
+                color: C.muted,
+                marginBottom: 10,
               }}
             >
               On this page
@@ -257,12 +302,16 @@ export default async function TopicPage({ params }: Props) {
                   href={`#${item.id}`}
                   style={{
                     fontSize: 13,
-                    color: "#a78bfa",
+                    color: C.accent,
                     textDecoration: "none",
                   }}
                 >
                   <span
-                    style={{ color: "#4b5563", fontSize: 11, marginRight: 4 }}
+                    style={{
+                      color: C.placeholder,
+                      fontSize: 11,
+                      marginRight: 4,
+                    }}
                   >
                     {i + 1}.
                   </span>
@@ -273,53 +322,25 @@ export default async function TopicPage({ params }: Props) {
           </nav>
         )}
 
-        {/* ━━━━━ CONCEPT HUB LAYER ━━━━━ */}
+        {/* ━━━━━ CONCEPT HUB ━━━━━ */}
 
         {topic.mentalModel && (
           <section style={{ marginBottom: 40 }}>
             <Anchor id="concept" />
+            <SectionHeading color={C.green}>The Mental Model</SectionHeading>
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 16,
-              }}
-            >
-              <span
-                style={{
-                  width: 3,
-                  height: 20,
-                  borderRadius: 2,
-                  background: "#6af7c0",
-                  display: "inline-block",
-                  flexShrink: 0,
-                }}
-              />
-              <h2
-                style={{
-                  color: "#f1f0ff",
-                  fontSize: 18,
-                  fontWeight: 700,
-                  margin: 0,
-                }}
-              >
-                The Mental Model
-              </h2>
-            </div>
-            <div
-              style={{
-                background: "rgba(106,247,192,0.05)",
-                border: "1px solid rgba(106,247,192,0.18)",
-                borderRadius: 14,
-                padding: "24px 28px",
+                background: C.greenSubtle,
+                border: `1px solid ${C.greenBorder}`,
+                borderRadius: 12,
+                padding: "20px 24px",
               }}
             >
               <p
                 style={{
                   fontSize: 16,
                   lineHeight: 1.85,
-                  color: "#d4f5e8",
+                  color: C.text,
                   margin: 0,
                   fontStyle: "italic",
                 }}
@@ -333,35 +354,7 @@ export default async function TopicPage({ params }: Props) {
         {topic.deepDive && (
           <section style={{ marginBottom: 40 }}>
             <Anchor id="explanation" />
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 20,
-              }}
-            >
-              <span
-                style={{
-                  width: 3,
-                  height: 20,
-                  borderRadius: 2,
-                  background: "#7c6af7",
-                  display: "inline-block",
-                  flexShrink: 0,
-                }}
-              />
-              <h2
-                style={{
-                  color: "#f1f0ff",
-                  fontSize: 18,
-                  fontWeight: 700,
-                  margin: 0,
-                }}
-              >
-                The Explanation
-              </h2>
-            </div>
+            <SectionHeading color={C.accent}>The Explanation</SectionHeading>
             <div
               className="concept-body"
               dangerouslySetInnerHTML={{ __html: topic.deepDive }}
@@ -372,56 +365,28 @@ export default async function TopicPage({ params }: Props) {
         {topic.misconceptions && topic.misconceptions.length > 0 && (
           <section style={{ marginBottom: 40 }}>
             <Anchor id="misconceptions" />
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 16,
-              }}
-            >
-              <span
-                style={{
-                  width: 3,
-                  height: 20,
-                  borderRadius: 2,
-                  background: "#f87171",
-                  display: "inline-block",
-                  flexShrink: 0,
-                }}
-              />
-              <h2
-                style={{
-                  color: "#f1f0ff",
-                  fontSize: 18,
-                  fontWeight: 700,
-                  margin: 0,
-                }}
-              >
-                Common Misconceptions
-              </h2>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <SectionHeading color={C.red}>Common Misconceptions</SectionHeading>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {topic.misconceptions.map((item, i) => (
                 <div
                   key={i}
                   style={{
-                    background: "rgba(248,113,113,0.05)",
-                    border: "1px solid rgba(248,113,113,0.18)",
-                    borderRadius: 12,
-                    padding: "16px 20px",
+                    background: C.redSubtle,
+                    border: `1px solid ${C.redBorder}`,
+                    borderRadius: 10,
+                    padding: "14px 18px",
                     display: "flex",
-                    gap: 14,
+                    gap: 12,
                   }}
                 >
-                  <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>
+                  <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>
                     ⚠️
                   </span>
                   <p
                     style={{
                       fontSize: 14,
                       lineHeight: 1.75,
-                      color: "#f5c6c6",
+                      color: C.text,
                       margin: 0,
                     }}
                   >
@@ -436,36 +401,10 @@ export default async function TopicPage({ params }: Props) {
         {topic.realWorldExamples && topic.realWorldExamples.length > 0 && (
           <section style={{ marginBottom: 44 }}>
             <Anchor id="real-world" />
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 16,
-              }}
-            >
-              <span
-                style={{
-                  width: 3,
-                  height: 20,
-                  borderRadius: 2,
-                  background: "#60a5fa",
-                  display: "inline-block",
-                  flexShrink: 0,
-                }}
-              />
-              <h2
-                style={{
-                  color: "#f1f0ff",
-                  fontSize: 18,
-                  fontWeight: 700,
-                  margin: 0,
-                }}
-              >
-                Where You'll See This in Real Code
-              </h2>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <SectionHeading color={C.accent}>
+              Where You'll See This in Real Code
+            </SectionHeading>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topic.realWorldExamples.map((item, i) => (
                 <div
                   key={i}
@@ -473,17 +412,17 @@ export default async function TopicPage({ params }: Props) {
                     display: "flex",
                     gap: 12,
                     alignItems: "flex-start",
-                    padding: "12px 16px",
-                    background: "rgba(96,165,250,0.05)",
-                    border: "1px solid rgba(96,165,250,0.12)",
-                    borderRadius: 10,
+                    padding: "11px 16px",
+                    background: C.accentSubtle,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 8,
                   }}
                 >
                   <span
                     style={{
-                      color: "#60a5fa",
+                      color: C.accent,
                       flexShrink: 0,
-                      fontWeight: 700,
+                      fontWeight: 600,
                       fontSize: 13,
                       marginTop: 2,
                     }}
@@ -494,7 +433,7 @@ export default async function TopicPage({ params }: Props) {
                     style={{
                       fontSize: 14,
                       lineHeight: 1.7,
-                      color: "#b8d4f8",
+                      color: C.text,
                       margin: 0,
                     }}
                   >
@@ -506,34 +445,35 @@ export default async function TopicPage({ params }: Props) {
           </section>
         )}
 
-        {/* ━━━━━ INTERVIEW PREP LAYER ━━━━━ */}
+        {/* ━━━━━ INTERVIEW PREP ━━━━━ */}
 
         <section style={{ marginBottom: 28 }}>
           <Anchor id="cheatsheet" />
           <div
             style={{
-              background: "rgba(124,106,247,0.08)",
-              border: "1px solid rgba(124,106,247,0.25)",
-              borderRadius: 14,
-              padding: "24px 28px",
+              background: C.accentSubtle,
+              border: `1px solid ${C.border}`,
+              borderLeft: `3px solid ${C.accent}`,
+              borderRadius: 10,
+              padding: "20px 24px",
             }}
           >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
-                marginBottom: 18,
+                gap: 8,
+                marginBottom: 16,
               }}
             >
-              <span style={{ fontSize: 20 }}>⚡</span>
+              <span style={{ fontSize: 18 }}>⚡</span>
               <h2
                 style={{
-                  color: "#c4b5fd",
-                  fontSize: 15,
+                  color: C.accentText,
+                  fontSize: 13,
                   fontWeight: 700,
                   margin: 0,
-                  letterSpacing: "0.04em",
+                  letterSpacing: "0.06em",
                   textTransform: "uppercase",
                 }}
               >
@@ -547,7 +487,7 @@ export default async function TopicPage({ params }: Props) {
                 listStyle: "none",
                 display: "flex",
                 flexDirection: "column",
-                gap: 10,
+                gap: 9,
               }}
             >
               {topic.cheatSheet.map((point, i) => (
@@ -557,15 +497,15 @@ export default async function TopicPage({ params }: Props) {
                     display: "flex",
                     gap: 10,
                     fontSize: 14,
-                    lineHeight: 1.6,
+                    lineHeight: 1.65,
                   }}
                 >
                   <span
-                    style={{ color: "#7c6af7", flexShrink: 0, marginTop: 1 }}
+                    style={{ color: C.accent, flexShrink: 0, marginTop: 1 }}
                   >
                     ✦
                   </span>
-                  <span style={{ color: "#d4d0e8" }}>{point}</span>
+                  <span style={{ color: C.text }}>{point}</span>
                 </li>
               ))}
             </ul>
@@ -576,10 +516,11 @@ export default async function TopicPage({ params }: Props) {
           <Anchor id="interview-tips" />
           <div
             style={{
-              background: "rgba(251,191,36,0.06)",
-              border: "1px solid rgba(251,191,36,0.2)",
-              borderRadius: 14,
-              padding: "20px 24px",
+              background: C.amberSubtle,
+              border: `1px solid ${C.amberBorder}`,
+              borderLeft: `3px solid ${C.amber}`,
+              borderRadius: 10,
+              padding: "18px 22px",
             }}
           >
             <div
@@ -587,17 +528,17 @@ export default async function TopicPage({ params }: Props) {
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                marginBottom: 14,
+                marginBottom: 12,
               }}
             >
-              <span style={{ fontSize: 18 }}>💡</span>
+              <span style={{ fontSize: 16 }}>💡</span>
               <h2
                 style={{
-                  color: "#fcd34d",
-                  fontSize: 14,
+                  color: C.amber,
+                  fontSize: 13,
                   fontWeight: 700,
                   margin: 0,
-                  letterSpacing: "0.04em",
+                  letterSpacing: "0.06em",
                   textTransform: "uppercase",
                 }}
               >
@@ -622,11 +563,16 @@ export default async function TopicPage({ params }: Props) {
                     gap: 10,
                     fontSize: 14,
                     lineHeight: 1.65,
-                    color: "#c8b87a",
+                    color: C.text,
                   }}
                 >
                   <span
-                    style={{ color: "#fbbf24", flexShrink: 0, fontWeight: 700 }}
+                    style={{
+                      color: C.amber,
+                      flexShrink: 0,
+                      fontWeight: 700,
+                      minWidth: "1rem",
+                    }}
                   >
                     {i + 1}.
                   </span>
@@ -637,25 +583,26 @@ export default async function TopicPage({ params }: Props) {
           </div>
         </section>
 
+        {/* Related articles */}
         {relatedPosts.length > 0 && (
           <section style={{ marginBottom: 44 }}>
             <Anchor id="articles" />
             <div
               style={{
-                background: "rgba(167,139,250,0.06)",
-                border: "1px solid rgba(167,139,250,0.2)",
-                borderRadius: 14,
-                padding: "18px 22px",
+                background: C.bgSubtle,
+                border: `1px solid ${C.border}`,
+                borderRadius: 12,
+                padding: "16px 20px",
               }}
             >
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 700,
-                  color: "#a78bfa",
+                  color: C.muted,
                   marginBottom: 12,
                   textTransform: "uppercase",
-                  letterSpacing: "0.07em",
+                  letterSpacing: "0.08em",
                 }}
               >
                 📖 Deep Dive Articles
@@ -673,19 +620,23 @@ export default async function TopicPage({ params }: Props) {
                     padding: "8px 0",
                     borderBottom:
                       i < relatedPosts.length - 1
-                        ? "1px solid rgba(255,255,255,0.04)"
+                        ? `1px solid ${C.border}`
                         : "none",
                   }}
                 >
                   <span
-                    style={{ fontSize: 14, color: "#d4d0e8", fontWeight: 600 }}
+                    style={{
+                      fontSize: 14,
+                      color: C.text,
+                      fontWeight: 500,
+                    }}
                   >
                     {post.title}
                   </span>
                   <span
                     style={{
                       fontSize: 12,
-                      color: "#6b7280",
+                      color: C.muted,
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -697,6 +648,7 @@ export default async function TopicPage({ params }: Props) {
           </section>
         )}
 
+        {/* Practice questions */}
         <section style={{ marginBottom: 60 }}>
           <Anchor id="questions" />
           <div
@@ -704,21 +656,24 @@ export default async function TopicPage({ params }: Props) {
               display: "flex",
               alignItems: "baseline",
               gap: 12,
-              marginBottom: 28,
+              marginBottom: 24,
+              paddingBottom: 16,
+              borderBottom: `1px solid ${C.border}`,
             }}
           >
             <h2
               style={{
-                color: "#f1f0ff",
-                fontSize: 22,
+                color: C.text,
+                fontSize: 20,
                 fontWeight: 700,
                 margin: 0,
+                letterSpacing: "-0.02em",
               }}
             >
               Practice Questions
             </h2>
             {questions.length > 0 && (
-              <span style={{ color: "#6b7280", fontSize: 13 }}>
+              <span style={{ color: C.muted, fontSize: 13 }}>
                 {questions.length} question{questions.length !== 1 ? "s" : ""}
               </span>
             )}
@@ -727,15 +682,17 @@ export default async function TopicPage({ params }: Props) {
           <TopicQuestionList questions={questions} topicSlug={topic.slug} />
         </section>
 
+        {/* Related topics */}
         {relatedTopics.length > 0 && (
           <section style={{ marginBottom: 56 }}>
             <Anchor id="related" />
             <h2
               style={{
-                color: "#f1f0ff",
-                fontSize: 18,
-                fontWeight: 700,
+                color: C.text,
+                fontSize: 17,
+                fontWeight: 600,
                 marginBottom: 16,
+                letterSpacing: "-0.01em",
               }}
             >
               Related Topics
@@ -744,7 +701,7 @@ export default async function TopicPage({ params }: Props) {
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))",
-                gap: 12,
+                gap: 10,
               }}
             >
               {relatedTopics.map((t) => {
@@ -757,18 +714,18 @@ export default async function TopicPage({ params }: Props) {
                     href={`/${t.slug}`}
                     style={{
                       display: "block",
-                      padding: "16px 20px",
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: 12,
+                      padding: "14px 18px",
+                      background: C.bg,
+                      border: `1px solid ${C.border}`,
+                      borderRadius: 10,
                       textDecoration: "none",
                     }}
                   >
                     <div
                       style={{
-                        color: "#e8e6f8",
+                        color: C.text,
                         fontSize: 14,
-                        fontWeight: 600,
+                        fontWeight: 500,
                         lineHeight: 1.4,
                         marginBottom: 6,
                       }}
@@ -778,11 +735,13 @@ export default async function TopicPage({ params }: Props) {
                     <div
                       style={{ display: "flex", gap: 6, alignItems: "center" }}
                     >
-                      <span style={{ fontSize: 11, color: d, fontWeight: 600 }}>
+                      <span style={{ fontSize: 11, color: d, fontWeight: 500 }}>
                         {t.difficulty}
                       </span>
-                      <span style={{ color: "#4b5563", fontSize: 10 }}>·</span>
-                      <span style={{ fontSize: 11, color: "#6b7280" }}>
+                      <span style={{ color: C.borderStrong, fontSize: 10 }}>
+                        ·
+                      </span>
+                      <span style={{ fontSize: 11, color: C.muted }}>
                         {t.questionCount} Qs
                       </span>
                     </div>
@@ -793,30 +752,31 @@ export default async function TopicPage({ params }: Props) {
           </section>
         )}
 
+        {/* Bottom CTA */}
         <section
           style={{
-            background:
-              "linear-gradient(135deg,rgba(124,106,247,0.12) 0%,rgba(96,165,250,0.08) 100%)",
-            border: "1px solid rgba(124,106,247,0.3)",
-            borderRadius: 16,
+            background: C.accentSubtle,
+            border: `1px solid ${C.border}`,
+            borderRadius: 14,
             padding: "36px 32px",
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: 36, marginBottom: 12 }}>🎯</div>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>🎯</div>
           <h3
             style={{
-              color: "#f1f0ff",
+              color: C.text,
               fontSize: 20,
-              fontWeight: 800,
+              fontWeight: 700,
               marginBottom: 10,
+              letterSpacing: "-0.02em",
             }}
           >
             Can you answer these under pressure?
           </h3>
           <p
             style={{
-              color: "#9090a8",
+              color: C.muted,
               fontSize: 15,
               lineHeight: 1.7,
               marginBottom: 24,
@@ -831,7 +791,7 @@ export default async function TopicPage({ params }: Props) {
           <div
             style={{
               display: "flex",
-              gap: 12,
+              gap: 10,
               justifyContent: "center",
               flexWrap: "wrap",
             }}
@@ -839,12 +799,12 @@ export default async function TopicPage({ params }: Props) {
             <Link
               href="/auth"
               style={{
-                padding: "12px 28px",
-                background: "#7c6af7",
-                color: "white",
-                borderRadius: 10,
+                padding: "11px 26px",
+                background: C.accent,
+                color: "#ffffff",
+                borderRadius: 8,
                 textDecoration: "none",
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 15,
               }}
             >
@@ -853,14 +813,14 @@ export default async function TopicPage({ params }: Props) {
             <Link
               href="/output-quiz"
               style={{
-                padding: "12px 24px",
-                background: "rgba(255,255,255,0.06)",
-                color: "#c4b5fd",
-                borderRadius: 10,
+                padding: "11px 22px",
+                background: C.bg,
+                color: C.muted,
+                borderRadius: 8,
                 textDecoration: "none",
-                fontWeight: 600,
+                fontWeight: 500,
                 fontSize: 15,
-                border: "1px solid rgba(124,106,247,0.3)",
+                border: `1px solid ${C.border}`,
               }}
             >
               Try Output Quiz
@@ -869,31 +829,150 @@ export default async function TopicPage({ params }: Props) {
         </section>
       </div>
 
+      {/* ─── Injected prose styles — light theme ─────────────────────────────── */}
       <style>{`
-        .answer-body p { margin: 0 0 12px; line-height: 1.75; font-size: 15px; color: #b0aec8; }
-        .answer-body pre { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
-        .answer-body code { font-family: 'Fira Code','Cascadia Code',monospace; font-size: 13px; color: #e2e0f0; }
-        .answer-body p code { background: rgba(124,106,247,0.15); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #c4b5fd; }
-        .answer-body ul,.answer-body ol { padding-left: 24px; margin: 0 0 14px; }
-        .answer-body li { margin-bottom: 6px; font-size: 15px; line-height: 1.7; color: #b0aec8; }
-        .answer-body strong { color: #e8e6f8; font-weight: 700; }
-        .answer-body h3,.answer-body h4 { color: #e8e6f8; margin: 20px 0 8px; font-size: 15px; }
-        .answer-body table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 14px 0; }
-        .answer-body th { text-align: left; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.12); color: #a78bfa; font-weight: 700; }
-        .answer-body td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #b0aec8; }
+        /* Answer body (AI explanation prose) */
+        .answer-body p {
+          margin: 0 0 12px;
+          line-height: 1.75;
+          font-size: 15px;
+          color: ${C.text};
+        }
+        .answer-body pre {
+          background: ${C.codeBg};
+          border: 1px solid ${C.border};
+          border-radius: 8px;
+          padding: 16px 18px;
+          overflow-x: auto;
+          margin: 14px 0;
+        }
+        .answer-body code {
+          font-family: 'JetBrains Mono','Fira Code',monospace;
+          font-size: 13px;
+          color: ${C.codeText};
+        }
+        .answer-body p code {
+          background: ${C.codeInlineBg};
+          border: 1px solid ${C.border};
+          padding: 2px 5px;
+          border-radius: 4px;
+          font-size: 12.5px;
+          color: ${C.codeText};
+        }
+        .answer-body ul, .answer-body ol {
+          padding-left: 22px;
+          margin: 0 0 14px;
+        }
+        .answer-body li {
+          margin-bottom: 6px;
+          font-size: 15px;
+          line-height: 1.7;
+          color: ${C.text};
+        }
+        .answer-body strong {
+          color: ${C.text};
+          font-weight: 600;
+        }
+        .answer-body h3, .answer-body h4 {
+          color: ${C.text};
+          margin: 20px 0 8px;
+          font-size: 15px;
+          font-weight: 600;
+        }
+        .answer-body table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 13px;
+          margin: 14px 0;
+        }
+        .answer-body th {
+          text-align: left;
+          padding: 8px 12px;
+          border-bottom: 1px solid ${C.border};
+          color: ${C.text};
+          font-weight: 600;
+          background: ${C.bgSubtle};
+        }
+        .answer-body td {
+          padding: 8px 12px;
+          border-bottom: 1px solid ${C.border};
+          color: ${C.muted};
+        }
 
-        .concept-body p { margin: 0 0 16px; line-height: 1.85; font-size: 16px; color: #b8b6d0; }
-        .concept-body pre { background: #0d0c18; border: 1px solid rgba(124,106,247,0.2); border-left: 3px solid #7c6af7; border-radius: 10px; padding: 20px 24px; overflow-x: auto; margin: 20px 0; }
-        .concept-body code { font-family: 'Fira Code','Cascadia Code',monospace; font-size: 13.5px; color: #e2e0f0; }
-        .concept-body p code,.concept-body li code { background: rgba(124,106,247,0.15); padding: 2px 7px; border-radius: 4px; font-size: 13px; color: #c4b5fd; }
-        .concept-body pre code { background: none; padding: 0; color: #c8c8d8; }
-        .concept-body h3 { color: #f1f0ff; font-size: 17px; font-weight: 700; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-        .concept-body h4 { color: #e8e6f8; font-size: 15px; font-weight: 700; margin: 24px 0 8px; }
-        .concept-body ul,.concept-body ol { padding-left: 24px; margin: 0 0 16px; }
-        .concept-body li { margin-bottom: 8px; font-size: 15px; line-height: 1.75; color: #b8b6d0; }
-        .concept-body strong { color: #f1f0ff; font-weight: 700; }
-        .concept-body blockquote { border-left: 3px solid #7c6af7; margin: 20px 0; padding: 12px 20px; background: rgba(124,106,247,0.07); border-radius: 0 8px 8px 0; font-style: italic; color: #c4b5fd; }
+        /* Concept body (deep-dive explanation prose) */
+        .concept-body p {
+          margin: 0 0 16px;
+          line-height: 1.85;
+          font-size: 16px;
+          color: ${C.text};
+        }
+        .concept-body pre {
+          background: ${C.codeBg};
+          border: 1px solid ${C.border};
+          border-left: 3px solid ${C.accent};
+          border-radius: 8px;
+          padding: 18px 22px;
+          overflow-x: auto;
+          margin: 20px 0;
+        }
+        .concept-body code {
+          font-family: 'JetBrains Mono','Fira Code',monospace;
+          font-size: 13.5px;
+          color: ${C.codeText};
+        }
+        .concept-body p code, .concept-body li code {
+          background: ${C.codeInlineBg};
+          border: 1px solid ${C.border};
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-size: 13px;
+          color: ${C.codeText};
+        }
+        .concept-body pre code {
+          background: none;
+          border: none;
+          padding: 0;
+          color: ${C.codeText};
+        }
+        .concept-body h3 {
+          color: ${C.text};
+          font-size: 16px;
+          font-weight: 600;
+          margin: 28px 0 10px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid ${C.border};
+          letter-spacing: -0.01em;
+        }
+        .concept-body h4 {
+          color: ${C.text};
+          font-size: 15px;
+          font-weight: 600;
+          margin: 22px 0 8px;
+        }
+        .concept-body ul, .concept-body ol {
+          padding-left: 22px;
+          margin: 0 0 16px;
+        }
+        .concept-body li {
+          margin-bottom: 8px;
+          font-size: 15px;
+          line-height: 1.75;
+          color: ${C.text};
+        }
+        .concept-body strong {
+          color: ${C.text};
+          font-weight: 600;
+        }
+        .concept-body blockquote {
+          border-left: 3px solid ${C.accent};
+          margin: 18px 0;
+          padding: 10px 18px;
+          background: ${C.accentSubtle};
+          border-radius: 0 6px 6px 0;
+          font-style: italic;
+          color: ${C.accentText};
+        }
       `}</style>
-    </>
+    </div>
   );
 }

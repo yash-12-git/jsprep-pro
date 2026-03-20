@@ -15,26 +15,9 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import * as Shared from "@/styles/shared";
-import { C } from "@/styles/tokens";
+import { C, RADIUS } from "@/styles/tokens";
 import * as S from "./styles";
 import type { Question } from "@/types/question";
-
-/**
- * STATE MODEL
- * ──────────────────────────────────────────────────────────────────────────
- * Same separation as OutputCard:
- *   Firestore state = progress badge in header only (has the user ever solved/revealed?)
- *   Local state = drives all visible UI
- *
- *   showReveal  — whether the fixed-code diff + explanation is currently shown
- *   aiFeedback  — current AI check result (local, not persisted)
- *   uiPhase     — 'editing' | 'checking' | 'feedback'
- *
- * This means:
- *   - reset() truly blanks the card back to the original broken code
- *   - "Show answer" / "Hide answer" toggles freely
- *   - AI check always available if isPro, regardless of prior Firestore state
- */
 
 export interface AIFeedback {
   correct: boolean;
@@ -58,7 +41,6 @@ interface Props {
   isRevealed: (id: string) => boolean;
   recordSolved: (id: string) => Promise<void>;
   recordRevealed: (id: string) => Promise<void>;
-  /** Hides code — show a locked upgrade card instead */
   isLocked?: boolean;
   onPaywall?: () => void;
 }
@@ -81,8 +63,6 @@ export default function DebugCard({
   const [feedback, setFeedback] = useState<AIFeedback | null>(null);
   const [showReveal, setShowReveal] = useState(false);
 
-  const toggle = () => setIsOpen((o) => !o);
-
   const persistedSolved = isSolved(q.id);
   const persistedRevealed = isRevealed(q.id);
   const hasEdited = userCode.trim() !== (q.brokenCode || q.code || "").trim();
@@ -90,7 +70,7 @@ export default function DebugCard({
 
   const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
   const cs = S.CAT_STYLE[q.category] ?? {
-    bg: C.border,
+    bg: C.bgSubtle,
     color: C.muted,
     border: C.border,
   };
@@ -147,12 +127,9 @@ export default function DebugCard({
   }
 
   async function revealAnswer() {
-    if (!persistedSolved && !persistedRevealed && isPro) await recordRevealed(q.id);
+    if (!persistedSolved && !persistedRevealed && isPro)
+      await recordRevealed(q.id);
     setShowReveal(true);
-  }
-
-  function hideReveal() {
-    setShowReveal(false);
   }
 
   function reset() {
@@ -161,18 +138,17 @@ export default function DebugCard({
     setFeedback(null);
     setShowReveal(false);
   }
-
   function retryAI() {
     setUiPhase("editing");
     setFeedback(null);
   }
 
   return (
-    <div css={S.questionCard(highlight, C.danger)}>
-      {/* ── Header ── */}
-      <div css={S.cardHeader} onClick={toggle}>
-        <span css={S.qNumber(C.danger)}>
-          #{String(index + 1).padStart(2, "00")}
+    <div css={S.questionCard(highlight, C.red)}>
+      {/* Header */}
+      <div css={S.cardHeader} onClick={() => setIsOpen((o) => !o)}>
+        <span css={S.qNumber(C.red)}>
+          #{String(index + 1).padStart(2, "0")}
         </span>
         <div css={{ flex: 1, minWidth: 0 }}>
           <div
@@ -184,21 +160,23 @@ export default function DebugCard({
               marginBottom: "0.375rem",
             }}
           >
-            <p css={{ fontWeight: 700, fontSize: "0.875rem" }}>{q.title}</p>
+            <p css={{ fontWeight: 600, fontSize: "0.875rem", color: C.text }}>
+              {q.title}
+            </p>
             {isLocked && <Lock size={12} color={C.muted} />}
-            {isSolvedQ && <CheckCircle size={14} color={C.accent3} />}
+            {isSolvedQ && <CheckCircle size={14} color={C.green} />}
             {!persistedSolved && persistedRevealed && (
               <Eye size={14} color={C.muted} />
             )}
             {uiPhase === "feedback" && !isSolvedQ && (
-              <XCircle size={14} color={C.danger} />
+              <XCircle size={14} color={C.red} />
             )}
           </div>
           <div css={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             <span
               css={{
                 fontSize: "0.625rem",
-                fontWeight: 700,
+                fontWeight: 600,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
                 border: `1px solid ${ds.border}`,
@@ -211,7 +189,7 @@ export default function DebugCard({
             <span
               css={{
                 fontSize: "0.625rem",
-                fontWeight: 700,
+                fontWeight: 500,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
                 border: `1px solid ${cs.border}`,
@@ -224,12 +202,12 @@ export default function DebugCard({
             <span
               css={{
                 fontSize: "0.625rem",
-                fontWeight: 700,
+                fontWeight: 600,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
-                border: `1px solid ${C.danger}33`,
-                background: `${C.danger}0d`,
-                color: C.danger,
+                border: `1px solid ${C.redBorder}`,
+                background: C.redSubtle,
+                color: C.red,
               }}
             >
               Debug
@@ -237,14 +215,13 @@ export default function DebugCard({
           </div>
         </div>
         <div css={S.chevronWrapper(isOpen)}>
-          <ChevronDown size={16} color={C.muted} />
+          <ChevronDown size={16} />
         </div>
       </div>
 
-      {/* ── Body ── */}
+      {/* Body */}
       {isOpen && (
         <div css={S.cardBody}>
-          {/* LOCKED: no code shown */}
           {isLocked ? (
             <div css={[S.bodyInner, { paddingTop: "1.25rem" }]}>
               <div
@@ -254,18 +231,19 @@ export default function DebugCard({
                   alignItems: "center",
                   gap: "0.75rem",
                   padding: "1.5rem",
-                  background: `${C.danger}08`,
-                  border: `1px solid ${C.danger}22`,
-                  borderRadius: "0.75rem",
+                  background: C.redSubtle,
+                  border: `1px solid ${C.redBorder}`,
+                  borderRadius: RADIUS.lg,
                   textAlign: "center",
                 }}
               >
-                <Lock size={22} color={C.danger} />
+                <Lock size={22} color={C.red} />
                 <div>
                   <p
                     css={{
-                      fontWeight: 800,
+                      fontWeight: 600,
                       fontSize: "0.9375rem",
+                      color: C.text,
                       marginBottom: "0.25rem",
                     }}
                   >
@@ -283,7 +261,7 @@ export default function DebugCard({
                   </p>
                 </div>
                 <button
-                  css={Shared.primaryBtn(C.danger)}
+                  css={Shared.primaryBtn(C.red)}
                   style={{ width: "auto", padding: "0.5rem 1.5rem" }}
                   onClick={onPaywall}
                 >
@@ -293,18 +271,17 @@ export default function DebugCard({
             </div>
           ) : (
             <div css={S.bodyInner}>
-              {/* Bug description */}
               {q.question && (
                 <div css={S.descriptionBox}>
                   <AlertTriangle
                     size={14}
-                    color={C.danger}
+                    color={C.red}
                     style={{ flexShrink: 0, marginTop: 2 }}
                   />
                   <p
                     css={{
                       fontSize: "0.875rem",
-                      color: "#e8c8c8",
+                      color: C.text,
                       lineHeight: 1.6,
                       margin: 0,
                     }}
@@ -314,17 +291,15 @@ export default function DebugCard({
                 </div>
               )}
 
-              {/* Broken code reference */}
               <div>
-                <p css={S.sectionLabel(C.danger)}>🔴 Broken Code</p>
-                <pre css={Shared.codeBlock(`${C.danger}4d`)}>
+                <p css={S.sectionLabel(C.red)}>🔴 Broken Code</p>
+                <pre css={Shared.codeBlock(C.redBorder)}>
                   <code>{q.brokenCode || q.code}</code>
                 </pre>
               </div>
 
-              {/* Editable fix */}
               <div>
-                <p css={S.sectionLabel(C.accent3)}>
+                <p css={S.sectionLabel(C.green)}>
                   ✏️ Your Fix
                   <span
                     css={{
@@ -350,7 +325,6 @@ export default function DebugCard({
 
               {/* Action row */}
               <div css={S.actionRow}>
-                {/* AI check button — handles all three states: pro, free+loggedIn, not logged in */}
                 {isPro ? (
                   <button
                     css={Shared.primaryBtn(C.accent)}
@@ -364,7 +338,7 @@ export default function DebugCard({
                           size={13}
                           css={{ animation: "spin 1s linear infinite" }}
                         />{" "}
-                        AI is checking...
+                        AI is checking…
                       </>
                     ) : (
                       <>
@@ -373,7 +347,6 @@ export default function DebugCard({
                     )}
                   </button>
                 ) : isLoggedIn ? (
-                  /* Logged in but free — show paywall */
                   <button
                     css={Shared.primaryBtn(C.accent)}
                     onClick={onPaywall}
@@ -385,7 +358,6 @@ export default function DebugCard({
                     </span>
                   </button>
                 ) : (
-                  /* Not logged in — sign in first */
                   <a
                     href="/auth"
                     css={Shared.primaryBtn(C.accent)}
@@ -398,7 +370,6 @@ export default function DebugCard({
                     <Zap size={13} /> Sign in to check with AI
                   </a>
                 )}
-
                 {!showReveal && (
                   <button
                     css={Shared.actionBtn(C.muted)}
@@ -408,11 +379,14 @@ export default function DebugCard({
                   </button>
                 )}
                 {showReveal && (
-                  <button css={Shared.actionBtn(C.muted)} onClick={hideReveal}>
+                  <button
+                    css={Shared.actionBtn(C.muted)}
+                    onClick={() => setShowReveal(false)}
+                  >
                     <EyeOff size={13} /> Hide Answer
                   </button>
                 )}
-                {(uiPhase === "feedback" || showReveal && !isSolvedQ) && (
+                {(uiPhase === "feedback" || (showReveal && !isSolvedQ)) && (
                   <button
                     css={Shared.ghostBtn}
                     onClick={reset}
@@ -445,11 +419,17 @@ export default function DebugCard({
                         }}
                       >
                         {feedback.correct ? (
-                          <CheckCircle size={15} color={C.accent3} />
+                          <CheckCircle size={15} color={C.green} />
                         ) : (
-                          <XCircle size={15} color={C.danger} />
+                          <XCircle size={15} color={C.red} />
                         )}
-                        <p css={{ fontWeight: 700, fontSize: "0.875rem" }}>
+                        <p
+                          css={{
+                            fontWeight: 600,
+                            fontSize: "0.875rem",
+                            color: C.text,
+                          }}
+                        >
                           {feedback.verdict}
                         </p>
                       </div>
@@ -458,24 +438,24 @@ export default function DebugCard({
                           css={S.scoreBarFill(
                             feedback.score * 10,
                             feedback.correct
-                              ? C.accent3
+                              ? C.green
                               : feedback.score >= 5
-                                ? C.accent2
-                                : C.danger,
+                                ? C.amber
+                                : C.red,
                           )}
                         />
                       </div>
                     </div>
                   </div>
                   <div css={S.feedbackRow}>
-                    <p css={S.feedbackRowTitle(C.accent3)}>
+                    <p css={S.feedbackRowTitle(C.green)}>
                       ✓ What you got right
                     </p>
                     <p css={S.feedbackRowText}>{feedback.whatTheyGotRight}</p>
                   </div>
                   {feedback.remainingIssues !== "None" && (
                     <div css={S.feedbackRow}>
-                      <p css={S.feedbackRowTitle(C.danger)}>
+                      <p css={S.feedbackRowTitle(C.red)}>
                         ✗ Still needs fixing
                       </p>
                       <p css={S.feedbackRowText}>{feedback.remainingIssues}</p>
@@ -487,7 +467,7 @@ export default function DebugCard({
                         css={{
                           fontSize: "0.75rem",
                           fontWeight: 700,
-                          color: C.accent2,
+                          color: C.amber,
                           marginBottom: "0.25rem",
                         }}
                       >
@@ -516,7 +496,7 @@ export default function DebugCard({
                 </div>
               )}
 
-              {/* Revealed: side-by-side diff */}
+              {/* Revealed diff */}
               {showReveal && (
                 <div
                   css={{
@@ -527,21 +507,21 @@ export default function DebugCard({
                 >
                   <div css={S.diffGrid}>
                     <div>
-                      <p css={S.diffLabel(C.danger)}>❌ Broken</p>
+                      <p css={S.diffLabel(C.red)}>❌ Broken</p>
                       <pre
-                        css={Shared.codeBlock(`${C.danger}4d`)}
+                        css={Shared.codeBlock(C.redBorder)}
                         style={{ maxHeight: "13rem", overflow: "auto" }}
                       >
                         <code>{q.brokenCode || q.code}</code>
                       </pre>
                     </div>
                     <div>
-                      <p css={S.diffLabel(C.accent3)}>✅ Fixed</p>
+                      <p css={S.diffLabel(C.green)}>✅ Fixed</p>
                       <pre
-                        css={Shared.codeBlock(`${C.accent3}4d`)}
+                        css={Shared.codeBlock(C.greenBorder)}
                         style={{ maxHeight: "13rem", overflow: "auto" }}
                       >
-                        <code css={{ color: C.accent3 }}>{q.fixedCode}</code>
+                        <code css={{ color: C.green }}>{q.fixedCode}</code>
                       </pre>
                     </div>
                   </div>
@@ -550,7 +530,7 @@ export default function DebugCard({
                       css={{
                         fontSize: "0.75rem",
                         fontWeight: 700,
-                        color: C.danger,
+                        color: C.red,
                         marginBottom: "0.375rem",
                       }}
                     >
@@ -559,8 +539,9 @@ export default function DebugCard({
                     <p
                       css={{
                         fontSize: "0.75rem",
-                        color: C.text,
+                        color: C.muted,
                         marginBottom: "0.75rem",
+                        lineHeight: 1.6,
                       }}
                     >
                       {q.bugDescription}
@@ -578,8 +559,9 @@ export default function DebugCard({
                     <p
                       css={{
                         fontSize: "0.75rem",
-                        color: C.text,
+                        color: C.muted,
                         marginBottom: q.keyInsight ? "0.75rem" : 0,
+                        lineHeight: 1.6,
                       }}
                     >
                       {q.explanation}
@@ -590,13 +572,19 @@ export default function DebugCard({
                           css={{
                             fontSize: "0.75rem",
                             fontWeight: 700,
-                            color: C.accent2,
+                            color: C.amber,
                             marginBottom: "0.375rem",
                           }}
                         >
                           ⚡ Key Insight
                         </p>
-                        <p css={{ fontSize: "0.75rem", color: C.text }}>
+                        <p
+                          css={{
+                            fontSize: "0.75rem",
+                            color: C.muted,
+                            lineHeight: 1.6,
+                          }}
+                        >
                           {q.keyInsight}
                         </p>
                       </>
