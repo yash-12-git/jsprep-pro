@@ -86,10 +86,12 @@ export default function JavaScriptOutputQuestionsPage() {
     <>
       <script
         type="application/ld+json"
+        key="faq-schema-output-questions"
         dangerouslySetInnerHTML={{ __html: faqSchema(faqItems) }}
       />
       <script
         type="application/ld+json"
+        key="breadcrumb-schema-output-questions"
         dangerouslySetInnerHTML={{
           __html: breadcrumbSchema([
             { name: "Home", path: "/" },

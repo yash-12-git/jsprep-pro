@@ -59,10 +59,12 @@ export default async function JavaScriptInterviewQuestionsPage() {
     <>
       <script
         type="application/ld+json"
+        key="faq-schema-interview-questions"
         dangerouslySetInnerHTML={{ __html: faqSchema(faqItems) }}
       />
       <script
         type="application/ld+json"
+        key="breadcrumb-schema-interview-questions"
         dangerouslySetInnerHTML={{
           __html: breadcrumbSchema([
             { name: "Home", path: "/" },

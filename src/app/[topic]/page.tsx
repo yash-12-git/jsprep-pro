@@ -165,6 +165,7 @@ export default async function TopicPage({ params }: Props) {
       />
       {faqItems && (
         <script
+          key="faq-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: faqItems }}
         />

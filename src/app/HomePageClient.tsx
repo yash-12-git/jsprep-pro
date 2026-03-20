@@ -320,11 +320,11 @@ export default function HomePageClient() {
             tells you exactly if you&apos;re ready.
           </p>
           <div css={ctas}>
-            <Link href={ctaHref} css={btnP}>
-              {ctaLabel} <ArrowRight size={16} />
+            <Link href="/sprint" css={btnP}>
+              Try the Sprint <ArrowRight size={16} />
             </Link>
-            <a href="#sprint" css={btnO}>
-              <Zap size={14} /> Try the Sprint
+            <a href={ctaHref} css={btnO}>
+              <Zap size={14} /> {ctaLabel}
             </a>
           </div>
         </div>

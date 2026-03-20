@@ -112,10 +112,12 @@ export default async function JavaScriptTrickyQuestionsPage() {
     <>
       <script
         type="application/ld+json"
+        key="faq-schema-tricky-questions"
         dangerouslySetInnerHTML={{ __html: faqSchema(faqItems) }}
       />
       <script
         type="application/ld+json"
+        key="breadcrumb-schema-tricky-questions"
         dangerouslySetInnerHTML={{
           __html: breadcrumbSchema([
             { name: "Home", path: "/" },

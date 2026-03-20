@@ -68,10 +68,12 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
+          key="software-schema"
           dangerouslySetInnerHTML={{ __html: softwareSchema() }}
         />
         <script
           type="application/ld+json"
+          key="website-schema"
           dangerouslySetInnerHTML={{ __html: websiteSchema() }}
         />
         <meta name="application-name" content="JSPrep Pro" />

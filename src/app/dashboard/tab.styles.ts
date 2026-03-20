@@ -83,10 +83,10 @@ export const mobileNav = css`
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.95);
+  background: ${C.bg};
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid ${C.border};
+  border-top: 1px solid ${C.bgSubtle};
   padding-bottom: env(safe-area-inset-bottom, 0px);
   @media (min-width: ${BP.md}) {
     display: none;
