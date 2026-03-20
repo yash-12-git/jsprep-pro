@@ -60,7 +60,7 @@ export function useUpgrade({ onSuccess }: UseUpgradeOptions = {}) {
           email: user.email ?? "",
           name: user.displayName ?? "",
         },
-        theme: { color: "#7c6af7" },
+        theme: { color: "#ffffff" },
         modal: {
           ondismiss: () => setLoading(false),
         },

@@ -235,8 +235,6 @@ export function useUserProgress({ uid }: UseUserProgressOptions) {
   async function recordSolved(questionId: string, score?: number) {
     if (!uid) return;
     await markSolved(uid, questionId, score);
-    console.log("mark solved done");
-    
     setProgressMap((prev) => {
       const next = new Map(prev);
       next.set(questionId, {
@@ -248,7 +246,6 @@ export function useUserProgress({ uid }: UseUserProgressOptions) {
     });
     // Award XP on the root doc so the leaderboard reflects this solve
     awardProgressXP(uid, XP.SOLVE_OUTPUT, 0).catch(() => {});
-    console.log("award xp done");
     
   }
 

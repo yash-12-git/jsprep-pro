@@ -13,7 +13,7 @@ export const SITE = {
   domain: "https://jsprep.pro",
   twitterHandle: "@jspreppro",
   description:
-    "195+ JavaScript interview questions with AI scoring, output prediction " +
+    "200+ JavaScript interview questions with AI scoring, output prediction " +
     "& debug challenges. Theory, output quiz, and debug lab modes. " +
     "Free to start — no card needed.",
 };
@@ -246,7 +246,7 @@ export function courseSchema(): string {
     "@type": "Course",
     name: "JavaScript Interview Preparation",
     description:
-      "195+ JavaScript interview questions across theory, output prediction, " +
+      "200+ JavaScript interview questions across theory, output prediction, " +
       "and debugging. AI scoring, Interview Sprint, and 36 topic deep-dives.",
     url: SITE.domain,
     provider: {

@@ -314,7 +314,7 @@ export default function HomePageClient() {
             <span css={grad}>Questions & Practice.</span>
           </h1>
           <p css={sub}>
-            Land your next role with 195+ questions across theory, output
+            Land your next role with 200+ questions across theory, output
             prediction, and debugging — with AI scoring and a timed{" "}
             <strong style={{ color: C.amber }}>Interview Sprint</strong> that
             tells you exactly if you&apos;re ready.
@@ -345,7 +345,7 @@ export default function HomePageClient() {
         {/* ── STATS ────────────────────────────────────────── */}
         <div css={statsRow}>
           {[
-            { n: "195+", l: "Questions" },
+            { n: "200+", l: "Questions" },
             { n: "3", l: "Practice modes" },
             { n: "36", l: "Topic guides" },
             { n: "6", l: "AI tools" },

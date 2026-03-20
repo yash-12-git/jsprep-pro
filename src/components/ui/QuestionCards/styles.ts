@@ -407,7 +407,7 @@ export const catBadge = (_accent: string) => css`
   color: ${C.muted};
 `;
 
-export const proBadge = (_accent2: string) => css`
+export const proBadge = css`
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;

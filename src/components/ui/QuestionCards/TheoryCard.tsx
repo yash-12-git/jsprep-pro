@@ -121,7 +121,7 @@ export default function TheoryCard({
               </span>
               <span css={S.catBadge(C.accent)}>{q.category}</span>
               {q.isPro && !isPro && (
-                <span css={S.proBadge(C.amber)}>
+                <span css={S.proBadge}>
                   <Zap size={7} /> PRO
                 </span>
               )}

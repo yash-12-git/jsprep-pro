@@ -403,7 +403,7 @@ export default async function Image({ params }: { params: { topic: string } }) {
 
         {/* Stat boxes */}
         {[
-          { value: "195+", label: "Questions" },
+          { value: "200+", label: "Questions" },
           { value: "3", label: "Modes" },
           { value: "6", label: "AI Tools" },
         ].map(({ value, label }) => (

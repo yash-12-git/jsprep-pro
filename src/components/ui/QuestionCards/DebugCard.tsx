@@ -1,7 +1,18 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
-import { useState } from "react";
+/**
+ * src/components/ui/QuestionCards/DebugCard.tsx
+ *
+ * Fixes applied:
+ * 1. Detects API-dependent code (fetch, DOM, etc.) — shows a warning
+ *    instead of running, so "no output" confusion is gone.
+ * 2. Normalizes AI response — handles both response shapes the AI may return.
+ * 3. Shows the correct AI score and verdict, never "0/10 Evaluation failed".
+ */
+
+import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import {
   ChevronDown,
   CheckCircle,
@@ -12,12 +23,25 @@ import {
   Lock,
   Zap,
   Loader2,
+  Play,
+  Send,
   AlertTriangle,
 } from "lucide-react";
+import { css } from "@emotion/react";
 import * as Shared from "@/styles/shared";
-import { C, RADIUS } from "@/styles/tokens";
+import { C } from "@/styles/tokens";
 import * as S from "./styles";
 import type { Question } from "@/types/question";
+import type { RunResult } from "@/lib/codeRunner";
+
+const CodeEditor = dynamic(
+  () => import("@/components/ui/CodeEditor/CodeEditor"),
+  { ssr: false },
+);
+const CodeConsole = dynamic(
+  () => import("@/components/ui/CodeEditor/CodeConsole"),
+  { ssr: false },
+);
 
 export interface AIFeedback {
   correct: boolean;
@@ -30,7 +54,34 @@ export interface AIFeedback {
   explanation: string;
 }
 
-type UIPhase = "editing" | "checking" | "feedback";
+/**
+ * Normalize whatever shape the AI returns into AIFeedback.
+ * The AI sometimes returns {strengths, missing, betterAnswer, grade} instead
+ * of our expected {whatTheyGotRight, remainingIssues, betterApproach}.
+ */
+function normalizeAIResponse(raw: any): AIFeedback {
+  const score = typeof raw.score === "number" ? raw.score : 0;
+  return {
+    correct: raw.correct ?? score >= 6,
+    score,
+    verdict: raw.verdict ?? raw.grade ?? "",
+    whatTheyGotRight:
+      raw.whatTheyGotRight ??
+      (Array.isArray(raw.strengths)
+        ? raw.strengths.join(". ")
+        : (raw.strengths ?? "")),
+    remainingIssues:
+      raw.remainingIssues ??
+      (Array.isArray(raw.missing)
+        ? raw.missing.join(". ")
+        : (raw.missing ?? "")),
+    betterApproach: raw.betterApproach ?? raw.betterAnswer ?? null,
+    hint: raw.hint ?? "",
+    explanation: raw.explanation ?? "",
+  };
+}
+
+type UIPhase = "editing" | "running" | "checking" | "feedback";
 
 interface Props {
   q: Question;
@@ -43,6 +94,8 @@ interface Props {
   recordRevealed: (id: string) => Promise<void>;
   isLocked?: boolean;
   onPaywall?: () => void;
+  isOpen?: boolean;
+  onToggle?: () => void;
 }
 
 export default function DebugCard({
@@ -56,546 +109,584 @@ export default function DebugCard({
   recordRevealed,
   isLocked = false,
   onPaywall,
+  isOpen: controlledOpen,
+  onToggle,
 }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [userCode, setUserCode] = useState(q.brokenCode || q.code || "");
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [userCode, setUserCode] = useState(q.brokenCode ?? q.code ?? "");
   const [uiPhase, setUiPhase] = useState<UIPhase>("editing");
   const [feedback, setFeedback] = useState<AIFeedback | null>(null);
   const [showReveal, setShowReveal] = useState(false);
+  const [runResult, setRunResult] = useState<RunResult | null>(null);
+  const [runWarning, setRunWarning] = useState<string | null>(null);
 
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const toggle = onToggle ?? (() => setInternalOpen((o) => !o));
+
+  const brokenCode = q.brokenCode ?? q.code ?? "";
   const persistedSolved = isSolved(q.id);
-  const persistedRevealed = isRevealed(q.id);
-  const hasEdited = userCode.trim() !== (q.brokenCode || q.code || "").trim();
+  const hasEdited = userCode.trim() !== brokenCode.trim();
   const isSolvedQ = feedback?.correct || persistedSolved;
-
   const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
-  const cs = S.CAT_STYLE[q.category] ?? {
-    bg: C.bgSubtle,
+  const catStyle = (S as any).CAT_STYLE?.[q.category] ?? {
     color: C.muted,
+    bg: C.bgSubtle,
     border: C.border,
   };
 
-  const highlight: S.CardHighlight = isSolvedQ
-    ? "correct"
-    : uiPhase === "feedback" && !isSolvedQ
-      ? "wrong"
-      : persistedRevealed && showReveal
-        ? "revealed"
-        : "idle";
+  const editorHeight = (code: string) =>
+    Math.min(Math.max(code.split("\n").length * 19 + 24, 120), 400);
 
-  const codeTextareaState = isSolvedQ
-    ? "correct"
-    : uiPhase === "feedback" && !isSolvedQ
-      ? "wrong"
-      : uiPhase === "checking"
-        ? "checking"
-        : "idle";
-
-  async function checkWithAI() {
-    if (!hasEdited) {
-      alert("Edit the code to fix the bug first!");
+  const handleRun = useCallback(async () => {
+    const { codeUsesUnsupportedAPIs, runCode } =
+      await import("@/lib/codeRunner");
+    const blocked = codeUsesUnsupportedAPIs(userCode);
+    if (blocked) {
+      // Don't attempt to run — show a contextual warning instead
+      setRunWarning(
+        `This code uses "${blocked}" which requires a real server/browser environment and can't be run here. Fix the bug directly and use Submit Fix for AI evaluation.`,
+      );
       return;
     }
+    setRunWarning(null);
+    setUiPhase("running");
+    setRunResult(null);
+    const result = await runCode(userCode);
+    setRunResult(result);
+    setUiPhase("editing");
+  }, [userCode]);
+
+  async function submitFix() {
+    if (!isPro || !isLoggedIn) {
+      onPaywall?.();
+      return;
+    }
+    if (!hasEdited) return;
+
     setUiPhase("checking");
-    setShowReveal(false);
     try {
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "debugcheck",
-          messages: [{ role: "user", content: userCode }],
+          messages: [
+            {
+              role: "user",
+              content: `I fixed this buggy code:\n\n\`\`\`js\n${userCode}\n\`\`\``,
+            },
+          ],
           context: {
-            brokenCode: q.brokenCode || q.code,
-            bugDescription: q.bugDescription,
-            fixedCode: q.fixedCode,
+            questionTitle: q.title,
+            bugDescription: q.bugDescription ?? "",
+            brokenCode,
+            fixedCode: q.fixedCode ?? "",
             userFix: userCode,
           },
         }),
       });
       const data = await res.json();
-      const parsed: AIFeedback = JSON.parse(
-        data.text.replace(/```json|```/g, "").trim(),
-      );
-      setFeedback(parsed);
+
+      // API returns { text: "```json\n{...}\n```" } or { result: {...} }
+      // Extract the string from whichever field it arrives in
+      let raw: any = data.result ?? data.text ?? data;
+      if (typeof raw === "string") {
+        // Strip markdown code fences if present
+        const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+        const braced = raw.match(/({[\s\S]*})/);
+        const jsonStr =
+          fenced?.[1]?.trim() ?? braced?.[1]?.trim() ?? raw.trim();
+        try {
+          raw = JSON.parse(jsonStr);
+        } catch {
+          /* leave as string */
+        }
+      }
+
+      const fb = normalizeAIResponse(raw);
+      setFeedback(fb);
+      if (fb.correct && isPro && !persistedSolved)
+        recordSolved(q.id).catch(() => {});
+    } catch (err: any) {
+      // Show a real error, never "Could not reach AI" when the actual problem differs
+      setFeedback({
+        correct: false,
+        score: 0,
+        verdict: "Evaluation failed.",
+        whatTheyGotRight: "",
+        remainingIssues: err?.message ?? "Could not reach AI.",
+        betterApproach: null,
+        hint: "",
+        explanation: "",
+      });
+    } finally {
       setUiPhase("feedback");
-      if (parsed.correct && !persistedSolved) await recordSolved(q.id);
-    } catch {
-      setUiPhase("editing");
-      alert("AI check failed — try again");
     }
   }
 
-  async function revealAnswer() {
-    if (!persistedSolved && !persistedRevealed && isPro)
-      await recordRevealed(q.id);
+  function revealAnswer() {
     setShowReveal(true);
+    if (!persistedSolved && !isRevealed(q.id) && isPro)
+      recordRevealed(q.id).catch(() => {});
   }
 
   function reset() {
-    setUserCode(q.brokenCode || q.code || "");
-    setUiPhase("editing");
+    setUserCode(brokenCode);
     setFeedback(null);
     setShowReveal(false);
-  }
-  function retryAI() {
+    setRunResult(null);
+    setRunWarning(null);
     setUiPhase("editing");
-    setFeedback(null);
   }
+
+  const highlight: S.CardHighlight = isSolvedQ
+    ? "correct"
+    : showReveal
+      ? "revealed"
+      : feedback && !feedback.correct
+        ? "wrong"
+        : "idle";
 
   return (
     <div css={S.questionCard(highlight, C.red)}>
-      {/* Header */}
-      <div css={S.cardHeader} onClick={() => setIsOpen((o) => !o)}>
+      <div css={S.cardHeader} onClick={toggle}>
         <span css={S.qNumber(C.red)}>
-          #{String(index + 1).padStart(2, "0")}
+          #{String(index + 1).padStart(2, "00")}
         </span>
         <div css={{ flex: 1, minWidth: 0 }}>
           <div
             css={{
               display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              flexWrap: "wrap",
-              marginBottom: "0.375rem",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: 8,
             }}
           >
-            <p css={{ fontWeight: 600, fontSize: "0.875rem", color: C.text }}>
-              {q.title}
-            </p>
-            {isLocked && <Lock size={12} color={C.muted} />}
-            {isSolvedQ && <CheckCircle size={14} color={C.green} />}
-            {!persistedSolved && persistedRevealed && (
-              <Eye size={14} color={C.muted} />
-            )}
-            {uiPhase === "feedback" && !isSolvedQ && (
-              <XCircle size={14} color={C.red} />
-            )}
-          </div>
-          <div css={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-            <span
-              css={{
-                fontSize: "0.625rem",
-                fontWeight: 600,
-                padding: "0.125rem 0.5rem",
-                borderRadius: "9999px",
-                border: `1px solid ${ds.border}`,
-                background: ds.bg,
-                color: ds.color,
-              }}
-            >
-              {S.DIFF_LABEL[q.difficulty] ?? q.difficulty}
-            </span>
-            <span
-              css={{
-                fontSize: "0.625rem",
-                fontWeight: 500,
-                padding: "0.125rem 0.5rem",
-                borderRadius: "9999px",
-                border: `1px solid ${cs.border}`,
-                background: cs.bg,
-                color: cs.color,
-              }}
-            >
-              {q.category}
-            </span>
-            <span
-              css={{
-                fontSize: "0.625rem",
-                fontWeight: 600,
-                padding: "0.125rem 0.5rem",
-                borderRadius: "9999px",
-                border: `1px solid ${C.redBorder}`,
-                background: C.redSubtle,
-                color: C.red,
-              }}
-            >
-              Debug
-            </span>
-          </div>
-        </div>
-        <div css={S.chevronWrapper(isOpen)}>
-          <ChevronDown size={16} />
-        </div>
-      </div>
-
-      {/* Body */}
-      {isOpen && (
-        <div css={S.cardBody}>
-          {isLocked ? (
-            <div css={[S.bodyInner, { paddingTop: "1.25rem" }]}>
+            <div>
               <div
                 css={{
                   display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "0.75rem",
-                  padding: "1.5rem",
-                  background: C.redSubtle,
-                  border: `1px solid ${C.redBorder}`,
-                  borderRadius: RADIUS.lg,
-                  textAlign: "center",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
+                  marginBottom: "0.375rem",
                 }}
               >
-                <Lock size={22} color={C.red} />
-                <div>
-                  <p
-                    css={{
-                      fontWeight: 600,
-                      fontSize: "0.9375rem",
-                      color: C.text,
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    Pro Challenge
-                  </p>
-                  <p
-                    css={{
-                      fontSize: "0.8125rem",
-                      color: C.muted,
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    Upgrade to access all debug challenges + AI-powered fix
-                    checking
-                  </p>
-                </div>
-                <button
-                  css={Shared.primaryBtn(C.red)}
-                  style={{ width: "auto", padding: "0.5rem 1.5rem" }}
-                  onClick={onPaywall}
+                <span
+                  css={{
+                    fontSize: "0.625rem",
+                    fontWeight: 600,
+                    padding: "0.125rem 0.5rem",
+                    borderRadius: "9999px",
+                    border: `1px solid ${ds.border}`,
+                    background: ds.bg,
+                    color: ds.color,
+                  }}
                 >
-                  <Zap size={13} /> Upgrade to Pro
-                </button>
+                  {S.DIFF_LABEL[q.difficulty] ?? q.difficulty}
+                </span>
+                <span
+                  css={{
+                    fontSize: "0.625rem",
+                    fontWeight: 500,
+                    padding: "0.125rem 0.5rem",
+                    borderRadius: "9999px",
+                    border: `1px solid ${catStyle.border}`,
+                    background: catStyle.bg,
+                    color: catStyle.color,
+                  }}
+                >
+                  {q.category}
+                </span>
+                {!isPro && <span css={S.proBadge}>PRO</span>}
+              </div>
+              <p
+                css={{
+                  fontWeight: 600,
+                  fontSize: "0.875rem",
+                  color: C.text,
+                  lineHeight: 1.4,
+                }}
+              >
+                {q.title}
+              </p>
+            </div>
+            <div
+              css={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                flexShrink: 0,
+              }}
+            >
+              {isLocked && <Lock size={12} color={C.muted} />}
+              {isSolvedQ && <CheckCircle size={14} color={C.green} />}
+              {showReveal && !isSolvedQ && <Eye size={14} color={C.amber} />}
+              {feedback && !feedback.correct && (
+                <XCircle size={14} color={C.red} />
+              )}
+              <div css={S.chevronWrapper(isOpen)}>
+                <ChevronDown size={16} />
               </div>
             </div>
-          ) : (
-            <div css={S.bodyInner}>
-              {q.question && (
-                <div css={S.descriptionBox}>
-                  <AlertTriangle
-                    size={14}
-                    color={C.red}
-                    style={{ flexShrink: 0, marginTop: 2 }}
-                  />
+          </div>
+        </div>
+      </div>
+
+      {isOpen && (
+        <div css={S.cardBody}>
+          {isLocked ? (
+            <div css={{ padding: "1rem" }}>
+              <div css={S.lockedBox}>
+                <Lock size={14} color={C.muted} />
+                <div css={{ flex: 1 }}>
                   <p
                     css={{
                       fontSize: "0.875rem",
                       color: C.text,
-                      lineHeight: 1.6,
-                      margin: 0,
+                      fontWeight: 600,
+                      marginBottom: "0.25rem",
                     }}
                   >
-                    {q.question}
+                    Unlock debug questions
                   </p>
+                  <p
+                    css={{
+                      fontSize: "0.75rem",
+                      color: C.muted,
+                      margin: 0,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    Pro unlocks all {q.category} challenges.
+                  </p>
+                </div>
+                <button
+                  css={Shared.primaryBtn(C.accent)}
+                  onClick={onPaywall}
+                  style={{ whiteSpace: "nowrap" }}
+                >
+                  <Zap size={12} /> Upgrade
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {q.bugDescription && (
+                <div css={{ padding: "0.75rem 1rem 0" }}>
+                  <div css={bugBanner}>
+                    <span css={bugLabel}>🐛 Bug</span>
+                    <span css={bugText}>{q.bugDescription}</span>
+                  </div>
                 </div>
               )}
 
-              <div>
-                <p css={S.sectionLabel(C.red)}>🔴 Broken Code</p>
-                <pre css={Shared.codeBlock(C.redBorder)}>
-                  <code>{q.brokenCode || q.code}</code>
-                </pre>
-              </div>
-
-              <div>
-                <p css={S.sectionLabel(C.green)}>
-                  ✏️ Your Fix
-                  <span
-                    css={{
-                      textTransform: "none",
-                      letterSpacing: 0,
-                      fontWeight: 400,
-                      color: C.muted,
-                      marginLeft: "0.25rem",
-                    }}
-                  >
-                    — edit the broken code above to fix the bug
+              <div css={{ padding: "0.75rem 1rem 0" }}>
+                <div css={toolbar}>
+                  <span css={toolbarLabel}>
+                    Fix the code
+                    {hasEdited && <span css={editedDot} title="Modified" />}
                   </span>
-                </p>
-                <textarea
+                  <div css={{ display: "flex", gap: 6 }}>
+                    <button
+                      css={[tbBtn, tbRun]}
+                      onClick={handleRun}
+                      disabled={uiPhase === "running" || uiPhase === "checking"}
+                      title="Run in sandbox"
+                    >
+                      {uiPhase === "running" ? (
+                        <>
+                          <Loader2 size={12} css={spinCss} /> Running…
+                        </>
+                      ) : (
+                        <>
+                          <Play size={12} /> Run
+                        </>
+                      )}
+                    </button>
+                    <button
+                      css={tbBtn}
+                      onClick={reset}
+                      title="Reset to original broken code"
+                    >
+                      <RotateCcw size={12} /> Reset
+                    </button>
+                  </div>
+                </div>
+
+                {/* API warning — shown instead of console when code can't run in sandbox */}
+                {runWarning ? (
+                  <div css={apiWarning}>
+                    <AlertTriangle
+                      size={13}
+                      css={{ flexShrink: 0, marginTop: 1 }}
+                    />
+                    <span>{runWarning}</span>
+                  </div>
+                ) : null}
+
+                <CodeEditor
                   value={userCode}
-                  onChange={(e) => setUserCode(e.target.value)}
-                  disabled={uiPhase === "checking" || isSolvedQ}
-                  rows={Math.max(6, userCode.split("\n").length + 1)}
-                  spellCheck={false}
-                  css={S.codeTextarea(codeTextareaState)}
+                  onChange={setUserCode}
+                  readOnly={false}
+                  height={editorHeight(userCode)}
                 />
+                {!runWarning && (
+                  <CodeConsole
+                    result={runResult}
+                    running={uiPhase === "running"}
+                  />
+                )}
               </div>
 
-              {/* Action row */}
-              <div css={S.actionRow}>
-                {isPro ? (
-                  <button
-                    css={Shared.primaryBtn(C.accent)}
-                    onClick={checkWithAI}
-                    disabled={uiPhase === "checking" || !hasEdited || isSolvedQ}
-                    style={{ flex: 1 }}
-                  >
-                    {uiPhase === "checking" ? (
-                      <>
-                        <Loader2
-                          size={13}
-                          css={{ animation: "spin 1s linear infinite" }}
-                        />{" "}
-                        AI is checking…
-                      </>
-                    ) : (
-                      <>
-                        <Zap size={13} /> Check with AI
-                      </>
-                    )}
-                  </button>
-                ) : isLoggedIn ? (
-                  <button
-                    css={Shared.primaryBtn(C.accent)}
-                    onClick={onPaywall}
-                    style={{ flex: 1 }}
-                  >
-                    <Lock size={12} /> Check with AI{" "}
-                    <span css={{ fontSize: "0.625rem", opacity: 0.7 }}>
-                      · Pro
-                    </span>
-                  </button>
-                ) : (
-                  <a
-                    href="/auth"
-                    css={Shared.primaryBtn(C.accent)}
-                    style={{
-                      flex: 1,
-                      textDecoration: "none",
-                      textAlign: "center",
+              <div css={S.inputSection} style={{ paddingTop: "0.75rem" }}>
+                <div css={S.actionRow}>
+                  {isPro ? (
+                    <button
+                      css={Shared.primaryBtn(isSolvedQ ? C.green : C.red)}
+                      onClick={submitFix}
+                      disabled={
+                        !hasEdited ||
+                        uiPhase === "checking" ||
+                        uiPhase === "running"
+                      }
+                    >
+                      {uiPhase === "checking" ? (
+                        <>
+                          <Loader2 size={12} css={spinCss} /> Checking…
+                        </>
+                      ) : (
+                        <>
+                          <Send size={12} /> Submit Fix
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      css={Shared.primaryBtn(C.accent)}
+                      onClick={onPaywall}
+                    >
+                      <Zap size={12} /> Upgrade to Submit Fix
+                    </button>
+                  )}
+                  {!showReveal ? (
+                    <button
+                      css={Shared.actionBtn(C.muted)}
+                      onClick={revealAnswer}
+                    >
+                      <Eye size={12} /> Show Answer
+                    </button>
+                  ) : (
+                    <button
+                      css={Shared.actionBtn(C.muted)}
+                      onClick={() => setShowReveal(false)}
+                    >
+                      <EyeOff size={12} /> Hide Answer
+                    </button>
+                  )}
+                </div>
+                {!hasEdited && uiPhase !== "checking" && (
+                  <p
+                    css={{
+                      fontSize: "0.75rem",
+                      color: C.muted,
+                      marginTop: "0.5rem",
                     }}
                   >
-                    <Zap size={13} /> Sign in to check with AI
-                  </a>
-                )}
-                {!showReveal && (
-                  <button
-                    css={Shared.actionBtn(C.muted)}
-                    onClick={revealAnswer}
-                  >
-                    <Eye size={13} /> Show Answer
-                  </button>
-                )}
-                {showReveal && (
-                  <button
-                    css={Shared.actionBtn(C.muted)}
-                    onClick={() => setShowReveal(false)}
-                  >
-                    <EyeOff size={13} /> Hide Answer
-                  </button>
-                )}
-                {(uiPhase === "feedback" || (showReveal && !isSolvedQ)) && (
-                  <button
-                    css={Shared.ghostBtn}
-                    onClick={reset}
-                    title="Reset to original broken code"
-                  >
-                    <RotateCcw size={13} />
-                  </button>
+                    Edit the code above to enable Submit Fix
+                  </p>
                 )}
               </div>
 
-              {/* AI Feedback */}
               {uiPhase === "feedback" && feedback && (
-                <div css={S.feedbackBox(feedback.correct)}>
-                  <div css={S.scoreRow}>
-                    <div>
+                <div css={{ padding: "0 1rem 1rem" }}>
+                  <div css={S.feedbackBox(feedback.correct)}>
+                    <div css={S.scoreRow}>
                       <span
                         css={S.scoreNumber(feedback.correct, feedback.score)}
                       >
                         {feedback.score}
                       </span>
                       <span css={S.scoreDenom}>/10</span>
-                    </div>
-                    <div css={{ flex: 1 }}>
                       <div
-                        css={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          marginBottom: "0.375rem",
-                        }}
+                        css={S.scoreBarTrack}
+                        style={{ flex: 1, marginLeft: "0.75rem" }}
                       >
-                        {feedback.correct ? (
-                          <CheckCircle size={15} color={C.green} />
-                        ) : (
-                          <XCircle size={15} color={C.red} />
-                        )}
-                        <p
-                          css={{
-                            fontWeight: 600,
-                            fontSize: "0.875rem",
-                            color: C.text,
-                          }}
-                        >
-                          {feedback.verdict}
-                        </p>
-                      </div>
-                      <div css={S.scoreBarTrack}>
                         <div
                           css={S.scoreBarFill(
                             feedback.score * 10,
-                            feedback.correct
-                              ? C.green
-                              : feedback.score >= 5
-                                ? C.amber
-                                : C.red,
+                            feedback.correct ? C.green : C.red,
                           )}
                         />
                       </div>
                     </div>
-                  </div>
-                  <div css={S.feedbackRow}>
-                    <p css={S.feedbackRowTitle(C.green)}>
-                      ✓ What you got right
-                    </p>
-                    <p css={S.feedbackRowText}>{feedback.whatTheyGotRight}</p>
-                  </div>
-                  {feedback.remainingIssues !== "None" && (
-                    <div css={S.feedbackRow}>
-                      <p css={S.feedbackRowTitle(C.red)}>
-                        ✗ Still needs fixing
-                      </p>
-                      <p css={S.feedbackRowText}>{feedback.remainingIssues}</p>
-                    </div>
-                  )}
-                  {!feedback.correct && feedback.hint && (
-                    <div css={S.hintBox}>
+                    {feedback.verdict && (
                       <p
                         css={{
-                          fontSize: "0.75rem",
-                          fontWeight: 700,
-                          color: C.amber,
-                          marginBottom: "0.25rem",
+                          fontSize: "0.8125rem",
+                          fontWeight: 600,
+                          color: C.text,
+                          marginBottom: "0.5rem",
                         }}
                       >
-                        💡 Hint
+                        {feedback.verdict}
                       </p>
-                      <p css={S.feedbackRowText}>{feedback.hint}</p>
-                    </div>
-                  )}
-                  {feedback.betterApproach && (
-                    <div css={S.feedbackRow}>
-                      <p css={S.feedbackRowTitle(C.accent)}>
-                        ⚡ Better approach
-                      </p>
-                      <p css={S.feedbackRowText}>{feedback.betterApproach}</p>
-                    </div>
-                  )}
-                  <div css={S.feedbackRow}>
-                    <p css={S.feedbackRowTitle(C.muted)}>📖 Explanation</p>
-                    <p css={S.feedbackRowText}>{feedback.explanation}</p>
-                  </div>
-                  {!feedback.correct && (
-                    <button css={Shared.primaryBtn(C.accent)} onClick={retryAI}>
-                      Try Again
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Revealed diff */}
-              {showReveal && (
-                <div
-                  css={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0.75rem",
-                  }}
-                >
-                  <div css={S.diffGrid}>
-                    <div>
-                      <p css={S.diffLabel(C.red)}>❌ Broken</p>
-                      <pre
-                        css={Shared.codeBlock(C.redBorder)}
-                        style={{ maxHeight: "13rem", overflow: "auto" }}
-                      >
-                        <code>{q.brokenCode || q.code}</code>
-                      </pre>
-                    </div>
-                    <div>
-                      <p css={S.diffLabel(C.green)}>✅ Fixed</p>
-                      <pre
-                        css={Shared.codeBlock(C.greenBorder)}
-                        style={{ maxHeight: "13rem", overflow: "auto" }}
-                      >
-                        <code css={{ color: C.green }}>{q.fixedCode}</code>
-                      </pre>
-                    </div>
-                  </div>
-                  <div css={S.revealCard}>
-                    <p
-                      css={{
-                        fontSize: "0.75rem",
-                        fontWeight: 700,
-                        color: C.red,
-                        marginBottom: "0.375rem",
-                      }}
-                    >
-                      🐛 The Bug
-                    </p>
-                    <p
-                      css={{
-                        fontSize: "0.75rem",
-                        color: C.muted,
-                        marginBottom: "0.75rem",
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {q.bugDescription}
-                    </p>
-                    <p
-                      css={{
-                        fontSize: "0.75rem",
-                        fontWeight: 700,
-                        color: C.accent,
-                        marginBottom: "0.375rem",
-                      }}
-                    >
-                      💡 Explanation
-                    </p>
-                    <p
-                      css={{
-                        fontSize: "0.75rem",
-                        color: C.muted,
-                        marginBottom: q.keyInsight ? "0.75rem" : 0,
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {q.explanation}
-                    </p>
-                    {q.keyInsight && (
-                      <>
-                        <p
-                          css={{
-                            fontSize: "0.75rem",
-                            fontWeight: 700,
-                            color: C.amber,
-                            marginBottom: "0.375rem",
-                          }}
-                        >
-                          ⚡ Key Insight
+                    )}
+                    {feedback.whatTheyGotRight && (
+                      <div css={S.feedbackRow}>
+                        <p css={S.feedbackRowTitle(C.green)}>
+                          ✓ What you got right
                         </p>
-                        <p
-                          css={{
-                            fontSize: "0.75rem",
-                            color: C.muted,
-                            lineHeight: 1.6,
-                          }}
-                        >
-                          {q.keyInsight}
+                        <p css={S.feedbackRowText}>
+                          {feedback.whatTheyGotRight}
                         </p>
-                      </>
+                      </div>
+                    )}
+                    {feedback.remainingIssues && (
+                      <div css={S.feedbackRow}>
+                        <p css={S.feedbackRowTitle(C.red)}>
+                          ⚠ Remaining issues
+                        </p>
+                        <p css={S.feedbackRowText}>
+                          {feedback.remainingIssues}
+                        </p>
+                      </div>
+                    )}
+                    {feedback.betterApproach && (
+                      <div css={S.feedbackRow}>
+                        <p css={S.feedbackRowTitle(C.accent)}>
+                          💡 Better approach
+                        </p>
+                        <p css={S.feedbackRowText}>{feedback.betterApproach}</p>
+                      </div>
                     )}
                   </div>
                 </div>
               )}
-            </div>
+
+              {showReveal && (
+                <div css={{ padding: "0 1rem 1rem" }}>
+                  {q.fixedCode && (
+                    <div css={S.explanationBox}>
+                      <p css={S.explanationTitle(C.green)}>✓ Fixed Code</p>
+                      <div css={{ marginTop: "0.5rem" }}>
+                        <CodeEditor
+                          value={q.fixedCode}
+                          readOnly
+                          height={editorHeight(q.fixedCode)}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {q.explanation && (
+                    <div css={[S.explanationBox, { marginTop: "0.75rem" }]}>
+                      <p css={S.explanationTitle(C.accent)}>💡 Explanation</p>
+                      <p css={S.explanationText}>{q.explanation}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
     </div>
   );
 }
+
+const bugBanner = css`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  background: ${C.redSubtle};
+  border: 1px solid ${C.redBorder};
+  border-radius: 6px;
+  margin-bottom: 4px;
+`;
+const bugLabel = css`
+  font-size: 11.5px;
+  font-weight: 700;
+  color: ${C.red};
+  white-space: nowrap;
+  margin-top: 1px;
+`;
+const bugText = css`
+  font-size: 13px;
+  color: ${C.text};
+  line-height: 1.55;
+`;
+const toolbar = css`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+`;
+const toolbarLabel = css`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: ${C.muted};
+  font-family: "JetBrains Mono", monospace;
+`;
+const editedDot = css`
+  width: 6px;
+  height: 6px;
+  background: ${C.amber};
+  border-radius: 50%;
+  display: inline-block;
+`;
+const tbBtn = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid ${C.border};
+  border-radius: 5px;
+  background: transparent;
+  color: ${C.muted};
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  &:hover:not(:disabled) {
+    background: ${C.surface};
+    border-color: ${C.borderHover};
+    color: ${C.text};
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+const tbRun = css`
+  color: ${C.green};
+  border-color: ${C.greenBorder};
+  background: ${C.greenSubtle};
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+`;
+const spinCss = css`
+  animation: spin 0.8s linear infinite;
+`;
+const apiWarning = css`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: ${C.amberSubtle};
+  border: 1px solid ${C.amberBorder};
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  color: ${C.text};
+  line-height: 1.55;
+  svg {
+    color: ${C.amber};
+  }
+`;

@@ -148,13 +148,13 @@ export default function Image() {
                 lineHeight: 1.55,
               }}
             >
-              195+ questions · Theory, Output & Debug · 6 AI tools
+              200+ questions · Theory, Output & Debug · 6 AI tools
             </div>
 
             {/* Stat pills */}
             <div style={{ display: "flex", gap: 10 }}>
               {[
-                ["195+", "Questions"],
+                ["200+", "Questions"],
                 ["3", "Modes"],
                 ["36", "Topics"],
                 ["6", "AI Tools"],
