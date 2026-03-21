@@ -3,8 +3,16 @@
 
 import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
-import { Save, Eye, EyeOff, Loader2, Trash2, CheckCircle } from "lucide-react";
-import { C, RADIUS, BP } from "@/styles/tokens";
+import {
+  Save,
+  Eye,
+  EyeOff,
+  Loader2,
+  Trash2,
+  CheckCircle,
+  Building2,
+} from "lucide-react";
+import { C, RADIUS } from "@/styles/tokens";
 import MarkdownEditor from "@/components/md/MarkdownEditor";
 import MarkdownRenderer from "@/components/md/MarkdownRenderer";
 import type {
@@ -27,273 +35,22 @@ interface Props {
   onDelete?: () => Promise<void>;
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-const S = {
-  wrap: css`
-    max-width: 52rem;
-  `,
-
-  row: css`
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-    @media (min-width: ${BP.sm}) {
-      grid-template-columns: 1fr 1fr;
-    }
-  `,
-
-  row3: css`
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-    @media (min-width: ${BP.sm}) {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-  `,
-
-  field: css`
-    margin-bottom: 1.25rem;
-  `,
-
-  label: css`
-    display: block;
-    font-size: 0.6875rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: ${C.muted};
-    margin-bottom: 0.375rem;
-  `,
-
-  required: css`
-    color: ${C.danger};
-    margin-left: 0.125rem;
-  `,
-
-  input: css`
-    width: 100%;
-    background: ${C.surface};
-    border: 1px solid ${C.border};
-    border-radius: ${RADIUS.md};
-    padding: 0.625rem 0.875rem;
-    font-size: 0.875rem;
-    color: white;
-    outline: none;
-    transition: border-color 0.15s ease;
-    &:focus {
-      border-color: ${C.accent}55;
-    }
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.2);
-    }
-  `,
-
-  select: css`
-    width: 100%;
-    background: ${C.surface};
-    border: 1px solid ${C.border};
-    border-radius: ${RADIUS.md};
-    padding: 0.625rem 0.875rem;
-    font-size: 0.875rem;
-    color: white;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.875rem center;
-    &:focus {
-      border-color: ${C.accent}55;
-    }
-    option {
-      background: ${C.card};
-    }
-  `,
-
-  textarea: css`
-    width: 100%;
-    background: ${C.surface};
-    border: 1px solid ${C.border};
-    border-radius: ${RADIUS.md};
-    padding: 0.625rem 0.875rem;
-    font-size: 0.875rem;
-    color: white;
-    outline: none;
-    resize: vertical;
-    font-family: "JetBrains Mono", monospace;
-    &:focus {
-      border-color: ${C.accent}55;
-    }
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.2);
-    }
-  `,
-
-  toggle: (active: boolean, color: string) => css`
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.875rem;
-    border-radius: ${RADIUS.md};
-    font-size: 0.75rem;
-    font-weight: 700;
-    border: 1px solid ${active ? color + "55" : C.border};
-    background: ${active ? color + "14" : "transparent"};
-    color: ${active ? color : C.muted};
-    cursor: pointer;
-    transition: all 0.15s ease;
-  `,
-
-  divider: css`
-    border: none;
-    border-top: 1px solid ${C.border};
-    margin: 1.5rem 0;
-  `,
-
-  sectionLabel: css`
-    font-size: 0.6875rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: ${C.muted};
-    margin-bottom: 1rem;
-  `,
-
-  footer: css`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid ${C.border};
-    margin-top: 1.5rem;
-  `,
-
-  submitBtn: (loading: boolean) => css`
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.75rem;
-    background: ${loading ? C.accent + "80" : C.accent};
-    border: none;
-    border-radius: ${RADIUS.xl};
-    color: white;
-    font-weight: 800;
-    font-size: 0.9375rem;
-    cursor: ${loading ? "not-allowed" : "pointer"};
-    transition: all 0.15s ease;
-    &:hover {
-      background: ${loading ? "" : C.accent + "ee"};
-    }
-  `,
-
-  deleteBtn: css`
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.625rem 1rem;
-    background: transparent;
-    border: 1px solid ${C.danger}44;
-    border-radius: ${RADIUS.xl};
-    color: ${C.danger};
-    font-size: 0.8125rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    &:hover {
-      background: ${C.danger}12;
-    }
-  `,
-
-  success: css`
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.875rem 1.25rem;
-    background: ${C.accent3}12;
-    border: 1px solid ${C.accent3}33;
-    border-radius: ${RADIUS.xl};
-    color: ${C.accent3};
-    font-size: 0.875rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-  `,
-
-  error: css`
-    padding: 0.875rem 1.25rem;
-    background: ${C.danger}12;
-    border: 1px solid ${C.danger}33;
-    border-radius: ${RADIUS.xl};
-    color: ${C.danger};
-    font-size: 0.875rem;
-    margin-bottom: 1.5rem;
-  `,
-
-  preview: css`
-    background: ${C.surface};
-    border: 1px solid ${C.border};
-    border-radius: ${RADIUS.xl};
-    padding: 1.25rem;
-    margin-top: 0.5rem;
-  `,
-
-  tagsInput: css`
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.375rem;
-    background: ${C.surface};
-    border: 1px solid ${C.border};
-    border-radius: ${RADIUS.md};
-    padding: 0.5rem 0.75rem;
-    &:focus-within {
-      border-color: ${C.accent}55;
-    }
-  `,
-
-  tag: css`
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    background: ${C.accent}18;
-    border: 1px solid ${C.accent}33;
-    color: ${C.accent};
-    font-size: 0.6875rem;
-    font-weight: 700;
-    padding: 0.125rem 0.5rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    &:hover {
-      background: ${C.danger}18;
-      border-color: ${C.danger}33;
-      color: ${C.danger};
-    }
-  `,
-
-  tagInput: css`
-    flex: 1;
-    min-width: 8rem;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 0.875rem;
-    color: white;
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.2);
-    }
-  `,
-};
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function slugify(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
+const ALL_COMPANIES = [
+  "Razorpay",
+  "Flipkart",
+  "Swiggy",
+  "Zomato",
+  "CRED",
+  "PhonePe",
+  "Google",
+  "Atlassian",
+  "Amazon",
+  "Microsoft",
+  "Meesho",
+  "Paytm",
+  "ShareChat",
+  "Uber",
+];
 
 const EMPTY: QuestionInput = {
   slug: "",
@@ -308,6 +65,7 @@ const EMPTY: QuestionInput = {
   code: "",
   category: "",
   tags: [],
+  companies: [],
   difficulty: "core",
   expectedOutput: "",
   brokenCode: "",
@@ -315,47 +73,306 @@ const EMPTY: QuestionInput = {
   bugDescription: "",
   status: "draft",
   isPro: false,
-  isTricky: false,
   order: 0,
   topicSlug: "",
   relatedBlogSlugs: [],
 };
 
-// ─── Component ────────────────────────────────────────────────────────────────
+const S = {
+  wrap: css`
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 56rem;
+  `,
+  success: css`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1rem;
+    background: ${C.greenSubtle};
+    border: 1px solid ${C.greenBorder};
+    border-radius: ${RADIUS.lg};
+    color: ${C.green};
+    font-size: 0.875rem;
+    font-weight: 600;
+  `,
+  error: css`
+    padding: 0.875rem 1rem;
+    background: ${C.redSubtle};
+    border: 1px solid ${C.redBorder};
+    border-radius: ${RADIUS.lg};
+    color: ${C.red};
+    font-size: 0.875rem;
+  `,
+  sectionLabel: css`
+    font-size: 0.6875rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: ${C.muted};
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid ${C.border};
+  `,
+  field: css`
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  `,
+  label: css`
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: ${C.text};
+  `,
+  required: css`
+    color: ${C.red};
+    margin-left: 2px;
+  `,
+  labelHint: css`
+    font-size: 0.75rem;
+    color: ${C.muted};
+    line-height: 1.5;
+  `,
+  row: css`
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  `,
+  input: css`
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid ${C.border};
+    border-radius: ${RADIUS.md};
+    background: ${C.surface};
+    color: ${C.text};
+    font-size: 0.875rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    &:focus {
+      outline: none;
+      border-color: ${C.accent};
+    }
+  `,
+  select: css`
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid ${C.border};
+    border-radius: ${RADIUS.md};
+    background: ${C.surface};
+    color: ${C.text};
+    font-size: 0.875rem;
+    cursor: pointer;
+    &:focus {
+      outline: none;
+      border-color: ${C.accent};
+    }
+  `,
+  textarea: css`
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid ${C.border};
+    border-radius: ${RADIUS.md};
+    background: ${C.surface};
+    color: ${C.text};
+    font-size: 0.875rem;
+    font-family: "JetBrains Mono", monospace;
+    resize: vertical;
+    box-sizing: border-box;
+    &:focus {
+      outline: none;
+      border-color: ${C.accent};
+    }
+  `,
+  tagsInput: css`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    background: ${C.surface};
+    border: 1px solid ${C.border};
+    border-radius: ${RADIUS.md};
+    padding: 0.5rem 0.75rem;
+    min-height: 2.5rem;
+    align-items: center;
+    &:focus-within {
+      border-color: ${C.accent};
+    }
+  `,
+  tag: css`
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    background: ${C.bgSubtle};
+    border: 1px solid ${C.border};
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: ${C.text};
+    cursor: pointer;
+    &:hover {
+      opacity: 0.8;
+    }
+  `,
+  tagInput: css`
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.8125rem;
+    color: ${C.text};
+    flex: 1;
+    min-width: 8rem;
+    font-family: inherit;
+  `,
+  companiesGrid: css`
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.5rem;
+  `,
+  companyBtn: (active: boolean) => css`
+    padding: 0.375rem 0.625rem;
+    border-radius: ${RADIUS.md};
+    border: 1px solid ${active ? C.accent : C.border};
+    background: ${active ? C.accent + "14" : C.surface};
+    color: ${active ? C.accent : C.muted};
+    font-size: 0.75rem;
+    font-weight: ${active ? "600" : "400"};
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.1s;
+    &:hover {
+      border-color: ${C.accent};
+      color: ${C.accent};
+    }
+  `,
+  sandboxNote: css`
+    padding: 0.75rem 1rem;
+    background: ${C.amberSubtle};
+    border: 1px solid ${C.amberBorder};
+    border-radius: ${RADIUS.md};
+    font-size: 0.8125rem;
+    color: ${C.amber};
+    line-height: 1.6;
+  `,
+  divider: css`
+    border: none;
+    border-top: 1px solid ${C.border};
+    margin: 0;
+  `,
+  actions: css`
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+  `,
+  saveBtn: css`
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.5rem;
+    background: ${C.accent};
+    border: none;
+    border-radius: ${RADIUS.xl};
+    color: white;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    &:hover {
+      opacity: 0.9;
+    }
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  `,
+  delBtn: css`
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border: 1px solid ${C.redBorder};
+    border-radius: ${RADIUS.xl};
+    background: transparent;
+    color: ${C.red};
+    font-size: 0.875rem;
+    cursor: pointer;
+    margin-left: auto;
+    &:hover {
+      background: ${C.redSubtle};
+    }
+  `,
+  previewToggle: css`
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid ${C.border};
+    border-radius: ${RADIUS.xl};
+    background: transparent;
+    color: ${C.muted};
+    font-size: 0.8125rem;
+    cursor: pointer;
+    &:hover {
+      border-color: ${C.accent};
+      color: ${C.accent};
+    }
+  `,
+  proBtn: (active: boolean) => css`
+    padding: 0.5rem 1rem;
+    border-radius: ${RADIUS.xl};
+    border: 1px solid ${active ? C.accent : C.border};
+    background: ${active ? C.accent + "14" : "transparent"};
+    color: ${active ? C.accent : C.muted};
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+  `,
+  toggle: (active: boolean, color: string) => css`
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: ${RADIUS.md};
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid ${active ? color + "55" : C.border};
+    background: ${active ? color + "14" : "transparent"};
+    color: ${active ? color : C.muted};
+    cursor: pointer;
+    transition: all 0.1s;
+    &:hover {
+      border-color: ${color};
+      color: ${color};
+    }
+  `,
+};
 
 export default function QuestionForm({
   mode,
-  initial = {},
+  initial,
   onSubmit,
   onDelete,
 }: Props) {
   const [form, setForm] = useState<QuestionInput>({ ...EMPTY, ...initial });
-  const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [preview, setPreview] = useState(false);
+  const [tagInput, setTagInput] = useState("");
   const [topics, setTopics] = useState<Topic[]>([]);
 
-  // Load available topics for the dropdown
   useEffect(() => {
     getPublishedTopics()
       .then(setTopics)
-      .catch(() => {
-        /* topics not critical — form still works */
-      });
+      .catch(() => {});
   }, []);
+  useEffect(() => {
+    if (initial) setForm((f) => ({ ...f, ...initial }));
+  }, [initial]);
 
   function set<K extends keyof QuestionInput>(key: K, val: QuestionInput[K]) {
-    setForm((f) => {
-      const next = { ...f, [key]: val };
-      // Auto-generate slug from title when creating
-      if (key === "title" && mode === "create") {
-        next.slug = slugify(val as string);
-      }
-      return next;
-    });
+    setForm((f) => ({ ...f, [key]: val }));
+    setSuccess(false);
   }
 
   function addTag(tag: string) {
@@ -363,12 +380,19 @@ export default function QuestionForm({
     if (t && !form.tags.includes(t)) set("tags", [...form.tags, t]);
     setTagInput("");
   }
-
   function removeTag(tag: string) {
     set(
       "tags",
       form.tags.filter((t) => t !== tag),
     );
+  }
+
+  const selectedCompanies: string[] = (form as any).companies ?? [];
+  function toggleCompany(c: string) {
+    const next = selectedCompanies.includes(c)
+      ? selectedCompanies.filter((x) => x !== c)
+      : [...selectedCompanies, c];
+    set("companies" as any, next);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -385,31 +409,35 @@ export default function QuestionForm({
       setError("Category is required");
       return;
     }
+    if (!form.slug.trim()) {
+      form.slug = form.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 60);
+    }
+    setError("");
     setSaving(true);
-    setError(null);
-    setSuccess(false);
     try {
       await onSubmit(form);
       setSuccess(true);
-      if (mode === "create") setForm(EMPTY);
-      setTimeout(() => setSuccess(false), 4000);
+      if (mode === "create") setForm({ ...EMPTY });
     } catch (e: any) {
-      setError(e.message ?? "Save failed");
+      setError(e.message ?? "Failed to save");
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDelete() {
-    if (!onDelete || !showDeleteConfirm) {
-      setShowDeleteConfirm(true);
+    if (!onDelete || !confirm("Delete this question? This cannot be undone."))
       return;
-    }
     setDeleting(true);
     try {
       await onDelete();
     } catch (e: any) {
       setError(e.message);
+    } finally {
       setDeleting(false);
     }
   }
@@ -426,10 +454,10 @@ export default function QuestionForm({
       )}
       {error && <div css={S.error}>{error}</div>}
 
-      {/* ── Core metadata ── */}
+      {/* ── Identity ── */}
       <div css={S.sectionLabel}>Identity</div>
       <div css={S.row}>
-        <div>
+        <div css={S.field}>
           <label css={S.label}>
             Type <span css={S.required}>*</span>
           </label>
@@ -440,126 +468,25 @@ export default function QuestionForm({
           >
             <option value="theory">📖 Theory</option>
             <option value="output">💻 Output (What prints?)</option>
-            <option value="debug">🐛 Debug (Fix the bug)</option>
-            <option value="coding">⌨️ Coding (Write code)</option>
-            <option value="system">🏗️ System Design</option>
-            <option value="behavioral">🗣️ Behavioral</option>
+            <option value="debug">🐛 Debug (Find the bug)</option>
           </select>
         </div>
-        <div>
+        <div css={S.field}>
           <label css={S.label}>
-            Track <span css={S.required}>*</span>
+            Difficulty <span css={S.required}>*</span>
           </label>
-          <select
-            css={S.select}
-            value={form.track}
-            onChange={(e) => set("track", e.target.value as Track)}
-          >
-            <option value="javascript">JavaScript</option>
-            <option value="react">React</option>
-            <option value="typescript">TypeScript</option>
-            <option value="system-design">System Design</option>
-            <option value="behavioral">Behavioral</option>
-          </select>
-        </div>
-      </div>
-
-      <div css={S.field}>
-        <label css={S.label}>
-          Title (shown in the list) <span css={S.required}>*</span>
-        </label>
-        <input
-          css={S.input}
-          type="text"
-          value={form.title}
-          onChange={(e) => set("title", e.target.value)}
-          placeholder="e.g. What is closure? / What does this code print?"
-        />
-      </div>
-
-      <div css={S.row}>
-        <div>
-          <label css={S.label}>
-            Category <span css={S.required}>*</span>
-          </label>
-          <input
-            css={S.input}
-            value={form.category}
-            onChange={(e) => set("category", e.target.value)}
-            placeholder="e.g. Closures, Event Loop, Promises"
-          />
-        </div>
-        <div>
-          <label css={S.label}>Slug (URL)</label>
-          <input
-            css={S.input}
-            value={form.slug}
-            onChange={(e) => set("slug", e.target.value)}
-            placeholder="auto-generated from title"
-          />
-        </div>
-      </div>
-
-      {/* Topic link */}
-      <div css={S.field}>
-        <label css={S.label}>
-          Topic Page
-          <span
-            css={{
-              color: C.muted,
-              fontWeight: 500,
-              textTransform: "none",
-              letterSpacing: 0,
-              marginLeft: "0.5rem",
-            }}
-          >
-            — question appears on this topic's /[slug] page
-          </span>
-        </label>
-        <select
-          css={S.select}
-          value={form.topicSlug ?? ""}
-          onChange={(e) => set("topicSlug", e.target.value)}
-        >
-          <option value="">— no topic assigned —</option>
-          {topics.map((t) => (
-            <option key={t.slug} value={t.slug}>
-              {t.keyword} — {t.category}
-            </option>
-          ))}
-        </select>
-        {topics.length === 0 && (
-          <p
-            style={{ margin: "6px 0 0", fontSize: "0.75rem", color: "#fbbf24" }}
-          >
-            ⚠ No published topics found. Publish topics in Admin → Topics first.
-          </p>
-        )}
-        {topics.length > 0 && !form.topicSlug && (
-          <p
-            style={{ margin: "6px 0 0", fontSize: "0.75rem", color: "#6b7280" }}
-          >
-            Tip: use Admin → Tag Questions to assign topics to many questions at
-            once.
-          </p>
-        )}
-      </div>
-
-      <div css={S.row3}>
-        <div>
-          <label css={S.label}>Difficulty</label>
           <select
             css={S.select}
             value={form.difficulty}
             onChange={(e) => set("difficulty", e.target.value as Difficulty)}
           >
-            <option value="beginner">🟢 Beginner</option>
-            <option value="core">🔵 Core</option>
-            <option value="advanced">🟡 Advanced</option>
-            <option value="expert">🔴 Expert</option>
+            <option value="beginner">Beginner</option>
+            <option value="core">Core</option>
+            <option value="advanced">Advanced</option>
+            <option value="expert">Expert</option>
           </select>
         </div>
-        <div>
+        <div css={S.field}>
           <label css={S.label}>Status</label>
           <select
             css={S.select}
@@ -571,19 +498,83 @@ export default function QuestionForm({
             <option value="archived">Archived</option>
           </select>
         </div>
-        <div>
-          <label css={S.label}>Sort Order</label>
+        <div css={S.field}>
+          <label css={S.label}>Track</label>
+          <select
+            css={S.select}
+            value={form.track}
+            onChange={(e) => set("track", e.target.value as Track)}
+          >
+            <option value="javascript">JavaScript</option>
+            <option value="react">React</option>
+            <option value="typescript">TypeScript</option>
+          </select>
+        </div>
+      </div>
+
+      <div css={[S.field, { gridColumn: "1 / -1" }]}>
+        <label css={S.label}>
+          Title <span css={S.required}>*</span>
+        </label>
+        <input
+          css={S.input}
+          value={form.title}
+          onChange={(e) => set("title", e.target.value)}
+          placeholder="What is a closure in JavaScript?"
+        />
+      </div>
+
+      <div css={S.row}>
+        <div css={S.field}>
+          <label css={S.label}>
+            Category <span css={S.required}>*</span>
+          </label>
+          <input
+            css={S.input}
+            value={form.category}
+            onChange={(e) => set("category", e.target.value)}
+            placeholder={isOutputOrDebug ? "Closures & Scope" : "Async JS"}
+          />
+        </div>
+        <div css={S.field}>
+          <label css={S.label}>Slug</label>
+          <input
+            css={S.input}
+            value={form.slug}
+            onChange={(e) => set("slug", e.target.value)}
+            placeholder="auto-generated from title"
+          />
+        </div>
+        <div css={S.field}>
+          <label css={S.label}>Order</label>
           <input
             css={S.input}
             type="number"
-            min={0}
             value={form.order}
             onChange={(e) => set("order", Number(e.target.value))}
           />
         </div>
       </div>
 
-      {/* Tags */}
+      {topics.length > 0 && (
+        <div css={S.field}>
+          <label css={S.label}>Topic</label>
+          <select
+            css={S.select}
+            value={form.topicSlug ?? ""}
+            onChange={(e) => set("topicSlug", e.target.value)}
+          >
+            <option value="">— none —</option>
+            {topics.map((t) => (
+              <option key={t.slug} value={t.slug}>
+                {t.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* ── Tags ── */}
       <div css={S.field}>
         <label css={S.label}>Tags</label>
         <div css={S.tagsInput}>
@@ -607,88 +598,101 @@ export default function QuestionForm({
             placeholder="Add tags (Enter to add)"
           />
         </div>
+        <span css={S.labelHint}>
+          e.g. closure, async, promise — used for search and filtering
+        </span>
       </div>
 
-      {/* Toggles */}
-      <div
-        css={{
-          display: "flex",
-          gap: "0.75rem",
-          marginBottom: "1.5rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <button
-          type="button"
-          css={S.toggle(form.isPro, C.accent2)}
-          onClick={() => set("isPro", !form.isPro)}
-        >
-          {form.isPro ? "⭐ Pro Only" : "🆓 Free"}
-        </button>
-        <button
-          type="button"
-          css={S.toggle(!!form.isTricky, C.danger)}
-          onClick={() => set("isTricky", !form.isTricky)}
-        >
-          {form.isTricky ? "🤯 Tricky ✓" : "🤯 Mark as Tricky"}
-        </button>
-        <button
-          type="button"
-          css={S.toggle(form.status === "published", C.accent3)}
-          onClick={() =>
-            set("status", form.status === "published" ? "draft" : "published")
-          }
-        >
-          {form.status === "published" ? "✓ Published" : "○ Draft"}
-        </button>
-      </div>
+      {/* ── Companies (output + debug only) ── */}
+      {isOutputOrDebug && (
+        <div css={S.field}>
+          <label css={S.label}>
+            <Building2
+              size={13}
+              style={{
+                display: "inline",
+                marginRight: 5,
+                verticalAlign: "middle",
+              }}
+            />
+            Companies that ask this in interviews
+            {selectedCompanies.length > 0 && (
+              <span
+                css={S.labelHint}
+                style={{ marginLeft: 8, display: "inline" }}
+              >
+                — {selectedCompanies.join(", ")}
+              </span>
+            )}
+          </label>
+          <div css={S.companiesGrid}>
+            {ALL_COMPANIES.map((c) => (
+              <button
+                key={c}
+                type="button"
+                css={S.companyBtn(selectedCompanies.includes(c))}
+                onClick={() => toggleCompany(c)}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+          <span css={S.labelHint}>
+            Select companies known to ask questions on this JS concept.
+          </span>
+        </div>
+      )}
 
       <hr css={S.divider} />
 
-      {/* ── Question text ── */}
-      <div css={S.sectionLabel}>Question Content</div>
-
-      <div css={S.field}>
-        <MarkdownEditor
-          label="Full Question Text (Markdown)"
-          value={form.question}
-          onChange={(v) => set("question", v)}
-          rows={5}
-          placeholder="Write the full question prompt here. Supports **Markdown** and \`code\`."
-        />
-      </div>
-
-      {/* Code block for output/debug */}
+      {/* ── Sandbox contract notice ── */}
       {isOutputOrDebug && (
-        <div css={S.field}>
-          <label css={S.label}>Code Snippet</label>
-          <textarea
-            css={S.textarea}
-            rows={8}
-            value={form.code ?? ""}
-            onChange={(e) => set("code", e.target.value)}
-            placeholder="const x = ...&#10;console.log(x)"
-          />
+        <div css={S.sandboxNote}>
+          <strong>⚡ Sandbox contract</strong>
+          {" — "}
+          {form.type === "output"
+            ? "Pure JS only (no fetch/DOM/React). All output via console.log. expectedOutput = exact logs, never an error string."
+            : 'brokenCode must run without throwing — it produces WRONG output silently. fixedCode produces expectedOutput. Never put "Error" in expectedOutput.'}
         </div>
       )}
 
-      {/* Expected output for output type */}
+      {/* ── Output fields ── */}
       {form.type === "output" && (
-        <div css={S.field}>
-          <label css={S.label}>
-            Expected Output <span css={S.required}>*</span>
-          </label>
-          <textarea
-            css={S.textarea}
-            rows={3}
-            value={form.expectedOutput ?? ""}
-            onChange={(e) => set("expectedOutput", e.target.value)}
-            placeholder="1&#10;2&#10;undefined"
-          />
-        </div>
+        <>
+          <div css={S.field}>
+            <label css={S.label}>
+              Code <span css={S.required}>*</span>
+            </label>
+            <textarea
+              css={S.textarea}
+              rows={8}
+              value={form.code ?? ""}
+              onChange={(e) => set("code", e.target.value)}
+              placeholder={
+                "for (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}"
+              }
+            />
+          </div>
+          <div css={S.field}>
+            <label css={S.label}>
+              Expected Output <span css={S.required}>*</span>
+            </label>
+            <textarea
+              css={S.textarea}
+              rows={3}
+              value={form.expectedOutput ?? ""}
+              onChange={(e) => set("expectedOutput", e.target.value)}
+              placeholder={"3\n3\n3"}
+            />
+            <span css={S.labelHint}>
+              Exact console.log output — one value per line. Never include error
+              strings.
+            </span>
+          </div>
+        </>
       )}
 
-      {/* Debug-specific fields */}
+      {/* ── Debug fields ── */}
       {form.type === "debug" && (
         <>
           <div css={S.field}>
@@ -700,6 +704,7 @@ export default function QuestionForm({
               rows={8}
               value={form.brokenCode ?? ""}
               onChange={(e) => set("brokenCode", e.target.value)}
+              placeholder="// Runs without throwing — produces wrong output"
             />
           </div>
           <div css={S.field}>
@@ -711,7 +716,24 @@ export default function QuestionForm({
               rows={8}
               value={form.fixedCode ?? ""}
               onChange={(e) => set("fixedCode", e.target.value)}
+              placeholder="// Produces the correct expectedOutput"
             />
+          </div>
+          <div css={S.field}>
+            <label css={S.label}>
+              Expected Output (what fixedCode logs){" "}
+              <span css={S.required}>*</span>
+            </label>
+            <textarea
+              css={S.textarea}
+              rows={3}
+              value={form.expectedOutput ?? ""}
+              onChange={(e) => set("expectedOutput", e.target.value)}
+              placeholder={"0\n1\n2"}
+            />
+            <span css={S.labelHint}>
+              Never an error string — must be actual console.log values.
+            </span>
           </div>
           <div css={S.field}>
             <label css={S.label}>Bug Description</label>
@@ -719,7 +741,7 @@ export default function QuestionForm({
               css={S.input}
               value={form.bugDescription ?? ""}
               onChange={(e) => set("bugDescription", e.target.value)}
-              placeholder="Missing await on the fetch call"
+              placeholder="var is function-scoped — all closures share the same i"
             />
           </div>
         </>
@@ -731,103 +753,152 @@ export default function QuestionForm({
       <div css={S.sectionLabel}>Answer &amp; Explanation</div>
 
       <div css={S.field}>
-        <MarkdownEditor
-          label="Answer (Markdown — supports code blocks)"
-          value={form.answer}
-          onChange={(v) => set("answer", v)}
-          rows={12}
-          placeholder={`**Closure** is a function that retains access to its outer scope.\n\n\`\`\`js\nfunction counter() {\n  let n = 0\n  return () => ++n\n}\n\`\`\``}
-        />
+        <div
+          css={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <label css={S.label}>
+            Answer (Markdown) <span css={S.required}>*</span>
+          </label>
+          <button
+            type="button"
+            css={S.previewToggle}
+            onClick={() => setPreview((p) => !p)}
+          >
+            {preview ? (
+              <>
+                <EyeOff size={13} /> Edit
+              </>
+            ) : (
+              <>
+                <Eye size={13} /> Preview
+              </>
+            )}
+          </button>
+        </div>
+        {preview ? (
+          <div
+            css={{
+              padding: "0.75rem 1rem",
+              border: `1px solid ${C.border}`,
+              borderRadius: RADIUS.md,
+              background: C.surface,
+              minHeight: "8rem",
+            }}
+          >
+            <MarkdownRenderer content={form.answer} />
+          </div>
+        ) : (
+          <MarkdownEditor
+            value={form.answer}
+            onChange={(v) => set("answer", v)}
+          />
+        )}
       </div>
 
       <div css={S.field}>
-        <label css={S.label}>Hint (shown before answer)</label>
+        <label css={S.label}>Key Insight</label>
+        <input
+          css={S.input}
+          value={form.keyInsight ?? ""}
+          onChange={(e) => set("keyInsight", e.target.value)}
+          placeholder="The single most important takeaway for interviews"
+        />
+      </div>
+      <div css={S.field}>
+        <label css={S.label}>Explanation</label>
+        <textarea
+          css={S.textarea}
+          rows={3}
+          value={form.explanation ?? ""}
+          onChange={(e) => set("explanation", e.target.value)}
+          placeholder="Plain-text step-by-step explanation (shown after reveal)"
+        />
+      </div>
+      <div css={S.field}>
+        <label css={S.label}>Hint</label>
         <input
           css={S.input}
           value={form.hint ?? ""}
           onChange={(e) => set("hint", e.target.value)}
-          placeholder="Think about scope and what the function can 'see'"
+          placeholder="A subtle nudge without giving the answer away"
         />
       </div>
 
-      <div css={S.row}>
-        <div>
-          <label css={S.label}>Explanation</label>
-          <textarea
-            css={S.textarea}
-            rows={3}
-            value={form.explanation ?? ""}
-            onChange={(e) => set("explanation", e.target.value)}
-            placeholder="Used for output/debug detailed breakdown"
-          />
-        </div>
-        <div>
-          <label css={S.label}>Key Insight</label>
-          <textarea
-            css={S.textarea}
-            rows={3}
-            value={form.keyInsight ?? ""}
-            onChange={(e) => set("keyInsight", e.target.value)}
-            placeholder="One sentence takeaway that sticks"
-          />
-        </div>
+      <hr css={S.divider} />
+
+      {/* ── Visibility ── */}
+      <div css={S.sectionLabel}>Visibility</div>
+      <div css={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+        <button
+          type="button"
+          css={S.toggle(form.isPro, C.accent)}
+          onClick={() => set("isPro", !form.isPro)}
+        >
+          {form.isPro ? "⭐ Pro Only" : "🆓 Free"}
+        </button>
+        <button
+          type="button"
+          css={S.toggle(!!(form as any).isTricky, C.red)}
+          onClick={() => set("isTricky" as any, !(form as any).isTricky)}
+        >
+          {(form as any).isTricky ? "🤯 Tricky ✓" : "🤯 Mark as Tricky"}
+        </button>
+        <button
+          type="button"
+          css={S.toggle(form.status === "published", C.green)}
+          onClick={() =>
+            set("status", form.status === "published" ? "draft" : "published")
+          }
+        >
+          {form.status === "published" ? "✓ Published" : "○ Draft"}
+        </button>
       </div>
 
-      {/* ── Footer ── */}
-      <div css={S.footer}>
-        <div css={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          {onDelete && (
-            <button
-              type="button"
-              css={S.deleteBtn}
-              onClick={handleDelete}
-              disabled={deleting}
-            >
-              {deleting ? (
-                <Loader2
-                  size={14}
-                  css={{ animation: "spin 1s linear infinite" }}
-                />
-              ) : (
-                <Trash2 size={14} />
-              )}
-              {showDeleteConfirm ? "Confirm delete?" : "Delete"}
-            </button>
-          )}
-          {showDeleteConfirm && (
-            <button
-              type="button"
-              onClick={() => setShowDeleteConfirm(false)}
-              css={{
-                fontSize: "0.75rem",
-                color: C.muted,
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Cancel
-            </button>
-          )}
-        </div>
+      <hr css={S.divider} />
 
-        <button type="submit" css={S.submitBtn(saving)} disabled={saving}>
+      {/* ── Actions ── */}
+      <div css={S.actions}>
+        <button type="submit" css={S.saveBtn} disabled={saving}>
           {saving ? (
             <>
               <Loader2
-                size={16}
+                size={15}
                 css={{ animation: "spin 1s linear infinite" }}
               />{" "}
               Saving…
             </>
           ) : (
             <>
-              <Save size={16} />{" "}
+              <Save size={15} />{" "}
               {mode === "create" ? "Create Question" : "Save Changes"}
             </>
           )}
         </button>
+        {onDelete && (
+          <button
+            type="button"
+            css={S.delBtn}
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? (
+              <Loader2
+                size={14}
+                css={{ animation: "spin 1s linear infinite" }}
+              />
+            ) : (
+              <Trash2 size={14} />
+            )}
+            Delete
+          </button>
+        )}
       </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </form>
   );
 }

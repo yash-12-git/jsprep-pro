@@ -76,7 +76,7 @@ export default function CodeEditor({
           },
           padding: { top: 12, bottom: 12 },
           tabSize: 2,
-          wordWrap: "off",
+          wordWrap: "on",
           contextmenu: false,
           quickSuggestions: !readOnly,
           parameterHints: { enabled: !readOnly },

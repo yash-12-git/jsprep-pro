@@ -472,15 +472,15 @@ export default function CheatsheetPage() {
             {[
               {
                 href: "/javascript-interview-questions",
-                text: "150+ full JavaScript interview questions with answers",
+                text: "200+ full JavaScript interview questions with answers",
               },
               {
                 href: "/output-quiz",
-                text: "Output prediction quiz (40 tricky code snippets)",
+                text: "Output prediction quiz ( tricky code snippets)",
               },
               {
                 href: "/debug-lab",
-                text: "Debug lab (20 real bugs to fix with AI feedback)",
+                text: "Debug lab ( real bugs to fix with AI feedback)",
               },
               {
                 href: "/questions/async-js",

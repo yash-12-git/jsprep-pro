@@ -464,7 +464,7 @@ export default function JavaScriptOutputQuestionsPage() {
               ⚡ Start Free — 5 Questions
             </Link>
             <Link
-              href="/pricing"
+              href="/#pricing"
               style={{
                 display: "inline-flex",
                 alignItems: "center",

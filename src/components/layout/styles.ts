@@ -185,7 +185,7 @@ export const newBadge = css`
   font-size: 0.5rem;
   background: ${C.amberSubtle};
   color: ${C.amber};
-  border: 1px solid ${C.amberBorder};
+  border: 1px solid ${C.amber};
   padding: 0.125rem 0.3125rem;
   border-radius: ${RADIUS.sm};
   font-weight: 700;

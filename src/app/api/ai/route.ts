@@ -1,3 +1,13 @@
+/**
+ * src/app/api/ai/route.ts
+ *
+ * All AI features — Groq only (free, fast).
+ * RAG context injected into qa + evaluate + generate prompts.
+ *
+ * Env vars needed:
+ *   GROQ_API_KEY=gsk_...   (free at console.groq.com)
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { buildRAGContext } from "@/lib/embeddings";
 import type { SimilarQuestion } from "@/lib/embeddings";
@@ -172,7 +182,31 @@ Start the interview now with your first question.`;
 
       // ── Question Generator ────────────────────────────────────────────────
       case "generate":
-        systemPrompt = `You are an expert JavaScript interview question author creating high-quality questions for developers with 1-5 years experience.
+        // ── SANDBOX CONTRACT (enforced for all output + debug questions) ────────
+        // Output questions: code must run → console.log matches expectedOutput
+        // Debug questions:  brokenCode must run → produce WRONG output (not throw)
+        //                   fixedCode must run → produce correct expectedOutput
+        // BANNED: fetch, XMLHttpRequest, DOM, React, Node.js APIs, error-output
+        const sandboxRules =
+          context.type === "output" || context.type === "debug"
+            ? `
+CRITICAL SANDBOX RULES — you MUST follow these exactly:
+1. Use ONLY pure JavaScript — no fetch, no XMLHttpRequest, no DOM APIs,
+   no document, no window, no React, no Node.js (fs, path, process, require)
+2. ALL output must be via console.log — no alert, confirm, prompt
+3. The code must be deterministic — same output every single run
+4. setTimeout and Promise are ALLOWED for event-loop questions only
+5. For DEBUG questions specifically:
+   - brokenCode must RUN without throwing — it must produce WRONG output
+   - The bug must be subtle and conceptual (scope, this, closure, coercion)
+   - fixedCode must produce the correct expectedOutput
+   - NEVER generate a bug that throws a ReferenceError, TypeError, or SyntaxError
+   - expectedOutput must NEVER contain the word "Error"
+6. Teach exactly ONE core JavaScript concept per question`
+            : "";
+
+        systemPrompt = `You are an expert JavaScript interview question author creating questions for developers with 1-3 years experience.
+${sandboxRules}
 
 Generate a ${context.difficulty} ${context.type} JavaScript interview question about: ${context.topic}
 Category: ${context.category}
@@ -191,21 +225,30 @@ ${
     : context.type === "output"
       ? `Respond ONLY with this JSON (no markdown, no backticks):
 {
-  "title": "<What does this output? question title>",
-  "code": "<the JavaScript code snippet, use \\n for newlines>",
-  "expectedOutput": "<exact output, each value on its own line>",
-  "explanation": "<why this is the output — step by step>",
-  "keyInsight": "<the JS concept this tests>"
-}`
+  "title": "<concise question title — describes the concept, not 'what does this output'>",
+  "code": "<the JavaScript code, use \\n for newlines — must run in sandbox>",
+  "expectedOutput": "<exact console.log output, one value per line — NEVER an error string>",
+  "explanation": "<why this is the output — step by step reasoning>",
+  "keyInsight": "<the one JS concept this question tests>",
+  "hint": "<a hint that guides thinking without revealing the answer>",
+  "companies": ["<co1>", "<co2>"]
+}
+
+For companies: pick 2-4 from Razorpay, Flipkart, Swiggy, Zomato, CRED, PhonePe, Google, Atlassian, Amazon, Microsoft, Paytm based on which are known to interview on this JS concept.`
       : `Respond ONLY with this JSON (no markdown, no backticks):
 {
-  "title": "<Find the bug question title>",
-  "brokenCode": "<the buggy JavaScript code, use \\n for newlines>",
-  "fixedCode": "<the corrected code, use \\n for newlines>",
-  "bugDescription": "<one sentence describing the bug>",
-  "explanation": "<why it was broken and how the fix works>",
-  "keyInsight": "<the JS concept this teaches>"
-}`
+  "title": "<concise title describing the bug>",
+  "brokenCode": "<the RUNNABLE buggy code that produces WRONG output — must not throw>",
+  "fixedCode": "<the corrected code that produces the correct expectedOutput>",
+  "bugDescription": "<one sentence: what the bug is and why it produces wrong output>",
+  "expectedOutput": "<what fixedCode logs — NEVER contains 'Error' or 'error'>",
+  "explanation": "<why it was broken and exactly how the fix works>",
+  "keyInsight": "<the JS concept this teaches>",
+  "hint": "<a hint pointing toward the bug without revealing it>",
+  "companies": ["<co1>", "<co2>"]
+}
+
+For companies: pick 2-4 from Razorpay, Flipkart, Swiggy, CRED, PhonePe, Google, Atlassian, Amazon, Microsoft based on which ask about this JS bug pattern in interviews.`
 }`;
         break;
 

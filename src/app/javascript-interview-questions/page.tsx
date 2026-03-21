@@ -1,442 +1,381 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  pageMeta,
-  faqSchema,
-  breadcrumbSchema,
-  catToSlug,
-  KEYWORDS,
-} from "@/lib/seo/seo";
-import PracticeCTA from "./PracticeCTA";
-import HeroCTA from "./HeroCTA";
-import { getPublishedCategories, getQuestions } from "@/lib/cachedQueries";
+import { Suspense } from "react";
+import { pageMeta } from "@/lib/seo/seo";
+import QuestionList from "./QuestionList";
 import { C } from "@/styles/tokens";
+
+// ─── Static metadata ──────────────────────────────────────────────────────────
 
 export const metadata: Metadata = pageMeta({
   title: "150+ JavaScript Interview Questions With Answers (2025)",
   description:
-    "The most complete list of JavaScript interview questions with detailed answers, code examples, and explanations. Covers closures, event loop, promises, async/await, prototypes, and more.",
+    "The most complete list of JavaScript interview questions with detailed answers and code examples. Covers closures, event loop, promises, async/await, prototypes, this keyword, type coercion and more. Asked at Razorpay, Flipkart, Google, Atlassian.",
   path: "/javascript-interview-questions",
-  keywords: [
-    "javascript interview questions 2026",
-    "js interview questions and answers",
-    "javascript interview questions for experienced",
-    "top javascript interview questions",
-    "advanced javascript interview questions",
-    ...KEYWORDS.secondary,
-  ],
 });
 
-function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 300);
-}
+// ─── FAQ schema (static, does not need Firestore) ────────────────────────────
 
-export const revalidate = 3600;
+const STATIC_FAQS = [
+  {
+    q: "What is a closure in JavaScript?",
+    a: "A closure is a function that retains access to its outer scope even after the outer function has returned. It captures the variable binding, not the value at definition time.",
+  },
+  {
+    q: "What is the difference between var, let, and const?",
+    a: "var is function-scoped and hoisted as undefined. let and const are block-scoped and not accessible before declaration (TDZ). const additionally prevents reassignment.",
+  },
+  {
+    q: "What is the event loop in JavaScript?",
+    a: "The event loop processes tasks from the call stack and queues. Synchronous code runs first, then microtasks (Promise.then, queueMicrotask), then macrotasks (setTimeout, setInterval).",
+  },
+  {
+    q: "What is the difference between == and === in JavaScript?",
+    a: "== performs type coercion before comparison. === compares both value and type without coercion. null == undefined is true but null === undefined is false.",
+  },
+  {
+    q: "How does prototypal inheritance work in JavaScript?",
+    a: "Objects inherit properties from their prototype chain. When accessing a property, JavaScript walks up the chain until it finds the property or reaches null. Object.create() sets the prototype directly.",
+  },
+  {
+    q: "What is async/await in JavaScript?",
+    a: "async/await is syntactic sugar over Promises. An async function always returns a Promise. await pauses execution inside the async function until the Promise settles, then resumes as a microtask.",
+  },
+  {
+    q: "What is the difference between null and undefined?",
+    a: 'undefined means a variable has been declared but not assigned. null is an explicit assignment meaning "no value". typeof null returns "object" — a historic JavaScript bug.',
+  },
+  {
+    q: "How does hoisting work in JavaScript?",
+    a: "var declarations are moved to the top of their function scope at compile time, initialized as undefined. Function declarations are fully hoisted. let and const are hoisted but stay in the TDZ until the declaration is reached.",
+  },
+];
 
-export default async function JavaScriptInterviewQuestionsPage() {
-  const { questions: allQuestions } = await getQuestions({
-    filters: { status: "published", type: "theory" },
-    pageSize: 500,
-  });
-  const categories = await getPublishedCategories();
+// ─── Static topic sections (shown while QuestionList loads / as SEO content) ─
 
-  const questionsByCategory = categories.map((cat) => ({
-    cat,
-    slug: catToSlug(cat),
-    questions: allQuestions.filter((q) => q.category === cat),
-  }));
+const TOPIC_SECTIONS = [
+  {
+    title: "Closures & Scope",
+    href: "/javascript-closure-interview-questions",
+  },
+  {
+    title: "Event Loop & Async",
+    href: "/javascript-event-loop-interview-questions",
+  },
+  {
+    title: "Execution Context",
+    href: "/javascript-execution-context-interview-questions",
+  },
+  {
+    title: "Prototypes & Inheritance",
+    href: "/javascript-prototype-interview-questions",
+  },
+  {
+    title: "Type Coercion",
+    href: "/javascript-type-coercion-interview-questions",
+  },
+  {
+    title: "Hoisting & TDZ",
+    href: "/javascript-hoisting-interview-questions",
+  },
+];
 
-  const faqItems = allQuestions.slice(0, 20).map((q) => ({
-    question: q.title,
-    answer: stripHtml(q.answer ?? ""),
-  }));
+const PREP_TIPS = [
+  {
+    emoji: "🧠",
+    title: "Understand, don't memorize",
+    desc: "Focus on why JavaScript behaves the way it does — coercion rules, event loop mechanics, closure semantics. Interviewers can tell the difference.",
+  },
+  {
+    emoji: "💻",
+    title: "Predict output before running",
+    desc: "Use output quiz questions to train your mental model. If you can predict what code logs, you truly understand the concept.",
+  },
+  {
+    emoji: "🐛",
+    title: "Debug real bugs",
+    desc: "Practice with buggy code that produces wrong output silently — not syntax errors. Real interview bugs are always logical, not typos.",
+  },
+  {
+    emoji: "📐",
+    title: "Master the big 8 concepts",
+    desc: "Closures, this binding, event loop, prototypes, async/await, type coercion, hoisting, and ES6+ features cover 90% of JavaScript interviews.",
+  },
+  {
+    emoji: "🏢",
+    title: "Company patterns vary",
+    desc: "Razorpay loves event loop. Flipkart tests closures heavily. Google digs into prototypes and generators. Know which concepts each company emphasizes.",
+  },
+  {
+    emoji: "⏱️",
+    title: "Practice under time pressure",
+    desc: "Use the Sprint feature — 10 questions in 15 minutes. Interview pressure is real and you can train for it.",
+  },
+];
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function JSInterviewQuestionsPage() {
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: STATIC_FAQS.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
 
   return (
     <>
       <script
         type="application/ld+json"
-        key="faq-schema-interview-questions"
-        dangerouslySetInnerHTML={{ __html: faqSchema(faqItems) }}
-      />
-      <script
-        type="application/ld+json"
-        key="breadcrumb-schema-interview-questions"
-        dangerouslySetInnerHTML={{
-          __html: breadcrumbSchema([
-            { name: "Home", path: "/" },
-            {
-              name: "JavaScript Interview Questions",
-              path: "/javascript-interview-questions",
-            },
-          ]),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
       <div
         style={{
           maxWidth: "56rem",
           margin: "0 auto",
-          padding: "2.5rem 1.25rem",
-          color: C.text,
-          fontFamily: "system-ui, sans-serif",
+          padding: "2rem 1.25rem 4rem",
         }}
       >
-        {/* Breadcrumb */}
-        <nav
-          style={{
-            fontSize: "0.8125rem",
-            color: C.muted,
-            marginBottom: "2rem",
-          }}
-        >
-          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
-            JSPrep Pro
-          </Link>
-          <span style={{ margin: "0 0.5rem", color: C.borderStrong }}>›</span>
-          <span style={{ color: C.muted }}>JavaScript Interview Questions</span>
-        </nav>
-
-        {/* Hero */}
-        <header style={{ marginBottom: "2.5rem" }}>
-          <h1
+        {/* ── Hero ── */}
+        <div style={{ marginBottom: "2.5rem" }}>
+          <div
             style={{
-              fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
-              fontWeight: 700,
-              color: C.text,
-              lineHeight: 1.15,
-              marginBottom: "1rem",
-              letterSpacing: "-0.025em",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              color: "var(--color-accent)",
+              marginBottom: "0.75rem",
             }}
           >
-            150+ JavaScript Interview Questions
-            <br />
-            <span style={{ color: C.accent }}>
-              With Answers & Code Examples
-            </span>
+            JavaScript Interview Prep
+          </div>
+          <h1
+            style={{
+              fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
+              fontWeight: 900,
+              lineHeight: 1.15,
+              color: "var(--color-text)",
+              marginBottom: "1rem",
+            }}
+          >
+            200+ JavaScript Interview Questions
           </h1>
           <p
             style={{
               fontSize: "1.0625rem",
-              lineHeight: 1.75,
-              marginBottom: "1rem",
-              maxWidth: "44rem",
-              color: C.text,
-            }}
-          >
-            The most comprehensive collection of{" "}
-            <strong style={{ color: C.text }}>
-              JavaScript interview questions
-            </strong>{" "}
-            for frontend developers in 2025. Covers everything from basic JS
-            concepts to advanced topics like the event loop, closures, promises,
-            prototypes, and modern ES2023+ features.
-          </p>
-          <p
-            style={{
-              fontSize: "0.9375rem",
-              color: C.muted,
+              color: "var(--color-muted)",
+              lineHeight: 1.7,
+              maxWidth: "48rem",
               marginBottom: "1.5rem",
             }}
           >
-            ✅ {allQuestions.length} questions &nbsp;·&nbsp; ✅{" "}
-            {categories.length} categories &nbsp;·&nbsp; ✅ Code examples in
-            every answer &nbsp;·&nbsp; ✅ Updated 2025
+            Comprehensive JavaScript interview prep covering closures, event
+            loop, promises, async/await, prototypes,{" "}
+            <code style={inlineCode}>this</code> keyword, type coercion and
+            more. Questions asked at{" "}
+            <strong>Razorpay, Flipkart, Google, Atlassian, Swiggy, CRED</strong>{" "}
+            and other top tech companies.
           </p>
-          <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
-            <HeroCTA />
-            <a
-              href="#questions"
+
+          {/* CTA buttons */}
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+            <Link
+              href="/dashboard"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "0.5625rem 1.25rem",
-                border: `1px solid ${C.border}`,
-                color: C.muted,
-                borderRadius: "0.625rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                fontSize: "0.9375rem",
+                ...btn,
+                background: "var(--color-accent)",
+                color: "white",
+                border: "none",
               }}
             >
-              Browse Questions ↓
-            </a>
+              🚀 Practice Now — It's Free
+            </Link>
+            <Link
+              href="/output-quiz"
+              style={{
+                ...btn,
+                background: "transparent",
+                color: "var(--color-text)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              💻 Output Quiz
+            </Link>
+            <Link
+              href="/debug-lab"
+              style={{
+                ...btn,
+                background: "transparent",
+                color: "var(--color-text)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              🐛 Debug Lab
+            </Link>
           </div>
-        </header>
+        </div>
 
-        {/* Table of Contents */}
-        <section
-          style={{
-            background: C.bgSubtle,
-            border: `1px solid ${C.border}`,
-            borderRadius: "0.875rem",
-            padding: "1.375rem",
-            marginBottom: "2.5rem",
-          }}
+        {/* ── Live question list (client component, loads from Firestore) ── */}
+        {/* Shows stats, company banner, and categorized question list */}
+        {/* Falls back silently to static sections below if not loaded */}
+        <Suspense
+          fallback={
+            <div
+              style={{
+                color: "var(--color-muted)",
+                fontSize: "0.875rem",
+                padding: "1rem 0",
+              }}
+            >
+              Loading questions…
+            </div>
+          }
         >
-          <h2
+          <QuestionList />
+        </Suspense>
+
+        {/* ── Static topic overview (always visible, good for SEO + fallback) ── */}
+        <div style={{ marginBottom: "3rem", marginTop: "1rem" }}>
+          <h2 style={h2}>Core JavaScript Topics</h2>
+          <div
             style={{
-              fontSize: "0.9375rem",
-              fontWeight: 600,
-              color: C.text,
-              marginBottom: "1rem",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: "0.625rem",
+              marginBottom: "2rem",
             }}
           >
-            📋 Table of Contents
-          </h2>
-          <ol
-            style={{
-              paddingLeft: "1.25rem",
-              columns: 2,
-              columnGap: "2rem",
-              fontSize: "0.875rem",
-            }}
-          >
-            {questionsByCategory.map(({ cat, slug, questions: qs }) => (
-              <li
-                key={cat}
-                style={{ marginBottom: "0.5rem", breakInside: "avoid" }}
-              >
-                <a
-                  href={`#${slug}`}
-                  style={{ color: C.accent, textDecoration: "none" }}
-                >
-                  {cat}
-                </a>
+            {TOPIC_SECTIONS.map((s) => (
+              <Link key={s.href} href={s.href} style={topicCard}>
                 <span
                   style={{
-                    color: C.muted,
-                    marginLeft: "0.375rem",
-                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    color: "var(--color-text)",
+                    fontSize: "0.875rem",
                   }}
                 >
-                  ({qs.length})
+                  {s.title}
                 </span>
-              </li>
+              </Link>
             ))}
-          </ol>
-        </section>
-
-        {/* Intro */}
-        <section
-          style={{
-            marginBottom: "3rem",
-            lineHeight: 1.85,
-            fontSize: "0.9375rem",
-            color: C.text,
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "1.25rem",
-              fontWeight: 700,
-              color: C.text,
-              marginBottom: "0.875rem",
-              letterSpacing: "-0.015em",
-            }}
-          >
-            How to Use This Guide
-          </h2>
-          <p style={{ marginBottom: "0.875rem", color: C.text }}>
-            This guide covers the most frequently asked{" "}
-            <strong>JavaScript interview questions</strong> across all
-            experience levels — from junior developers with 0–1 years of
-            experience to senior engineers. Each answer includes a clear
-            explanation, working code examples, and common gotchas that
-            interviewers specifically test for.
-          </p>
-          <p style={{ marginBottom: "0.875rem", color: C.text }}>
-            The questions are organized by topic so you can focus on your weak
-            areas first. We recommend using the{" "}
-            <Link href="/dashboard" style={{ color: C.accent }}>
-              interactive practice platform
-            </Link>{" "}
-            to test yourself rather than just reading — active recall improves
-            retention by up to 50%.
-          </p>
-          <p style={{ color: C.text }}>
-            For each concept, we also have{" "}
-            <Link href="/output-quiz" style={{ color: C.accent }}>
-              output prediction challenges
-            </Link>{" "}
-            (predict what a code snippet logs) and a{" "}
-            <Link href="/debug-lab" style={{ color: C.accent }}>
-              debug lab
-            </Link>{" "}
-            where you fix real buggy code — the closest thing to an actual
-            interview.
-          </p>
-        </section>
-
-        {/* Questions by category */}
-        <main id="questions">
-          {questionsByCategory.map(({ cat, slug, questions: catQs }) => (
-            <section key={cat} id={slug} style={{ marginBottom: "4rem" }}>
-              {/* Category header */}
-              <div
+            <Link
+              href="/topics"
+              style={{
+                ...topicCard,
+                gridColumn: "span 1",
+                justifyContent: "center",
+                background: "var(--color-accent)",
+                color: "white",
+                border: "none",
+              }}
+            >
+              <span
                 style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  gap: "0.5rem",
-                  marginBottom: "1.5rem",
-                  paddingBottom: "0.75rem",
-                  borderBottom: `1px solid ${C.border}`,
+                  fontWeight: 700,
+                  color: "inherit",
+                  fontSize: "0.875rem",
                 }}
               >
-                <h2
+                Browse All Topics →
+              </span>
+            </Link>
+          </div>
+        </div>
+
+        {/* ── FAQ ── */}
+        <div style={{ marginBottom: "3rem" }}>
+          <h2 style={h2}>Frequently Asked Interview Questions</h2>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          >
+            {STATIC_FAQS.map((faq, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: "1.25rem",
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "0.75rem",
+                }}
+              >
+                <h3
                   style={{
-                    fontSize: "1.375rem",
+                    fontSize: "0.9375rem",
                     fontWeight: 700,
-                    color: C.text,
-                    letterSpacing: "-0.015em",
+                    color: "var(--color-text)",
+                    marginBottom: "0.625rem",
                   }}
                 >
-                  {cat} Interview Questions
-                </h2>
-                <Link
-                  href={`/questions/${slug}`}
+                  {faq.q}
+                </h3>
+                <p
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "var(--color-muted)",
+                    lineHeight: 1.7,
+                    margin: 0,
+                  }}
+                >
+                  {faq.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Prep tips ── */}
+        <div style={{ marginBottom: "3rem" }}>
+          <h2 style={h2}>How to Prepare for JavaScript Interviews</h2>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+              gap: "1rem",
+            }}
+          >
+            {PREP_TIPS.map((tip, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: "1.125rem",
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "0.75rem",
+                }}
+              >
+                <div style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>
+                  {tip.emoji}
+                </div>
+                <h3
+                  style={{
+                    fontSize: "0.9375rem",
+                    fontWeight: 700,
+                    color: "var(--color-text)",
+                    marginBottom: "0.375rem",
+                  }}
+                >
+                  {tip.title}
+                </h3>
+                <p
                   style={{
                     fontSize: "0.8125rem",
-                    color: C.accent,
-                    textDecoration: "none",
-                    fontWeight: 500,
+                    color: "var(--color-muted)",
+                    lineHeight: 1.6,
+                    margin: 0,
                   }}
                 >
-                  Practice {cat} questions →
-                </Link>
+                  {tip.desc}
+                </p>
               </div>
+            ))}
+          </div>
+        </div>
 
-              {catQs.map((q, i) => (
-                <article
-                  key={q.id}
-                  style={{ marginBottom: "2.5rem" }}
-                  itemScope
-                  itemType="https://schema.org/Question"
-                >
-                  <h3
-                    itemProp="name"
-                    id={`q-${q.id ?? q.slug}`}
-                    style={{
-                      fontSize: "1.0625rem",
-                      fontWeight: 600,
-                      color: C.text,
-                      marginBottom: "1rem",
-                      lineHeight: 1.4,
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: C.accent,
-                        marginRight: "0.5rem",
-                        fontSize: "0.875rem",
-                      }}
-                    ></span>
-                    {q.title}
-                  </h3>
-
-                  {q.hint && (
-                    <p
-                      style={{
-                        fontSize: "0.8125rem",
-                        color: C.green,
-                        background: C.greenSubtle,
-                        border: `1px solid ${C.greenBorder}`,
-                        borderRadius: "0.5rem",
-                        padding: "0.5rem 0.875rem",
-                        marginBottom: "0.875rem",
-                      }}
-                    >
-                      💡 Hint: {q.hint}
-                    </p>
-                  )}
-
-                  <div
-                    itemProp="suggestedAnswer"
-                    itemScope
-                    itemType="https://schema.org/Answer"
-                  >
-                    <div
-                      itemProp="text"
-                      dangerouslySetInnerHTML={{ __html: q.answer ?? "" }}
-                      style={{ lineHeight: 1.8, fontSize: "0.9375rem" }}
-                    />
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: "0.875rem",
-                      display: "flex",
-                      gap: "0.75rem",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <PracticeCTA />
-                    {i === catQs.length - 1 && (
-                      <Link
-                        href={`/questions/${slug}`}
-                        style={{
-                          fontSize: "0.75rem",
-                          color: C.muted,
-                          border: `1px solid ${C.border}`,
-                          padding: "0.25rem 0.75rem",
-                          borderRadius: "0.375rem",
-                          textDecoration: "none",
-                        }}
-                      >
-                        More {cat} questions →
-                      </Link>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </section>
-          ))}
-        </main>
-
-        {/* Platform CTA */}
-        <section
-          style={{
-            background: C.accentSubtle,
-            border: `1px solid ${C.border}`,
-            borderRadius: "0.875rem",
-            padding: "2.5rem",
-            textAlign: "center",
-            marginBottom: "3rem",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "1.625rem",
-              fontWeight: 700,
-              color: C.text,
-              marginBottom: "0.75rem",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Don't Just Read — Practice
-          </h2>
-          <p
-            style={{
-              color: C.muted,
-              maxWidth: "36rem",
-              margin: "0 auto 1.5rem",
-              lineHeight: 1.7,
-            }}
-          >
-            Reading answers is passive. JSPrep Pro makes you actively recall
-            answers, predict code output, fix real bugs, and get evaluated by AI
-            — just like an actual interview.
-          </p>
-          <HeroCTA />
-        </section>
-
-        {/* Related resources */}
         <section style={{ marginBottom: "3rem" }}>
           <h2
             style={{
@@ -472,11 +411,7 @@ export default async function JavaScriptInterviewQuestionsPage() {
                 href: "/output-quiz",
                 text: "JavaScript Output Prediction Quiz",
               },
-              { href: "/debug-lab", text: "JavaScript Debug Lab" },
-              {
-                href: "/blog/event-loop-explained",
-                text: "JavaScript Event Loop Explained Visually",
-              },
+              { href: "/debug-lab", text: "JavaScript Debug Lab" }
             ].map(({ href, text }) => (
               <li key={href} style={{ color: C.muted }}>
                 <Link
@@ -490,71 +425,145 @@ export default async function JavaScriptInterviewQuestionsPage() {
           </ul>
         </section>
 
-        {/* Footer */}
-        <footer
+        {/* ── Bottom CTA ── */}
+        <div
           style={{
-            borderTop: `1px solid ${C.border}`,
-            paddingTop: "1.5rem",
-            fontSize: "0.8125rem",
-            color: C.muted,
             textAlign: "center",
+            padding: "2.5rem 1.5rem",
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "1rem",
           }}
         >
-          <p>
-            © 2025 JSPrep Pro · Last updated January 2025 ·{" "}
-            <Link href="/" style={{ color: C.accentText }}>
-              Home
-            </Link>{" "}
-            ·{" "}
-            <Link href="/dashboard" style={{ color: C.accentText }}>
-              Practice Platform
-            </Link>
+          <h2
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: 900,
+              color: "var(--color-text)",
+              marginBottom: "0.75rem",
+            }}
+          >
+            Ready to practice?
+          </h2>
+          <p
+            style={{
+              fontSize: "1rem",
+              color: "var(--color-muted)",
+              marginBottom: "1.5rem",
+              lineHeight: 1.6,
+            }}
+          >
+            Interactive questions with instant feedback. Predict outputs, find
+            bugs, and master JavaScript.
           </p>
-        </footer>
+          <div
+            style={{
+              display: "flex",
+              gap: "0.75rem",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <Link
+              href="/dashboard"
+              style={{
+                ...btn,
+                background: "var(--color-accent)",
+                color: "white",
+                border: "none",
+                padding: "0.75rem 2rem",
+                fontSize: "1rem",
+              }}
+            >
+              Start Practicing Free →
+            </Link>
+            <Link
+              href="/sprint"
+              style={{
+                ...btn,
+                background: "transparent",
+                color: "var(--color-text)",
+                border: "1px solid var(--color-border)",
+                padding: "0.75rem 1.5rem",
+              }}
+            >
+              ⚡ Daily Sprint
+            </Link>
+          </div>
+        </div>
       </div>
-
-      {/* ─── Answer prose — light theme ──────────────────────────────────────── */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        #questions p { margin: 0 0 0.75rem; color: ${C.text}; }
-        #questions pre {
-          background: ${C.codeBg};
-          border: 1px solid ${C.border};
-          border-left: 3px solid ${C.accent};
-          border-radius: 0.625rem;
-          padding: 0.875rem 1rem;
-          overflow-x: auto;
-          margin: 0.75rem 0;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.8125rem;
-          line-height: 1.7;
-          color: ${C.codeText};
-        }
-        #questions code { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; }
-        #questions p > code, #questions li > code {
-          background: ${C.codeInlineBg};
-          border: 1px solid ${C.border};
-          padding: 0.125rem 0.35rem;
-          border-radius: 0.25rem;
-          color: ${C.codeText};
-          font-size: 0.8em;
-        }
-        #questions ul, #questions ol { padding-left: 1.5rem; margin: 0 0 0.875rem; }
-        #questions li { margin-bottom: 0.375rem; line-height: 1.7; color: ${C.text}; }
-        #questions strong { color: ${C.text}; font-weight: 600; }
-        #questions .tip {
-          background: ${C.accentSubtle};
-          border-left: 3px solid ${C.accent};
-          border-radius: 0 0.5rem 0.5rem 0;
-          padding: 0.5rem 0.875rem;
-          margin: 0.75rem 0;
-          font-size: 0.875rem;
-          color: ${C.accentText};
-        }
-      `,
-        }}
-      />
     </>
   );
 }
+
+// ─── Styles (static, no CSS-in-JS needed for server component) ───────────────
+
+function diffBg(d: string) {
+  return d === "beginner"
+    ? "#f0fff4"
+    : d === "core"
+      ? "#e8f4fd"
+      : d === "advanced"
+        ? "#fffbeb"
+        : "#fff5f5";
+}
+function diffColor(d: string) {
+  return d === "beginner"
+    ? "#2d7a4f"
+    : d === "core"
+      ? "#2383e2"
+      : d === "advanced"
+        ? "#d97706"
+        : "#c53030";
+}
+
+const inlineCode: React.CSSProperties = {
+  fontFamily: '"JetBrains Mono", monospace',
+  fontSize: "0.875em",
+  background: "var(--color-bg-subtle)",
+  padding: "0.1rem 0.35rem",
+  borderRadius: "0.25rem",
+};
+
+const btn: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "0.375rem",
+  padding: "0.625rem 1.25rem",
+  borderRadius: "0.625rem",
+  fontWeight: 700,
+  fontSize: "0.9375rem",
+  textDecoration: "none",
+  cursor: "pointer",
+};
+
+const h2: React.CSSProperties = {
+  fontSize: "1.25rem",
+  fontWeight: 900,
+  color: "var(--color-text)",
+  marginBottom: "1.25rem",
+  paddingBottom: "0.625rem",
+  borderBottom: "1px solid var(--color-border)",
+};
+
+const topicCard: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.25rem",
+  padding: "0.875rem 1rem",
+  background: "var(--color-surface)",
+  border: "1px solid var(--color-border)",
+  borderRadius: "0.625rem",
+  textDecoration: "none",
+};
+
+const staticRow: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.625rem",
+  padding: "0.5rem 0.875rem",
+  background: "var(--color-surface)",
+  border: "1px solid var(--color-border)",
+  borderRadius: "0.5rem",
+  textDecoration: "none",
+};

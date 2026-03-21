@@ -1,16 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
-/**
- * src/components/ui/QuestionCards/OutputCard.tsx
- *
- * Fixes applied:
- * - checkAnswer compares textarea against originalExpectedOut (always),
- *   but when user has run edited code, shows a note clarifying the
- *   prediction should be for the ORIGINAL code.
- * - "Edit & Run" mode clearly labelled as exploration mode.
- */
-
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -25,6 +15,7 @@ import {
   RotateCcw,
   Play,
   Code2,
+  Building2,
 } from "lucide-react";
 import { css } from "@emotion/react";
 import * as Shared from "@/styles/shared";
@@ -41,6 +32,60 @@ const CodeConsole = dynamic(
   () => import("@/components/ui/CodeEditor/CodeConsole"),
   { ssr: false },
 );
+
+const ERROR_PATTERNS = [
+  "ReferenceError",
+  "TypeError",
+  "SyntaxError",
+  "RangeError",
+  "Cannot access",
+  "is not defined",
+  "Cannot read propert",
+  "is not a function",
+  "Maximum call stack",
+  "Assignment to constant",
+];
+
+const ERROR_CONCEPT_KEYWORDS: Record<string, string[]> = {
+  ReferenceError: [
+    "referenceerror",
+    "reference error",
+    "not defined",
+    "tdz",
+    "temporal",
+    "hoisting",
+  ],
+  "Cannot access": [
+    "tdz",
+    "temporal dead zone",
+    "referenceerror",
+    "before initialization",
+    "let",
+    "const",
+    "hoisting",
+    "block",
+  ],
+  TypeError: [
+    "typeerror",
+    "type error",
+    "not a function",
+    "cannot read",
+    "undefined",
+    "null",
+  ],
+  "is not defined": ["referenceerror", "not defined", "undeclared", "hoisting"],
+  SyntaxError: ["syntaxerror", "syntax error", "invalid", "unexpected"],
+  "is not a function": ["typeerror", "not a function", "undefined"],
+  "Cannot read propert": ["typeerror", "null", "undefined", "cannot read"],
+  "Maximum call stack": [
+    "stack overflow",
+    "infinite",
+    "recursion",
+    "call stack",
+    "rangeerror",
+  ],
+  "Assignment to constant": ["typeerror", "const", "constant", "reassign"],
+};
 
 type AnswerState = "idle" | "correct" | "wrong" | "revealed";
 
@@ -73,7 +118,6 @@ export default function OutputCard({
   const [localRevealed, setLocalRevealed] = useState(false);
   const [manuallyReset, setManuallyReset] = useState(false);
   const [answerState, setAnswerState] = useState<AnswerState>("idle");
-
   const [monacoMode, setMonacoMode] = useState<"readonly" | "edit">("readonly");
   const [editedCode, setEditedCode] = useState(q.code ?? "");
   const [runResult, setRunResult] = useState<RunResult | null>(null);
@@ -88,116 +132,12 @@ export default function OutputCard({
           ? "wrong"
           : "idle";
 
-  // Always compare against the ORIGINAL question's expected output,
-  // not whatever the user may have edited and run.
   const originalExpectedOut = q.expectedOutput ?? q.answer ?? "";
-  const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
-
-  const handleRun = useCallback(async () => {
-    setRunning(true);
-    setRunResult(null);
-    const { runCode, codeUsesUnsupportedAPIs } =
-      await import("@/lib/codeRunner");
-    const blocked = codeUsesUnsupportedAPIs(editedCode);
-    if (blocked) {
-      setRunResult({
-        output: [],
-        error: `Cannot run: "${blocked}" requires a real browser/server environment.`,
-        timed_out: false,
-      });
-      setRunning(false);
-      return;
-    }
-    const result = await runCode(editedCode);
-    setRunResult(result);
-    setRunning(false);
-  }, [editedCode]);
-
-  // ── Error-output detection ────────────────────────────────────────────────
-  // Questions where the answer is an error/exception need concept-based matching
-  // not exact string matching — we test understanding, not memorization.
-  const ERROR_PATTERNS = [
-    "ReferenceError",
-    "TypeError",
-    "SyntaxError",
-    "RangeError",
-    "Cannot access",
-    "is not defined",
-    "Cannot read propert",
-    "is not a function",
-    "Maximum call stack",
-    "Assignment to constant",
-  ];
-
   const isErrorQuestion = ERROR_PATTERNS.some((p) =>
     originalExpectedOut.includes(p),
   );
-
-  // Keywords that signal the user understands the error concept
-  const ERROR_CONCEPT_KEYWORDS: Record<string, string[]> = {
-    ReferenceError: [
-      "referenceerror",
-      "reference error",
-      "not defined",
-      "tdz",
-      "temporal",
-      "hoisting",
-    ],
-    "Cannot access": [
-      "tdz",
-      "temporal dead zone",
-      "referenceerror",
-      "reference error",
-      "before initialization",
-      "let",
-      "const",
-      "hoisting",
-      "block",
-    ],
-    TypeError: [
-      "typeerror",
-      "type error",
-      "not a function",
-      "cannot read",
-      "undefined",
-      "null",
-    ],
-    "is not defined": [
-      "referenceerror",
-      "reference error",
-      "not defined",
-      "undeclared",
-      "hoisting",
-    ],
-    SyntaxError: ["syntaxerror", "syntax error", "invalid", "unexpected"],
-    "is not a function": [
-      "typeerror",
-      "type error",
-      "not a function",
-      "undefined",
-    ],
-    "Cannot read propert": [
-      "typeerror",
-      "type error",
-      "null",
-      "undefined",
-      "cannot read",
-    ],
-    "Maximum call stack": [
-      "stack overflow",
-      "infinite",
-      "recursion",
-      "call stack",
-      "rangeerror",
-    ],
-    "Assignment to constant": [
-      "typeerror",
-      "const",
-      "constant",
-      "reassign",
-      "cannot assign",
-    ],
-  };
+  const companies = (q as any).companies as string[] | undefined;
+  const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
 
   function conceptMatches(userAnswer: string): boolean {
     const ua = userAnswer.toLowerCase();
@@ -209,20 +149,33 @@ export default function OutputCard({
     return false;
   }
 
+  const handleRun = useCallback(async () => {
+    setRunning(true);
+    setRunResult(null);
+    const { runCode, codeUsesUnsupportedAPIs } =
+      await import("@/lib/codeRunner");
+    const blocked = codeUsesUnsupportedAPIs(editedCode);
+    if (blocked) {
+      setRunResult({
+        output: [],
+        error: `Cannot run: "${blocked}" requires a real browser environment.`,
+        timed_out: false,
+      });
+      setRunning(false);
+      return;
+    }
+    const result = await runCode(editedCode);
+    setRunResult(result);
+    setRunning(false);
+  }, [editedCode]);
+
   async function checkAnswer() {
     const ua = answer.toLowerCase().trim();
     const correct = originalExpectedOut.toLowerCase().trim();
-
-    // Exact match always works
-    const exactMatch =
+    const match =
       ua === correct ||
-      ua.split("\n").join(",") === correct.split("\n").join(",");
-
-    // For error questions: concept-based match is enough
-    const conceptMatch = isErrorQuestion && conceptMatches(answer);
-
-    const match = exactMatch || conceptMatch;
-
+      ua.split("\n").join(",") === correct.split("\n").join(",") ||
+      (isErrorQuestion && conceptMatches(answer));
     if (match) {
       !isSolved(q.id) && isPro && (await recordSolved(q.id));
       setLocalWrong(false);
@@ -263,15 +216,15 @@ export default function OutputCard({
         : state === "revealed"
           ? "revealed"
           : "idle";
-
-  const editorHeight = (code: string) =>
+  const editorH = (code: string) =>
     Math.min(Math.max(code.split("\n").length * 19 + 24, 80), 320);
 
   return (
     <div css={S.questionCard(highlight, C.amber)}>
+      {/* Header */}
       <div css={S.cardHeader} onClick={() => setIsOpen((o) => !o)}>
         <span css={S.qNumber(C.amber)}>
-          #{String(index + 1).padStart(2, "0")}
+          #{String(index + 1).padStart(2, "00")}
         </span>
         <div css={{ flex: 1, minWidth: 0 }}>
           <div
@@ -291,7 +244,14 @@ export default function OutputCard({
             {state === "revealed" && <Eye size={14} color={C.amber} />}
             {state === "wrong" && <XCircle size={14} color={C.red} />}
           </div>
-          <div css={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <div
+            css={{
+              display: "flex",
+              gap: "0.5rem",
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
             <span
               css={{
                 fontSize: "0.625rem",
@@ -318,6 +278,19 @@ export default function OutputCard({
             >
               {q.category}
             </span>
+            {companies && companies.length > 0 && (
+              <div css={companyRow}>
+                <Building2 size={10} css={{ color: C.muted, flexShrink: 0 }} />
+                {companies.slice(0, 3).map((c) => (
+                  <span key={c} css={companyChip}>
+                    {c}
+                  </span>
+                ))}
+                {companies.length > 3 && (
+                  <span css={companyChip}>+{companies.length - 3}</span>
+                )}
+              </div>
+            )}
           </div>
         </div>
         <div css={S.chevronWrapper(isOpen)}>
@@ -325,6 +298,7 @@ export default function OutputCard({
         </div>
       </div>
 
+      {/* Body */}
       {isOpen && (
         <div css={S.cardBody}>
           {isLocked ? (
@@ -364,10 +338,29 @@ export default function OutputCard({
             </div>
           ) : (
             <>
+              {/* Company banner — shown when expanded */}
+              {companies && companies.length > 0 && (
+                <div css={companyBanner}>
+                  <Building2
+                    size={11}
+                    css={{ color: C.accent, flexShrink: 0, marginTop: 1 }}
+                  />
+                  <span
+                    css={{ fontSize: "11px", color: C.muted, fontWeight: 500 }}
+                  >
+                    Asked at:
+                  </span>
+                  {companies.map((c) => (
+                    <span key={c} css={companyFull}>
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <div css={{ padding: "1rem 1rem 0" }}>
-                {/* Toolbar */}
                 <div css={toolbar}>
-                  <span css={toolbarLabel}>Code</span>
+                  <span css={tlabel}>Code</span>
                   <div css={{ display: "flex", gap: 6 }}>
                     {monacoMode === "readonly" ? (
                       <button
@@ -376,7 +369,6 @@ export default function OutputCard({
                           setMonacoMode("edit");
                           setRunResult(null);
                         }}
-                        title="Explore: edit and run the code"
                       >
                         <Code2 size={12} /> Edit &amp; Run
                       </button>
@@ -404,13 +396,20 @@ export default function OutputCard({
                   </div>
                 </div>
 
-                {/* Exploration mode notice */}
                 {monacoMode === "edit" && (
-                  <div css={explorationBanner}>
+                  <div css={exploreBanner}>
                     💡 Exploration mode — edit freely. Your prediction below
                     should still be for the <strong>original</strong> code.
                   </div>
                 )}
+                {isErrorQuestion &&
+                  runResult?.error &&
+                  monacoMode === "edit" && (
+                    <div css={runErrNote}>
+                      ↑ That's the error this code throws. Describe it in your
+                      own words below.
+                    </div>
+                  )}
 
                 <CodeEditor
                   value={
@@ -418,20 +417,18 @@ export default function OutputCard({
                   }
                   onChange={setEditedCode}
                   readOnly={monacoMode === "readonly"}
-                  height={editorHeight(
+                  height={editorH(
                     monacoMode === "readonly" ? (q.code ?? "") : editedCode,
                   )}
                 />
                 <CodeConsole result={runResult} running={running} />
               </div>
 
-              {/* Answer */}
               <div css={S.inputSection}>
-                {/* Label changes based on question type */}
                 <p css={S.sectionLabel()}>
                   {isErrorQuestion ? (
                     <>
-                      What happens when this code runs?{" "}
+                      What happens?{" "}
                       <span
                         css={{
                           textTransform: "none",
@@ -459,17 +456,6 @@ export default function OutputCard({
                     </>
                   )}
                 </p>
-
-                {/* When editor ran and produced an error, note it's the error to predict */}
-                {isErrorQuestion &&
-                  runResult?.error &&
-                  monacoMode === "edit" && (
-                    <div css={runErrorNote}>
-                      ↑ That's the error this code throws. Now describe it in
-                      your own words below.
-                    </div>
-                  )}
-
                 <textarea
                   value={
                     state === "correct"
@@ -482,7 +468,7 @@ export default function OutputCard({
                   disabled={state === "correct"}
                   placeholder={
                     isErrorQuestion
-                      ? 'e.g. "ReferenceError — x is in TDZ because let is hoisted but not initialized"'
+                      ? 'e.g. "ReferenceError — x is in the TDZ before initialization"'
                       : "Type the expected output...\nOne value per line"
                   }
                   rows={
@@ -590,8 +576,8 @@ export default function OutputCard({
                           lineHeight: 1.5,
                         }}
                       >
-                        💡 Exact wording isn't required — understanding{" "}
-                        <em>why</em> this error occurs is what matters.
+                        💡 Exact wording not required — understanding{" "}
+                        <em>why</em> it throws is what matters.
                       </p>
                     )}
                   </div>
@@ -599,12 +585,12 @@ export default function OutputCard({
                     <div css={[S.explanationBox, { marginTop: "0.75rem" }]}>
                       <p css={S.explanationTitle(C.accent)}>💡 Explanation</p>
                       <p css={S.explanationText}>{q.explanation}</p>
-                      {q.keyInsight && (
+                      {(q as any).keyInsight && (
                         <div css={S.insightRow}>
                           <p css={S.explanationTitle(C.amber)}>
                             ⚡ Key Insight
                           </p>
-                          <p css={S.explanationText}>{q.keyInsight}</p>
+                          <p css={S.explanationText}>{(q as any).keyInsight}</p>
                         </div>
                       )}
                     </div>
@@ -619,13 +605,49 @@ export default function OutputCard({
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const companyRow = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+`;
+const companyChip = css`
+  font-size: 10px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  color: ${C.muted};
+  white-space: nowrap;
+`;
+const companyBanner = css`
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 16px;
+  background: ${C.bgSubtle};
+  border-bottom: 1px solid ${C.border};
+  flex-wrap: wrap;
+`;
+const companyFull = css`
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: ${C.accent}12;
+  border: 1px solid ${C.accent}28;
+  color: ${C.accent};
+`;
 const toolbar = css`
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
 `;
-const toolbarLabel = css`
+const tlabel = css`
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -665,7 +687,7 @@ const tbRun = css`
     opacity: 0.85;
   }
 `;
-const explorationBanner = css`
+const exploreBanner = css`
   font-size: 12px;
   color: ${C.muted};
   background: ${C.bgSubtle};
@@ -679,8 +701,7 @@ const explorationBanner = css`
     font-weight: 600;
   }
 `;
-
-const runErrorNote = css`
+const runErrNote = css`
   font-size: 12px;
   color: ${C.amber};
   background: ${C.amberSubtle};
