@@ -478,7 +478,7 @@ export default function JavaScriptOutputQuestionsPage() {
                 fontSize: "0.9375rem",
               }}
             >
-              View Pro — $9/mo →
+              View Pro — ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}/mo →
             </Link>
           </div>
         </section>

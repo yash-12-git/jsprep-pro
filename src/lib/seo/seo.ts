@@ -220,7 +220,7 @@ export function softwareSchema(): string {
       { "@type": "Offer", price: "0", priceCurrency: "INR", name: "Free Plan" },
       {
         "@type": "Offer",
-        price: "199",
+        price: process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199,
         priceCurrency: "INR",
         name: "Pro Plan",
         billingDuration: "P1M",
@@ -281,7 +281,7 @@ export function courseSchema(): string {
       {
         "@type": "Offer",
         name: "Pro Plan",
-        price: "199",
+        price: process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199,
         priceCurrency: "INR",
         billingIncrement: "P1M",
         availability: "https://schema.org/InStock",

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import * as Shared from "@/styles/shared";
 import { C, RADIUS } from "@/styles/tokens";
+import PaywallBanner from "@/components/ui/PaywallBanner/page";
 
 // ─── Group topics by category ─────────────────────────────────────────────────
 type CategoryMap = Record<string, Topic[]>;
@@ -331,6 +332,7 @@ const proGateText = css`
 export default function CheatSheetPage() {
   const { user, progress, loading } = useAuth();
   const router = useRouter();
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicsLoading, setTopicsLoading] = useState(true);
@@ -360,6 +362,13 @@ export default function CheatSheetPage() {
   if (!progress.isPro)
     return (
       <div css={[pageWrap, proGate]}>
+        {showPaywall && (
+          <PaywallBanner
+            reason={`Get instant access to crisp topic-by-topic revision cards covering
+          every concept you need to know before your JavaScript interview`}
+            onClose={() => setShowPaywall(false)}
+          />
+        )}
         <div css={proGateIcon}>📄</div>
         <h2 css={proGateTitle}>Cheat Sheet is Pro</h2>
         <p css={proGateText}>
@@ -374,7 +383,7 @@ export default function CheatSheetPage() {
             margin: "0 auto",
             display: "inline-flex",
           }}
-          onClick={() => router.push("/dashboard")}
+          onClick={() => setShowPaywall(true)}
         >
           Upgrade to Pro →
         </button>
