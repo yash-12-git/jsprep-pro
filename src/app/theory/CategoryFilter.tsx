@@ -22,11 +22,11 @@ interface Props {
   totalAll: number;
   bookmarkCount: number;
   loading?: boolean;
+  showSaved?: boolean;
 }
 
 const DIFF_LABELS: Record<string, string> = {
   all: "All Levels",
-  beginner: "Beginner",
   core: "Core",
   advanced: "Advanced",
   expert: "Expert",
@@ -173,6 +173,7 @@ export default function CategoryFilter({
   totalShown,
   totalAll,
   bookmarkCount,
+  showSaved = false,
   loading,
 }: Props) {
   function set(partial: Partial<FilterState>) {
@@ -206,14 +207,16 @@ export default function CategoryFilter({
 
       {/* Bookmark + Category row */}
       <div css={S.row}>
-        <button
-          css={S.bookmarkChip(filters.showBookmarked)}
-          onClick={() => set({ showBookmarked: !filters.showBookmarked })}
-          title="Show only bookmarked questions"
-        >
-          <Bookmark size={10} />
-          Saved{bookmarkCount > 0 ? ` (${bookmarkCount})` : ""}
-        </button>
+        {showSaved && (
+          <button
+            css={S.bookmarkChip(filters.showBookmarked)}
+            onClick={() => set({ showBookmarked: !filters.showBookmarked })}
+            title="Show only bookmarked questions"
+          >
+            <Bookmark size={10} />
+            Saved{bookmarkCount > 0 ? ` (${bookmarkCount})` : ""}
+          </button>
+        )}
         {["All", ...categories].map((cat) => (
           <button
             key={cat}
@@ -252,17 +255,6 @@ export default function CategoryFilter({
           <span>Loading…</span>
         ) : (
           <>
-            {filters.showBookmarked ? (
-              <>
-                <span css={S.activeCount}>{totalShown}</span>
-                &nbsp;saved question{totalShown !== 1 ? "s" : ""}
-              </>
-            ) : (
-              <>
-                Showing&nbsp;<span css={S.activeCount}>{totalShown}</span>
-                &nbsp;of {totalAll} questions
-              </>
-            )}
             {hasActiveFilter && (
               <button
                 css={[

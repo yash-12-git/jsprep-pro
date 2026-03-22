@@ -186,7 +186,6 @@ export async function getWeeklyLeaderboard(
     const usersRef = collection(db, "users");
     const q = query(usersRef, orderBy("weeklyXp", "desc"), limit(topN));
     const snap = await getDocs(q);
-
     const thisMonday = getMondayISO();
     
     return (

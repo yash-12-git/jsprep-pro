@@ -23,44 +23,42 @@ import {
   Moon,
   Code,
   LayoutDashboard,
+  Menu,
+  X,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import * as S from "./styles";
 import { useTheme } from "@/contexts/ThemeContext";
 import { C, RADIUS } from "@/styles/tokens";
 
+// ─── Local-only styles (not in styles.ts) ─────────────────────────────────────
 
-
-const navLeft = css`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-
-const navCenter = css`
-  display: flex;
-  align-items: center;
-  gap: 0.125rem;
-`;
-
-const navRight = css`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: flex-end;
-`;
-
-// Thin vertical separator between groups
+// Thin vertical separator between nav groups
 const sep = css`
   width: 1px;
   height: 14px;
   background: ${C.border};
   flex-shrink: 0;
-  margin: 0 0.25rem;
+  margin: 0 0.125rem;
 `;
 
-// ─── Buttons ──────────────────────────────────────────────────────────────────
+// PRO badge — always visible in right rail, not hidden in dropdown
+const proBadgeRight = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: ${C.accentText};
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
+  flex-shrink: 0;
+`;
 
+// Theme toggle button
 const themeBtn = (isDark: boolean) => css`
   display: flex;
   align-items: center;
@@ -84,6 +82,7 @@ const themeBtn = (isDark: boolean) => css`
   }
 `;
 
+// Circular avatar button
 const avatarBtnStyle = css`
   display: flex;
   align-items: center;
@@ -102,24 +101,7 @@ const avatarBtnStyle = css`
   }
 `;
 
-// PRO badge in right side — persistent, not hidden in dropdown
-const proBadgeNav = css`
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px 8px;
-  border-radius: 9999px;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: ${C.accentText};
-  background: ${C.accentSubtle};
-  border: 1px solid ${C.border};
-  flex-shrink: 0;
-`;
-
-// ─── Dropdown panel ───────────────────────────────────────────────────────────
-
+// Account dropdown panel
 const panel = css`
   position: absolute;
   top: calc(100% + 8px);
@@ -201,7 +183,6 @@ const MARKETING_LINKS = [
   { href: "/#pricing", label: "Pricing" },
 ];
 
-// Direct links — colored icon on active
 const QUESTION_LINKS = [
   {
     href: "/theory",
@@ -274,11 +255,16 @@ export default function Navbar() {
   const { isDark, toggleTheme } = useTheme();
   const path = usePathname();
 
+  // Desktop dropdowns
   const [open, setOpen] = useState<"ai" | "learn" | "user" | null>(null);
+  // Mobile side sheet
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const aiRef = useRef<HTMLDivElement>(null);
   const learnRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
 
+  // Close desktop dropdowns on outside click
   useEffect(() => {
     function onDown(e: MouseEvent) {
       const t = e.target as Node;
@@ -293,8 +279,10 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  // Close everything on route change
   useEffect(() => {
     setOpen(null);
+    setMobileOpen(false);
   }, [path]);
 
   const toggle = (menu: typeof open) =>
@@ -311,185 +299,365 @@ export default function Navbar() {
   const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
-    <nav css={S.nav}>
-      <div css={S.navInner}>
-        {/* ── LEFT: Logo + Learn ── */}
-        <div css={navLeft}>
-          <Link href= "/" css={S.logoLink}>
-            <div css={S.logoBadge}>JS</div>
-            <span css={S.logoText}>
-              Prep<span css={S.logoAccent}>Pro</span>
-            </span>
-          </Link>
-
-          {/* Learn ▾ */}
-          <div css={S.learnDropdownWrapper} ref={learnRef}>
-            <button
-              css={[
-                S.learnDropdownTrigger,
-                isLearnActive && S.learnNavLinkActive,
-              ]}
-              onClick={() => toggle("learn")}
-            >
-              <Layers size={13} /> Learn
-              <ChevronDown size={11} css={S.chevron(open === "learn")} />
-            </button>
-            {open === "learn" && (
-              <div css={S.learnDropdownMenu}>
-                {LEARN_LINKS.map(({ href, label, icon: Icon, desc }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    css={[
-                      S.learnDropdownItem,
-                      path.startsWith(href) && S.learnDropdownItemActive,
-                    ]}
-                    onClick={() => setOpen(null)}
-                  >
-                    <div css={S.learnIconBadge}>
-                      <Icon size={13} color={learnColor} />
-                    </div>
-                    <div>
-                      <div css={S.learnDropdownLabel}>{label}</div>
-                      <div css={S.learnDropdownDesc}>{desc}</div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Marketing links — logged-out visitors only */}
-          {!user && (
-            <div css={S.marketingLinks}>
-              {MARKETING_LINKS.map(({ href, label }) => (
-                <Link key={href} href={href} css={S.marketingLink}>
-                  {label}
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* ── CENTER: Home | modes | Sprint | AI (auth only) ── */}
-        {user && (
-          <div css={navCenter}>
-            {/* Home */}
-            <Link
-              href="/dashboard"
-              css={[S.navLink, path === "/dashboard" && S.navLinkActive]}
-            >
-              <LayoutDashboard size={13} /> Home
+    <>
+      <nav css={S.nav}>
+        {/* S.navInner = flex + space-between. We place three groups inside:
+            left (logo+learn), center (S.desktopLinks, hidden on mobile),
+            right (PRO+theme+hamburger/avatar) */}
+        <div css={S.navInner}>
+          {/* ── LEFT: Logo + Learn ── */}
+          <div
+            css={css`
+              display: flex;
+              align-items: center;
+              gap: 0.25rem;
+              flex-shrink: 0;
+            `}
+          >
+            <Link href="/" css={S.logoLink}>
+              <div css={S.logoBadge}>JS</div>
+              <span css={S.logoText}>
+                Prep<span css={S.logoAccent}>Pro</span>
+              </span>
             </Link>
 
-            <span css={sep} />
-
-            {/* Theory · Output · Debug · Polyfill */}
-            {QUESTION_LINKS.map(({ href, label, icon: Icon, activeColor }) => {
-              const isActive = path.startsWith(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  css={[S.navLink, isActive && S.navLinkActive]}
-                  style={isActive ? { color: activeColor } : undefined}
-                >
-                  <Icon size={13} color={isActive ? activeColor : undefined} />
-                  {label}
-                </Link>
-              );
-            })}
-
-            <span css={sep} />
-
-            {/* Sprint */}
-            <Link
-              href="/sprint"
-              css={[
-                S.navLink,
-                path === "/sprint" && S.navLinkActive,
-                S.navLinkHighlight,
-              ]}
-            >
-              <Zap size={13} /> Sprint
-            </Link>
-
-            <span css={sep} />
-
-            {/* AI ▾ */}
-            <div css={S.aiDropdownWrapper} ref={aiRef}>
+            {/* Learn ▾ — always visible */}
+            <div css={S.learnDropdownWrapper} ref={learnRef}>
               <button
-                css={[S.aiDropdownTrigger, isAiActive && S.navLinkAiActive]}
-                onClick={() => toggle("ai")}
+                css={[
+                  S.learnDropdownTrigger,
+                  isLearnActive && S.learnNavLinkActive,
+                ]}
+                onClick={() => toggle("learn")}
               >
-                <Zap size={13} /> AI
-                {!progress?.isPro && <span css={S.proBadge}>PRO</span>}
-                <ChevronDown size={11} css={S.chevron(open === "ai")} />
+                <Layers size={13} /> Learn
+                <ChevronDown size={11} css={S.chevron(open === "learn")} />
               </button>
-              {open === "ai" && (
-                <div css={S.aiDropdownMenu}>
-                  {AI_LINKS.map(({ href, label, icon: Icon, desc }) => (
+              {open === "learn" && (
+                <div css={S.learnDropdownMenu}>
+                  {LEARN_LINKS.map(({ href, label, icon: Icon, desc }) => (
                     <Link
                       key={href}
                       href={href}
                       css={[
-                        S.aiDropdownItem,
-                        path === href && S.aiDropdownItemActive,
+                        S.learnDropdownItem,
+                        path.startsWith(href) && S.learnDropdownItemActive,
                       ]}
                       onClick={() => setOpen(null)}
                     >
-                      <div css={S.aiIconBadge}>
-                        <Icon size={13} color={aiColor} />
+                      <div css={S.learnIconBadge}>
+                        <Icon size={13} color={learnColor} />
                       </div>
                       <div>
-                        <div css={S.aiDropdownLabel}>{label}</div>
-                        <div css={S.aiDropdownDesc}>{desc}</div>
+                        <span css={S.learnDropdownLabel}>{label}</span>
+                        <span css={S.learnDropdownDesc}>{desc}</span>
                       </div>
                     </Link>
                   ))}
                 </div>
               )}
             </div>
-          </div>
-        )}
 
-        {/* ── RIGHT: PRO badge · theme · avatar ── */}
-        <div css={navRight}>
-          {/* PRO badge — persistent, visible at a glance */}
-          {user && progress?.isPro && (
-            <span css={proBadgeNav}>
-              <Zap size={9} /> PRO
-            </span>
+            {/* Marketing links — logged-out visitors, desktop only */}
+            {!user && (
+              <div css={S.marketingLinks}>
+                {MARKETING_LINKS.map(({ href, label }) => (
+                  <Link key={href} href={href} css={S.marketingLink}>
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── CENTER: Home | modes | Sprint | AI — desktop only (hidden on mobile via S.desktopLinks) ── */}
+          {user && (
+            <div
+              css={[
+                S.desktopLinks,
+                css`
+                  gap: 0.125rem;
+                `,
+              ]}
+            >
+              {/* Home */}
+              <Link
+                href="/dashboard"
+                css={[S.navLink, path === "/dashboard" && S.navLinkActive]}
+              >
+                <LayoutDashboard size={13} /> Home
+              </Link>
+
+              <span css={sep} />
+
+              {/* Theory · Output · Debug · Polyfill */}
+              {QUESTION_LINKS.map(
+                ({ href, label, icon: Icon, activeColor }) => {
+                  const isActive = path.startsWith(href);
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      css={[S.navLink, isActive && S.navLinkActive]}
+                      style={isActive ? { color: activeColor } : undefined}
+                    >
+                      <Icon
+                        size={13}
+                        color={isActive ? activeColor : undefined}
+                      />
+                      {label}
+                    </Link>
+                  );
+                },
+              )}
+
+              <span css={sep} />
+
+              {/* Sprint */}
+              <Link
+                href="/sprint"
+                css={[
+                  S.navLink,
+                  path === "/sprint" && S.navLinkActive,
+                  S.navLinkHighlight,
+                ]}
+              >
+                <Zap size={13} /> Sprint
+              </Link>
+
+              <span css={sep} />
+
+              {/* AI ▾ */}
+              <div css={S.aiDropdownWrapper} ref={aiRef}>
+                <button
+                  css={[S.aiDropdownTrigger, isAiActive && S.navLinkAiActive]}
+                  onClick={() => toggle("ai")}
+                >
+                  <Zap size={13} /> AI
+                  {!progress?.isPro && <span css={S.proBadge}>PRO</span>}
+                  <ChevronDown size={11} css={S.chevron(open === "ai")} />
+                </button>
+                {open === "ai" && (
+                  <div css={S.aiDropdownMenu}>
+                    {AI_LINKS.map(({ href, label, icon: Icon, desc }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        css={[
+                          S.aiDropdownItem,
+                          path === href && S.aiDropdownItemActive,
+                        ]}
+                        onClick={() => setOpen(null)}
+                      >
+                        <div css={S.aiIconBadge}>
+                          <Icon size={13} color={aiColor} />
+                        </div>
+                        <div>
+                          <div css={S.aiDropdownLabel}>{label}</div>
+                          <div css={S.aiDropdownDesc}>{desc}</div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           )}
 
-          {/* Theme toggle */}
-          <button
-            css={themeBtn(isDark)}
-            onClick={toggleTheme}
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {isDark ? <Sun size={14} /> : <Moon size={14} />}
-          </button>
+          {/* ── RIGHT: PRO · theme · hamburger (mobile) · avatar (desktop) ── */}
+          <div css={S.rightSide}>
+            {/* PRO badge — desktop only, persistent */}
+            {user && progress?.isPro && (
+              <span
+                css={[
+                  proBadgeRight,
+                  css`
+                    @media (max-width: 767px) {
+                      display: none;
+                    }
+                  `,
+                ]}
+              >
+                <Zap size={9} /> PRO
+              </span>
+            )}
 
-          {user ? (
-            /* Avatar → account dropdown */
+            {/* Theme toggle */}
+            <button
+              css={themeBtn(isDark)}
+              onClick={toggleTheme}
+              aria-label={
+                isDark ? "Switch to light mode" : "Switch to dark mode"
+              }
+            >
+              {isDark ? <Sun size={14} /> : <Moon size={14} />}
+            </button>
+
+            {user ? (
+              <>
+                {/* ── Hamburger — mobile only ── */}
+                <button
+                  css={S.hamburgerBtn}
+                  onClick={() => setMobileOpen((v) => !v)}
+                  aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                >
+                  {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+                </button>
+
+                {/* ── Avatar dropdown — desktop only ── */}
+                <div
+                  ref={userRef}
+                  css={css`
+                    position: relative;
+                    @media (max-width: 767px) {
+                      display: none;
+                    }
+                  `}
+                >
+                  <button
+                    css={avatarBtnStyle}
+                    onClick={() => toggle("user")}
+                    aria-label="Account"
+                  >
+                    {user.photoURL ? (
+                      <Image
+                        src={user.photoURL}
+                        alt=""
+                        width={28}
+                        height={28}
+                        style={{
+                          objectFit: "cover",
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      />
+                    ) : (
+                      <span
+                        css={css`
+                          font-size: 0.6875rem;
+                          font-weight: 700;
+                          color: ${C.muted};
+                        `}
+                      >
+                        {initials}
+                      </span>
+                    )}
+                  </button>
+
+                  {open === "user" && (
+                    <div css={panel}>
+                      <div css={pHeader}>
+                        <div css={pName}>{displayName}</div>
+                        {user.email && <div css={pEmail}>{user.email}</div>}
+                        {(progress?.streakDays ?? 0) > 0 && (
+                          <span
+                            css={[
+                              streakChip,
+                              css`
+                                margin-top: 7px;
+                                display: inline-flex;
+                              `,
+                            ]}
+                          >
+                            🔥 {progress!.streakDays}d streak
+                          </span>
+                        )}
+                      </div>
+                      <Link
+                        href="/analytics"
+                        css={pItem}
+                        onClick={() => setOpen(null)}
+                      >
+                        📊 Analytics
+                        {!progress?.isPro && (
+                          <span css={S.proBadge} style={{ marginLeft: "auto" }}>
+                            PRO
+                          </span>
+                        )}
+                      </Link>
+                      <hr css={pDivider} />
+                      <button
+                        css={pItem}
+                        onClick={() => {
+                          toggleTheme();
+                          setOpen(null);
+                        }}
+                      >
+                        {isDark ? (
+                          <Sun size={14} color={C.muted} />
+                        ) : (
+                          <Moon size={14} color={C.muted} />
+                        )}
+                        {isDark ? "Light mode" : "Dark mode"}
+                      </button>
+                      <hr css={pDivider} />
+                      <button
+                        css={[
+                          pItem,
+                          css`
+                            color: ${C.red};
+                          `,
+                        ]}
+                        onClick={() => {
+                          logout();
+                          setOpen(null);
+                        }}
+                      >
+                        <LogOut size={14} color={C.red} /> Sign out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div css={S.authCtas}>
+                <Link href="/auth" css={S.signInBtn}>
+                  Log in
+                </Link>
+                <Link href="/auth" css={S.getStartedBtn}>
+                  Get started <ArrowRight size={13} />
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      {/* ── Mobile menu (slide-down sheet) ── */}
+      {user && mobileOpen && (
+        <div css={S.mobileMenu}>
+          <div css={S.mobileMenuInner}>
+            {/* User header */}
             <div
-              ref={userRef}
               css={css`
-                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem 0.875rem 0.875rem;
+                border-bottom: 1px solid ${C.border};
+                margin-bottom: 0.25rem;
               `}
             >
-              <button
-                css={avatarBtnStyle}
-                onClick={() => toggle("user")}
-                aria-label="Account"
+              <div
+                css={css`
+                  width: 2.25rem;
+                  height: 2.25rem;
+                  border-radius: 9999px;
+                  border: 1px solid ${C.border};
+                  background: ${C.bgSubtle};
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  overflow: hidden;
+                  flex-shrink: 0;
+                `}
               >
                 {user.photoURL ? (
                   <Image
                     src={user.photoURL}
                     alt=""
-                    width={30}
-                    height={30}
+                    width={36}
+                    height={36}
                     style={{
                       objectFit: "cover",
                       width: "100%",
@@ -499,7 +667,7 @@ export default function Navbar() {
                 ) : (
                   <span
                     css={css`
-                      font-size: 0.6875rem;
+                      font-size: 0.75rem;
                       font-weight: 700;
                       color: ${C.muted};
                     `}
@@ -507,103 +675,168 @@ export default function Navbar() {
                     {initials}
                   </span>
                 )}
-              </button>
-
-              {open === "user" && (
-                <div css={panel}>
-                  <div css={pHeader}>
-                    <div css={pName}>{displayName}</div>
-                    {user.email && <div css={pEmail}>{user.email}</div>}
-                    {(progress?.streakDays ?? 0) > 0 && (
-                      <span
-                        css={[
-                          streakChip,
-                          css`
-                            margin-top: 7px;
-                            display: inline-flex;
-                          `,
-                        ]}
-                      >
-                        🔥 {progress!.streakDays}d streak
-                      </span>
-                    )}
-                  </div>
-
-                  <Link
-                    href="/analytics"
-                    css={pItem}
-                    onClick={() => setOpen(null)}
-                  >
-                    📊 Analytics
-                    {!progress?.isPro && (
-                      <span css={S.proBadge} style={{ marginLeft: "auto" }}>
-                        PRO
-                      </span>
-                    )}
-                  </Link>
-                  <Link
-                    href="/leaderboard"
-                    css={pItem}
-                    onClick={() => setOpen(null)}
-                  >
-                    🏆 Leaderboard
-                  </Link>
-                  <Link
-                    href="/study-plan"
-                    css={pItem}
-                    onClick={() => setOpen(null)}
-                  >
-                    🗺️ Study Plan
-                  </Link>
-
-                  <hr css={pDivider} />
-
-                  <button
-                    css={pItem}
-                    onClick={() => {
-                      toggleTheme();
-                      setOpen(null);
-                    }}
-                  >
-                    {isDark ? (
-                      <Sun size={14} color={C.muted} />
-                    ) : (
-                      <Moon size={14} color={C.muted} />
-                    )}
-                    {isDark ? "Light mode" : "Dark mode"}
-                  </button>
-
-                  <hr css={pDivider} />
-
-                  <button
-                    css={[
-                      pItem,
-                      css`
-                        color: ${C.red};
-                      `,
-                    ]}
-                    onClick={() => {
-                      logout();
-                      setOpen(null);
-                    }}
-                  >
-                    <LogOut size={14} color={C.red} /> Sign out
-                  </button>
+              </div>
+              <div>
+                <div
+                  css={css`
+                    font-size: 0.875rem;
+                    font-weight: 600;
+                    color: ${C.text};
+                  `}
+                >
+                  {displayName}
                 </div>
-              )}
+                <div
+                  css={css`
+                    display: flex;
+                    gap: 5px;
+                    margin-top: 3px;
+                  `}
+                >
+                  {progress?.isPro && (
+                    <span
+                      css={css`
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 3px;
+                        padding: 2px 7px;
+                        border-radius: 9999px;
+                        font-size: 0.625rem;
+                        font-weight: 600;
+                        color: ${C.accentText};
+                        background: ${C.accentSubtle};
+                        border: 1px solid ${C.border};
+                      `}
+                    >
+                      <Zap size={9} /> PRO
+                    </span>
+                  )}
+                  {(progress?.streakDays ?? 0) > 0 && (
+                    <span css={streakChip}>🔥 {progress!.streakDays}d</span>
+                  )}
+                </div>
+              </div>
             </div>
-          ) : (
-            <div css={S.authCtas}>
-              <Link href="/auth" css={S.signInBtn}>
-                Log in
+
+            {/* Main nav */}
+            <Link
+              href="/dashboard"
+              css={[S.mobileNavLink, path === "/dashboard" && S.mobileNavLinkActive]}
+            >
+              <LayoutDashboard size={16} /> Home
+            </Link>
+
+            <hr css={S.mobileDivider} />
+            <p css={S.mobileSectionLabel}>Practice</p>
+
+            {QUESTION_LINKS.map(({ href, label, icon: Icon, activeColor }) => {
+              const isActive = path.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  css={[S.mobileNavLink, isActive && S.mobileNavLinkActive]}
+                  style={isActive ? { color: activeColor } : undefined}
+                >
+                  <Icon size={16} color={isActive ? activeColor : undefined} />{" "}
+                  {label}
+                </Link>
+              );
+            })}
+
+            <Link
+              href="/sprint"
+              css={[
+                S.mobileNavLink,
+                path === "/sprint" && S.mobileNavLinkActive,
+              ]}
+              style={{ color: path === "/sprint" ? C.amber : undefined }}
+            >
+              <Zap size={16} color={path === "/sprint" ? C.amber : undefined} />{" "}
+              Sprint ✨
+            </Link>
+
+            <hr css={S.mobileDivider} />
+            <p css={S.mobileSectionLabel}>Learn</p>
+
+            {LEARN_LINKS.map(({ href, label, icon: Icon, desc }) => (
+              <Link
+                key={href}
+                href={href}
+                css={[
+                  S.mobileNavLink,
+                  path.startsWith(href) && S.learnNavLinkActive,
+                ]}
+              >
+                <div css={S.mobileAiItemIcon}>
+                  <Icon size={14} color={learnColor} />
+                </div>
+                <div css={S.mobileNavItemContent}>
+                  <span>{label}</span>
+                  <span css={S.mobileNavItemDesc}>{desc}</span>
+                </div>
               </Link>
-              <Link href="/auth" css={S.getStartedBtn}>
-                Get started <ArrowRight size={13} />
+            ))}
+
+            <hr css={S.mobileDivider} />
+            <p css={S.mobileSectionLabel}>AI Tools</p>
+
+            {AI_LINKS.map(({ href, label, icon: Icon, desc }) => (
+              <Link
+                key={href}
+                href={href}
+                css={[
+                  S.mobileNavLink,
+                  path === href && S.mobileNavLinkAiActive,
+                ]}
+              >
+                <div css={S.mobileAiItemIcon}>
+                  <Icon size={14} color={aiColor} />
+                </div>
+                <div css={S.mobileNavItemContent}>
+                  <span>{label}</span>
+                  <span css={S.mobileNavItemDesc}>{desc}</span>
+                </div>
+                {!progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
               </Link>
-            </div>
-          )}
+            ))}
+
+            <hr css={S.mobileDivider} />
+            <p css={S.mobileSectionLabel}>Account</p>
+
+            <Link href="/analytics" css={S.mobileNavLink}>
+              📊 Analytics
+              {!progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
+            </Link>
+
+            <hr css={S.mobileDivider} />
+
+            <button
+              css={S.mobileNavLink}
+              style={{ width: "100%", border: "none", cursor: "pointer" }}
+              onClick={() => {
+                toggleTheme();
+                setMobileOpen(false);
+              }}
+            >
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+              {isDark ? "Light mode" : "Dark mode"}
+            </button>
+
+            <hr css={S.mobileDivider} />
+
+            <button
+              css={S.mobileLogoutBtn}
+              onClick={() => {
+                logout();
+                setMobileOpen(false);
+              }}
+            >
+              <LogOut size={16} /> Sign out
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      )}
+    </>
   );
 }

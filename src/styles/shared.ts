@@ -351,3 +351,33 @@ export const statLabel = css`
   text-transform: uppercase;
   letter-spacing: 0.06em;
 `;
+
+export const proNudge = css`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  background: ${C.amberSubtle};
+  border: 1px solid ${C.amberBorder};
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: ${C.amber};
+  font-weight: 600;
+  flex-wrap: wrap;
+`;
+export const upgradeBtn = css`
+  padding: 0.5rem 1.125rem;
+  background: ${C.accent};
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  &:hover {
+    opacity: 0.9;
+  }
+`;

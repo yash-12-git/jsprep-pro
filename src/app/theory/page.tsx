@@ -112,6 +112,7 @@ export default function DashboardPage() {
       <CategoryFilter
         categories={categories}
         filters={filters}
+        showSaved
         onChange={setFilters}
         totalShown={filtered.length}
         totalAll={questions.length}

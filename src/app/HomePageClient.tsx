@@ -306,7 +306,7 @@ export default function HomePageClient() {
         {/* ── HERO ─────────────────────────────────────────── */}
         <div css={hero} id="features">
           <div css={badge}>
-            <Zap size={10} /> For 1–3 Year Frontend Developers
+            <Zap size={10} /> Train for Real JavaScript Interviews
           </div>
           <h1 css={h1}>
             JavaScript Interview
@@ -314,14 +314,13 @@ export default function HomePageClient() {
             <span css={grad}>Questions & Practice.</span>
           </h1>
           <p css={sub}>
-            Land your next role with 200+ questions across theory, output
-            prediction, and debugging — with AI scoring and a timed{" "}
-            <strong style={{ color: C.amber }}>Interview Sprint</strong> that
-            tells you exactly if you&apos;re ready.
+            Practice real JavaScript interview questions, take timed{" "}
+            <strong style={{ color: C.amber }}>Interview Sprint</strong> and
+            know exactly if you're ready.
           </p>
           <div css={ctas}>
             <Link href="/sprint" css={btnP}>
-              Try the Sprint <ArrowRight size={16} />
+              ⚡ Try the Sprint <ArrowRight size={16} />
             </Link>
             <a href={ctaHref} css={btnO}>
               <Zap size={14} /> {ctaLabel}
@@ -335,7 +334,7 @@ export default function HomePageClient() {
           <span
             style={{ fontSize: "0.9375rem", color: C.green, fontWeight: 600 }}
           >
-            91 theory questions — completely free, forever.
+            90+ core JavaScript questions — free, forever.
           </span>
           <span style={{ fontSize: "0.875rem", color: C.muted }}>
             No card. No trial. No paywall.
@@ -346,7 +345,7 @@ export default function HomePageClient() {
         <div css={statsRow}>
           {[
             { n: "200+", l: "Questions" },
-            { n: "3", l: "Practice modes" },
+            { n: "4", l: "Practice modes" },
             { n: "36", l: "Topic guides" },
             { n: "6", l: "AI tools" },
           ].map(({ n, l }) => (
@@ -623,7 +622,7 @@ console.log({} + [])`}</pre>
           </p>
           <div css={modesG}>
             {MODES.map((m) => (
-              <div key={m.label} css={modeCard(m.c)}>
+              <Link key={m.label} href={m.href} css={modeCard(m.c)}>
                 <span css={modeE}>{m.emoji}</span>
                 {m.free && <div css={modeFree}>✓ Free</div>}
                 <div css={modeL}>{m.label}</div>
@@ -636,7 +635,7 @@ console.log({} + [])`}</pre>
                     </span>
                   ))}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

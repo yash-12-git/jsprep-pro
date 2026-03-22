@@ -247,7 +247,7 @@ const modeGo = (color: string) => css`
 
 const MODES = [
   {
-    href: "/dashboard",
+    href: "/theory",
     label: "Theory",
     icon: "📖",
     color: C.accent,

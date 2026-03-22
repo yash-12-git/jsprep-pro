@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 import { css } from "@emotion/react";
 import * as Shared from "@/styles/shared";
+import * as S from "./styles";
 import { C } from "@/styles/tokens";
-import type { PolyfillQuestion } from "@/data/polyfillQuestions";
 import type { RunResult } from "@/lib/codeRunner";
 import { Question } from "@/types/question";
 
@@ -148,7 +148,9 @@ export default function PolyfillCard({
     Math.min(Math.max(code.split("\n").length * 19 + 24, 120), 400);
 
   return (
-    <div css={card(allPassed ? "pass" : anyFailed ? "fail" : "idle")}>
+    <div
+      css={S.questionCard(allPassed ? "correct" : anyFailed ? "wrong" : "idle")}
+    >
       {/* Header */}
       <div css={cardHeader} onClick={() => setIsOpen((o) => !o)}>
         <span css={qNum}>#{String(index + 1).padStart(2, "0")}</span>
@@ -254,6 +256,7 @@ export default function PolyfillCard({
             <div
               css={{
                 padding: "1rem",
+                flexDirection: "column",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.75rem",
@@ -488,13 +491,14 @@ export default function PolyfillCard({
                     ]}
                     onClick={() => {
                       setShowSolution((s) => !s);
-                      console.log(!isSolved(q.id), !isRevealed(q.id), isPro, "line227");
-                      
-                      if (
-                        !isSolved(q.id) &&
-                        !isRevealed(q.id) &&
-                        isPro
-                      )
+                      console.log(
+                        !isSolved(q.id),
+                        !isRevealed(q.id),
+                        isPro,
+                        "line227",
+                      );
+
+                      if (!isSolved(q.id) && !isRevealed(q.id) && isPro)
                         console.log("recored reverald firebase");
 
                       recordRevealed(q.id).catch(() => {});

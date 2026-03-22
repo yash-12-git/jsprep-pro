@@ -155,6 +155,7 @@ export const insightRow = css`
 export const lockedBox = css`
   display: flex;
   align-items: center;
+  flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
   background: ${C.bgSubtle};

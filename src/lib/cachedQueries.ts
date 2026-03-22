@@ -82,7 +82,7 @@ export const getTopicSlugs = unstable_cache(
 
 /** Weekly leaderboard — shared across all users */
 export const getWeeklyLeaderboardCached = unstable_cache(
-  () => _getWeeklyLeaderboard(10),
+  async () => await _getWeeklyLeaderboard(10),
   ["weekly-leaderboard"],
   {
     revalidate: 60 * 60 * 2,

@@ -147,7 +147,6 @@ export default function QuestionForm({ mode, initial, onSubmit, onDelete }: Prop
         <div css={S.field}>
           <label css={S.label}>Difficulty <span css={S.required}>*</span></label>
           <select css={S.select} value={form.difficulty} onChange={e => set('difficulty', e.target.value as Difficulty)}>
-            <option value="beginner">Beginner</option>
             <option value="core">Core</option>
             <option value="advanced">Advanced</option>
             <option value="expert">Expert</option>

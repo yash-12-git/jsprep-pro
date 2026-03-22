@@ -334,8 +334,7 @@ export default function DebugCard({
 
       {isOpen && (
         <div css={S.cardBody}>
-          {isLocked ? (
-            <div css={{ padding: "1rem" }}>
+          {isLocked ? ( 
               <div css={S.lockedBox}>
                 <Lock size={14} color={C.muted} />
                 <div css={{ flex: 1 }}>
@@ -368,7 +367,6 @@ export default function DebugCard({
                   <Zap size={12} /> Upgrade
                 </button>
               </div>
-            </div>
           ) : (
             <>
               {q.bugDescription && (

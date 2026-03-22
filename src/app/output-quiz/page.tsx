@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
-import { useEffect, useState } from "react";
+
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useCategories, useUserProgress } from "@/hooks/useQuestions";
@@ -11,8 +12,15 @@ import { OutputCard } from "@/components/ui/QuestionCards";
 import * as Shared from "@/styles/shared";
 import { C, RADIUS } from "@/styles/tokens";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationControls from "@/components/ui/PaginationControls";
+import CategoryFilter, {
+  defaultFilters,
+  type FilterState,
+} from "@/app/theory/CategoryFilter";
 
 const FREE_OUTPUT_LIMIT = 5;
+const PAGE_SIZE = 10;
 
 export default function OutputQuizPage() {
   const { user, progress, loading: authLoading } = useAuth();
@@ -20,20 +28,56 @@ export default function OutputQuizPage() {
 
   const { outputQs: questions, loading: qLoading } = useAllQuestions();
   const { categories } = useCategories("output", "javascript");
-  const { isSolved, isRevealed, recordSolved, recordRevealed, solvedIds } =
-    useUserProgress({ uid: user?.uid ?? null });
+  const {
+    isSolved,
+    isRevealed,
+    recordSolved,
+    recordRevealed,
+    solvedIds,
+    bookmarkIds,
+  } = useUserProgress({ uid: user?.uid ?? null });
 
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [filters, setFilters] = useState<FilterState>(defaultFilters());
   const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/auth");
   }, [user, authLoading, router]);
 
-  const filtered =
-    activeCategory === "All"
-      ? questions
-      : questions.filter((q) => q.category === activeCategory);
+  const bookmarkedSet = useMemo(
+    () => new Set(bookmarkIds ?? []),
+    [bookmarkIds],
+  );
+
+  // Full filter logic — mirrors DashboardPage
+  const filtered = useMemo(() => {
+    let qs = questions;
+
+    if (filters.showBookmarked) {
+      return qs.filter((q) => bookmarkedSet.has(q.id));
+    }
+    if (filters.category !== "All") {
+      qs = qs.filter((q) => q.category === filters.category);
+    }
+    if (filters.difficulty !== "all") {
+      qs = qs.filter((q) => q.difficulty === filters.difficulty);
+    }
+    if (filters.search.trim()) {
+      const term = filters.search.toLowerCase();
+      qs = qs.filter(
+        (q) =>
+          q.title.toLowerCase().includes(term) ||
+          q.category.toLowerCase().includes(term) ||
+          (q.tags ?? []).some((t) => t.toLowerCase().includes(term)),
+      );
+    }
+    return qs;
+  }, [questions, filters, bookmarkedSet]);
+
+  const { page, totalPages, paginated, goPage } = usePagination(
+    filtered,
+    PAGE_SIZE,
+  );
 
   const solvedCount = solvedIds.filter((id) =>
     questions.some((q) => q.id === id),
@@ -56,12 +100,11 @@ export default function OutputQuizPage() {
         <div css={Shared.pageWrapper}>
           <div css={Shared.pageHeader}>
             <div css={Shared.pageHeaderTop}>
-              {/* C.accent2 → C.amber */}
               <div css={Shared.iconBox(C.amber)}>
                 <Code2 size={18} color={C.amber} />
               </div>
               <div>
-                <h1 css={Shared.pageTitleText}>What's the Output?</h1>
+                <h1 css={Shared.pageTitleText}>What&apos;s the Output?</h1>
                 <p css={Shared.pageSubtitleText}>
                   Read the code → predict the output → progress saved
                   automatically
@@ -70,7 +113,6 @@ export default function OutputQuizPage() {
             </div>
             <div css={Shared.pageProgressRow}>
               <div css={Shared.progressBarTrack}>
-                {/* flat accent fill — no neon gradient */}
                 <div css={Shared.progressBarFill(pct)} />
               </div>
               <span css={Shared.pageProgressCount(C.amber)}>
@@ -79,20 +121,19 @@ export default function OutputQuizPage() {
             </div>
           </div>
 
-          {/* Category chips */}
-          <div css={Shared.categoryScroll}>
-            {["All", ...categories].map((cat) => (
-              <button
-                key={cat}
-                css={Shared.categoryChip(activeCategory === cat, C.amber)}
-                onClick={() => setActiveCategory(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+          {/* Full filter — same component as theory page */}
+          <CategoryFilter
+            categories={categories}
+            filters={filters}
+            onChange={(f) => {
+              setFilters(f);
+            }}
+            totalShown={filtered.length}
+            totalAll={questions.length}
+            bookmarkCount={bookmarkIds?.length ?? 0}
+            loading={qLoading}
+          />
 
-          {/* Skeletons — visible on white */}
           {qLoading && (
             <div
               css={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
@@ -112,28 +153,54 @@ export default function OutputQuizPage() {
           )}
 
           {!qLoading && (
-            <div
-              css={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+            <PaginationControls
+              page={page}
+              totalPages={totalPages}
+              totalItems={filtered.length}
+              itemLabel="question"
+              onPage={goPage}
             >
-              {filtered.map((q, idx) => {
-                const globalIdx = questions.indexOf(q);
-                const isLocked =
-                  !progress?.isPro && globalIdx >= FREE_OUTPUT_LIMIT;
-                return (
-                  <OutputCard
-                    key={q.id}
-                    q={q}
-                    index={idx}
-                    isSolved={isSolved}
-                    isRevealed={isRevealed}
-                    recordSolved={recordSolved}
-                    recordRevealed={recordRevealed}
-                    isLocked={isLocked}
-                    isPro={!!progress?.isPro}
-                    onPaywall={() => setShowPaywall(true)}
-                  />
-                );
-              })}
+              <div
+                css={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                }}
+              >
+                {paginated.map((q) => {
+                  const globalIdx = questions.indexOf(q);
+                  return (
+                    <OutputCard
+                      key={q.id}
+                      q={q}
+                      index={globalIdx}
+                      isSolved={isSolved}
+                      isRevealed={isRevealed}
+                      recordSolved={recordSolved}
+                      recordRevealed={recordRevealed}
+                      isLocked={
+                        !progress?.isPro && globalIdx >= FREE_OUTPUT_LIMIT
+                      }
+                      isPro={!!progress?.isPro}
+                      onPaywall={() => setShowPaywall(true)}
+                    />
+                  );
+                })}
+              </div>
+            </PaginationControls>
+          )}
+          {!progress?.isPro && (
+            <div css={Shared.proNudge}>
+              <span>
+                🔒 First {FREE_OUTPUT_LIMIT} challenges free —{" "}
+                {questions.length - FREE_OUTPUT_LIMIT} more with Pro
+              </span>
+              <button
+                css={Shared.upgradeBtn}
+                onClick={() => setShowPaywall(true)}
+              >
+                Unlock All {questions.length} →
+              </button>
             </div>
           )}
         </div>
