@@ -1,6 +1,22 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
+/**
+ * QOTDInteractive.tsx
+ *
+ * Client-only interactive layer for the Question of the Day.
+ * Receives the pre-fetched question as a plain prop — no data fetching here.
+ *
+ * Responsibilities:
+ *   - localStorage "done" state
+ *   - Answer reveal toggle
+ *   - AI evaluator (fetch /api/ai)
+ *   - Scores + feedback display
+ *
+ * This component is imported by the server component QuestionOfTheDay.tsx
+ * via a dynamic() import to keep it out of the server bundle.
+ */
+
 import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 import {
@@ -11,24 +27,10 @@ import {
   Loader2,
   Target,
 } from "lucide-react";
-import { useAllQuestions } from "@/contexts/QuestionsContext";
 import type { Question } from "@/types/question";
 import { C, RADIUS } from "@/styles/tokens";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function getDayIndex() {
-  return Math.floor(Date.now() / 86400000);
-}
-function getTodayKey() {
-  return `qotd_done_${getDayIndex()}`;
-}
-function formatDate() {
-  return new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-}
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface EvalResult {
   score: number;
@@ -39,7 +41,14 @@ interface EvalResult {
   betterAnswer: string;
 }
 
+interface Props {
+  question: Question;
+  storageKey: string; // e.g. "qotd_done_20015" — passed from server
+  formattedDate: string; // e.g. "Sunday, March 22, 2026"
+}
+
 // ─── Diff meta ────────────────────────────────────────────────────────────────
+
 const DIFF: Record<
   string,
   { color: string; bg: string; border: string; label: string }
@@ -64,13 +73,19 @@ const DIFF: Record<
   },
 };
 
+function getDiffKey(difficulty: string): string {
+  if (difficulty === "advanced" || difficulty === "expert") return "adv";
+  if (difficulty === "core") return "mid";
+  return "core";
+}
+
 // ─── Styles ───────────────────────────────────────────────────────────────────
+
 const wrap = css`
   background: ${C.bg};
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   overflow: hidden;
-  margin-bottom: 1.5rem;
 `;
 
 const wrapDone = css`
@@ -146,7 +161,79 @@ const catBadge = css`
   font-weight: 500;
 `;
 
-// answer reveal
+const actionBar = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.125rem;
+  border-top: 1px solid ${C.border};
+`;
+
+const revealBtn = css`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: ${RADIUS.md};
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid ${C.border};
+  color: ${C.muted};
+  transition: all 0.12s ease;
+  &:hover {
+    border-color: ${C.borderStrong};
+    color: ${C.text};
+    background: ${C.bgHover};
+  }
+`;
+
+const doneBtn = css`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: ${RADIUS.md};
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: ${C.greenSubtle};
+  border: 1px solid ${C.greenBorder};
+  color: ${C.green};
+  transition: opacity 0.12s;
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const tryAiBtn = css`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: ${RADIUS.md};
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: ${C.accentSubtle};
+  border: 1px solid ${C.border};
+  color: ${C.accentText};
+  transition: border-color 0.12s;
+  &:hover {
+    border-color: ${C.accent};
+  }
+`;
+
+const donePill = css`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: ${C.green};
+`;
+
 const answerSection = css`
   border-top: 1px solid ${C.border};
   padding: 0.875rem 1.125rem;
@@ -194,92 +281,8 @@ const answerBody = css`
   pre code {
     color: ${C.codeText};
   }
-  .tip {
-    background: ${C.accentSubtle};
-    border-left: 3px solid ${C.accent};
-    padding: 0.5rem 0.75rem;
-    border-radius: 0 ${RADIUS.sm} ${RADIUS.sm} 0;
-    margin: 0.625rem 0;
-    font-size: 0.8rem;
-    color: ${C.accentText};
-  }
 `;
 
-// action row
-const actionBar = css`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.125rem;
-  border-top: 1px solid ${C.border};
-`;
-
-const revealBtn = css`
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.4375rem 0.875rem;
-  border-radius: ${RADIUS.md};
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  background: transparent;
-  border: 1px solid ${C.border};
-  color: ${C.muted};
-  transition: all 0.12s ease;
-  &:hover {
-    border-color: ${C.borderStrong};
-    color: ${C.text};
-    background: ${C.bgHover};
-  }
-`;
-
-const doneBtn = css`
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.4375rem 0.875rem;
-  border-radius: ${RADIUS.md};
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  background: ${C.greenSubtle};
-  border: 1px solid ${C.greenBorder};
-  color: ${C.green};
-  transition: opacity 0.12s ease;
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
-const tryAiBtn = css`
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.4375rem 0.875rem;
-  border-radius: ${RADIUS.md};
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  background: ${C.accentSubtle};
-  border: 1px solid ${C.border};
-  color: ${C.accentText};
-  transition: border-color 0.12s ease;
-  &:hover {
-    border-color: ${C.accent};
-  }
-`;
-
-const donePill = css`
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: ${C.green};
-`;
-
-// inline evaluator
 const evalWrap = css`
   margin: 0 1.125rem 0.875rem;
   background: ${C.accentSubtle};
@@ -315,8 +318,8 @@ const textarea = css`
   outline: none;
   min-height: 100px;
   transition:
-    border-color 0.12s ease,
-    box-shadow 0.12s ease;
+    border-color 0.12s,
+    box-shadow 0.12s;
   &::placeholder {
     color: ${C.placeholder};
   }
@@ -339,7 +342,7 @@ const submitBtn = (active: boolean) => css`
   color: ${active ? "#ffffff" : C.muted};
   border: 1px solid ${active ? C.accent : C.border};
   cursor: ${active ? "pointer" : "default"};
-  transition: opacity 0.12s ease;
+  transition: opacity 0.12s;
   &:hover {
     opacity: ${active ? 0.88 : 1};
   }
@@ -396,7 +399,6 @@ const barTrack = css`
   border-radius: 9999px;
   overflow: hidden;
 `;
-
 const barFill = (n: number) => css`
   height: 100%;
   width: ${n * 10}%;
@@ -407,7 +409,6 @@ const barFill = (n: number) => css`
 const feedSection = css`
   margin-top: 0.75rem;
 `;
-
 const feedTitle = (c: string) => css`
   font-size: 0.6875rem;
   font-weight: 700;
@@ -416,7 +417,6 @@ const feedTitle = (c: string) => css`
   text-transform: uppercase;
   letter-spacing: 0.05em;
 `;
-
 const feedItem = css`
   display: flex;
   gap: 0.375rem;
@@ -436,7 +436,7 @@ const toggleBetterBtn = css`
   background: none;
   border: none;
   cursor: pointer;
-  transition: color 0.12s ease;
+  transition: color 0.12s;
   &:hover {
     color: ${C.text};
   }
@@ -461,61 +461,36 @@ const tryAgainBtn = css`
   border: none;
   cursor: pointer;
   text-decoration: underline;
-  transition: color 0.12s ease;
+  transition: color 0.12s;
   &:hover {
     color: ${C.text};
   }
 `;
 
-// ─── Skeleton placeholders ────────────────────────────────────────────────────
-const skeletonLine = (w: string, h = "1rem") =>
-  ({
-    height: h,
-    width: w,
-    borderRadius: "0.375rem",
-    background: C.bgSubtle,
-    border: `1px solid ${C.border}`,
-    marginBottom: "0.75rem",
-  }) as React.CSSProperties;
+// ─── Component ────────────────────────────────────────────────────────────────
 
-interface Props {
-  isPro: boolean;
-}
-
-export default function QuestionOfTheDay({ isPro }: Props) {
-  const key = getTodayKey();
-  const [q, setQ] = useState<Question | null>(null);
+export default function QOTDInteractive({
+  question: q,
+  storageKey,
+  formattedDate,
+}: Props) {
   const [done, setDone] = useState(false);
   const [answerOpen, setAnswerOpen] = useState(false);
   const [evalOpen, setEvalOpen] = useState(false);
   const [userAnswer, setUserAnswer] = useState("");
-  const { theoryQs } = useAllQuestions();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<EvalResult | null>(null);
   const [showBetter, setShowBetter] = useState(false);
 
+  // Read completion state from localStorage (client-only)
   useEffect(() => {
-    if (typeof window !== "undefined")
-      setDone(localStorage.getItem(key) === "1");
-  }, [key]);
-
-  useEffect(() => {
-    if (theoryQs.length) setQ(theoryQs[getDayIndex() % theoryQs.length]);
-  }, [theoryQs]);
+    setDone(localStorage.getItem(storageKey) === "1");
+  }, [storageKey]);
 
   function markDone() {
-    localStorage.setItem(key, "1");
+    localStorage.setItem(storageKey, "1");
     setDone(true);
   }
-
-  if (!q)
-    return (
-      <div css={[wrap, { padding: "1.25rem", marginBottom: "1.5rem" }]}>
-        <div style={skeletonLine("7rem", "0.75rem")} />
-        <div style={skeletonLine("85%", "1.25rem")} />
-        <div style={skeletonLine("65%", "1.25rem")} />
-      </div>
-    );
 
   async function evaluate() {
     if (!userAnswer.trim() || loading) return;
@@ -529,8 +504,8 @@ export default function QuestionOfTheDay({ isPro }: Props) {
           type: "evaluate",
           messages: [{ role: "user", content: userAnswer }],
           context: {
-            question: q?.title,
-            idealAnswer: (q?.answer ?? "")
+            question: q.title,
+            idealAnswer: (q.answer ?? "")
               .replace(/<[^>]*>/g, "")
               .replace(/\s+/g, " ")
               .trim(),
@@ -544,19 +519,13 @@ export default function QuestionOfTheDay({ isPro }: Props) {
       setResult(parsed);
       if (parsed.score >= 7) markDone();
     } catch {
-      // fail silently
+      // fail silently — don't break the page if AI is unavailable
     } finally {
       setLoading(false);
     }
   }
 
-  const diffKey =
-    q.difficulty === "advanced" || q.difficulty === "expert"
-      ? "adv"
-      : q.difficulty === "core"
-        ? "mid"
-        : "core";
-  const dm = DIFF[diffKey];
+  const dm = DIFF[getDiffKey(q.difficulty ?? "beginner")];
 
   return (
     <div css={[wrap, done && wrapDone]}>
@@ -573,7 +542,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
             </>
           )}
         </div>
-        <span css={dateLabel}>{formatDate()}</span>
+        <span css={dateLabel}>{formattedDate}</span>
       </div>
 
       {/* Question */}
@@ -583,7 +552,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
         <span css={catBadge}>{q.category}</span>
       </div>
 
-      {/* Actions */}
+      {/* Action bar */}
       <div css={actionBar}>
         {done ? (
           <div css={donePill}>
@@ -591,29 +560,17 @@ export default function QuestionOfTheDay({ isPro }: Props) {
           </div>
         ) : (
           <>
-            {!evalOpen ? (
-              <button
-                css={[tryAiBtn, { flex: 1 }]}
-                onClick={() => {
-                  setEvalOpen(true);
-                  setAnswerOpen(false);
-                }}
-              >
-                <Target size={13} /> Try to answer
-              </button>
-            ) : (
-              <button
-                css={[tryAiBtn, { flex: 1 }]}
-                onClick={() => setEvalOpen(false)}
-              >
-                <Target size={13} /> Hide evaluator
-              </button>
-            )}
             <button
-              css={revealBtn}
-              onClick={() => setAnswerOpen((o) => !o)}
-              title={answerOpen ? "Hide answer" : "Show answer"}
+              css={[tryAiBtn, { flex: 1 }]}
+              onClick={() => {
+                setEvalOpen((e) => !e);
+                setAnswerOpen(false);
+              }}
             >
+              <Target size={13} />{" "}
+              {evalOpen ? "Hide evaluator" : "Try to answer"}
+            </button>
+            <button css={revealBtn} onClick={() => setAnswerOpen((o) => !o)}>
               {answerOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
               {answerOpen ? "Hide" : "Answer"}
             </button>
@@ -627,12 +584,11 @@ export default function QuestionOfTheDay({ isPro }: Props) {
       </div>
 
       {/* Inline evaluator */}
-      {evalOpen && (
+      {evalOpen && !done && (
         <div css={evalWrap}>
           <div css={evalLabel}>
             <Target size={12} /> Answer as you would in an interview
           </div>
-
           {!result ? (
             <>
               <textarea
@@ -653,7 +609,7 @@ export default function QuestionOfTheDay({ isPro }: Props) {
                       size={13}
                       style={{ animation: "spin 1s linear infinite" }}
                     />{" "}
-                    Evaluating...
+                    Evaluating…
                   </>
                 ) : (
                   <>
@@ -773,6 +729,8 @@ export default function QuestionOfTheDay({ isPro }: Props) {
           />
         </div>
       )}
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

@@ -10,13 +10,14 @@ import { C, RADIUS } from '@/styles/tokens'
 // embeddings called via /api/embed (server-side) — COHERE_API_KEY not available client-side
 import {
   Database, CheckCircle2, Loader2,
-  BookOpen, Code2, Bug, Trash2, Zap
+  BookOpen, Code2, Bug, Trash2, Zap, FlaskConical
 } from 'lucide-react'
 
 // ── Import all static data ─────────────────────────────────────────────────────
 import { questions as theoryRaw }   from '@/data/questions'
 import { outputQuestions }          from '@/data/outputQuestions'
 import { debugQuestions }           from '@/data/debugQuestions'
+import { polyfillQuestions }        from '@/data/polyfillQuestions'
 import type { QuestionInput }       from '@/types/question'
 
 // ─── Difficulty map ────────────────────────────────────────────────────────────
@@ -108,7 +109,37 @@ function buildDebugQuestions(): QuestionInput[] {
     brokenCode:     q.brokenCode,
     fixedCode:      q.fixedCode,
     bugDescription: q.bugDescription,
-    // companies:      q.companies ?? [],
+    companies:      q.companies ?? [],
+  }))
+}
+
+function buildPolyfillQuestions(): QuestionInput[] {
+  return polyfillQuestions.map((q, i) => ({
+    slug:           `polyfill-${q.id}-${q.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50)}`,
+    type:           'polyfill'    as const,
+    track:          'javascript'  as const,
+    title:          q.title,
+    question:       q.description,
+    answer:         `**Key Insight:** ${q.keyInsight}`,
+    hint:           '',
+    explanation:    q.description,
+    keyInsight:     q.keyInsight,
+    code:           q.stubCode,
+    category:       q.cat,
+    tags:           [q.cat.toLowerCase().replace(/[^a-z0-9]+/g, '-'), q.difficulty],
+    companies:      q.companies,
+    difficulty:     diffMap(q.difficulty),
+    status:         'published'   as const,
+    isPro:          i >= 5,
+    order:          i,
+    expectedOutput: '',
+    brokenCode:     '',
+    fixedCode:      '',
+    bugDescription: '',
+    // Polyfill-specific fields (schema matches existing question format)
+    stubCode:       q.stubCode,
+    testCode:       q.testCode,
+    solutionCode:   q.solutionCode,
   }))
 }
 
@@ -249,10 +280,11 @@ export default function SeedPage() {
   const [log,        setLog]        = useState<LogEntry[]>([])
   const [done,       setDone]       = useState<Record<string, number>>({})
 
-  const theoryQs = buildTheoryQuestions()
-  const outputQs = buildOutputQuestions()
-  const debugQs  = buildDebugQuestions()
-  const totalQs  = theoryQs.length + outputQs.length + debugQs.length
+  const theoryQs   = buildTheoryQuestions()
+  const outputQs   = buildOutputQuestions()
+  const debugQs    = buildDebugQuestions()
+  const polyfillQs = buildPolyfillQuestions()
+  const totalQs    = theoryQs.length + outputQs.length + debugQs.length + polyfillQs.length
 
   function addLog(type: LogEntry['type'], text: string) {
     setLog(prev => [...prev, { type, text }])
@@ -369,17 +401,18 @@ export default function SeedPage() {
       addLog('info', `Total: ${totalQs} questions`)
       addLog('info', '─────────────────────────────')
 
-      // await seedBatch(theoryQs, 'Theory', C.accent)
-      await seedBatch(outputQs, 'Output', C.amber)
-      // await seedBatch(debugQs,  'Debug',  C.red)
+      await seedBatch(theoryQs,   'Theory',   C.accent)
+      await seedBatch(outputQs,   'Output',   C.amber)
+      await seedBatch(debugQs,    'Debug',    C.red)
+      await seedBatch(polyfillQs, 'Polyfill', C.green)
 
       addLog('info', '─────────────────────────────')
       addLog('success', `Seed complete! ${totalQs} questions in Firestore.`)
       addLog('info', 'Generating embeddings for output + debug questions...')
 
-      // Automatically generate embeddings after seeding
+      // Polyfill questions don't need embeddings (no RAG dedup needed)
       setEmbedding(true)
-      await generateEmbeddings([...outputQs])
+      await generateEmbeddings([...outputQs, ...debugQs])
       setEmbedding(false)
 
       addLog('success', 'All done! Questions are ready for the dedup pipeline.')
@@ -446,10 +479,9 @@ export default function SeedPage() {
 
     try {
       addLog('warn', 'Fetching all question IDs...')
-      // const snap = await getDocs(query(collection(db, 'questions'), where('type', '==', 'output')))
       const snap = await getDocs(collection(db, 'questions'))
       addLog('warn', `Found ${snap.docs.length} documents to delete.`)
-      
+
       const BATCH_SIZE = 400
       for (let i = 0; i < snap.docs.length; i += BATCH_SIZE) {
         const batch = writeBatch(db)
@@ -467,7 +499,7 @@ export default function SeedPage() {
     }
   }
 
-  const allDone   = done['Theory'] && done['Output'] && done['Debug']
+  const allDone   = done['Theory'] && done['Output'] && done['Debug'] && done['Polyfill']
   const isBusy    = seeding || clearing || embedding
 
   return (
@@ -491,9 +523,10 @@ export default function SeedPage() {
       <div css={S.sectionTitle}>Data to import</div>
       <div css={S.grid}>
         {[
-          { label: 'Theory',  count: theoryQs.length, icon: BookOpen, color: C.accent,  desc: 'Core JS, Functions, Async, Objects',         key: 'Theory' },
-          { label: 'Output',  count: outputQs.length, icon: Code2,    color: C.amber,   desc: 'Predict console output — event loop, scope',  key: 'Output' },
-          { label: 'Debug',   count: debugQs.length,  icon: Bug,      color: C.red,     desc: 'Find & fix silent JS bugs — pure sandbox JS', key: 'Debug'  },
+          { label: 'Theory',   count: theoryQs.length,   icon: BookOpen,     color: C.accent, desc: 'Core JS, Functions, Async, Objects',          key: 'Theory'   },
+          { label: 'Output',   count: outputQs.length,   icon: Code2,        color: C.amber,  desc: 'Predict console output — event loop, scope',   key: 'Output'   },
+          { label: 'Debug',    count: debugQs.length,    icon: Bug,          color: C.red,    desc: 'Find & fix silent JS bugs — pure sandbox JS',  key: 'Debug'    },
+          { label: 'Polyfill', count: polyfillQs.length, icon: FlaskConical, color: C.green,  desc: 'Implement JS methods from scratch with tests', key: 'Polyfill' },
         ].map(({ label, count, icon: Icon, color, desc, key }) => (
           <div key={key} css={S.dataCard(color, !!done[key])}>
             <div css={S.dataIcon(color)}><Icon size={16} color={color} /></div>

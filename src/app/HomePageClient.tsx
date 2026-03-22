@@ -614,12 +614,12 @@ console.log({} + [])`}</pre>
 
         <hr css={hr} />
 
-        {/* ── 3 MODES ──────────────────────────────────────── */}
+        {/* ── 4 MODES ─────────────────────────────────────────────── */}
         <div css={sec} id="practice">
-          <p css={eye(C.green)}>Three Practice Modes</p>
+          <p css={eye(C.green)}>Four Practice Modes</p>
           <h2 css={sh2}>How real interviews test you</h2>
           <p css={ssub}>
-            Most prep sites are theory-only. Real JS interviews use all three.
+            Most prep sites are theory-only. Real JS interviews use all four.
           </p>
           <div css={modesG}>
             {MODES.map((m) => (
@@ -729,6 +729,12 @@ console.log({} + [])`}</pre>
                   label: "Debug Challenges",
                   before: "Never practiced bug fixing",
                   after: "AI-scored real bug fixing practice",
+                },
+                {
+                  emoji: "🧪",
+                  label: "Polyfill Lab",
+                  before: "Skipped polyfills entirely",
+                  after: "Write reduce, bind, Promise.all with test feedback",
                 },
               ].map(({ emoji, label, before, after }) => (
                 <div key={label} css={whyItem}>

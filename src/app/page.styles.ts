@@ -399,7 +399,7 @@ export const modesG = css`
   display: grid;
   gap: 1rem;
   @media (min-width: ${BP.sm}) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   }
 `;
 
@@ -649,7 +649,7 @@ export const whyG = css`
   display: grid;
   gap: 1.5rem;
   @media (min-width: ${BP.sm}) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 `;
 

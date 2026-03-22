@@ -6,6 +6,7 @@ export type QuestionType =
   | "theory" // What is closure? / Explain event loop
   | "output" // What does this code print?
   | "debug" // Find and fix the bug
+  | 'polyfill'   // Write the implementation from scratch + test runner
   | "coding" // Write a function that... (future)
   | "system" // Design a rate limiter (future)
   | "behavioral"; // Tell me about a time... (future)
@@ -52,6 +53,13 @@ export interface Question {
   brokenCode?: string;
   fixedCode?: string;
   bugDescription?: string;
+
+  methodName?:   string    // "Array.prototype.myReduce" — displayed in card header
+  starterCode?:  string    // skeleton code shown in Monaco
+  testCode?:     string    // test() / expect() calls injected after user code
+  solutionCode?: string    // reference implementation shown on "Show Solution"
+  testCount?:    number    // number of test() calls in testCode
+  hints?:        string[]  // progressive hints, one shown at a time
 
   // Linking fields — connect questions to topics and blog posts
   topicSlug?: string; // Foreign key → topics.slug (e.g. 'javascript-closure-interview-questions')

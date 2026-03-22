@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAllQuestions } from "@/contexts/QuestionsContext";
 import { useUserProgress } from "@/hooks/useQuestions";
 import PageGuard from "@/components/ui/PageGuard";
-import { Flame, Brain, Code2, Bug } from "lucide-react";
+import { Flame, Brain, Code2, Bug, Zap } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -30,7 +30,7 @@ export default function AnalyticsPage() {
   const { user, progress, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const { theoryQs, outputQs, debugQs } = useAllQuestions();
+  const { theoryQs, outputQs, debugQs ,polyfillQs } = useAllQuestions();
   const { masteredIds, solvedIds } = useUserProgress({
     uid: user?.uid ?? null,
   });
@@ -65,8 +65,11 @@ export default function AnalyticsPage() {
   const solvedDebugCount = debugQs.filter((q) =>
     solvedIds.includes(q.id),
   ).length;
-  const totalQuestions = theoryQs.length + outputQs.length + debugQs.length;
-  const totalSolved = masteredCount + solvedOutputCount + solvedDebugCount;
+    const solvedPolyfillCount = polyfillQs.filter((q) =>
+    solvedIds.includes(q.id),
+  ).length;
+  const totalQuestions = theoryQs.length + outputQs.length + debugQs.length + polyfillQs.length;
+  const totalSolved = masteredCount + solvedOutputCount + solvedDebugCount + solvedPolyfillCount;
   const overallPct =
     totalQuestions > 0 ? Math.round((totalSolved / totalQuestions) * 100) : 0;
   const masterPct =
@@ -80,6 +83,10 @@ export default function AnalyticsPage() {
   const debugPct =
     debugQs.length > 0
       ? Math.round((solvedDebugCount / debugQs.length) * 100)
+      : 0;
+  const polyfillPct =
+    polyfillQs.length > 0
+      ? Math.round((solvedPolyfillCount / polyfillQs.length) * 100)
       : 0;
 
   // ── Category breakdowns ───────────────────────────────────────────────────
@@ -108,6 +115,18 @@ export default function AnalyticsPage() {
   const debugCatStats = [...new Set(debugQs.map((q) => q.category))].map(
     (cat) => {
       const qs = debugQs.filter((q) => q.category === cat);
+      const s = qs.filter((q) => solvedIds.includes(q.id)).length;
+      return {
+        cat,
+        total: qs.length,
+        solved: s,
+        pct: Math.round((s / qs.length) * 100),
+      };
+    },
+  );
+  const polyfillCatStats = [...new Set(polyfillQs.map((q) => q.category))].map(
+    (cat) => {
+      const qs = polyfillQs.filter((q) => q.category === cat);
       const s = qs.filter((q) => solvedIds.includes(q.id)).length;
       return {
         cat,
@@ -156,6 +175,12 @@ export default function AnalyticsPage() {
       icon: Bug,
       color: C.red,
     },
+    {
+      label: "Polyfill",
+      value: `${solvedPolyfillCount}/${polyfillQs.length}`,
+      icon: Zap,
+      color: C.green,
+    },
   ];
 
   return (
@@ -188,7 +213,7 @@ export default function AnalyticsPage() {
               <div>
                 <h2 css={S.sectionTitle}>Overall Progress</h2>
                 <p css={S.sectionSub}>
-                  Across all 3 modes · {totalSolved}/{totalQuestions} questions
+                  Across all 4 modes · {totalSolved}/{totalQuestions} questions
                 </p>
               </div>
               <span css={S.overallPct}>{overallPct}%</span>
@@ -224,6 +249,13 @@ export default function AnalyticsPage() {
                   total: debugQs.length,
                   color: C.red,
                 },
+                {
+                  label: "🧩 Polyfill Lab",
+                  pct: polyfillPct,
+                  solved: solvedPolyfillCount,
+                  total: polyfillQs.length,
+                  color: C.green,
+                }
               ].map(({ label, pct, solved, total, color }) => (
                 <div key={label} css={S.categoryItem}>
                   <div css={S.categoryLabelRow}>
@@ -257,6 +289,11 @@ export default function AnalyticsPage() {
               sub: "Which bug types you can spot and fix",
               stats: debugCatStats,
             },
+            {
+              title: "🧩 Polyfill Lab — Category Breakdown",
+              sub: "Which polyfill challenges you've mastered",
+              stats: polyfillCatStats,
+            }
           ].map(
             ({ title, sub, stats }) =>
               stats.length > 0 && (

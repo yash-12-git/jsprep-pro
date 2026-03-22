@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import * as S from "@/app/dashboard/styles";
+import * as S from "./styles";
 import { TheoryCard } from "@/components/ui/QuestionCards";
 import type { Question } from "@/types/question";
 

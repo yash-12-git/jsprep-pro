@@ -29,6 +29,7 @@ import type { Question } from "@/types/question";
 interface QuestionsState {
   theoryQs: Question[];
   outputQs: Question[];
+  polyfillQs: Question[];
   debugQs: Question[];
   allQs: Question[];
   loading: boolean;
@@ -39,6 +40,7 @@ interface QuestionsState {
 const QuestionsContext = createContext<QuestionsState>({
   theoryQs: [],
   outputQs: [],
+  polyfillQs: [],
   debugQs: [],
   allQs: [],
   loading: true,
@@ -97,13 +99,14 @@ export function QuestionsProvider({ children }: { children: React.ReactNode }) {
   const theoryQs = allQs.filter((q) => q.type === "theory");
   const outputQs = allQs.filter((q) => q.type === "output");
   const debugQs = allQs.filter((q) => q.type === "debug");
-
+  const polyfillQs = allQs.filter((q) => q.type === "polyfill");
   return (
     <QuestionsContext.Provider
       value={{
         theoryQs,
         outputQs,
         debugQs,
+        polyfillQs,
         allQs,
         loading,
         error,

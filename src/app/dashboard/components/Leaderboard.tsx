@@ -2,34 +2,12 @@
 "use client";
 
 import { css } from "@emotion/react";
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Trophy, Zap, Flame, Crown } from "lucide-react";
-import {
-  getWeeklyLeaderboard,
-  type LeaderboardEntry,
-} from "@/lib/userProgress";
+import { LeaderboardEntry } from "@/lib/userProgress";
 import { C, RADIUS } from "@/styles/tokens";
 import Link from "next/link";
-
-// ─── Module-level cache — 1-hour TTL ─────────────────────────────────────────
-let _leaderboardCache: {
-  entries: LeaderboardEntry[];
-  fetchedAt: number;
-} | null = null;
-const LEADERBOARD_TTL_MS = 60 * 60 * 1000;
-
-async function getCachedLeaderboard(topN: number): Promise<LeaderboardEntry[]> {
-  if (
-    _leaderboardCache &&
-    Date.now() - _leaderboardCache.fetchedAt < LEADERBOARD_TTL_MS
-  ) {
-    return _leaderboardCache.entries;
-  }
-  const entries = await getWeeklyLeaderboard(topN);
-  _leaderboardCache = { entries, fetchedAt: Date.now() };
-  return entries;
-}
+import { useAuth } from "@/hooks/useAuth";
 
 // ─── Rank medal colours — kept intentional (gold/silver/bronze are universal) ─
 const RANK_GOLD = "#b45309"; // amber-700 — dark enough on white
@@ -259,19 +237,11 @@ function getNextMonday(): string {
 }
 
 interface Props {
-  currentUid?: string;
+  entries: LeaderboardEntry[]
 }
 
-export default function Leaderboard({ currentUid }: Props) {
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getCachedLeaderboard(10)
-      .then(setEntries)
-      .finally(() => setLoading(false));
-  }, []);
-
+export default function Leaderboard({  entries }: Props) {
+    const { user, progress, loading: authLoading } = useAuth();
   return (
     <div css={wrapper}>
       <div css={header}>
@@ -282,13 +252,7 @@ export default function Leaderboard({ currentUid }: Props) {
         <span css={resetLabel}>Resets {getNextMonday()}</span>
       </div>
 
-      {loading ? (
-        <div css={list}>
-          {[...Array(5)].map((_, i) => (
-            <div key={i} css={skeletonRow} />
-          ))}
-        </div>
-      ) : entries.length === 0 ? (
+      { entries.length === 0 ? (
         <div css={emptyState}>
           <div css={emptyTitle}>Nobody on the board yet!</div>
           <div css={emptyDesc}>
@@ -302,7 +266,7 @@ export default function Leaderboard({ currentUid }: Props) {
         <div css={list}>
           {entries.map((entry, i) => {
             const rank = i + 1;
-            const isCurrentUser = entry.uid === currentUid;
+            const isCurrentUser = entry.uid === user?.uid;
             const initials = (entry.displayName ?? "?").charAt(0).toUpperCase();
 
             return (

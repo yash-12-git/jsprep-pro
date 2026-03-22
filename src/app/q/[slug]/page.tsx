@@ -79,7 +79,7 @@ export default async function QuestionPage({ params }: Props) {
 
   const { questions: allTypeQs } = await getQuestions({
     filters: { status: "published", type: question.type },
-    pageSize: 100,
+    pageSize: 300,
   });
   const related = allTypeQs
     .filter((q) => q.id !== question.id && q.category === question.category)

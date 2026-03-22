@@ -1,237 +1,163 @@
-/** @jsxImportSource @emotion/react */
-"use client";
+/**
+ * app/home/page.tsx
+ *
+ * Server component — orchestrates the /home page.
+ *
+ * What lives here (server):
+ *   - Cached Firestore reads via cachedQueries (one read per deploy / revalidate)
+ *   - Sprint CTA — pure static markup, no reason to ship to client
+ *   - Section composition
+ *
+ * What stays client-side:
+ *   - HomeClient   → greeting + mode progress cards (needs useAuth, useUserProgress)
+ *   - QuestionOfTheDay (already a server component with client shell)
+ *   - LeaderboardWrapper → uses getWeeklyLeaderboardCached internally
+ *   - LearnSection → already handles its own cached reads
+ *
+ * Auth: intentionally NOT checked here — logged-out users can visit /home.
+ * Individual sections degrade gracefully when user is null.
+ */
 
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
-import { useCategories, useUserProgress } from "@/hooks/useQuestions";
-import { useAllQuestions } from "@/contexts/QuestionsContext";
-import {
-  BookOpen,
-  Home,
-  Layers,
-  Trophy
-} from "lucide-react";
-import * as ST from "./tab.styles";
-import * as Shared from "@/styles/shared";
-import { C } from "@/styles/tokens";
-import DashboardHeader from "./components/DashboardHeader";
-import QuestionList from "./components/QuestionList";
-import CategoryFilter, {
-  defaultFilters,
-  type FilterState,
-} from "./components/CategoryFilter";
+import { Suspense } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { getQuestions } from "@/lib/cachedQueries";
+import HomeClient from "./components/HomeClient";
+import LeaderboardWrapper from "./components/LeaderboardWrapper";
 import LearnSection from "./components/LearnSection";
-import QuestionOfTheDay from "./components/QuestionOfTheDay";
-import Leaderboard from "./components/Leaderboard";
+import QuestionOfTheDay from "./components/QuestionOfTheDayWrapper";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Data fetching ────────────────────────────────────────────────────────────
+// All four reads are parallelised with Promise.all.
+// Each is served from Next.js Data Cache — Firestore is not hit on repeated visits.
 
-type Tab = "home" | "practice" | "learn" | "community";
+async function getQuestionTotals() {
+  const [theory, output, debug, polyfill] = await Promise.all([
+    getQuestions({ filters: { status: "published", type: "theory"   }, pageSize: 500 }).catch(() => ({ questions: [] })),
+    getQuestions({ filters: { status: "published", type: "output"   }, pageSize: 500 }).catch(() => ({ questions: [] })),
+    getQuestions({ filters: { status: "published", type: "debug"    }, pageSize: 500 }).catch(() => ({ questions: [] })),
+    getQuestions({ filters: { status: "published", type: "polyfill" }, pageSize: 500 }).catch(() => ({ questions: [] })),
+  ]);
 
-const TABS: { id: Tab; label: string; Icon: typeof Home }[] = [
-  { id: "home", label: "Home", Icon: Home },
-  { id: "practice", label: "Practice", Icon: BookOpen },
-  { id: "learn", label: "Learn", Icon: Layers },
-  { id: "community", label: "Community", Icon: Trophy },
-];
+  return {
+    theoryTotal:   theory.questions.length,
+    outputTotal:   output.questions.length,
+    debugTotal:    debug.questions.length,
+    polyfillTotal: polyfill.questions.length,
+    // Pass question IDs so client can cross-reference against solvedIds
+    outputIds:    output.questions.map(q => q.id),
+    debugIds:     debug.questions.map(q => q.id),
+    polyfillIds:  polyfill.questions.map(q => q.id),
+  };
+}
+
+// ─── Sprint CTA — server-rendered static section ─────────────────────────────
+// Pure HTML/CSS — no interactivity, no reason to hydrate.
+
+function SprintCTA() {
+  return (
+    <div style={{
+      maxWidth: "46rem",
+      margin: "0 auto",
+      padding: "0 1.25rem 1.5rem",
+    }}>
+      <Link
+        href="/sprint"
+        style={{
+          display:        "flex",
+          alignItems:     "center",
+          justifyContent: "space-between",
+          gap:            "1rem",
+          padding:        "1rem 1.25rem",
+          background:     "var(--color-bg, #ffffff)",
+          border:         "1px solid var(--color-border, #e9e9e7)",
+          borderRadius:   "0.75rem",
+          textDecoration: "none",
+          transition:     "border-color 0.12s, background 0.12s",
+        }}
+        // Hover handled via global CSS below — inline styles can't do :hover
+        className="sprint-cta-card"
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.875rem" }}>
+          <span style={{ fontSize: "1.5rem", flexShrink: 0 }}>⚡</span>
+          <div>
+            <div style={{
+              fontSize:   "0.9375rem",
+              fontWeight: 600,
+              color:      "var(--color-text, #37352f)",
+            }}>
+              Take an Interview Sprint
+            </div>
+            <div style={{
+              fontSize:  "0.75rem",
+              color:     "var(--color-muted, #787774)",
+              marginTop: "1px",
+            }}>
+              Timed · mixed questions · AI scored · one number tells you if you&apos;re ready
+            </div>
+          </div>
+        </div>
+        <span style={{
+          display:       "inline-flex",
+          alignItems:    "center",
+          gap:           "0.375rem",
+          padding:       "0.4375rem 1rem",
+          borderRadius:  "0.5rem",
+          background:    "var(--color-accent, #2383e2)",
+          color:         "#ffffff",
+          fontSize:      "0.8125rem",
+          fontWeight:    600,
+          flexShrink:    0,
+          whiteSpace:    "nowrap",
+        }}>
+          Start <ArrowRight size={13} />
+        </span>
+      </Link>
+
+      {/* Scoped hover style — tiny, no runtime cost */}
+      <style>{`
+        .sprint-cta-card:hover {
+          border-color: var(--color-accent, #2383e2) !important;
+          background: var(--color-accent-subtle, #e8f1fb) !important;
+        }
+      `}</style>
+    </div>
+  );
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function DashboardPage() {
-  const { user, progress, loading: authLoading } = useAuth();
-  const router = useRouter();
-
-  const { theoryQs: questions, loading: qLoading } = useAllQuestions();
-  const qError = null; // errors handled by QuestionsContext
-  const { categories } = useCategories("theory", "javascript");
-  const {
-    loading: pLoading,
-    masteredIds,
-    bookmarkIds,
-    solvedIds,
-    toggleMastered,
-    toggleBookmark,
-  } = useUserProgress({ uid: user?.uid ?? null });
-
-  const [tab, setTab] = useState<Tab>("home");
-  const [filters, setFilters] = useState<FilterState>(defaultFilters());
-
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/auth");
-  }, [user, authLoading, router]);
-
-  // Reset filters + scroll to top on tab change
-  const switchTab = useCallback((t: Tab) => {
-    setTab(t);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    if (t !== "practice") setFilters(defaultFilters());
-  }, []);
-
-  // ── Derived data ──────────────────────────────────────────────────────────
-  const masteredCount = masteredIds.length;
-  const isNewUser = masteredCount === 0 && !qLoading;
-
-  const progressIds = useMemo(
-    () => ({
-      mastered: new Set(masteredIds),
-      bookmarked: new Set(bookmarkIds),
-      solved: new Set(solvedIds),
-    }),
-    [masteredIds, bookmarkIds, solvedIds],
-  );
-
-  const filtered = useMemo(() => {
-    let qs = questions;
-    // Bookmark filter takes priority over all others — shows only saved questions
-    if (filters.showBookmarked) {
-      return qs.filter((q) => progressIds.bookmarked.has(q.id));
-    }
-    if (filters.category !== "All")
-      qs = qs.filter((q) => q.category === filters.category);
-    if (filters.difficulty !== "all")
-      qs = qs.filter((q) => q.difficulty === filters.difficulty);
-    if (filters.search.trim()) {
-      const term = filters.search.toLowerCase();
-      qs = qs.filter(
-        (q) =>
-          q.title.toLowerCase().includes(term) ||
-          q.category.toLowerCase().includes(term) ||
-          q.tags.some((t) => t.toLowerCase().includes(term)),
-      );
-    }
-    return qs;
-  }, [questions, filters, progressIds.bookmarked]);
-
-  // ── Progress handlers — Pro check is inside TheoryCard, not here ─────────
-  async function handleMastered(questionId: string) {
-    await toggleMastered(questionId);
-  }
-
-  async function handleBookmark(questionId: string) {
-    await toggleBookmark(questionId);
-  }
-
-  if (authLoading || !user || !progress) {
-    return (
-      <div css={Shared.spinner}>
-        <div css={Shared.spinnerDot} />
-      </div>
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
+export default async function HomePage() {
+  const totals = await getQuestionTotals();
 
   return (
-    <div css={ST.pageShell}>
-      {/* Ambient glows */}
-      <div css={ST.purpleGlow} />
-      <div css={ST.greenGlow} />
+    <>
+      {/* Greeting + mode progress cards — needs auth state (client) */}
+      <HomeClient {...totals} />
 
-      <div css={ST.content}>
-        {/* ── Header ── */}
-        <DashboardHeader
-          user={user}
-          progress={progress}
-          totalQuestions={questions.length}
-          masteredCount={masteredCount}
-        />
-
-        {/* ── Desktop tab nav (hidden on mobile) ── */}
-        <div css={ST.desktopNav}>
-          {TABS.map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              css={[ST.desktopBtn, tab === id && ST.desktopBtnActive]}
-              onClick={() => switchTab(id)}
-            >
-              <Icon size={13} />
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* ══════════ HOME ══════════ */}
-        {tab === "home" && (
-          <div>
-            <QuestionOfTheDay isPro={progress.isPro} />
-
-            {/* Stats row */}
-            {!isNewUser && (
-              <div css={ST.statsRow}>
-                <div css={ST.statCell}>
-                  <div css={ST.statNumber(C.accent3)}>{masteredCount}</div>
-                  <div css={ST.statLabel}>Mastered</div>
-                </div>
-                <div css={ST.statCell}>
-                  <div css={ST.statNumber(C.accent2)}>
-                    {progress.streakDays}
-                  </div>
-                  <div css={ST.statLabel}>Day Streak</div>
-                </div>
-                <div css={ST.statCell}>
-                  <div css={ST.statNumber(C.muted)}>
-                    {Math.max(0, questions.length - masteredCount)}
-                  </div>
-                  <div css={ST.statLabel}>Remaining</div>
-                </div>
-              </div>
-            )}
-
-            <button css={ST.jumpBtn} onClick={() => switchTab("practice")}>
-              <BookOpen size={15} />
-              {masteredCount > 0
-                ? "Continue practising →"
-                : "Start practising →"}
-            </button>
-          </div>
-        )}
-
-        {/* ══════════ PRACTICE ══════════ */}
-        {tab === "practice" && (
-          <div>
-            <CategoryFilter
-              categories={categories}
-              filters={filters}
-              onChange={(f) => setFilters(f)}
-              totalShown={filtered.length}
-              totalAll={questions.length}
-              bookmarkCount={bookmarkIds.length}
-              loading={qLoading || pLoading}
-            />
-            <QuestionList
-              key={`${filters.category}|${filters.difficulty}|${filters.search}`}
-              questions={filtered}
-              loading={qLoading || pLoading}
-              error={qError}
-              progressIds={progressIds}
-              onMastered={handleMastered}
-              onBookmark={handleBookmark}
-            />
-          </div>
-        )}
-
-        {/* ══════════ LEARN ══════════ */}
-        {tab === "learn" && <LearnSection />}
-
-        {/* ══════════ COMMUNITY ══════════ */}
-        {tab === "community" && <Leaderboard currentUid={user.uid} />}
+      {/* Question of the Day — server component with 24hr cache */}
+      <div style={{ maxWidth: "46rem", margin: "0 auto", padding: "0 1.25rem 1.5rem" }}>
+        <Suspense fallback={null}>
+          <QuestionOfTheDay />
+        </Suspense>
       </div>
 
-      {/* ── Mobile bottom nav ── */}
-      <nav css={ST.mobileNav}>
-        {TABS.map(({ id, label, Icon }) => (
-          <button
-            key={id}
-            css={[ST.mobileNavBtn, tab === id && ST.mobileNavBtnActive]}
-            onClick={() => switchTab(id)}
-          >
-            {tab === id && <span css={ST.mobileNavDot} />}
-            <Icon size={20} />
-            <span css={ST.mobileNavLabel}>{label}</span>
-          </button>
-        ))}
-      </nav>
-    </div>
+      {/* Sprint CTA — static, server-rendered */}
+      <SprintCTA />
+
+      {/* Leaderboard mini — uses getWeeklyLeaderboardCached */}
+      <div style={{ maxWidth: "46rem", margin: "0 auto", padding: "0 1.25rem 1.5rem" }}>
+        <Suspense fallback={null}>
+          <LeaderboardWrapper />
+        </Suspense>
+      </div>
+
+      {/* Learn section — topics + blog teasers */}
+      <div style={{ maxWidth: "46rem", margin: "0 auto", padding: "0 1.25rem 5rem" }}>
+        <Suspense fallback={null}>
+          <LearnSection />
+        </Suspense>
+      </div>
+    </>
   );
 }

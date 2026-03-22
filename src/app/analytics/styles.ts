@@ -15,7 +15,7 @@ export const statsGrid = css`
   gap: 0.75rem;
   margin-bottom: 1.5rem;
   @media (min-width: 640px) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
   }
 `;
 

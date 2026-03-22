@@ -188,7 +188,7 @@ export async function getWeeklyLeaderboard(
     const snap = await getDocs(q);
 
     const thisMonday = getMondayISO();
-
+    
     return (
       snap.docs
         .map((d) => {
@@ -208,7 +208,7 @@ export async function getWeeklyLeaderboard(
         // Only show users who have actually earned XP this week (not stale values from previous weeks)
         .filter((e) => e.weeklyXp > 0 && e.weeklyXpResetDate >= thisMonday)
     );
-  } catch {
+  } catch(error) {
     return [];
   }
 }

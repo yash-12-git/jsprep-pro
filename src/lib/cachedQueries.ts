@@ -39,6 +39,8 @@ import {
   getBlogPostsForTopic as _getBlogPostsForTopic,
 } from "@/lib/blogPosts";
 
+import { getWeeklyLeaderboard as _getWeeklyLeaderboard } from "@/lib/userProgress";
+
 import {
   getQuestions as _getQuestions,
   getPublishedCategories as _getPublishedCategories,
@@ -54,6 +56,7 @@ export const CACHE_TAGS = {
   topics: "topics",
   blogPosts: "blog-posts",
   questions: "questions",
+  leaderboard: "leaderboard",
 } as const;
 
 // revalidate: false = cache forever, cleared only by revalidateTag() on admin write
@@ -75,6 +78,16 @@ export const getTopicSlugs = unstable_cache(
   },
   ["topic-slugs"],
   { revalidate: false, tags: [CACHE_TAGS.topics] },
+);
+
+/** Weekly leaderboard — shared across all users */
+export const getWeeklyLeaderboardCached = unstable_cache(
+  () => _getWeeklyLeaderboard(10),
+  ["weekly-leaderboard"],
+  {
+    revalidate: 60 * 60 * 2,
+    tags: [CACHE_TAGS.leaderboard],
+  },
 );
 
 /** Single topic by slug — slug baked into key AND per-slug tag for granular invalidation */
