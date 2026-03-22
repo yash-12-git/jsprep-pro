@@ -206,89 +206,7 @@ import {
   TESTIMONIALS,
   TOPICS,
 } from "@/data/homepageStaticData";
-
-// ── Inline ProCTA (separate component avoids remount on every render) ─────────
-function ProCTA({
-  user,
-  progress,
-  handleUpgrade,
-  payLoading,
-  payError,
-}: {
-  user: any;
-  progress: any;
-  handleUpgrade: () => void;
-  payLoading: boolean;
-  payError: string | null;
-}) {
-  if (user && progress?.isPro) {
-    return (
-      <>
-        <Link href="/dashboard" css={proActiveBtn}>
-          <CheckCircle size={15} /> You&apos;re Pro — Go to Dashboard
-        </Link>
-        <p
-          style={{
-            fontSize: "0.75rem",
-            color: C.muted,
-            textAlign: "center",
-            marginTop: "0.625rem",
-          }}
-        >
-          <Sparkles
-            size={10}
-            style={{ verticalAlign: "middle", marginRight: "3px" }}
-          />
-          Pro is active on your account
-        </p>
-      </>
-    );
-  }
-  if (user) {
-    return (
-      <>
-        <button css={proPayBtn} onClick={handleUpgrade} disabled={payLoading}>
-          {payLoading ? (
-            "Opening payment…"
-          ) : (
-            <>
-              <Zap size={16} /> Upgrade to Pro →
-            </>
-          )}
-        </button>
-        {payError && (
-          <p
-            style={{
-              color: C.red,
-              fontSize: "0.75rem",
-              textAlign: "center",
-              marginTop: "0.5rem",
-            }}
-          >
-            {payError}
-          </p>
-        )}
-      </>
-    );
-  }
-  return (
-    <>
-      <Link href="/auth" css={pBtnP}>
-        Start with Pro →
-      </Link>
-      <p
-        style={{
-          fontSize: "0.75rem",
-          color: C.muted,
-          textAlign: "center",
-          marginTop: "0.625rem",
-        }}
-      >
-        You&apos;ll sign in or create an account during checkout
-      </p>
-    </>
-  );
-}
+import ProCTA from "@/components/home/ProCTA";
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function HomePageClient() {
@@ -889,13 +807,7 @@ console.log({} + [])`}</pre>
                   </li>
                 ))}
               </ul>
-              <ProCTA
-                user={user}
-                progress={progress}
-                handleUpgrade={handleUpgrade}
-                payLoading={payLoading}
-                payError={payError}
-              />
+              <ProCTA />
             </div>
           </div>
         </div>

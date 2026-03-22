@@ -38,14 +38,6 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
     return (
       <div css={S.emptyState}>
         <p css={S.emptyText}>No questions tagged to this topic yet.</p>
-        <p css={S.emptyHint}>
-          Tag questions in{" "}
-          <a href="/admin/questions" css={S.adminLink}>
-            Admin → Questions
-          </a>{" "}
-          by setting the "Topic Page" field to{" "}
-          <code css={S.emptyCode}>{topicSlug}</code>.
-        </p>
       </div>
     );
   }
