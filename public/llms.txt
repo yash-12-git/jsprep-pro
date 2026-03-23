@@ -54,6 +54,7 @@ Each concept hub contains: a mental model analogy, deep code explanation, common
 - https://jsprep.pro/javascript-regex-interview-questions — Regular Expressions: regex syntax, flags, groups, lookahead, common patterns
 - https://jsprep.pro/javascript-event-propagation-interview-questions - javascript event propagation: bubbling, capturing implementation, use cases
 - https://jsprep.pro/javascript-memoization-interview-questions - javascript memoization: LRU, weak map, weak set
+- https://jsprep.pro/javascript-design-pattern-interview-questions - javascript design pattern, factory
 
 ## Practice Question Sets (by category)
 

@@ -776,7 +776,7 @@ export const TOPIC_FAQS: Record<string, FAQItem[]> = {
         "useMemo caches a computed value — it runs the provided function and stores its return value, recomputing only when specified dependencies change. useCallback caches a function reference — it returns the same function object between renders, rerunning only when dependencies change. useMemo is for expensive computations; useCallback is for preventing memoized child components from receiving a new function reference prop and re-rendering unnecessarily.",
     },
   ],
-  'javascript-design-patterns-interview-questions': [
+  'javascript-design-pattern-interview-questions': [
   {
     question: 'What is the Observer pattern in JavaScript?',
     answer: 'The Observer pattern defines a one-to-many relationship between a subject and its observers. The subject maintains a list of observer functions and notifies all of them when its state changes. Observers subscribe and unsubscribe independently. The subject never needs to know the implementation of any observer. It is the pattern behind addEventListener, Node.js EventEmitter, Vue emit, and Redux store.subscribe.',
