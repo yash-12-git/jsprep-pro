@@ -52,6 +52,8 @@ Each concept hub contains: a mental model analogy, deep code explanation, common
 - https://jsprep.pro/javascript-browser-apis-interview-questions — Browser APIs: fetch, storage APIs, Web Workers, IntersectionObserver, Permissions API
 - https://jsprep.pro/javascript-immutability-interview-questions — Immutability: Object.freeze, structuredClone, Immer, immutable update patterns
 - https://jsprep.pro/javascript-regex-interview-questions — Regular Expressions: regex syntax, flags, groups, lookahead, common patterns
+- https://jsprep.pro/javascript-event-propagation-interview-questions - javascript event propagation: bubbling, capturing implementation, use cases
+- https://jsprep.pro/javascript-memoization-interview-questions - javascript memoization: LRU, weak map, weak set
 
 ## Practice Question Sets (by category)
 

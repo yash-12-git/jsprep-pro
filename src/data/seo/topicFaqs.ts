@@ -742,6 +742,40 @@ export const TOPIC_FAQS: Record<string, FAQItem[]> = {
         "focus, blur, load, unload, scroll, mouseenter, and mouseleave do not bubble. This means they cannot be intercepted on a parent element with a standard listener. The bubbling equivalents are focusin and focusout (for focus/blur) and mouseover and mouseout (for mouseenter/mouseleave) — use these when you need to delegate these event types.",
     },
   ],
+  "javascript-memoization-interview-questions": [
+    {
+      question: "What is memoization in JavaScript?",
+      answer:
+        "Memoization is an optimization technique that caches the return value of a function based on its input arguments. On the first call with a given set of arguments, the function executes normally and the result is stored in a cache. On every subsequent call with the same arguments, the cached result is returned without executing the function body. It is only valid for pure functions — functions that always return the same output for the same input with no side effects.",
+    },
+    {
+      question: "How do you implement a memoize function in JavaScript?",
+      answer:
+        "A memoize function uses a closure to maintain a cache between calls. It wraps the original function, serializes the arguments into a cache key using JSON.stringify, checks if that key exists in the cache, and returns the stored result if it does. If not, it calls the original function, stores the result under that key, and returns it. The cache is a plain object or Map that persists in the closure across all invocations of the memoized function.",
+    },
+    {
+      question:
+        "What is the problem with using JSON.stringify as a memoization cache key?",
+      answer:
+        "JSON.stringify has three significant failures as a cache key: it silently drops function and Symbol properties so two different function arguments can produce the same key, it treats object property order as significant so the same logical object with different key order produces different keys, and it throws a TypeError on circular references. For functions receiving complex objects, a custom key resolver or WeakMap-based cache is required.",
+    },
+    {
+      question: "What is the difference between memoization and caching?",
+      answer:
+        "Memoization is a specific type of caching that operates automatically on function return values keyed by input arguments. General caching is broader — it can store anything by any key and requires explicit management. Memoization is function-level and automatic: you wrap a function once and the caching happens transparently on every call. General caching is explicit: you decide what to store, when to store it, and when to invalidate it.",
+    },
+    {
+      question: "What is an LRU cache and why is it used with memoization?",
+      answer:
+        "An LRU (Least Recently Used) cache is a bounded cache that evicts the entry accessed least recently when it reaches its size limit. It is used with memoization because an unbounded cache is a memory leak — every unique set of arguments permanently occupies cache space that is never freed. In JavaScript, LRU cache is elegantly implemented using Map, which preserves insertion order, by deleting and reinserting an entry on access to move it to the most-recently-used position.",
+    },
+    {
+      question:
+        "What is the difference between useMemo and useCallback in React?",
+      answer:
+        "useMemo caches a computed value — it runs the provided function and stores its return value, recomputing only when specified dependencies change. useCallback caches a function reference — it returns the same function object between renders, rerunning only when dependencies change. useMemo is for expensive computations; useCallback is for preventing memoized child components from receiving a new function reference prop and re-rendering unnecessarily.",
+    },
+  ],
 };
 
 /**
