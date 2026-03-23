@@ -776,6 +776,32 @@ export const TOPIC_FAQS: Record<string, FAQItem[]> = {
         "useMemo caches a computed value — it runs the provided function and stores its return value, recomputing only when specified dependencies change. useCallback caches a function reference — it returns the same function object between renders, rerunning only when dependencies change. useMemo is for expensive computations; useCallback is for preventing memoized child components from receiving a new function reference prop and re-rendering unnecessarily.",
     },
   ],
+  'javascript-design-patterns-interview-questions': [
+  {
+    question: 'What is the Observer pattern in JavaScript?',
+    answer: 'The Observer pattern defines a one-to-many relationship between a subject and its observers. The subject maintains a list of observer functions and notifies all of them when its state changes. Observers subscribe and unsubscribe independently. The subject never needs to know the implementation of any observer. It is the pattern behind addEventListener, Node.js EventEmitter, Vue emit, and Redux store.subscribe.',
+  },
+  {
+    question: 'What is the difference between Observer and Pub/Sub pattern?',
+    answer: 'In the Observer pattern, the subject holds direct references to its observers — both sides know each other exist, creating tighter coupling. In Pub/Sub, publishers and subscribers both interact only with a central message broker and never reference each other directly. Observer is simpler and suitable for direct event relationships. Pub/Sub enables complete decoupling, making it appropriate for application-wide event buses and micro-frontend communication.',
+  },
+  {
+    question: 'What is the Singleton pattern and when is it dangerous in JavaScript?',
+    answer: 'The Singleton ensures only one instance of a class exists and provides a global access point to it. It is useful for shared resources like database connections and configuration stores. It is dangerous because it introduces hidden global state — any code anywhere can read or modify it, making behavior hard to predict. It makes testing difficult because state from one test leaks into the next. Dependency injection, passing the instance as a parameter rather than accessing it globally, is the preferred alternative.',
+  },
+  {
+    question: 'What is the Module pattern in JavaScript?',
+    answer: 'The Module pattern uses an IIFE and closure to create a private scope. Variables declared inside the IIFE are private — inaccessible from outside. The IIFE returns a plain object containing only the functions and values meant to be public. This creates encapsulation: the public API works correctly, but implementation details are hidden. ES6 modules provide the same encapsulation natively — variables not exported are private to the module file.',
+  },
+  {
+    question: 'What is the Factory pattern in JavaScript?',
+    answer: 'The Factory pattern provides a function or method that creates and returns objects without the caller needing to use a specific constructor or know the exact class being instantiated. The factory determines which type to create based on its parameters and returns it through a consistent interface. This decouples the caller from implementation details — adding a new type does not require changing any calling code. React.createElement is a factory: you pass a type and it creates the appropriate element.',
+  },
+  {
+    question: 'What is the Decorator pattern in JavaScript?',
+    answer: 'The Decorator pattern wraps a function or object with a new function that adds behaviour without modifying the original. The wrapper maintains the same interface as the original. Decorators can be stacked — each wraps the previous, building a pipeline of added behaviours. In JavaScript, function decorators are higher-order functions: withLogging(withCache(fn)) adds logging and caching to fn without touching fn itself. React Higher-Order Components are the Decorator pattern applied to components.',
+  },
+]
 };
 
 /**
