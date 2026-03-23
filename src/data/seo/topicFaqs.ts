@@ -776,32 +776,106 @@ export const TOPIC_FAQS: Record<string, FAQItem[]> = {
         "useMemo caches a computed value — it runs the provided function and stores its return value, recomputing only when specified dependencies change. useCallback caches a function reference — it returns the same function object between renders, rerunning only when dependencies change. useMemo is for expensive computations; useCallback is for preventing memoized child components from receiving a new function reference prop and re-rendering unnecessarily.",
     },
   ],
-  'javascript-design-pattern-interview-questions': [
-  {
-    question: 'What is the Observer pattern in JavaScript?',
-    answer: 'The Observer pattern defines a one-to-many relationship between a subject and its observers. The subject maintains a list of observer functions and notifies all of them when its state changes. Observers subscribe and unsubscribe independently. The subject never needs to know the implementation of any observer. It is the pattern behind addEventListener, Node.js EventEmitter, Vue emit, and Redux store.subscribe.',
-  },
-  {
-    question: 'What is the difference between Observer and Pub/Sub pattern?',
-    answer: 'In the Observer pattern, the subject holds direct references to its observers — both sides know each other exist, creating tighter coupling. In Pub/Sub, publishers and subscribers both interact only with a central message broker and never reference each other directly. Observer is simpler and suitable for direct event relationships. Pub/Sub enables complete decoupling, making it appropriate for application-wide event buses and micro-frontend communication.',
-  },
-  {
-    question: 'What is the Singleton pattern and when is it dangerous in JavaScript?',
-    answer: 'The Singleton ensures only one instance of a class exists and provides a global access point to it. It is useful for shared resources like database connections and configuration stores. It is dangerous because it introduces hidden global state — any code anywhere can read or modify it, making behavior hard to predict. It makes testing difficult because state from one test leaks into the next. Dependency injection, passing the instance as a parameter rather than accessing it globally, is the preferred alternative.',
-  },
-  {
-    question: 'What is the Module pattern in JavaScript?',
-    answer: 'The Module pattern uses an IIFE and closure to create a private scope. Variables declared inside the IIFE are private — inaccessible from outside. The IIFE returns a plain object containing only the functions and values meant to be public. This creates encapsulation: the public API works correctly, but implementation details are hidden. ES6 modules provide the same encapsulation natively — variables not exported are private to the module file.',
-  },
-  {
-    question: 'What is the Factory pattern in JavaScript?',
-    answer: 'The Factory pattern provides a function or method that creates and returns objects without the caller needing to use a specific constructor or know the exact class being instantiated. The factory determines which type to create based on its parameters and returns it through a consistent interface. This decouples the caller from implementation details — adding a new type does not require changing any calling code. React.createElement is a factory: you pass a type and it creates the appropriate element.',
-  },
-  {
-    question: 'What is the Decorator pattern in JavaScript?',
-    answer: 'The Decorator pattern wraps a function or object with a new function that adds behaviour without modifying the original. The wrapper maintains the same interface as the original. Decorators can be stacked — each wraps the previous, building a pipeline of added behaviours. In JavaScript, function decorators are higher-order functions: withLogging(withCache(fn)) adds logging and caching to fn without touching fn itself. React Higher-Order Components are the Decorator pattern applied to components.',
-  },
-]
+  "javascript-design-pattern-interview-questions": [
+    {
+      question: "What is the Observer pattern in JavaScript?",
+      answer:
+        "The Observer pattern defines a one-to-many relationship between a subject and its observers. The subject maintains a list of observer functions and notifies all of them when its state changes. Observers subscribe and unsubscribe independently. The subject never needs to know the implementation of any observer. It is the pattern behind addEventListener, Node.js EventEmitter, Vue emit, and Redux store.subscribe.",
+    },
+    {
+      question: "What is the difference between Observer and Pub/Sub pattern?",
+      answer:
+        "In the Observer pattern, the subject holds direct references to its observers — both sides know each other exist, creating tighter coupling. In Pub/Sub, publishers and subscribers both interact only with a central message broker and never reference each other directly. Observer is simpler and suitable for direct event relationships. Pub/Sub enables complete decoupling, making it appropriate for application-wide event buses and micro-frontend communication.",
+    },
+    {
+      question:
+        "What is the Singleton pattern and when is it dangerous in JavaScript?",
+      answer:
+        "The Singleton ensures only one instance of a class exists and provides a global access point to it. It is useful for shared resources like database connections and configuration stores. It is dangerous because it introduces hidden global state — any code anywhere can read or modify it, making behavior hard to predict. It makes testing difficult because state from one test leaks into the next. Dependency injection, passing the instance as a parameter rather than accessing it globally, is the preferred alternative.",
+    },
+    {
+      question: "What is the Module pattern in JavaScript?",
+      answer:
+        "The Module pattern uses an IIFE and closure to create a private scope. Variables declared inside the IIFE are private — inaccessible from outside. The IIFE returns a plain object containing only the functions and values meant to be public. This creates encapsulation: the public API works correctly, but implementation details are hidden. ES6 modules provide the same encapsulation natively — variables not exported are private to the module file.",
+    },
+    {
+      question: "What is the Factory pattern in JavaScript?",
+      answer:
+        "The Factory pattern provides a function or method that creates and returns objects without the caller needing to use a specific constructor or know the exact class being instantiated. The factory determines which type to create based on its parameters and returns it through a consistent interface. This decouples the caller from implementation details — adding a new type does not require changing any calling code. React.createElement is a factory: you pass a type and it creates the appropriate element.",
+    },
+    {
+      question: "What is the Decorator pattern in JavaScript?",
+      answer:
+        "The Decorator pattern wraps a function or object with a new function that adds behaviour without modifying the original. The wrapper maintains the same interface as the original. Decorators can be stacked — each wraps the previous, building a pipeline of added behaviours. In JavaScript, function decorators are higher-order functions: withLogging(withCache(fn)) adds logging and caching to fn without touching fn itself. React Higher-Order Components are the Decorator pattern applied to components.",
+    },
+  ],
+  "javascript-deep-vs-shallow-clone-interview-questions": [
+    {
+      question:
+        "What is the difference between shallow copy and deep copy in JavaScript?",
+      answer:
+        "A shallow copy creates a new top-level object but all nested objects and arrays inside it are still shared references with the original. Changing a top-level primitive on the copy does not affect the original, but mutating a nested object does. A deep copy recursively duplicates every level so no part of the copy shares memory with the original — changes at any depth are completely independent.",
+    },
+    {
+      question:
+        "Why does Object.assign and spread operator only create a shallow copy?",
+      answer:
+        "Object.assign and spread copy property values directly. For primitive values like strings and numbers, the value itself is copied. For nested objects and arrays, the value stored in the property is a reference (a memory address), and that reference is what gets copied. Both the original and the copy now hold the same reference, so they point to the same nested object in memory.",
+    },
+    {
+      question:
+        "What are the limitations of JSON.parse(JSON.stringify()) for deep cloning?",
+      answer:
+        "Five significant limitations: functions and Symbol-keyed properties are silently dropped from the output, undefined values are dropped, Date objects are converted to ISO strings and lose their Date type, Infinity and NaN become null, and circular references throw a TypeError immediately. It is only safe for plain data objects containing strings, numbers, booleans, arrays, and nested plain objects.",
+    },
+    {
+      question:
+        "What is structuredClone() and how does it differ from JSON.parse(JSON.stringify())?",
+      answer:
+        "structuredClone() is a native browser and Node.js API (available since 2022) that uses the Structured Clone Algorithm. It correctly handles Dates (preserving them as Date objects), RegExp, Map, Set, typed arrays, and circular references. Unlike the JSON approach, it does not silently corrupt data. It cannot clone functions or DOM nodes (throws DataCloneError) and loses prototype chains on class instances.",
+    },
+    {
+      question:
+        "How do you implement a deep clone function that handles circular references?",
+      answer:
+        "Use a WeakMap to track every object that has been seen during the recursion. Before recursing into an object, check if it already exists in the WeakMap and return the previously created clone if so. If not, create the new clone object, register it in the WeakMap immediately before recursing into its properties, then recursively clone each property. The WeakMap registration before recursion is what breaks the circular chain.",
+    },
+    {
+      question:
+        "Why use WeakMap instead of Map for tracking seen objects in deep clone?",
+      answer:
+        "WeakMap holds weak references to its keys, meaning it does not prevent the objects from being garbage collected after the clone operation completes. Using a regular Map would keep every object alive in memory for the lifetime of the Map. Since the seen-objects tracker is only needed during the clone call, WeakMap is the correct choice — the memory is released as soon as the cloned objects are no longer referenced elsewhere.",
+    },
+  ],
+  "javascript-optional-chaining-interview-questions": [
+    {
+      question:
+        "What does the optional chaining operator (?.) do in JavaScript?",
+      answer:
+        "The optional chaining operator (?.) evaluates the expression to its left and checks if it is null or undefined. If it is, the entire expression short-circuits and returns undefined without evaluating the rest. If the left side has a value, evaluation continues normally. It prevents TypeError crashes when accessing properties on potentially null or undefined values in nested object chains.",
+    },
+    {
+      question: "What is the difference between ?? and || in JavaScript?",
+      answer:
+        "Both return their right-hand side as a fallback, but they differ in what triggers the fallback. The nullish coalescing operator (??) only falls back when the left side is null or undefined. The logical OR operator (||) falls back for any falsy value including 0, false, empty string, and NaN. This means port ?? 3000 correctly keeps port 0, while port || 3000 incorrectly replaces port 0 with 3000 because 0 is falsy.",
+    },
+    {
+      question: "Why does user?.getName() still throw if getName is null?",
+      answer:
+        "The ?. in user?.getName() only checks if user is null or undefined. If user has a value, evaluation continues and attempts to call getName() as a function. If getName is null, calling null as a function throws a TypeError. To guard against getName itself not being a function, use user?.getName?.() — two optional chaining operators, one checking the object and one checking the method before calling it.",
+    },
+    {
+      question: "What are the logical assignment operators ??=, ||=, and &&=?",
+      answer:
+        "These are shorthand assignment operators. ??= assigns the right side only when the left side is null or undefined — it is equivalent to a = a ?? b. ||= assigns when the left is any falsy value — equivalent to a = a || b. &&= assigns when the left is truthy — equivalent to a = a && b. All three are lazy: the right side is never evaluated if the assignment will not happen.",
+    },
+    {
+      question:
+        "Does optional chaining prevent side effects in the bypassed expression?",
+      answer:
+        "Yes. Optional chaining short-circuits completely — when the left side is null or undefined, nothing to the right of the ?. is evaluated at all. If the right side contains a function call or an increment operation, it does not execute. For example, obj?.method(count++) will not increment count if obj is null or undefined, because the entire right side including the argument is never evaluated.",
+    },
+  ],
 };
 
 /**

@@ -262,9 +262,9 @@ export default function HomePageClient() {
         {/* ── STATS ────────────────────────────────────────── */}
         <div css={statsRow}>
           {[
-            { n: "200+", l: "Questions" },
+            { n: "250+", l: "Questions" },
             { n: "4", l: "Practice modes" },
-            { n: "36", l: "Topic guides" },
+            { n: "40", l: "Topic guides" },
             { n: "6", l: "AI tools" },
           ].map(({ n, l }) => (
             <div key={l} css={statCell}>

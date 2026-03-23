@@ -107,7 +107,7 @@ export const MODES = [
     emoji: "⚡",
     label: "Polyfill Lab",
     c: "#f7c76a",
-    n: "Mixed",
+    n: "20+",
     free: false,
     href: "/polyfill-lab",
     desc: "Write the implementation of common JS methods from scratch, then test and debug it in our custom test runner.",
