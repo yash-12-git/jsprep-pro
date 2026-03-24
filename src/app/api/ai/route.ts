@@ -49,7 +49,7 @@ async function callGroq(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { type, messages, context, similarQuestions } = body;
+    const { type, messages, context, similarQuestions, system } = body;
 
     // RAG context — injected into relevant prompts when provided
     const ragContext = similarQuestions?.length
@@ -161,7 +161,9 @@ Respond with ONLY a JSON object in this exact format:
 
       // ── Mock Interview ────────────────────────────────────────────────────
       case "mock":
-        systemPrompt = `You are a senior frontend engineer conducting a realistic JavaScript technical interview at a product company (think Razorpay, Swiggy, Flipkart level).
+        systemPrompt = systemPrompt =
+          system ??
+          `You are a senior frontend engineer conducting a realistic JavaScript technical interview at a product company (think Razorpay, Swiggy, Flipkart level).
 
 Interview style:
 - Start with a mid-level JS question
