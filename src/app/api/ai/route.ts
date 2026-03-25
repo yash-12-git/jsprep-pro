@@ -19,6 +19,7 @@ async function callGroq(
   systemPrompt: string,
   messages: { role: string; content: string }[],
   maxTokens = 1024,
+  temperature = 1,
 ): Promise<string> {
   const response = await fetch(GROQ_API, {
     method: "POST",
@@ -29,6 +30,7 @@ async function callGroq(
     body: JSON.stringify({
       model: GROQ_MODEL,
       max_tokens: maxTokens,
+      temperature: temperature,
       messages: [
         { role: "system", content: systemPrompt },
         ...messages.map((m) => ({ role: m.role, content: m.content })),
@@ -57,6 +59,7 @@ export async function POST(req: NextRequest) {
       : "";
 
     let systemPrompt = "";
+    let mockMesssages: { role: string; content: string }[] = [];
 
     switch (type) {
       // ── Q&A Tutor ─────────────────────────────────────────────────────────
@@ -161,28 +164,61 @@ Respond with ONLY a JSON object in this exact format:
 
       // ── Mock Interview ────────────────────────────────────────────────────
       case "mock":
-        systemPrompt = systemPrompt =
-          system ??
-          `You are a senior frontend engineer conducting a realistic JavaScript technical interview at a product company (think Razorpay, Swiggy, Flipkart level).
+        systemPrompt =
+          body.system ??
+          `You are a senior JavaScript interviewer. Conduct a realistic technical interview.
+     Ask one question at a time. Never hint or teach. Be professional and challenging.`;
 
-Interview style:
-- Start with a mid-level JS question
-- Follow up based on their answer — dig deeper, probe edge cases, ask "what if" scenarios
-- If they answer well, increase difficulty. If they struggle, offer a hint or simplify
-- Be professional but conversational, not robotic
-- Ask ONE question or follow-up at a time
-- After 6-8 exchanges, wrap up with honest feedback
+        const ctx = body.context ?? {};
+        const isFinal = ctx.isFinal ?? false;
+        const clientMsgs = (body.messages ?? []) as {
+          role: string;
+          content: string;
+        }[];
 
-Rules:
-- Never reveal you are an AI during the interview
-- React naturally to their answers ("Interesting approach", "Good point, but what about...")
-- Keep your messages concise (2-4 sentences max per turn)
-- End the interview after ~8 turns with a realistic verdict: "I think we have enough to evaluate, thanks for your time. Overall feedback: [honest assessment]"
+        // Per-request entropy prevents model caching / identical responses
+        const entropy = Math.random().toString(36).slice(2, 8);
+        const tsNow = Date.now();
 
-Start the interview now with your first question.`;
+        // Detect the very first exchange: single user message containing "Begin"
+        const isOpener =
+          clientMsgs.length === 1 &&
+          clientMsgs[0].role === "user" &&
+          (clientMsgs[0].content.toLowerCase().includes("begin") ||
+            clientMsgs[0].content.toLowerCase().includes("start"));
+
+        const enrichedMessages = isOpener
+          ? [
+              {
+                role: "user",
+                content: [
+                  `[req:${entropy} t:${tsNow}]`,
+                  ``,
+                  `Start the interview NOW. Ask the FIRST question from your opening topics list.`,
+                  ``,
+                  `Candidate context for this specific session:`,
+                  `  Company:    ${ctx.company ?? "General"}`,
+                  `  Role:       ${ctx.role ?? "Frontend Developer"}`,
+                  `  Level:      ${ctx.experience ?? "mid"}`,
+                  `  Focus:      ${ctx.focus ?? "Mixed"}`,
+                  ``,
+                  `CRITICAL: Do NOT ask "null vs undefined" or "var let const differences".`,
+                  `Those are banned. Use the company-specific opening question from your system prompt.`,
+                  `Ask exactly ONE question. Make it feel like a real ${ctx.company ?? "tech company"} interview.`,
+                ].join("\n"),
+              },
+            ]
+          : clientMsgs.map((m) => ({ role: m.role, content: m.content }));
+
+        // For non-opener messages, add the GENERATE_SCORECARD message when final
+        mockMesssages =
+          isFinal && !isOpener
+            ? [
+                ...enrichedMessages,
+                { role: "user", content: "GENERATE_SCORECARD" },
+              ]
+            : enrichedMessages;
         break;
-
-      // ── Question Generator ────────────────────────────────────────────────
       case "generate":
         // ── SANDBOX CONTRACT (enforced for all output + debug questions) ────────
         // Output questions: code must run → console.log matches expectedOutput
@@ -260,8 +296,9 @@ For companies: pick 2-4 from Razorpay, Flipkart, Swiggy, CRED, PhonePe, Google, 
 
     const text = await callGroq(
       systemPrompt,
-      messages,
-      type === "generate" ? 2048 : 1024,
+      type === "mock" ? (mockMesssages ?? messages) : messages,
+      type === "generate" || type === "mock" ? 2048 : 1024,
+      type === "mock" ? 0.7 : 1,
     );
     return NextResponse.json({ text });
   } catch (err) {

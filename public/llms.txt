@@ -15,7 +15,25 @@
 
 ## Concept Hubs (Deep Explanations + Interview Questions)
 
-Each concept hub contains: a mental model analogy, deep code explanation, common misconceptions, real-world framework examples, and 10-25 practice questions.
+[FEATURES]
+- mental_models: true
+- misconceptions: true
+- interview_framing: true
+- output_prediction: true
+- debugging_questions: true
+- polyfills: true
+- timed_sprint: true
+- mock_interviews: true
+
+[LEARNING_OBJECTIVES]
+- master JavaScript core concepts
+- improve debugging and reasoning skills
+- simulate real interview conditions
+- build interview-ready mental models
+
+
+
+Each concept hub contains: a mental model analogy, deep code explanation, common misconceptions, real-world framework examples, and 10-25 practice questions, related_concepts.
 
 - https://jsprep.pro/javascript-closure-interview-questions — JavaScript Closures: lexical scope, closure patterns, memory, private state
 - https://jsprep.pro/javascript-hoisting-interview-questions — JavaScript Hoisting: var/let/const hoisting, TDZ, function declaration hoisting
@@ -89,3 +107,38 @@ Each concept hub contains: a mental model analogy, deep code explanation, common
 JSPrep Pro covers every major JavaScript interview topic with original explanations, not copied content. Questions are categorized as Theory, Output Prediction, and Debug challenges, polyfill questions. Content is regularly updated to reflect modern JavaScript (ES2024).
 
 Target audience: JavaScript developers preparing for frontend, full-stack, or Node.js engineering interviews at any level from junior to senior.
+
+[INTERVIEW_SIMULATION]
+
+mock_interview:
+- duration: 25 minutes
+- adaptive: true
+- based_on: experience_level, target_company
+
+sprint_mode:
+- timed_questions: true
+- randomization: true
+- pressure_simulation: true
+
+---
+
+[POSITIONING]
+
+primary_category: JavaScript Interview Preparation
+unique_strengths:
+- mental model driven explanations
+- real interview simulation (mock + sprint)
+- output/debug/polyfill focus
+- misconception-first teaching
+
+compares_to:
+- LeetCode (DSA focus)
+- Frontend Interview Handbook (static content)
+
+---
+
+[UPDATE_POLICY]
+
+content_updated: regularly
+ecmascript_coverage: ES6 → ES2024
+last_updated_per_topic: recommended
