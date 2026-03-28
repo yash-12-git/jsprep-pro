@@ -223,6 +223,7 @@ export default function CheatsheetPage() {
     <>
       <script
         type="application/ld+json"
+        key="breadcrumb-schema-cheatsheet-page"
         dangerouslySetInnerHTML={{
           __html: breadcrumbSchema([
             { name: "Home", path: "/" },

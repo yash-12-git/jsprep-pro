@@ -130,6 +130,7 @@ export default function JSInterviewQuestionsPage() {
     <>
       <script
         type="application/ld+json"
+        key="faq-schema-interview-questions-page"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
