@@ -7,7 +7,6 @@ import {
 } from "@/lib/cachedQueries";
 
 import { catToSlug, SITE } from "@/lib/seo/seo";
-import { getServerTrack } from "@/lib/getServerTrack";
 
 function toSlug(text: string): string {
   return text
@@ -19,7 +18,6 @@ function toSlug(text: string): string {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date().toISOString();
-  const track = await getServerTrack();
 
   const [topicSlugs, blogPosts, questionSlugs, theoryResult] =
     await Promise.all([
@@ -68,13 +66,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${SITE.domain}/topics/${track}`,
+      url: `${SITE.domain}/topics/javascript`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
-      url: `${SITE.domain}/blog/${track}`,
+      url: `${SITE.domain}/topics/react`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE.domain}/blog/javascript`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${SITE.domain}/blog/react`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.85,
@@ -120,20 +130,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.75,
   }));
 
-  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${SITE.domain}/blog/${track}/${post.slug}`,
-    lastModified: new Date(
-      post.modifiedAt ?? post.publishedAt ?? now,
-    ).toISOString(),
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-  }));
+  const javascriptBlogPages: MetadataRoute.Sitemap = blogPosts
+    .filter((post) => post.track === "javascript")
+    .map((post) => ({
+      url: `${SITE.domain}/blog/javascript/${post.slug}`,
+      lastModified: new Date(
+        post.modifiedAt ?? post.publishedAt ?? now,
+      ).toISOString(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
+
+  const reactBlogPages: MetadataRoute.Sitemap = blogPosts
+    .filter((post) => post.track === "react")
+    .map((post) => ({
+      url: `${SITE.domain}/blog/react/${post.slug}`,
+      lastModified: new Date(
+        post.modifiedAt ?? post.publishedAt ?? now,
+      ).toISOString(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
 
   return [
     ...staticPages,
     ...topicPages,
     ...categoryPages,
     ...questionPages,
-    ...blogPages,
+    ...javascriptBlogPages,
+    ...reactBlogPages,
   ];
 }
