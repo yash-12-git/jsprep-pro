@@ -100,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const topicPages: MetadataRoute.Sitemap = topicSlugs.map((slug) => ({
-    url: `${SITE.domain}/${track}/${slug}`,
+    url: `${SITE.domain}/${slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.9,
