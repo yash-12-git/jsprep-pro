@@ -23,8 +23,7 @@ interface Props {
 
 export async function generateStaticParams() {
   try {
-    const track = await getServerTrack();
-    const slugs = await getTopicSlugs({ track });
+    const slugs = await getTopicSlugs();
     return slugs?.map((topic) => ({ topic }));
   } catch {
     return [];
@@ -101,7 +100,7 @@ function SectionHeading({
 export default async function TopicPage({ params }: Props) {
   const topic = await getTopicBySlug(params.topic);
   if (!topic) notFound();
-const track = await getServerTrack();
+  const track = await getServerTrack();
   const { questions } = await getQuestions({
     filters: { track, status: "published", topicSlug: topic.slug },
     pageSize: 50,
