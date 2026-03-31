@@ -11,11 +11,12 @@ import {
   Star,
   Target,
   Calendar,
-  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useUpgrade } from "@/hooks/useUpgrade";
 import { C } from "@/styles/tokens";
+import { useTrack } from "@/contexts/TrackContext";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 import {
   aiBdg,
@@ -77,7 +78,6 @@ import {
   modeTagRow,
   page,
   pBtnF,
-  pBtnP,
   pFeat,
   pFeats,
   pNote,
@@ -87,9 +87,6 @@ import {
   priceC,
   priceCPro,
   priceG,
-  proActiveBtn,
-  proPayBtn,
-  pTier,
   purpleGlow,
   qotdBadge,
   qotdBtn,
@@ -201,41 +198,81 @@ import {
   AI_TOOLS,
   FREE_F,
   LEADERS,
-  MODES,
   proFeatures,
   TESTIMONIALS,
-  TOPICS,
+  TRACK_HERO,
+  TRACK_MODES,
+  TRACK_WHY,
 } from "@/data/homepageStaticData";
 import ProCTA from "@/components/home/ProCTA";
+import { Track, TRACK_MAP } from "@/lib/tracks";
+import { Topic } from "@/types/topic";
 
-// ── Main component ────────────────────────────────────────────────────────────
-export default function HomePageClient() {
+// ─── Track-specific content config ────────────────────────────────────────────
+
+interface HomePageClientProps {
+  track: Track;
+  theory: number;
+  debug: number;
+  output: number;
+  polyfill: number;
+  topics: Topic[];
+  blogs: unknown[];
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function HomePageClient({
+  theory: theoryCt,
+  debug: debugCt,
+  output: outputCt,
+  polyfill: polyfillCt,
+  topics,
+}: HomePageClientProps) {
   const { user, progress } = useAuth();
-  const { handleUpgrade, loading: payLoading, error: payError } = useUpgrade();
+  const { track } = useTrack();
+  const router = useRouter();
+  const prevTrack = useRef(track);
+
+  // When user switches track client-side, refresh server data
+  useEffect(() => {
+    if (prevTrack.current !== track) {
+      prevTrack.current = track;
+      router.refresh();
+    }
+  }, [track, router]);
+
+  const trackCfg = TRACK_MAP[track];
+  const hero_content = TRACK_HERO[track];
+  const whyItems = TRACK_WHY[track];
+  const modes = TRACK_MODES[track];
 
   const ctaHref = user ? "/dashboard" : "/auth";
   const ctaLabel = user ? "Go to Dashboard" : "Start Free — No Card Needed";
+
+  // Real counts from server (fall back to 0 so UI doesn't break before data loads)
+  const totalQs = theoryCt + outputCt + debugCt + polyfillCt;
+  const topicsCt = topics?.length ?? 0;
+
+  // Free count = theory questions (they're all free per your copy)
+  const freeCount = theoryCt > 0 ? theoryCt : 90;
 
   return (
     <main css={page}>
       <div css={purpleGlow} />
       <div css={greenGlow} />
       <div css={wrap}>
-        {/* ── HERO ─────────────────────────────────────────── */}
+        {/* ── HERO ── */}
         <div css={hero} id="features">
           <div css={badge}>
-            <Zap size={10} /> Train for Real JavaScript Interviews
+            <Zap size={10} /> {hero_content.badge}
           </div>
           <h1 css={h1}>
-            JavaScript Interview
+            {hero_content.title}
             <br />
-            <span css={grad}>Questions & Practice.</span>
+            <span css={grad}>{hero_content.accent}</span>
           </h1>
-          <p css={sub}>
-            Practice real JavaScript interview questions, take timed{" "}
-            <strong style={{ color: C.amber }}>Interview Sprint</strong> and
-            know exactly if you're ready.
-          </p>
+          <p css={sub}>{hero_content.sub}</p>
           <div css={ctas}>
             <Link href="/sprint" css={btnP}>
               ⚡ Try the Sprint <ArrowRight size={16} />
@@ -246,25 +283,25 @@ export default function HomePageClient() {
           </div>
         </div>
 
-        {/* ── FREE CALLOUT ─────────────────────────────────── */}
+        {/* ── FREE CALLOUT ── */}
         <div css={freeBanner}>
           <CheckCircle size={15} color={C.green} style={{ flexShrink: 0 }} />
           <span
             style={{ fontSize: "0.9375rem", color: C.green, fontWeight: 600 }}
           >
-            90+ core JavaScript questions — free, forever.
+            {freeCount}+ {hero_content.freeLine}
           </span>
           <span style={{ fontSize: "0.875rem", color: C.muted }}>
             No card. No trial. No paywall.
           </span>
         </div>
 
-        {/* ── STATS ────────────────────────────────────────── */}
+        {/* ── STATS ── */}
         <div css={statsRow}>
           {[
-            { n: "250+", l: "Questions" },
+            { n: totalQs > 0 ? `${totalQs}+` : "250+", l: "Questions" },
             { n: "4", l: "Practice modes" },
-            { n: "40", l: "Topic guides" },
+            { n: topicsCt > 0 ? `${topicsCt}` : "40", l: "Topic guides" },
             { n: "6", l: "AI tools" },
           ].map(({ n, l }) => (
             <div key={l} css={statCell}>
@@ -274,12 +311,12 @@ export default function HomePageClient() {
           ))}
         </div>
 
-        {/* ── AI DEMO ──────────────────────────────────────── */}
+        {/* ── AI DEMO ── */}
         <div css={sec}>
           <p css={eye(C.accent)}>AI Answer Evaluator</p>
           <h2 css={sh2}>Know exactly where you stand</h2>
           <p css={ssub}>
-            Type your answer. Get scored 1–10 with specific gaps, not "great
+            Type your answer. Get scored 1–10 with specific gaps — not "great
             job".
           </p>
           <div css={demoShell}>
@@ -291,18 +328,30 @@ export default function HomePageClient() {
             </div>
             <div css={demoInner}>
               <div css={demoQL}>
-                <span css={demoPill}>Closures</span>
+                <span css={demoPill}>{trackCfg.label}</span>
                 <span css={demoPill}>Core</span>
               </div>
               <div css={demoQ}>
-                What is a closure in JavaScript, and why is it useful?
+                {track === "javascript" &&
+                  "What is a closure in JavaScript, and why is it useful?"}
+                {track === "react" &&
+                  "Explain the difference between useMemo and useCallback in React."}
+                {track === "typescript" &&
+                  "What is the difference between `interface` and `type` in TypeScript?"}
+                {track === "system-design" &&
+                  "How would you design a scalable frontend for a real-time chat application?"}
               </div>
               <div css={demoAns}>
                 <div css={demoAnsL}>Your answer</div>
                 <div css={demoAnsT}>
-                  A closure is when a function has access to variables from its
-                  outer scope, even after the outer function has returned. It's
-                  useful for data privacy and keeping state in counters.
+                  {track === "javascript" &&
+                    "A closure is when a function has access to variables from its outer scope, even after the outer function has returned. It's useful for data privacy and keeping state in counters."}
+                  {track === "react" &&
+                    "useMemo caches a computed value, useCallback caches a function. Both take a dependency array and only recompute when those deps change. You'd use useMemo for expensive calculations and useCallback when passing functions to child components."}
+                  {track === "typescript" &&
+                    "An interface is mainly for object shapes and can be extended or merged. A type alias is more flexible — it can represent primitives, unions, and intersections, but can't be re-opened for declaration merging."}
+                  {track === "system-design" &&
+                    "I'd use WebSockets for real-time messaging, a message queue for reliability, CDN for static assets, and optimistic UI updates on the client side. I'd also implement read receipts via a separate HTTP endpoint to reduce WebSocket traffic."}
                 </div>
               </div>
               <div css={demoResult}>
@@ -324,28 +373,69 @@ export default function HomePageClient() {
                   </span>
                 </div>
                 <div css={demoFb}>
-                  <span style={{ color: C.green, fontWeight: 600 }}>
-                    ✓ Correct on scope retention and persistence.
-                  </span>{" "}
-                  But you&apos;re missing the key mechanic — closures work
-                  because of{" "}
-                  <span style={{ color: C.text, fontWeight: 600 }}>
-                    lexical scoping
-                  </span>
-                  . The function retains a{" "}
-                  <span style={{ color: C.text, fontWeight: 600 }}>
-                    reference
-                  </span>{" "}
-                  to variables (not a copy), which is why the var-in-loop bug
-                  exists. A senior answer would also mention the{" "}
-                  <span style={{ color: C.text, fontWeight: 600 }}>
-                    module pattern
-                  </span>{" "}
-                  or{" "}
-                  <span style={{ color: C.text, fontWeight: 600 }}>
-                    React hooks
-                  </span>{" "}
-                  as real-world usage.
+                  {track === "javascript" && (
+                    <>
+                      <span style={{ color: C.green, fontWeight: 600 }}>
+                        ✓ Correct on scope retention and persistence.
+                      </span>{" "}
+                      Missing the key mechanic — closures work because of{" "}
+                      <span style={{ color: C.text, fontWeight: 600 }}>
+                        lexical scoping
+                      </span>
+                      . A senior answer would mention the{" "}
+                      <span style={{ color: C.text, fontWeight: 600 }}>
+                        module pattern
+                      </span>{" "}
+                      or{" "}
+                      <span style={{ color: C.text, fontWeight: 600 }}>
+                        React hooks
+                      </span>{" "}
+                      as real-world usage.
+                    </>
+                  )}
+                  {track === "react" && (
+                    <>
+                      <span style={{ color: C.green, fontWeight: 600 }}>
+                        ✓ Core definitions are correct.
+                      </span>{" "}
+                      Missing:{" "}
+                      <span style={{ color: C.text, fontWeight: 600 }}>
+                        referential equality
+                      </span>{" "}
+                      — useCallback exists because functions are recreated every
+                      render, breaking React.memo. Also missed that useMemo is
+                      often overused; profiling should come first.
+                    </>
+                  )}
+                  {track === "typescript" && (
+                    <>
+                      <span style={{ color: C.green, fontWeight: 600 }}>
+                        ✓ Declaration merging distinction is spot-on.
+                      </span>{" "}
+                      Add:{" "}
+                      <span style={{ color: C.text, fontWeight: 600 }}>
+                        interfaces can `extend` other interfaces and classes
+                      </span>
+                      , while types use `&` for intersection. A senior answer
+                      mentions when to prefer each in a codebase style guide.
+                    </>
+                  )}
+                  {track === "system-design" && (
+                    <>
+                      <span style={{ color: C.green, fontWeight: 600 }}>
+                        ✓ Good coverage of real-time and CDN.
+                      </span>{" "}
+                      Missing:{" "}
+                      <span style={{ color: C.text, fontWeight: 600 }}>
+                        connection management at scale
+                      </span>{" "}
+                      (WebSocket limit per server),{" "}
+                      <span style={{ color: C.text, fontWeight: 600 }}>
+                        message ordering guarantees
+                      </span>
+                      , and how you'd handle offline users reconnecting.
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -354,10 +444,10 @@ export default function HomePageClient() {
 
         <hr css={hr} />
 
-        {/* ── INTERVIEW SPRINT ─────────────────────────────── */}
+        {/* ── INTERVIEW SPRINT ── */}
         <div css={sec} id="sprint">
           <p css={eye(C.amber)}>⚡ New: Interview Sprint</p>
-          <h2 css={sh2}>The fastest way to know if you&apos;re ready</h2>
+          <h2 css={sh2}>The fastest way to know if you're ready</h2>
           <p css={ssub}>
             A timed mixed-question challenge. Theory + output + debugging. AI
             judges your answers. One score tells you exactly where you stand.
@@ -367,7 +457,7 @@ export default function HomePageClient() {
               {
                 icon: "🎯",
                 title: "Real interview format",
-                desc: "Mixed question types under time pressure — exactly how JS interviews work",
+                desc: "Mixed question types under time pressure — exactly how interviews work",
               },
               {
                 icon: "🤖",
@@ -393,6 +483,7 @@ export default function HomePageClient() {
             ))}
           </div>
 
+          {/* Sprint demo UI — kept as interactive preview */}
           <div css={sprintDemo}>
             <div css={sprintHUD}>
               <div css={sprintHUDLeft}>
@@ -423,12 +514,26 @@ export default function HomePageClient() {
                   <div css={sprintCardHeader}>
                     <span css={sprintTypeTag("output")}>💻 Output</span>
                     <span css={sprintDiff}>Core</span>
-                    <span css={sprintCat}>Type Coercion</span>
+                    <span css={sprintCat}>
+                      {track === "javascript"
+                        ? "Type Coercion"
+                        : track === "react"
+                          ? "Rendering"
+                          : track === "typescript"
+                            ? "Type Inference"
+                            : "Architecture"}
+                    </span>
                   </div>
                   <p css={sprintCardQ}>What does this print?</p>
-                  <pre css={sprintCode}>{`console.log([] + [])
-console.log([] + {})
-console.log({} + [])`}</pre>
+                  <pre css={sprintCode}>
+                    {track === "javascript"
+                      ? `console.log([] + [])\nconsole.log([] + {})\nconsole.log({} + [])`
+                      : track === "react"
+                        ? `const [count, setCount] = useState(0);\nsetCount(count + 1);\nsetCount(count + 1);\nconsole.log(count);`
+                        : track === "typescript"
+                          ? `type A = string extends any ? 1 : 0;\ntype B = never extends string ? 1 : 0;\ntype C = any extends string ? 1 : 0;`
+                          : `// Given: 10k concurrent users\n// Each opens 1 WebSocket connection\n// Your server limit: 1k connections\n// What fails first?`}
+                  </pre>
                   <div css={sprintInputRow}>
                     <div css={sprintFakeInput}>
                       <span css={sprintFakePlaceholder}>
@@ -446,13 +551,37 @@ console.log({} + [])`}</pre>
                 <div css={sprintEvalCard}>
                   <div css={sprintEvalHeader}>
                     <span css={sprintTypeTag("theory")}>📖 Theory</span>
-                    <span css={sprintCat}>Closures</span>
+                    <span css={sprintCat}>
+                      {track === "javascript"
+                        ? "Closures"
+                        : track === "react"
+                          ? "Hooks"
+                          : track === "typescript"
+                            ? "Generics"
+                            : "Caching"}
+                    </span>
                   </div>
-                  <p css={sprintEvalQ}>What is a closure in JavaScript?</p>
+                  <p css={sprintEvalQ}>
+                    {track === "javascript" &&
+                      "What is a closure in JavaScript?"}
+                    {track === "react" &&
+                      "When should you use useCallback vs useMemo?"}
+                    {track === "typescript" &&
+                      "What are TypeScript generics and when do you use them?"}
+                    {track === "system-design" &&
+                      "Explain cache invalidation strategies for a SPA."}
+                  </p>
                   <div css={sprintEvalAnswer}>
-                    &ldquo;A closure is a function that remembers variables from
-                    its outer scope even after the outer function
-                    returns...&rdquo;
+                    &ldquo;
+                    {track === "javascript" &&
+                      "A closure is a function that remembers variables from its outer scope even after the outer function returns..."}
+                    {track === "react" &&
+                      "useCallback is for functions, useMemo is for values. Both help avoid unnecessary re-renders..."}
+                    {track === "typescript" &&
+                      "Generics let you write reusable code that works with multiple types. Like templates in other languages..."}
+                    {track === "system-design" &&
+                      "You can use TTL-based expiry or event-driven invalidation where the server notifies the client..."}
+                    &rdquo;
                   </div>
                   <div css={sprintEvalResult}>
                     <div css={sprintEvalScoreRow}>
@@ -463,11 +592,11 @@ console.log({} + [])`}</pre>
                       </div>
                     </div>
                     <div css={sprintEvalVerdict}>
-                      Good — missing lexical scoping detail
+                      Good — missing one key detail
                     </div>
                     <div css={sprintEvalFeedRow}>
-                      <span css={sprintFeedGood}>✓ Scope retention</span>
-                      <span css={sprintFeedMiss}>✗ Module pattern</span>
+                      <span css={sprintFeedGood}>✓ Core concept</span>
+                      <span css={sprintFeedMiss}>✗ Edge cases</span>
                     </div>
                   </div>
                   <div css={sprintEvalPoints}>+10 pts</div>
@@ -477,13 +606,13 @@ console.log({} + [])`}</pre>
                   <div css={sprintQueueItem}>
                     <span css={sprintQueueDot(C.red)} />
                     <span css={sprintQueueText}>
-                      🐛 Find the bug in this async/await chain
+                      🐛 Find the bug in this code
                     </span>
                   </div>
                   <div css={sprintQueueItem}>
                     <span css={sprintQueueDot(C.accentText)} />
                     <span css={sprintQueueText}>
-                      📖 Explain the JavaScript event loop
+                      📖 Explain the concept in depth
                     </span>
                   </div>
                 </div>
@@ -502,13 +631,27 @@ console.log({} + [])`}</pre>
                 <div css={sprintInsightRow(C.green)}>
                   <CheckCircle size={10} />
                   <span>
-                    <strong>Strong:</strong> Closures · Hoisting · Scope
+                    <strong>Strong:</strong>{" "}
+                    {track === "javascript"
+                      ? "Closures · Hoisting · Scope"
+                      : track === "react"
+                        ? "Hooks · Context · Effects"
+                        : track === "typescript"
+                          ? "Types · Interfaces · Generics"
+                          : "Architecture · Caching · APIs"}
                   </span>
                 </div>
                 <div css={sprintInsightRow(C.amber)}>
                   <Target size={10} />
                   <span>
-                    <strong>Review:</strong> Event Loop · Promises
+                    <strong>Review:</strong>{" "}
+                    {track === "javascript"
+                      ? "Event Loop · Promises"
+                      : track === "react"
+                        ? "Performance · Refs · Portals"
+                        : track === "typescript"
+                          ? "Conditional types · infer"
+                          : "Real-time · Micro-frontends"}
                   </span>
                 </div>
               </div>
@@ -531,34 +674,48 @@ console.log({} + [])`}</pre>
 
         <hr css={hr} />
 
-        {/* ── 4 MODES ─────────────────────────────────────────────── */}
+        {/* ── 4 MODES ── */}
         <div css={sec} id="practice">
           <p css={eye(C.green)}>Four Practice Modes</p>
-          <h2 css={sh2}>How real interviews test you</h2>
+          <h2 css={sh2}>How real {trackCfg.label} interviews test you</h2>
           <p css={ssub}>
-            Most prep sites are theory-only. Real JS interviews use all four.
+            Most prep sites are theory-only. Real {trackCfg.label} interviews
+            use all four.
           </p>
           <div css={modesG}>
-            {MODES.map((m) => (
-              <Link key={m.label} href={m.href} css={modeCard(m.c)}>
-                <span css={modeE}>{m.emoji}</span>
-                {m.free && <div css={modeFree}>✓ Free</div>}
-                <div css={modeL}>{m.label}</div>
-                <div css={modeC(m.c)}>{m.n} questions</div>
-                <p css={modeD}>{m.desc}</p>
-                <div css={modeTagRow}>
-                  {m.tags.map((t) => (
-                    <span key={t} css={modeT(m.c)}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </Link>
-            ))}
+            {modes.map((m, i) => {
+              // Real question counts per mode
+              const realCount =
+                i === 0
+                  ? theoryCt
+                  : i === 1
+                    ? outputCt
+                    : i === 2
+                      ? debugCt
+                      : polyfillCt;
+              const displayCount =
+                realCount > 0 ? realCount : m.label === "Concepts" ? 90 : 60;
+              return (
+                <Link key={m.label} href={m.href} css={modeCard(m.c)}>
+                  <span css={modeE}>{m.emoji}</span>
+                  {m.free && <div css={modeFree}>✓ Free</div>}
+                  <div css={modeL}>{m.label}</div>
+                  <div css={modeC(m.c)}>{displayCount} questions</div>
+                  <p css={modeD}>{m.desc}</p>
+                  <div css={modeTagRow}>
+                    {m.tags.map((t) => (
+                      <span key={t} css={modeT(m.c)}>
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
 
-        {/* ── BEYOND QUESTIONS ─────────────────────────────── */}
+        {/* ── BEYOND QUESTIONS ── */}
         <div css={sec}>
           <p css={eye(C.amber)}>Beyond Questions</p>
           <h2 css={sh2}>A full interview prep ecosystem</h2>
@@ -628,32 +785,7 @@ console.log({} + [])`}</pre>
               Why devs switch to JSPrep Pro
             </p>
             <div css={whyG}>
-              {[
-                {
-                  emoji: "📖",
-                  label: "Theory",
-                  before: "Read definitions on MDN",
-                  after: "Understand with AI + code examples",
-                },
-                {
-                  emoji: "💻",
-                  label: "Output Questions",
-                  before: "Get surprised in interviews",
-                  after: "Predict output confidently",
-                },
-                {
-                  emoji: "🐛",
-                  label: "Debug Challenges",
-                  before: "Never practiced bug fixing",
-                  after: "AI-scored real bug fixing practice",
-                },
-                {
-                  emoji: "🧪",
-                  label: "Polyfill Lab",
-                  before: "Skipped polyfills entirely",
-                  after: "Write reduce, bind, Promise.all with test feedback",
-                },
-              ].map(({ emoji, label, before, after }) => (
+              {whyItems.map(({ emoji, label, before, after }) => (
                 <div key={label} css={whyItem}>
                   <div css={whyEmoji}>{emoji}</div>
                   <div css={whyLabel}>{label}</div>
@@ -673,7 +805,7 @@ console.log({} + [])`}</pre>
 
         <hr css={hr} />
 
-        {/* ── TESTIMONIALS ─────────────────────────────────── */}
+        {/* ── TESTIMONIALS ── */}
         <div css={sec}>
           <p css={eye(C.amber)}>Real developers. Real offers.</p>
           <h2 css={sh2}>They prepped here. They got in.</h2>
@@ -704,34 +836,36 @@ console.log({} + [])`}</pre>
           </div>
         </div>
 
-        {/* ── TOPIC CARDS ──────────────────────────────────── */}
-        <div css={sec}>
-          <p css={eye(C.accentText)}>36 Topic Deep-Dives</p>
-          <h2 css={sh2}>Every concept, interview-ready</h2>
-          <p css={ssub}>
-            Each topic has a mental model, full explanation, cheat sheet, and
-            practice questions. Not just a Q&A list.
-          </p>
-          <div css={tpGrid}>
-            {TOPICS.map((t) => (
-              <Link key={t.slug} href={`/${t.slug}`} css={tpCard(t.c)}>
-                <div css={tpDot(t.c)} />
-                <div css={tpName}>{t.label} Interview Questions</div>
-                <div css={tpMeta}>
-                  <span css={tpDiff(t.c)}>{t.diff}</span>
-                  <span css={tpQs}>{t.qs} questions</span>
-                </div>
+        {/* ── TOPIC CARDS — from server props ── */}
+        {topics && topics.length > 0 && (
+          <div css={sec}>
+            <p css={eye(C.accentText)}>{topicsCt} Topic Deep-Dives</p>
+            <h2 css={sh2}>Every {trackCfg.label} concept, interview-ready</h2>
+            <p css={ssub}>
+              Each topic has a mental model, full explanation, cheat sheet, and
+              practice questions. Not just a Q&A list.
+            </p>
+            <div css={tpGrid}>
+              {topics.slice(0, 6).map((t) => (
+                <Link key={t.slug} href={`/${t.slug}`} css={tpCard(C.accent)}>
+                  <div css={tpDot(C.amber)} />
+                  <div css={tpName}>{t.category} Interview Questions</div>
+                  <div css={tpMeta}>
+                    <span css={tpDiff(C.accent3)}>{t.difficulty}</span>
+                    <span css={tpQs}>{t.questionCount} questions</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div style={{ textAlign: "center", marginTop: "1.75rem" }}>
+              <Link href={`/topics/${track}`} css={btnO}>
+                See all {topicsCt} topics <ArrowRight size={14} />
               </Link>
-            ))}
+            </div>
           </div>
-          <div style={{ textAlign: "center", marginTop: "1.75rem" }}>
-            <Link href="/topics" css={btnO}>
-              See all 36 topics <ArrowRight size={14} />
-            </Link>
-          </div>
-        </div>
+        )}
 
-        {/* ── AI TOOLS ─────────────────────────────────────── */}
+        {/* ── AI TOOLS ── */}
         <div css={sec}>
           <p css={eye(C.accent)}>6 AI Features</p>
           <h2 css={sh2}>Your AI interview coach</h2>
@@ -757,17 +891,38 @@ console.log({} + [])`}</pre>
           </div>
         </div>
 
-        {/* ── PRICING ──────────────────────────────────────── */}
+        {/* ── PRICING ── */}
         <div css={sec} id="pricing">
           <p css={eye(C.green)}>Pricing</p>
           <h2 css={sh2}>Simple. Transparent.</h2>
           <p css={ssub}>
-            Start free with 91 real questions and AI feedback from day one.
+            Start free with {freeCount} real questions and AI feedback from day
+            one.
           </p>
           <div css={priceG}>
             <div css={priceC}>
-              <div css={pTier}>Free</div>
-              <div css={pPrice}>₹0</div>
+              <div
+                style={{
+                  fontSize: "0.9375rem",
+                  fontWeight: 500,
+                  color: C.muted,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                Free
+              </div>
+              <div
+                style={{
+                  fontSize: "2.75rem",
+                  fontWeight: 700,
+                  color: C.text,
+                  lineHeight: 1,
+                  marginBottom: "0.25rem",
+                  letterSpacing: "-0.03em",
+                }}
+              >
+                ₹0
+              </div>
               <div css={pNote}>Forever free — no card needed</div>
               <ul css={pFeats}>
                 {FREE_F.map((f) => (
@@ -788,9 +943,26 @@ console.log({} + [])`}</pre>
 
             <div css={priceCPro}>
               <div css={popularTag}>POPULAR</div>
-              {/* "Pro" tier label — C.accentText replaces "#c4b5fd" light purple */}
-              <div css={[pTier, { color: C.accentText }]}>Pro</div>
-              <div css={pPrice}>
+              <div
+                style={{
+                  fontSize: "0.9375rem",
+                  fontWeight: 500,
+                  color: C.accentText,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                Pro
+              </div>
+              <div
+                style={{
+                  fontSize: "2.75rem",
+                  fontWeight: 700,
+                  color: C.text,
+                  lineHeight: 1,
+                  marginBottom: "0.25rem",
+                  letterSpacing: "-0.03em",
+                }}
+              >
                 ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}
                 <span css={pPer}>/month</span>
               </div>
@@ -812,11 +984,12 @@ console.log({} + [])`}</pre>
           </div>
         </div>
 
-        {/* ── BOTTOM CTA ───────────────────────────────────── */}
+        {/* ── BOTTOM CTA ── */}
         <div css={btmCta}>
           <h2 css={btmH}>Ready to prep smarter?</h2>
           <p css={btmD}>
-            91 questions free. AI feedback from question one. No card needed.
+            {freeCount} questions free. AI feedback from question one. No card
+            needed.
           </p>
           <Link href={ctaHref} css={btnP} style={{ display: "inline-flex" }}>
             {ctaLabel} <ArrowRight size={16} />

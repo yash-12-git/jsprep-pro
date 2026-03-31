@@ -8,7 +8,6 @@ export interface TrackConfig {
   tagline: string;
   badge?: string;
   available: boolean;
-  practiceLinks: Array<{ href: string; label: string; icon: string; badge?: string }>;
   questionsPage: string;
 }
 
@@ -17,16 +16,10 @@ export const TRACKS: TrackConfig[] = [
     id: "javascript",
     label: "JavaScript",
     emoji: "🟨",
-    color: "#7c6af7",
+    color: "#dcd108",
     tagline: "200+ questions · Closures, async, prototypes",
     available: true,
     questionsPage: "/javascript-interview-questions",
-    practiceLinks: [
-      { href: "/dashboard", label: "Theory", icon: "BookOpen" },
-      { href: "/output-quiz", label: "Output", icon: "Code2" },
-      { href: "/debug-lab", label: "Debug", icon: "Bug" },
-      { href: "/polyfill-lab", label: "Polyfills", icon: "FlaskConical", badge: "NEW" },
-    ],
   },
   {
     id: "react",
@@ -37,11 +30,6 @@ export const TRACKS: TrackConfig[] = [
     badge: "NEW",
     available: true,
     questionsPage: "/react-interview-questions",
-    practiceLinks: [
-      { href: "/dashboard", label: "Theory", icon: "BookOpen" },
-      { href: "/react-challenges", label: "Challenges", icon: "Code2", badge: "NEW" },
-      { href: "/debug-lab", label: "Debug", icon: "Bug" },
-    ],
   },
   {
     id: "typescript",
@@ -52,7 +40,6 @@ export const TRACKS: TrackConfig[] = [
     badge: "SOON",
     available: false,
     questionsPage: "/typescript-interview-questions",
-    practiceLinks: [],
   },
   {
     id: "system-design",
@@ -63,12 +50,11 @@ export const TRACKS: TrackConfig[] = [
     badge: "SOON",
     available: false,
     questionsPage: "/system-design-interview-questions",
-    practiceLinks: [],
   },
 ];
 
 export const TRACK_MAP = Object.fromEntries(
-  TRACKS.map(t => [t.id, t])
+  TRACKS.map((t) => [t.id, t]),
 ) as Record<Track, TrackConfig>;
 
-export const AVAILABLE_TRACKS = TRACKS.filter(t => t.available);
+export const AVAILABLE_TRACKS = TRACKS.filter((t) => t.available);

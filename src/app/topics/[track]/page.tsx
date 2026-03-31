@@ -56,7 +56,7 @@ export default async function TopicsPage({
     getQuestions({ filters: { track, status: "published" }, pageSize: 1000 }),
   ]);
 
-  const categories = Array.from(new Set(questions.map((q) => q.category)));
+  const categories = Array.from(new Set(topics.map((q) => q.category)));
   const groups = groupTopics(topics, categories);
 
   return (

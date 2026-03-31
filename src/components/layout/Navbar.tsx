@@ -25,6 +25,11 @@ import {
   LayoutDashboard,
   Menu,
   X,
+  Sparkles,
+  FlaskConical,
+  BookMarked,
+  BarChart2,
+  User,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import * as S from "./styles";
@@ -33,172 +38,36 @@ import { C, RADIUS } from "@/styles/tokens";
 import TrackSwitcher from "../ui/TrackSwitcher";
 import { useTrack } from "@/contexts/TrackContext";
 
-// ─── Local-only styles (not in styles.ts) ─────────────────────────────────────
+// ─── Navigation Data ───────────────────────────────────────────────────────────
 
-// Thin vertical separator between nav groups
-const sep = css`
-  width: 1px;
-  height: 14px;
-  background: ${C.border};
-  flex-shrink: 0;
-  margin: 0 0.125rem;
-`;
-
-// PRO badge — always visible in right rail, not hidden in dropdown
-const proBadgeRight = css`
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px 8px;
-  border-radius: 9999px;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: ${C.accentText};
-  background: ${C.accentSubtle};
-  border: 1px solid ${C.border};
-  flex-shrink: 0;
-`;
-
-// Theme toggle button
-const themeBtn = (isDark: boolean) => css`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: ${RADIUS.md};
-  border: 1px solid ${isDark ? "rgba(255,255,255,0.1)" : C.border};
-  background: transparent;
-  color: ${isDark ? "rgba(255,255,255,0.5)" : C.muted};
-  cursor: pointer;
-  flex-shrink: 0;
-  transition:
-    background 0.12s,
-    border-color 0.12s,
-    color 0.12s;
-  &:hover {
-    background: ${isDark ? "rgba(255,255,255,0.08)" : C.bgHover};
-    border-color: ${isDark ? "rgba(255,255,255,0.18)" : C.borderStrong};
-    color: ${isDark ? "#fff" : C.text};
-  }
-`;
-
-// Circular avatar button
-const avatarBtnStyle = css`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 9999px;
-  border: 1px solid ${C.border};
-  background: ${C.bgSubtle};
-  cursor: pointer;
-  flex-shrink: 0;
-  overflow: hidden;
-  transition: border-color 0.12s;
-  &:hover {
-    border-color: ${C.accent};
-  }
-`;
-
-// Account dropdown panel
-const panel = css`
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  width: 216px;
-  background: ${C.bg};
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.lg};
-  box-shadow:
-    0 4px 6px rgba(55, 53, 47, 0.04),
-    0 12px 24px rgba(55, 53, 47, 0.09);
-  z-index: 200;
-  overflow: hidden;
-`;
-const pHeader = css`
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid ${C.border};
-`;
-const pName = css`
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: ${C.text};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-const pEmail = css`
-  font-size: 0.6875rem;
-  color: ${C.muted};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 1px;
-`;
-const pItem = css`
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.8125rem;
-  color: ${C.text};
-  text-decoration: none;
-  cursor: pointer;
-  width: 100%;
-  border: none;
-  background: transparent;
-  text-align: left;
-  transition: background 0.1s;
-  &:hover {
-    background: ${C.bgHover};
-  }
-`;
-const pDivider = css`
-  border: none;
-  border-top: 1px solid ${C.border};
-  margin: 0;
-`;
-
-const streakChip = css`
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 7px;
-  border-radius: 9999px;
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: ${C.amber};
-  background: ${C.amberSubtle};
-  border: 1px solid ${C.amberBorder};
-`;
-
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const MARKETING_LINKS = [
-  { href: "/#features", label: "Features" },
-  { href: "/#practice", label: "Practice" },
-  { href: "/topics", label: "Topics" },
-  { href: "/blog", label: "Blog" },
-  { href: "/#pricing", label: "Pricing" },
-];
-
-const QUESTION_LINKS = [
+const PRACTICE_LINKS = [
   {
     href: "/theory",
-    label: "Theory",
+    label: "Concepts",
     icon: BookOpen,
-    activeColor: C.accent,
+    desc: "Core JS theory",
+    color: C.accent,
   },
-  { href: "/output-quiz", label: "Output", icon: Code2, activeColor: C.amber },
-  { href: "/debug-lab", label: "Debug", icon: Bug, activeColor: C.red },
+  {
+    href: "/output-quiz",
+    label: "Output",
+    icon: Code2,
+    desc: "Predict the output",
+    color: C.amber,
+  },
+  {
+    href: "/debug-lab",
+    label: "Debugging",
+    icon: Bug,
+    desc: "Find & fix bugs",
+    color: C.red,
+  },
   {
     href: "/polyfill-lab",
-    label: "Polyfill",
+    label: "Polyfills",
     icon: Code,
-    activeColor: C.green,
+    desc: "Build from scratch",
+    color: C.green,
   },
 ];
 
@@ -207,7 +76,7 @@ const AI_LINKS = [
     href: "/mock-interview",
     label: "Mock Interview",
     icon: Mic,
-    desc: "AI interviewer",
+    desc: "Real interview simulation",
   },
   {
     href: "/study-plan",
@@ -238,15 +107,11 @@ const LEARN_LINKS = (track: string) => [
           icon: Code2,
           desc: "Predict the console.log",
         },
-      ]
-    : []),
-  ...(track === "javascript"
-    ? [
         {
           href: "/javascript-tricky-questions",
           label: "Tricky Questions",
           icon: Zap,
-          desc: "[] == false explained",
+          desc: "Deep-dive edge cases",
         },
       ]
     : []),
@@ -258,6 +123,15 @@ const LEARN_LINKS = (track: string) => [
   },
 ];
 
+// Bottom nav tabs for mobile
+const MOBILE_BOTTOM_TABS = [
+  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { href: "/theory", label: "Practice", icon: FlaskConical, matchPrefix: true },
+  { href: "/mock-interview", label: "Mock", icon: Mic },
+  { href: "/study-plan", label: "AI", icon: Sparkles, matchPrefix: false },
+  { href: "/analytics", label: "Profile", icon: User },
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Navbar() {
@@ -266,22 +140,23 @@ export default function Navbar() {
   const { track } = useTrack();
   const path = usePathname();
 
-  // Desktop dropdowns
-  const [open, setOpen] = useState<"ai" | "learn" | "user" | null>(null);
-  // Mobile side sheet
+  const [open, setOpen] = useState<"learn" | "practice" | "ai" | "user" | null>(
+    null,
+  );
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const aiRef = useRef<HTMLDivElement>(null);
   const learnRef = useRef<HTMLDivElement>(null);
+  const practiceRef = useRef<HTMLDivElement>(null);
+  const aiRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
 
-  // Close desktop dropdowns on outside click
   useEffect(() => {
     function onDown(e: MouseEvent) {
       const t = e.target as Node;
       if (
-        !aiRef.current?.contains(t) &&
         !learnRef.current?.contains(t) &&
+        !practiceRef.current?.contains(t) &&
+        !aiRef.current?.contains(t) &&
         !userRef.current?.contains(t)
       )
         setOpen(null);
@@ -290,7 +165,6 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  // Close everything on route change
   useEffect(() => {
     setOpen(null);
     setMobileOpen(false);
@@ -299,11 +173,9 @@ export default function Navbar() {
   const toggle = (menu: typeof open) =>
     setOpen((prev) => (prev === menu ? null : menu));
 
-  const isAiActive = AI_LINKS.some((l) => path === l.href);
   const isLearnActive = LEARN_LINKS(track).some((l) => path.startsWith(l.href));
-
-  const learnColor = isDark ? "#22a08a" : C.green;
-  const aiColor = isDark ? "#4ea1f3" : C.accentText;
+  const isPracticeActive = PRACTICE_LINKS.some((l) => path.startsWith(l.href));
+  const isAiActive = AI_LINKS.some((l) => path === l.href);
 
   const displayName =
     user?.displayName ?? user?.email?.split("@")[0] ?? "Account";
@@ -311,90 +183,23 @@ export default function Navbar() {
 
   return (
     <>
+      {/* ── Top Navbar ── */}
       <nav css={S.nav}>
-        {/* S.navInner = flex + space-between. We place three groups inside:
-            left (logo+learn), center (S.desktopLinks, hidden on mobile),
-            right (PRO+theme+hamburger/avatar) */}
         <div css={S.navInner}>
-          {/* ── LEFT: Logo + Learn ── */}
-          <div
-            css={css`
-              display: flex;
-              align-items: center;
-              gap: 0.25rem;
-              flex-shrink: 0;
-            `}
-          >
+          {/* LEFT: Logo + Track */}
+          <div css={S.leftGroup}>
             <Link href="/" css={S.logoLink}>
               <div css={S.logoBadge}>JS</div>
               <span css={S.logoText}>
                 Prep<span css={S.logoAccent}>Pro</span>
               </span>
             </Link>
-
             <TrackSwitcher />
-
-            {/* Learn ▾ — always visible */}
-            <div css={S.learnDropdownWrapper} ref={learnRef}>
-              <button
-                css={[
-                  S.learnDropdownTrigger,
-                  isLearnActive && S.learnNavLinkActive,
-                ]}
-                onClick={() => toggle("learn")}
-              >
-                <Layers size={13} /> Learn
-                <ChevronDown size={11} css={S.chevron(open === "learn")} />
-              </button>
-              {open === "learn" && (
-                <div css={S.learnDropdownMenu}>
-                  {LEARN_LINKS(track).map(
-                    ({ href, label, icon: Icon, desc }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        css={[
-                          S.learnDropdownItem,
-                          path.startsWith(href) && S.learnDropdownItemActive,
-                        ]}
-                        onClick={() => setOpen(null)}
-                      >
-                        <div css={S.learnIconBadge}>
-                          <Icon size={13} color={learnColor} />
-                        </div>
-                        <div>
-                          <span css={S.learnDropdownLabel}>{label}</span>
-                          <span css={S.learnDropdownDesc}>{desc}</span>
-                        </div>
-                      </Link>
-                    ),
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Marketing links — logged-out visitors, desktop only */}
-            {!user && (
-              <div css={S.marketingLinks}>
-                {MARKETING_LINKS.map(({ href, label }) => (
-                  <Link key={href} href={href} css={S.marketingLink}>
-                    {label}
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* ── CENTER: Home | modes | Sprint | AI — desktop only (hidden on mobile via S.desktopLinks) ── */}
-          {user && (
-            <div
-              css={[
-                S.desktopLinks,
-                css`
-                  gap: 0.125rem;
-                `,
-              ]}
-            >
+          {/* CENTER: Primary navigation — desktop only */}
+          {user ? (
+            <div css={S.desktopLinks}>
               {/* Home */}
               <Link
                 href="/dashboard"
@@ -403,103 +208,171 @@ export default function Navbar() {
                 <LayoutDashboard size={13} /> Home
               </Link>
 
-              <span css={sep} />
+              <span css={S.sep} />
 
-              {/* Theory · Output · Debug · Polyfill */}
-              {QUESTION_LINKS.map(
-                ({ href, label, icon: Icon, activeColor }) => {
-                  const isActive = path.startsWith(href);
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      css={[S.navLink, isActive && S.navLinkActive]}
-                      style={isActive ? { color: activeColor } : undefined}
-                    >
-                      <Icon
-                        size={13}
-                        color={isActive ? activeColor : undefined}
-                      />
-                      {label}
-                    </Link>
-                  );
-                },
-              )}
+              {/* Learn ▾ */}
+              <div css={S.dropdownWrapper} ref={learnRef}>
+                <button
+                  css={[S.navLinkBtn, isLearnActive && S.navLinkActive]}
+                  onClick={() => toggle("learn")}
+                >
+                  <BookMarked size={13} /> Learn
+                  <ChevronDown size={11} css={S.chevron(open === "learn")} />
+                </button>
+                {open === "learn" && (
+                  <div css={S.dropdownMenu}>
+                    <p css={S.dropdownSectionLabel}>Resources</p>
+                    {LEARN_LINKS(track).map(
+                      ({ href, label, icon: Icon, desc }) => (
+                        <Link
+                          key={href}
+                          href={href}
+                          css={[
+                            S.dropdownItem,
+                            path.startsWith(href) && S.dropdownItemActive,
+                          ]}
+                          onClick={() => setOpen(null)}
+                        >
+                          <div css={S.dropdownIconBadge(C.green)}>
+                            <Icon size={13} color={C.green} />
+                          </div>
+                          <div>
+                            <span css={S.dropdownLabel}>{label}</span>
+                            <span css={S.dropdownDesc}>{desc}</span>
+                          </div>
+                        </Link>
+                      ),
+                    )}
+                  </div>
+                )}
+              </div>
 
-              <span css={sep} />
+              {/* Practice ▾ */}
+              <div css={S.dropdownWrapper} ref={practiceRef}>
+                <button
+                  css={[S.navLinkBtn, isPracticeActive && S.navLinkActive]}
+                  onClick={() => toggle("practice")}
+                >
+                  <FlaskConical size={13} /> Practice
+                  <ChevronDown size={11} css={S.chevron(open === "practice")} />
+                </button>
+                {open === "practice" && (
+                  <div css={S.dropdownMenu}>
+                    <p css={S.dropdownSectionLabel}>Question Types</p>
+                    {PRACTICE_LINKS.map(
+                      ({ href, label, icon: Icon, desc, color }) => {
+                        const isActive = path.startsWith(href);
+                        return (
+                          <Link
+                            key={href}
+                            href={href}
+                            css={[
+                              S.dropdownItem,
+                              isActive && S.dropdownItemActive,
+                            ]}
+                            onClick={() => setOpen(null)}
+                          >
+                            <div css={S.dropdownIconBadge(color)}>
+                              <Icon size={13} color={color} />
+                            </div>
+                            <div>
+                              <span css={S.dropdownLabel}>{label}</span>
+                              <span css={S.dropdownDesc}>{desc}</span>
+                            </div>
+                          </Link>
+                        );
+                      },
+                    )}
+                  </div>
+                )}
+              </div>
 
-              {/* Sprint */}
+              {/* Mock Interview — promoted top-level */}
               <Link
-                href="/sprint"
-                css={[
-                  S.navLink,
-                  path === "/sprint" && S.navLinkActive,
-                  S.navLinkHighlight,
-                ]}
+                href="/mock-interview"
+                css={[S.navLink, path === "/mock-interview" && S.navLinkActive]}
               >
-                <Zap size={13} /> Sprint
+                <Mic size={13} /> Mock
               </Link>
 
-              <span css={sep} />
+              <span css={S.sep} />
 
-              {/* AI ▾ */}
-              <div css={S.aiDropdownWrapper} ref={aiRef}>
+              {/* ✨ AI Coach — highlighted CTA */}
+              <div css={S.dropdownWrapper} ref={aiRef}>
                 <button
-                  css={[S.aiDropdownTrigger, isAiActive && S.navLinkAiActive]}
+                  css={[S.aiCoachBtn, isAiActive && S.aiCoachBtnActive]}
                   onClick={() => toggle("ai")}
                 >
-                  <Zap size={13} /> AI
+                  <Sparkles size={12} />
+                  AI Coach
                   {!progress?.isPro && <span css={S.proBadge}>PRO</span>}
-                  <ChevronDown size={11} css={S.chevron(open === "ai")} />
+                  <ChevronDown size={10} css={S.chevron(open === "ai")} />
                 </button>
                 {open === "ai" && (
                   <div css={S.aiDropdownMenu}>
+                    <p css={S.dropdownSectionLabel}>AI-Powered Tools</p>
                     {AI_LINKS.map(({ href, label, icon: Icon, desc }) => (
                       <Link
                         key={href}
                         href={href}
                         css={[
-                          S.aiDropdownItem,
-                          path === href && S.aiDropdownItemActive,
+                          S.dropdownItem,
+                          path === href && S.dropdownItemActive,
                         ]}
                         onClick={() => setOpen(null)}
                       >
-                        <div css={S.aiIconBadge}>
-                          <Icon size={13} color={aiColor} />
+                        <div css={S.dropdownIconBadge(C.accent)}>
+                          <Icon size={13} color={C.accentText} />
                         </div>
                         <div>
-                          <div css={S.aiDropdownLabel}>{label}</div>
-                          <div css={S.aiDropdownDesc}>{desc}</div>
+                          <div css={S.dropdownLabel}>{label}</div>
+                          <div css={S.dropdownDesc}>{desc}</div>
                         </div>
                       </Link>
                     ))}
                   </div>
                 )}
               </div>
+
+              {/* ⚡ Sprint — end CTA */}
+              <Link
+                href="/sprint"
+                css={[
+                  S.navLink,
+                  S.sprintLink,
+                  path === "/sprint" && S.sprintLinkActive,
+                ]}
+              >
+                <Zap size={13} /> Sprint
+              </Link>
+            </div>
+          ) : (
+            /* Marketing links — logged-out visitors */
+            <div css={S.marketingLinks}>
+              {[
+                { href: "/#features", label: "Features" },
+                { href: "/#practice", label: "Practice" },
+                { href: "/topics", label: "Topics" },
+                { href: "/blog", label: "Blog" },
+                { href: "/#pricing", label: "Pricing" },
+              ].map(({ href, label }) => (
+                <Link key={href} href={href} css={S.marketingLink}>
+                  {label}
+                </Link>
+              ))}
             </div>
           )}
 
-          {/* ── RIGHT: PRO · theme · hamburger (mobile) · avatar (desktop) ── */}
+          {/* RIGHT: PRO · Theme · Hamburger / Avatar */}
           <div css={S.rightSide}>
-            {/* PRO badge — desktop only, persistent */}
             {user && progress?.isPro && (
-              <span
-                css={[
-                  proBadgeRight,
-                  css`
-                    @media (max-width: 767px) {
-                      display: none;
-                    }
-                  `,
-                ]}
-              >
+              <span css={S.proPill}>
                 <Zap size={9} /> PRO
               </span>
             )}
 
-            {/* Theme toggle */}
             <button
-              css={themeBtn(isDark)}
+              css={S.themeBtn(isDark)}
               onClick={toggleTheme}
               aria-label={
                 isDark ? "Switch to light mode" : "Switch to dark mode"
@@ -510,7 +383,7 @@ export default function Navbar() {
 
             {user ? (
               <>
-                {/* ── Hamburger — mobile only ── */}
+                {/* Hamburger — mobile only */}
                 <button
                   css={S.hamburgerBtn}
                   onClick={() => setMobileOpen((v) => !v)}
@@ -519,7 +392,7 @@ export default function Navbar() {
                   {mobileOpen ? <X size={18} /> : <Menu size={18} />}
                 </button>
 
-                {/* ── Avatar dropdown — desktop only ── */}
+                {/* Avatar dropdown — desktop only */}
                 <div
                   ref={userRef}
                   css={css`
@@ -530,7 +403,7 @@ export default function Navbar() {
                   `}
                 >
                   <button
-                    css={avatarBtnStyle}
+                    css={S.avatarBtn}
                     onClick={() => toggle("user")}
                     aria-label="Account"
                   >
@@ -547,52 +420,45 @@ export default function Navbar() {
                         }}
                       />
                     ) : (
-                      <span
-                        css={css`
-                          font-size: 0.6875rem;
-                          font-weight: 700;
-                          color: ${C.muted};
-                        `}
-                      >
-                        {initials}
-                      </span>
+                      <span css={S.avatarInitials}>{initials}</span>
                     )}
                   </button>
 
                   {open === "user" && (
-                    <div css={panel}>
-                      <div css={pHeader}>
-                        <div css={pName}>{displayName}</div>
-                        {user.email && <div css={pEmail}>{user.email}</div>}
+                    <div css={S.accountPanel}>
+                      <div css={S.accountPanelHeader}>
+                        <div css={S.accountName}>{displayName}</div>
+                        {user.email && (
+                          <div css={S.accountEmail}>{user.email}</div>
+                        )}
                         {(progress?.streakDays ?? 0) > 0 && (
-                          <span
-                            css={[
-                              streakChip,
-                              css`
-                                margin-top: 7px;
-                                display: inline-flex;
-                              `,
-                            ]}
-                          >
+                          <span css={S.streakChip}>
                             🔥 {progress!.streakDays}d streak
                           </span>
                         )}
                       </div>
                       <Link
-                        href="/analytics"
-                        css={pItem}
+                        href="/dashboard"
+                        css={S.panelItem}
                         onClick={() => setOpen(null)}
                       >
-                        📊 Analytics
+                        <LayoutDashboard size={14} color={C.muted} /> Dashboard
+                      </Link>
+                      <Link
+                        href="/analytics"
+                        css={S.panelItem}
+                        onClick={() => setOpen(null)}
+                      >
+                        <BarChart2 size={14} color={C.muted} /> Analytics
                         {!progress?.isPro && (
                           <span css={S.proBadge} style={{ marginLeft: "auto" }}>
                             PRO
                           </span>
                         )}
                       </Link>
-                      <hr css={pDivider} />
+                      <hr css={S.panelDivider} />
                       <button
-                        css={pItem}
+                        css={S.panelItem}
                         onClick={() => {
                           toggleTheme();
                           setOpen(null);
@@ -605,10 +471,10 @@ export default function Navbar() {
                         )}
                         {isDark ? "Light mode" : "Dark mode"}
                       </button>
-                      <hr css={pDivider} />
+                      <hr css={S.panelDivider} />
                       <button
                         css={[
-                          pItem,
+                          S.panelItem,
                           css`
                             color: ${C.red};
                           `,
@@ -638,35 +504,13 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ── Mobile menu (slide-down sheet) ── */}
+      {/* ── Mobile Slide-down Sheet ── */}
       {user && mobileOpen && (
-        <div css={S.mobileMenu}>
-          <div css={S.mobileMenuInner}>
+        <div css={S.mobileSheet}>
+          <div css={S.mobileSheetInner}>
             {/* User header */}
-            <div
-              css={css`
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                padding: 0.75rem 0.875rem 0.875rem;
-                border-bottom: 1px solid ${C.border};
-                margin-bottom: 0.25rem;
-              `}
-            >
-              <div
-                css={css`
-                  width: 2.25rem;
-                  height: 2.25rem;
-                  border-radius: 9999px;
-                  border: 1px solid ${C.border};
-                  background: ${C.bgSubtle};
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  overflow: hidden;
-                  flex-shrink: 0;
-                `}
-              >
+            <div css={S.mobileUserHeader}>
+              <div css={S.mobileAvatar}>
                 {user.photoURL ? (
                   <Image
                     src={user.photoURL}
@@ -680,84 +524,64 @@ export default function Navbar() {
                     }}
                   />
                 ) : (
-                  <span
-                    css={css`
-                      font-size: 0.75rem;
-                      font-weight: 700;
-                      color: ${C.muted};
-                    `}
-                  >
-                    {initials}
-                  </span>
+                  <span css={S.mobileAvatarInitials}>{initials}</span>
                 )}
               </div>
               <div>
-                <div
-                  css={css`
-                    font-size: 0.875rem;
-                    font-weight: 600;
-                    color: ${C.text};
-                  `}
-                >
-                  {displayName}
-                </div>
-                <div
-                  css={css`
-                    display: flex;
-                    gap: 5px;
-                    margin-top: 3px;
-                  `}
-                >
+                <div css={S.mobileUserName}>{displayName}</div>
+                <div css={S.mobileUserBadges}>
                   {progress?.isPro && (
-                    <span
-                      css={css`
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 3px;
-                        padding: 2px 7px;
-                        border-radius: 9999px;
-                        font-size: 0.625rem;
-                        font-weight: 600;
-                        color: ${C.accentText};
-                        background: ${C.accentSubtle};
-                        border: 1px solid ${C.border};
-                      `}
-                    >
+                    <span css={S.proPill}>
                       <Zap size={9} /> PRO
                     </span>
                   )}
                   {(progress?.streakDays ?? 0) > 0 && (
-                    <span css={streakChip}>🔥 {progress!.streakDays}d</span>
+                    <span css={S.streakChip}>🔥 {progress!.streakDays}d</span>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Main nav */}
-            <Link
-              href="/dashboard"
-              css={[
-                S.mobileNavLink,
-                path === "/dashboard" && S.mobileNavLinkActive,
-              ]}
-            >
-              <LayoutDashboard size={16} /> Home
-            </Link>
+            {/* Learn section */}
+            <p css={S.mobileSectionLabel}>Learn</p>
+            {LEARN_LINKS(track).map(({ href, label, icon: Icon, desc }) => (
+              <Link
+                key={href}
+                href={href}
+                css={[
+                  S.mobileNavLink,
+                  path.startsWith(href) && S.mobileNavLinkLearnActive,
+                ]}
+              >
+                <div css={S.mobileIconBadge(C.green)}>
+                  <Icon size={14} color={C.green} />
+                </div>
+                <div css={S.mobileItemContent}>
+                  <span>{label}</span>
+                  <span css={S.mobileItemDesc}>{desc}</span>
+                </div>
+              </Link>
+            ))}
 
             <hr css={S.mobileDivider} />
             <p css={S.mobileSectionLabel}>Practice</p>
 
-            {QUESTION_LINKS.map(({ href, label, icon: Icon, activeColor }) => {
+            {PRACTICE_LINKS.map(({ href, label, icon: Icon, desc, color }) => {
               const isActive = path.startsWith(href);
               return (
                 <Link
                   key={href}
                   href={href}
                   css={[S.mobileNavLink, isActive && S.mobileNavLinkActive]}
-                  style={isActive ? { color: activeColor } : undefined}
+                  style={isActive ? { color } : undefined}
                 >
-                  <Icon size={16} color={isActive ? activeColor : undefined} />{" "}
-                  {label}
+                  <div css={S.mobileIconBadge(color)}>
+                    <Icon size={14} color={color} />
+                  </div>
+                  <div css={S.mobileItemContent}>
+                    <span>{label}</span>
+                    <span css={S.mobileItemDesc}>{desc}</span>
+                  </div>
                 </Link>
               );
             })}
@@ -766,35 +590,18 @@ export default function Navbar() {
               href="/sprint"
               css={[
                 S.mobileNavLink,
-                path === "/sprint" && S.mobileNavLinkActive,
+                S.mobileSprintLink,
+                path === "/sprint" && S.mobileSprintActive,
               ]}
-              style={{ color: path === "/sprint" ? C.amber : undefined }}
             >
-              <Zap size={16} color={path === "/sprint" ? C.amber : undefined} />{" "}
-              Sprint ✨
+              <div css={S.mobileIconBadge(C.amber)}>
+                <Zap size={14} color={C.amber} />
+              </div>
+              <div css={S.mobileItemContent}>
+                <span>Sprint Mode</span>
+                <span css={S.mobileItemDesc}>Timed challenge</span>
+              </div>
             </Link>
-
-            <hr css={S.mobileDivider} />
-            <p css={S.mobileSectionLabel}>Learn</p>
-
-            {LEARN_LINKS(track).map(({ href, label, icon: Icon, desc }) => (
-              <Link
-                key={href}
-                href={href}
-                css={[
-                  S.mobileNavLink,
-                  path.startsWith(href) && S.learnNavLinkActive,
-                ]}
-              >
-                <div css={S.mobileAiItemIcon}>
-                  <Icon size={14} color={learnColor} />
-                </div>
-                <div css={S.mobileNavItemContent}>
-                  <span>{label}</span>
-                  <span css={S.mobileNavItemDesc}>{desc}</span>
-                </div>
-              </Link>
-            ))}
 
             <hr css={S.mobileDivider} />
             <p css={S.mobileSectionLabel}>AI Tools</p>
@@ -808,12 +615,12 @@ export default function Navbar() {
                   path === href && S.mobileNavLinkAiActive,
                 ]}
               >
-                <div css={S.mobileAiItemIcon}>
-                  <Icon size={14} color={aiColor} />
+                <div css={S.mobileIconBadge(C.accent)}>
+                  <Icon size={14} color={C.accentText} />
                 </div>
-                <div css={S.mobileNavItemContent}>
+                <div css={S.mobileItemContent}>
                   <span>{label}</span>
-                  <span css={S.mobileNavItemDesc}>{desc}</span>
+                  <span css={S.mobileItemDesc}>{desc}</span>
                 </div>
                 {!progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
               </Link>
@@ -823,21 +630,28 @@ export default function Navbar() {
             <p css={S.mobileSectionLabel}>Account</p>
 
             <Link href="/analytics" css={S.mobileNavLink}>
-              📊 Analytics
+              <BarChart2 size={16} color={C.muted} /> Analytics
               {!progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
             </Link>
 
-            <hr css={S.mobileDivider} />
-
             <button
               css={S.mobileNavLink}
-              style={{ width: "100%", border: "none", cursor: "pointer" }}
+              style={{
+                width: "100%",
+                border: "none",
+                cursor: "pointer",
+                background: "transparent",
+              }}
               onClick={() => {
                 toggleTheme();
                 setMobileOpen(false);
               }}
             >
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+              {isDark ? (
+                <Sun size={16} color={C.muted} />
+              ) : (
+                <Moon size={16} color={C.muted} />
+              )}
               {isDark ? "Light mode" : "Dark mode"}
             </button>
 
@@ -853,6 +667,87 @@ export default function Navbar() {
               <LogOut size={16} /> Sign out
             </button>
           </div>
+        </div>
+      )}
+
+      {/* ── Mobile Bottom Tab Bar ── */}
+      {user && (
+        <div css={S.mobileBottomNav}>
+          {/* Home */}
+          {(() => {
+            const isActive = path === "/dashboard";
+            return (
+              <Link
+                href="/dashboard"
+                css={[S.mobileTabItem, isActive && S.mobileTabItemActive]}
+              >
+                <LayoutDashboard size={20} />
+                <span css={S.mobileTabLabel}>Home</span>
+              </Link>
+            );
+          })()}
+
+          {/* Practice — matches any practice page */}
+          {(() => {
+            const isActive = PRACTICE_LINKS.some((l) =>
+              path.startsWith(l.href),
+            );
+            return (
+              <Link
+                href="/theory"
+                css={[S.mobileTabItem, isActive && S.mobileTabItemActive]}
+              >
+                <FlaskConical size={20} />
+                <span css={S.mobileTabLabel}>Practice</span>
+              </Link>
+            );
+          })()}
+
+          {/* Mock */}
+          {(() => {
+            const isActive = path === "/mock-interview";
+            return (
+              <Link
+                href="/mock-interview"
+                css={[S.mobileTabItem, isActive && S.mobileTabItemActive]}
+              >
+                <Mic size={20} />
+                <span css={S.mobileTabLabel}>Mock</span>
+              </Link>
+            );
+          })()}
+
+          {/* AI Coach */}
+          {(() => {
+            const isActive = AI_LINKS.some((l) => path === l.href);
+            return (
+              <Link
+                href="/study-plan"
+                css={[
+                  S.mobileTabItem,
+                  S.mobileTabAi,
+                  isActive && S.mobileTabAiActive,
+                ]}
+              >
+                <Sparkles size={20} />
+                <span css={S.mobileTabLabel}>AI</span>
+              </Link>
+            );
+          })()}
+
+          {/* Profile */}
+          {(() => {
+            const isActive = path === "/analytics";
+            return (
+              <Link
+                href="/analytics"
+                css={[S.mobileTabItem, isActive && S.mobileTabItemActive]}
+              >
+                <User size={20} />
+                <span css={S.mobileTabLabel}>Profile</span>
+              </Link>
+            );
+          })()}
         </div>
       )}
     </>

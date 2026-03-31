@@ -7,20 +7,29 @@
 
 import { proFeatures } from "@/data/homepageStaticData";
 import type { Metadata } from "next";
+import { Track } from "../tracks";
 
 export const SITE = {
   name: "JSPrep Pro",
   domain: "https://jsprep.pro",
   twitterHandle: "@jspreppro",
   description:
-    "200+ JavaScript interview questions with AI scoring, output prediction " +
-    "& debug challenges. Theory, output quiz, and debug lab modes. " +
+    "500+ frontend interview questions covering JavaScript, React, TypeScript & System Design. " +
+    "AI scoring, Mock interviews, output prediction, debug challenges, theory questions, polyfills, and Interview Sprint mode. " +
     "Free to start — no card needed.",
 };
 
+// ─── Keywords ─────────────────────────────────────────────────────────────────
 
 export const KEYWORDS = {
   primary: [
+    // Frontend (umbrella)
+    "frontend interview questions",
+    "frontend developer interview preparation",
+    "frontend coding interview",
+    "frontend interview questions india",
+    "frontend developer interview questions for 2 years experience",
+    // JavaScript
     "javascript interview questions",
     "javascript interview preparation",
     "js interview questions with answers",
@@ -28,36 +37,88 @@ export const KEYWORDS = {
     "javascript practice problems",
     "javascript output questions",
     "javascript debugging interview",
-    "frontend developer interview india",
-    "javascript interview questions for 2 years experience",
-    "javascript output prediction questions",
     "javascript debug interview questions",
+    "javascript output prediction questions",
+    // React
+    "react interview questions",
+    "react hooks interview questions",
+    "react interview preparation",
+    // TypeScript
+    "typescript interview questions",
+    "typescript interview preparation",
+    // System Design
+    "frontend system design interview",
+    "system design interview questions frontend",
   ],
   secondary: [
+    // JS concepts
     "closures interview questions",
     "event loop javascript",
     "javascript promises interview",
     "async await javascript",
     "javascript this keyword",
     "javascript hoisting",
-    "frontend developer interview",
-    "react interview questions",
-    "typescript interview questions",
+    // React concepts
+    "react usememo vs usecallback",
+    "react hooks interview",
+    "react state management interview",
+    // TS concepts
+    "typescript generics interview",
+    "typescript utility types",
+    // Companies
     "javascript interview questions razorpay",
     "javascript interview questions atlassian",
     "javascript interview questions flipkart",
+    "react interview questions swiggy",
+    "frontend interview questions zepto",
   ],
   platform: [
-    "javascript interview platform",
+    "frontend interview platform",
     "javascript practice platform",
-    "js interview prep online",
-    "javascript quiz for developers",
-    "leetcode for javascript",
-    "ai javascript interview prep",
+    "react interview prep online",
+    "ai frontend interview prep",
     "javascript mock interview online",
+    "frontend developer quiz",
+    "leetcode for javascript",
+    "leetcode for frontend developers",
+    "ai javascript interview scorer",
   ],
 };
 
+// ─── Track-specific keyword sets ──────────────────────────────────────────────
+
+export const TRACK_KEYWORDS: Record<Track, string[]> = {
+  javascript: [
+    "javascript interview questions",
+    "javascript output prediction",
+    "javascript closures hoisting scope",
+    "js debugging interview",
+    "javascript polyfill questions",
+  ],
+  react: [
+    "react interview questions",
+    "react hooks interview preparation",
+    "react useeffect usememo interview",
+    "react component lifecycle interview",
+    "react state management interview questions",
+  ],
+  typescript: [
+    "typescript interview questions",
+    "typescript generics interview",
+    "typescript utility types interview",
+    "typescript type narrowing interview",
+    "typescript vs javascript interview",
+  ],
+  "system-design": [
+    "frontend system design interview",
+    "system design interview frontend developer",
+    "micro frontend interview questions",
+    "frontend architecture interview",
+    "web performance interview questions",
+  ],
+};
+
+// ─── Page metadata helper ─────────────────────────────────────────────────────
 
 interface PageMetaOptions {
   title: string;
@@ -68,6 +129,7 @@ interface PageMetaOptions {
   publishedAt?: string;
   modifiedAt?: string;
   image?: string;
+  track?: Track;
 }
 
 export function pageMeta(opts: PageMetaOptions): Metadata {
@@ -79,17 +141,19 @@ export function pageMeta(opts: PageMetaOptions): Metadata {
     keywords = [],
     publishedAt,
     modifiedAt,
+    track,
   } = opts;
 
   const url = `${SITE.domain}${path}`;
   const fullTitle = title.includes("JSPrep") ? title : `${title} — JSPrep Pro`;
-
   const image = opts.image ?? `${SITE.domain}/og-default.png`;
+
+  const trackKw = track ? TRACK_KEYWORDS[track] : [];
 
   return {
     title: fullTitle,
     description,
-    keywords: [...KEYWORDS.primary, ...keywords].join(", "),
+    keywords: [...KEYWORDS.primary, ...trackKw, ...keywords].join(", "),
     authors: [{ name: "JSPrep Pro Team" }],
     creator: SITE.name,
     publisher: SITE.name,
@@ -111,13 +175,7 @@ export function pageMeta(opts: PageMetaOptions): Metadata {
       title: fullTitle,
       description,
       siteName: SITE.name,
-
-      // ── CHANGE 3b: locale ────────────────────────────────────
-      // BEFORE: 'en_US'
-      // Your site targets Indian developers (₹ pricing, IN geo tags, Indian companies)
-      // ✅ FIXED:
       locale: "en_IN",
-
       images: [{ url: image, width: 1200, height: 630, alt: fullTitle }],
       ...(publishedAt ? { publishedTime: publishedAt } : {}),
       ...(modifiedAt ? { modifiedTime: modifiedAt } : {}),
@@ -132,9 +190,8 @@ export function pageMeta(opts: PageMetaOptions): Metadata {
   };
 }
 
-// ─────────────────────────────────────────────────────────────
-// ✅ KEEP faqSchema — already correct, well-structured
-// ─────────────────────────────────────────────────────────────
+// ─── FAQ schema ───────────────────────────────────────────────────────────────
+
 export interface FAQItem {
   question: string;
   answer: string;
@@ -155,9 +212,8 @@ export function faqSchema(items: FAQItem[]): string {
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-// ✅ KEEP articleSchema — already correct
-// ─────────────────────────────────────────────────────────────
+// ─── Article schema ───────────────────────────────────────────────────────────
+
 export function articleSchema(opts: {
   title: string;
   description: string;
@@ -188,13 +244,8 @@ export function articleSchema(opts: {
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-// CHANGE 4: softwareSchema — add CourseInstance and fix description
-//
-// BEFORE: uses SITE.description (which was wrong — now fixed above)
-// ALSO ADD: CourseInstance and WebSite schema alongside SoftwareApplication
-//           Google prefers Course schema for educational platforms
-// ─────────────────────────────────────────────────────────────
+// ─── Software schema ──────────────────────────────────────────────────────────
+
 export function softwareSchema(): string {
   return JSON.stringify({
     "@context": "https://schema.org",
@@ -202,7 +253,7 @@ export function softwareSchema(): string {
     name: SITE.name,
     applicationCategory: "EducationalApplication",
     operatingSystem: "Web",
-    description: SITE.description, // ✅ now correct after CHANGE 1
+    description: SITE.description,
     url: SITE.domain,
     offers: [
       { "@type": "Offer", price: "0", priceCurrency: "INR", name: "Free Plan" },
@@ -214,35 +265,21 @@ export function softwareSchema(): string {
         billingDuration: "P1M",
       },
     ],
-    // aggregateRating: {
-    //   "@type": "AggregateRating",
-    //   ratingValue: "4.8",
-    //   reviewCount: "247", // ⚠️  update this with real review count when you have it
-    //   bestRating: "5",
-    // },
     featureList: proFeatures,
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-// ✅ ADD: courseSchema — higher-value signal for educational platforms
-// Use this in app/page.tsx alongside softwareSchema
-// ─────────────────────────────────────────────────────────────
-export function courseSchema(): string {
-  return JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Course",
+// ─── Course schema — track-aware ─────────────────────────────────────────────
+
+const TRACK_COURSE_META: Record<
+  Track,
+  { name: string; description: string; teaches: string[] }
+> = {
+  javascript: {
     name: "JavaScript Interview Preparation",
     description:
-      "200+ JavaScript interview questions across theory, output prediction, " +
-      "and debugging. AI scoring, Interview Sprint, and 36 topic deep-dives.",
-    url: SITE.domain,
-    provider: {
-      "@type": "Organization",
-      name: SITE.name,
-      url: SITE.domain,
-    },
-    educationalLevel: "Intermediate",
+      "200+ JavaScript interview questions across theory, output prediction, and debugging. " +
+      "AI scoring, Interview Sprint, and 36 topic deep-dives.",
     teaches: [
       "JavaScript Closures",
       "JavaScript Event Loop",
@@ -253,6 +290,69 @@ export function courseSchema(): string {
       "JavaScript Output Prediction",
       "JavaScript Debugging",
     ],
+  },
+  react: {
+    name: "React Interview Preparation",
+    description:
+      "150+ React interview questions covering hooks, state management, rendering, and patterns. " +
+      "AI scoring, output prediction, and debug challenges.",
+    teaches: [
+      "React Hooks (useState, useEffect, useMemo, useCallback)",
+      "React Component Lifecycle",
+      "React State Management",
+      "React Context API",
+      "React Performance Optimisation",
+      "React Design Patterns",
+      "React Rendering Behaviour",
+    ],
+  },
+  typescript: {
+    name: "TypeScript Interview Preparation",
+    description:
+      "100+ TypeScript interview questions covering types, generics, utility types, and type narrowing. " +
+      "AI scoring and debug challenges.",
+    teaches: [
+      "TypeScript Types and Interfaces",
+      "TypeScript Generics",
+      "TypeScript Utility Types",
+      "TypeScript Type Narrowing",
+      "TypeScript Conditional Types",
+      "TypeScript Mapped Types",
+      "TypeScript with React",
+    ],
+  },
+  "system-design": {
+    name: "Frontend System Design Interview Preparation",
+    description:
+      "Frontend system design questions covering architecture, APIs, micro-frontends, " +
+      "performance, and real-time systems. AI-scored answers.",
+    teaches: [
+      "Frontend Architecture Patterns",
+      "Micro-frontend Design",
+      "API Design (REST vs GraphQL)",
+      "Web Performance and Core Web Vitals",
+      "Real-time Systems (WebSockets)",
+      "CDN and Caching Strategies",
+      "Frontend at Scale",
+    ],
+  },
+};
+
+export function courseSchema(track: Track = "javascript"): string {
+  const meta = TRACK_COURSE_META[track];
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: meta.name,
+    description: meta.description,
+    url: SITE.domain,
+    provider: {
+      "@type": "Organization",
+      name: SITE.name,
+      url: SITE.domain,
+    },
+    educationalLevel: "Intermediate",
+    teaches: meta.teaches,
     hasCourseInstance: {
       "@type": "CourseInstance",
       courseMode: "online",
@@ -278,10 +378,8 @@ export function courseSchema(): string {
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-// ✅ ADD: websiteSchema — enables Google Sitelinks search box
-// Add to layout.tsx <head> alongside softwareSchema
-// ─────────────────────────────────────────────────────────────
+// ─── Website schema — enables Google Sitelinks search ────────────────────────
+
 export function websiteSchema(): string {
   return JSON.stringify({
     "@context": "https://schema.org",
@@ -299,10 +397,8 @@ export function websiteSchema(): string {
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-// ✅ KEEP — breadcrumbSchema, slugify, categorySlug, CATEGORY_SLUGS
-//    All correct, no changes needed.
-// ─────────────────────────────────────────────────────────────
+// ─── Breadcrumb schema ────────────────────────────────────────────────────────
+
 export function breadcrumbSchema(
   items: { name: string; path: string }[],
 ): string {
@@ -317,6 +413,8 @@ export function breadcrumbSchema(
     })),
   });
 }
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
 
 export function slugify(s: string): string {
   return s

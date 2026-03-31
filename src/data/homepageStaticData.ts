@@ -1,49 +1,6 @@
+import { Track } from "@/lib/tracks";
+import { C } from "@/styles/tokens";
 import { Brain, Bug, FileText, Mic, Sparkles, Target } from "lucide-react";
-
-export const TOPICS = [
-  {
-    label: "Closures",
-    slug: "javascript-closure-interview-questions",
-    diff: "Core",
-    qs: 12,
-    c: "#7c6af7",
-  },
-  {
-    label: "Event Loop",
-    slug: "javascript-event-loop-interview-questions",
-    diff: "Advanced",
-    qs: 9,
-    c: "#f7c76a",
-  },
-  {
-    label: "Promises",
-    slug: "javascript-promises-interview-questions",
-    diff: "Core",
-    qs: 11,
-    c: "#6af7c0",
-  },
-  {
-    label: "Hoisting",
-    slug: "javascript-hoisting-interview-questions",
-    diff: "Beginner",
-    qs: 8,
-    c: "#7c6af7",
-  },
-  {
-    label: "this Keyword",
-    slug: "javascript-this-keyword-interview-questions",
-    diff: "Core",
-    qs: 10,
-    c: "#f76a6a",
-  },
-  {
-    label: "async/await",
-    slug: "javascript-async-await-interview-questions",
-    diff: "Core",
-    qs: 9,
-    c: "#6af7c0",
-  },
-];
 
 export const TESTIMONIALS = [
   {
@@ -72,54 +29,313 @@ export const TESTIMONIALS = [
   },
 ];
 
-export const MODES = [
+export const TRACK_HERO: Record<
+  Track,
   {
-    emoji: "📖",
-    label: "Theory",
-    c: "#7c6af7",
-    n: "90+",
-    free: true,
-    href: "/theory",
-    desc: "Deep explanations, code examples, hints, and AI follow-up on every question.",
-    tags: ["Closures", "Prototypes", "Event Loop", "Promises"],
+    badge: string;
+    title: string;
+    accent: string;
+    sub: string;
+    freeLine: string;
+  }
+> = {
+  javascript: {
+    badge: "Train for Real JavaScript Interviews",
+    title: "JavaScript Interview",
+    accent: "Questions & Practice.",
+    sub: "Practice real JavaScript interview questions, take timed Interview Sprint and know exactly if you're ready.",
+    freeLine: "core JavaScript questions — free, forever.",
   },
-  {
-    emoji: "💻",
-    label: "Output Quiz",
-    c: "#6af7c0",
-    n: "100+",
-    free: false,
-    href: "/output-quiz",
-    desc: "Predict the exact output of real JS snippets. Catches what theory never does.",
-    tags: ["Type coercion", "Hoisting traps", "Async order", "Closure bugs"],
+  react: {
+    badge: "Train for Real React Interviews",
+    title: "React Interview",
+    accent: "Questions & Practice.",
+    sub: "Master React hooks, state management, and component patterns. AI-scored answers, not just multiple choice.",
+    freeLine: "core React questions — free, forever.",
   },
-  {
-    emoji: "🐛",
-    label: "Debug Lab",
-    c: "#f76a6a",
-    n: "25+",
-    free: false,
-    href: "/debug-lab",
-    desc: "Find and fix real bugs. AI scores your fix 1–10 and shows the cleaner approach.",
-    tags: ["Async bugs", "Stale closures", "Promise chains", "React hooks"],
+  typescript: {
+    badge: "Train for Real TypeScript Interviews",
+    title: "TypeScript Interview",
+    accent: "Questions & Practice.",
+    sub: "Level up with TypeScript types, generics, and utility types. Real interview questions with AI-graded answers.",
+    freeLine: "core TypeScript questions — free, forever.",
   },
-  {
-    emoji: "⚡",
-    label: "Polyfill Lab",
-    c: "#f7c76a",
-    n: "20+",
-    free: false,
-    href: "/polyfill-lab",
-    desc: "Write the implementation of common JS methods from scratch, then test and debug it in our custom test runner.",
-    tags: [
-      "Array Methods",
-      "Function Methods",
-      "Promise Methods",
-      "Object Methods",
-      "Utility Functions",
-    ],
+  "system-design": {
+    badge: "Train for Frontend System Design",
+    title: "System Design Interview",
+    accent: "Questions & Practice.",
+    sub: "Master frontend architecture, scalability patterns, and system design for senior engineering roles.",
+    freeLine: "system design questions — free, forever.",
   },
-];
+};
+
+export const TRACK_WHY: Record<
+  Track,
+  Array<{ emoji: string; label: string; before: string; after: string }>
+> = {
+  javascript: [
+    {
+      emoji: "📖",
+      label: "Theory",
+      before: "Read definitions on MDN",
+      after: "Understand with AI + code examples",
+    },
+    {
+      emoji: "💻",
+      label: "Output Questions",
+      before: "Get surprised in interviews",
+      after: "Predict output confidently",
+    },
+    {
+      emoji: "🐛",
+      label: "Debug Challenges",
+      before: "Never practiced bug fixing",
+      after: "AI-scored real bug fixing practice",
+    },
+    {
+      emoji: "🧪",
+      label: "Polyfill Lab",
+      before: "Skipped polyfills entirely",
+      after: "Write reduce, bind, Promise.all with test feedback",
+    },
+  ],
+  react: [
+    {
+      emoji: "🪝",
+      label: "Hooks",
+      before: "Memorised hook rules blindly",
+      after: "Understand closure traps & dependency arrays",
+    },
+    {
+      emoji: "🔄",
+      label: "State & Rendering",
+      before: "Guessed why re-renders happen",
+      after: "Predict render behaviour with confidence",
+    },
+    {
+      emoji: "🧩",
+      label: "Patterns",
+      before: "Copy-paste HOCs without understanding",
+      after: "Explain compound, render-prop & context patterns",
+    },
+    {
+      emoji: "⚡",
+      label: "Performance",
+      before: "Added memo() everywhere hoping for the best",
+      after: "Know exactly when useMemo & useCallback help",
+    },
+  ],
+  typescript: [
+    {
+      emoji: "🔷",
+      label: "Types & Interfaces",
+      before: "Used `any` to silence errors",
+      after: "Write precise types that catch bugs at compile time",
+    },
+    {
+      emoji: "🧬",
+      label: "Generics",
+      before: "Avoided generics — too complex",
+      after: "Write reusable, type-safe generic functions",
+    },
+    {
+      emoji: "🛠️",
+      label: "Utility Types",
+      before: "Re-wrote types from scratch every time",
+      after: "Use Partial, Pick, Omit & infer with ease",
+    },
+    {
+      emoji: "📐",
+      label: "Type Narrowing",
+      before: "Relied on type assertions everywhere",
+      after: "Narrow types safely with guards & discriminated unions",
+    },
+  ],
+  "system-design": [
+    {
+      emoji: "🏗️",
+      label: "Architecture",
+      before: "No structured way to think about scale",
+      after: "Apply proven frontend architecture patterns",
+    },
+    {
+      emoji: "🌐",
+      label: "APIs & Data",
+      before: "Vague answers about REST vs GraphQL",
+      after: "Explain trade-offs with concrete examples",
+    },
+    {
+      emoji: "📦",
+      label: "Micro-frontends",
+      before: "Never heard of module federation",
+      after: "Design scalable MFE systems confidently",
+    },
+    {
+      emoji: "⚡",
+      label: "Performance at Scale",
+      before: "Said 'use CDN' and hoped for the best",
+      after: "Discuss caching, lazy loading & Core Web Vitals strategically",
+    },
+  ],
+};
+
+export const TRACK_MODES: Record<
+  Track,
+  Array<{
+    label: string;
+    emoji: string;
+    href: string;
+    c: string;
+    free?: boolean;
+    desc: string;
+    tags: string[];
+  }>
+> = {
+  javascript: [
+    {
+      label: "Concepts",
+      emoji: "📖",
+      href: "/theory",
+      c: C.accent,
+      free: true,
+      desc: "Core JS theory with AI-graded written answers. Not MCQ — you explain it.",
+      tags: ["Closures", "Scope", "Prototypes", "Event Loop"],
+    },
+    {
+      label: "Output Quiz",
+      emoji: "💻",
+      href: "/output-quiz",
+      c: C.amber,
+      free: true,
+      desc: "Predict what the console prints. The most common real interview format.",
+      tags: ["Coercion", "Hoisting", "Async", "this"],
+    },
+    {
+      label: "Debug Lab",
+      emoji: "🐛",
+      href: "/debug-lab",
+      c: C.red,
+      desc: "Find and fix real bugs. AI tells you exactly what you missed.",
+      tags: ["Async bugs", "Scope issues", "Logic errors"],
+    },
+    {
+      label: "Polyfill Lab",
+      emoji: "🧪",
+      href: "/polyfill-lab",
+      c: C.green,
+      desc: "Write Array.map, Promise.all and bind from scratch with test feedback.",
+      tags: ["Array methods", "Promises", "bind / call"],
+    },
+  ],
+  react: [
+    {
+      label: "Concepts",
+      emoji: "📖",
+      href: "/theory",
+      c: C.accent,
+      free: true,
+      desc: "React theory with AI-graded written answers. Explain hooks, lifecycle, and patterns.",
+      tags: ["Hooks", "Lifecycle", "Context", "Rendering"],
+    },
+    {
+      label: "Output Quiz",
+      emoji: "💻",
+      href: "/output-quiz",
+      c: C.amber,
+      free: true,
+      desc: "Predict what renders. Re-render traps, stale closures, batching — all covered.",
+      tags: ["Re-renders", "Batching", "Stale state", "Refs"],
+    },
+    {
+      label: "Debug Lab",
+      emoji: "🐛",
+      href: "/debug-lab",
+      c: C.red,
+      desc: "Find bugs in real React code. Infinite loops, missing deps, stale closures.",
+      tags: ["useEffect bugs", "Missing deps", "Key issues"],
+    },
+    {
+      label: "Polyfill Lab",
+      emoji: "🧪",
+      href: "/polyfill-lab",
+      c: C.green,
+      desc: "Build custom hooks and utility functions from scratch with test feedback.",
+      tags: ["Custom hooks", "useReducer", "Composition"],
+    },
+  ],
+  typescript: [
+    {
+      label: "Concepts",
+      emoji: "📖",
+      href: "/theory",
+      c: C.accent,
+      free: true,
+      desc: "TypeScript theory — explain types, interfaces, generics and type narrowing in your own words.",
+      tags: ["Types", "Generics", "Narrowing", "Inference"],
+    },
+    {
+      label: "Output Quiz",
+      emoji: "💻",
+      href: "/output-quiz",
+      c: C.amber,
+      free: true,
+      desc: "Predict TypeScript's compile-time output. What type does this expression produce?",
+      tags: ["Type inference", "Conditional types", "Mapped types"],
+    },
+    {
+      label: "Debug Lab",
+      emoji: "🐛",
+      href: "/debug-lab",
+      c: C.red,
+      desc: "Fix real TypeScript errors. Beyond red squiggles — understand why they happen.",
+      tags: ["Type errors", "Strict mode", "Assertion bugs"],
+    },
+    {
+      label: "Polyfill Lab",
+      emoji: "🧪",
+      href: "/polyfill-lab",
+      c: C.green,
+      desc: "Implement utility types from scratch: Partial, Required, DeepReadonly and more.",
+      tags: ["Utility types", "Mapped types", "infer"],
+    },
+  ],
+  "system-design": [
+    {
+      label: "Concepts",
+      emoji: "📖",
+      href: "/theory",
+      c: C.accent,
+      free: true,
+      desc: "Explain frontend architecture decisions — CDNs, caching, MFEs — like a senior engineer.",
+      tags: ["Architecture", "Scalability", "Trade-offs"],
+    },
+    {
+      label: "Output Quiz",
+      emoji: "💻",
+      href: "/output-quiz",
+      c: C.amber,
+      free: true,
+      desc: "Identify bottlenecks and failure points in given system diagrams.",
+      tags: ["Bottlenecks", "SPOFs", "Load patterns"],
+    },
+    {
+      label: "Debug Lab",
+      emoji: "🐛",
+      href: "/debug-lab",
+      c: C.red,
+      desc: "Diagnose real production issues — slow TTFBs, layout shifts, memory leaks.",
+      tags: ["Core Web Vitals", "Memory", "Network"],
+    },
+    {
+      label: "Polyfill Lab",
+      emoji: "🧪",
+      href: "/polyfill-lab",
+      c: C.green,
+      desc: "Design systems from scratch: file upload service, infinite scroll, real-time chat.",
+      tags: ["Design exercises", "API design", "State sync"],
+    },
+  ],
+};
 
 export const AI_TOOLS = [
   {
@@ -169,7 +385,13 @@ export const LEADERS = [
     bg: "rgba(247,199,106,0.08)",
   },
   { name: "Susnata Das", xp: 290, av: "S", medal: "🥈", bg: "transparent" },
-  { name: "Shiv Malhar Dixit", xp: 215, av: "S", medal: "🥉", bg: "transparent" },
+  {
+    name: "Shiv Malhar Dixit",
+    xp: 215,
+    av: "S",
+    medal: "🥉",
+    bg: "transparent",
+  },
 ];
 
 export const proFeatures = [
@@ -189,7 +411,7 @@ export const proFeatures = [
 ];
 
 export const FREE_F = [
-  "All 91 theory questions",
+  "All theory questions",
   "Interview Sprint — 5-question warmup",
   "Daily Question of the Day + AI eval",
   "First 5 output + 5 debug questions",
