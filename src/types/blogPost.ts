@@ -29,6 +29,7 @@ export interface BlogPost {
   createdAt: string
   updatedAt: string
   createdBy?: string
+  track?: string                   // Optional track association for filtering by track
 }
 
 export type BlogPostInput = Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>
@@ -37,4 +38,5 @@ export interface BlogPostFilters {
   status?: BlogStatus
   category?: string
   topicSlug?: string
+  track?: string
 }

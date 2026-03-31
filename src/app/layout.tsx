@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
-import { QuestionsProvider } from "@/contexts/QuestionsContext";
 import { SITE, softwareSchema, websiteSchema, KEYWORDS } from "@/lib/seo/seo";
 import Navbar from "@/components/layout/Navbar";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-
+import { TrackProvider } from "@/contexts/TrackContext";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.domain),
@@ -84,14 +83,14 @@ export default function RootLayout({
         <meta name="geo.placename" content="India" />
       </head>
       <body className="antialiased">
-        <ThemeProvider>
-          <AuthProvider>
-            <QuestionsProvider>
+        <TrackProvider>
+          <ThemeProvider>
+            <AuthProvider>
               <Navbar />
               {children}
-            </QuestionsProvider>
-          </AuthProvider>
-        </ThemeProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </TrackProvider>
       </body>
     </html>
   );

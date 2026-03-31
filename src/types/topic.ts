@@ -34,6 +34,7 @@ export interface Topic {
   // Metadata
   status: TopicStatus
   order?: number                 // Sort order on /topics listing
+  track?: string                 // Optional track for filtering (e.g. 'frontend', 'fullstack', etc.)
   createdAt: string              // ISO timestamp
   updatedAt: string
   createdBy?: string             // admin uid
@@ -46,4 +47,5 @@ export interface TopicFilters {
   status?: TopicStatus
   difficulty?: TopicDifficulty
   category?: string
+  track?: string
 }

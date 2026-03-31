@@ -42,6 +42,7 @@ export async function getTopics(filters: TopicFilters = {}): Promise<Topic[]> {
   if (filters.status)     constraints.push(where('status',     '==', filters.status))
   if (filters.difficulty) constraints.push(where('difficulty', '==', filters.difficulty))
   if (filters.category)   constraints.push(where('category',   '==', filters.category))
+  if (filters.track)      constraints.push(where('track',      '==', filters.track))
 
   constraints.push(orderBy('order', 'asc'))
 
@@ -50,25 +51,26 @@ export async function getTopics(filters: TopicFilters = {}): Promise<Topic[]> {
 }
 
 /** Published topics — for generateStaticParams + public listings */
-export async function getPublishedTopics(): Promise<Topic[]> {
-  return getTopics({ status: 'published' })
+export async function getPublishedTopics({ track }: { track?: string } = {}): Promise<Topic[]> {
+  return getTopics({ status: 'published', track })
 }
 
 /** Slugs only — lightweight for generateStaticParams */
-export async function getTopicSlugs(): Promise<string[]> {
-  const snap = await getDocs(
-    query(collection(db, COL), where('status', '==', 'published'), orderBy('order', 'asc'))
-  )
+export async function getTopicSlugs({ track }: { track?: string } = {}): Promise<string[]> {
+  const constraints: QueryConstraint[] = [where('status', '==', 'published'), orderBy('order', 'asc')]
+  if (track) constraints.push(where('track', '==', track))
+
+  const snap = await getDocs(query(collection(db, COL), ...constraints))
   return snap.docs.map(d => (d.data() as Topic).slug)
 }
 
 /** Related topics for a given slug list */
-export async function getRelatedTopics(slugs: string[]): Promise<Topic[]> {
+export async function getRelatedTopics({slugs, track}: {slugs: string[], track?: string}): Promise<Topic[]> {
   if (!slugs.length) return []
   // Firestore `in` is limited to 10 items
   const batch = slugs.slice(0, 10)
   const snap = await getDocs(
-    query(collection(db, COL), where('slug', 'in', batch), where('status', '==', 'published'))
+    query(collection(db, COL), where('slug', 'in', batch), where('status', '==', 'published'), ...(track ? [where('track', '==', track)] : []))
   )
   return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Topic)
 }

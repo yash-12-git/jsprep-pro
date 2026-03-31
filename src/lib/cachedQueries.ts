@@ -48,6 +48,7 @@ import {
 } from "@/lib/questions";
 
 import type { GetQuestionsOptions } from "@/lib/questions";
+import { use } from "react";
 
 // ─── Cache tags ───────────────────────────────────────────────────────────────
 // Used to invalidate specific caches on admin write without waiting for TTL.
@@ -64,28 +65,33 @@ export const CACHE_TAGS = {
 // ─── Topics ───────────────────────────────────────────────────────────────────
 
 /** All published topics — listings, sitemaps, generateStaticParams */
-export const getPublishedTopics = unstable_cache(
-  () => getTopics({ status: "published" }),
-  ["published-topics"],
-  { revalidate: false, tags: [CACHE_TAGS.topics] },
-);
+export const getPublishedTopics = ({ track }: { track?: string } = {}) =>
+  unstable_cache(
+    () => getTopics({ status: "published", track }),
+    ["published-topics", track ? `track-${track}` : "all-tracks"],
+    {
+      revalidate: false,
+      tags: [CACHE_TAGS.topics],
+    },
+  )();
 
 /** Topic slugs — lightweight for generateStaticParams */
-export const getTopicSlugs = unstable_cache(
-  async () => {
-    const topics = await getTopics({ status: "published" });
-    return topics.map((t) => t.slug);
-  },
-  ["topic-slugs"],
-  { revalidate: false, tags: [CACHE_TAGS.topics] },
-);
+export const getTopicSlugs = async ({ track }: { track?: string } = {}) =>
+  unstable_cache(
+    async () => {
+      const topics = await getTopics({ status: "published", track });
+      return topics.map((t) => t.slug);
+    },
+    ["topic-slugs", track ? `track-${track}` : "all-tracks"],
+    { revalidate: false, tags: [CACHE_TAGS.topics] },
+  )();
 
 /** Weekly leaderboard — shared across all users */
 export const getWeeklyLeaderboardCached = unstable_cache(
   async () => await _getWeeklyLeaderboard(10),
   ["weekly-leaderboard"],
   {
-    revalidate: 60 * 60 * 2,
+    revalidate: false,
     tags: [CACHE_TAGS.leaderboard],
   },
 );
@@ -98,10 +104,10 @@ export const getTopicBySlug = (slug: string) =>
   })();
 
 /** Related topics by slug array */
-export const getRelatedTopics = (slugs: string[]) => {
+export const getRelatedTopics = (slugs: string[], track?: string) => {
   const key = [...slugs].sort().join(",");
   return unstable_cache(
-    () => _getRelatedTopics(slugs),
+    () => _getRelatedTopics({ slugs, track }),
     ["related-topics", key],
     { revalidate: false, tags: [CACHE_TAGS.topics] },
   )();
@@ -110,21 +116,26 @@ export const getRelatedTopics = (slugs: string[]) => {
 // ─── Blog posts ───────────────────────────────────────────────────────────────
 
 /** All published posts — for /blog listing + sitemaps */
-export const getPublishedBlogPosts = unstable_cache(
-  () => getBlogPosts({ status: "published" }),
-  ["published-blog-posts"],
-  { revalidate: false, tags: [CACHE_TAGS.blogPosts] },
-);
+export const getPublishedBlogPosts = ({ track }: { track?: string } = {}) =>
+  unstable_cache(
+    () => getBlogPosts({ status: "published", track }),
+    ["published-blog-posts", track ? `track-${track}` : "all-tracks"],
+    {
+      revalidate: false,
+      tags: [CACHE_TAGS.blogPosts],
+    },
+  )();
 
 /** Blog post slugs — for generateStaticParams */
-export const getBlogPostSlugs = unstable_cache(
-  async () => {
-    const posts = await getBlogPosts({ status: "published" });
-    return posts.map((p) => p.slug);
-  },
-  ["blog-post-slugs"],
-  { revalidate: false, tags: [CACHE_TAGS.blogPosts] },
-);
+export const getBlogPostSlugs = ({ track }: { track?: string } = {}) =>
+  unstable_cache(
+    async () => {
+      const posts = await getBlogPosts({ status: "published", track });
+      return posts.map((p) => p.slug);
+    },
+    ["blog-post-slugs", track ? `track-${track}` : "all-tracks"],
+    { revalidate: false, tags: [CACHE_TAGS.blogPosts] },
+  )();
 
 /** Single post by slug — slug baked into key AND per-slug tag for granular invalidation */
 export const getBlogPostBySlug = (slug: string) =>
@@ -153,11 +164,15 @@ export const getQuestions = (opts: GetQuestionsOptions) => {
 };
 
 /** Published categories — for /questions/[slug] nav */
-export const getPublishedCategories = unstable_cache(
-  () => _getPublishedCategories(),
-  ["published-categories"],
-  { revalidate: false, tags: [CACHE_TAGS.questions] },
-);
+export const getPublishedCategories = ({ track }: { track?: string } = {}) =>
+  unstable_cache(
+    () => _getPublishedCategories({ track }),
+    ["published-categories", track ? `track-${track}` : "all-tracks"],
+    {
+      revalidate: false,
+      tags: [CACHE_TAGS.questions],
+    },
+  )();
 
 /** Question slugs — for generateStaticParams on /q/[slug] */
 export const getPublishedQuestionSlugs = unstable_cache(

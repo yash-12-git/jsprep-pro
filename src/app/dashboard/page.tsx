@@ -26,17 +26,19 @@ import HomeClient from "./components/HomeClient";
 import LeaderboardWrapper from "./components/LeaderboardWrapper";
 import LearnSection from "./components/LearnSection";
 import QuestionOfTheDay from "./components/QuestionOfTheDayWrapper";
+import { getServerTrack } from "@/lib/getServerTrack";
 
 // ─── Data fetching ────────────────────────────────────────────────────────────
 // All four reads are parallelised with Promise.all.
 // Each is served from Next.js Data Cache — Firestore is not hit on repeated visits.
 
 async function getQuestionTotals() {
+  const track = await getServerTrack();
   const [theory, output, debug, polyfill] = await Promise.all([
-    getQuestions({ filters: { status: "published", type: "theory"   }, pageSize: 500 }).catch(() => ({ questions: [] })),
-    getQuestions({ filters: { status: "published", type: "output"   }, pageSize: 500 }).catch(() => ({ questions: [] })),
-    getQuestions({ filters: { status: "published", type: "debug"    }, pageSize: 500 }).catch(() => ({ questions: [] })),
-    getQuestions({ filters: { status: "published", type: "polyfill" }, pageSize: 500 }).catch(() => ({ questions: [] })),
+    getQuestions({ filters: { track, status: "published", type: "theory"   }, pageSize: 300 }).catch(() => ({ questions: [] })),
+    getQuestions({ filters: { track, status: "published", type: "output"   }, pageSize: 300 }).catch(() => ({ questions: [] })),
+    getQuestions({ filters: { track, status: "published", type: "debug"    }, pageSize: 300 }).catch(() => ({ questions: [] })),
+    getQuestions({ filters: { track, status: "published", type: "polyfill" }, pageSize: 300 }).catch(() => ({ questions: [] })),
   ]);
 
   return {

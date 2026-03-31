@@ -12,12 +12,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   getQuestions,
-  getCategories,
   type GetQuestionsOptions,
 } from "@/lib/questions";
 import type {
   Question,
-  QuestionFilters,
   QuestionType,
   Track,
 } from "@/types/question";
@@ -49,6 +47,8 @@ export function useQuestions({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const { track: trackContext } = useTrack();
+  const activeTrack = track ?? trackContext;
 
   const fetchQuestions = useCallback(async () => {
     if (!enabled) return;
@@ -58,7 +58,7 @@ export function useQuestions({
     const opts: GetQuestionsOptions = {
       filters: {
         ...(type ? { type } : {}),
-        ...(track ? { track } : {}),
+        ...(activeTrack ? { track: activeTrack } : {}),
         ...(category ? { category } : {}),
         status: "published",
       },
@@ -87,7 +87,7 @@ export function useQuestions({
     } finally {
       setLoading(false);
     }
-  }, [type, track, category, enabled]);
+  }, [type, track, trackContext, category, enabled]);
 
   useEffect(() => {
     fetchQuestions();
@@ -103,35 +103,15 @@ export function useQuestions({
   return { questions, loading, error, refresh };
 }
 
-// ─── useCategories hook ───────────────────────────────────────────────────────
-// Derives categories from QuestionsContext — zero extra Firestore reads.
-
-import { useAllQuestions } from "@/contexts/QuestionsContext";
-import { useMemo } from "react";
-
-export function useCategories(type?: QuestionType, track?: Track) {
-  const { allQs, loading } = useAllQuestions();
-
-  const categories = useMemo(() => {
-    let qs = allQs;
-    if (type) qs = qs.filter((q) => q.type === type);
-    if (track) qs = qs.filter((q) => q.track === track);
-    return [...new Set(qs.map((q) => q.category))].sort();
-  }, [allQs, type, track]);
-
-  return { categories, loading };
-}
-
-// ─── useUserProgress hook ─────────────────────────────────────────────────────
-
 import {
   getAllProgress,
   scheduleProgressWrite,
   markSolved,
-  markRevealed
+  markRevealed,
 } from "@/lib/questions";
 import { awardProgressXP, XP } from "@/lib/userProgress";
 import type { QuestionProgress } from "@/types/question";
+import { useTrack } from "@/contexts/TrackContext";
 
 interface UseUserProgressOptions {
   uid: string | null;
@@ -246,7 +226,6 @@ export function useUserProgress({ uid }: UseUserProgressOptions) {
     });
     // Award XP on the root doc so the leaderboard reflects this solve
     awardProgressXP(uid, XP.SOLVE_OUTPUT, 0).catch(() => {});
-    
   }
 
   async function recordRevealed(questionId: string) {

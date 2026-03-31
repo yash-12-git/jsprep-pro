@@ -14,30 +14,39 @@ import {
   faqSchema,
 } from "@/lib/seo/seo";
 import { BLOG_FAQS } from "@/data/seo/blogFaqs";
-import { C, RADIUS } from "@/styles/tokens";
+import { C } from "@/styles/tokens";
+import { Track, TRACKS } from "@/lib/tracks";
+import { getServerTrack } from "@/lib/getServerTrack";
 
 export const revalidate = 3600;
 
 interface Props {
-  params: { slug: string };
+  params: { track: Track; slug: string };
 }
 
 export async function generateStaticParams() {
   try {
     const slugs = await getBlogPostSlugs();
-    return slugs.map((slug) => ({ slug }));
+    return TRACKS.filter((t) => t.available).flatMap((t) =>
+      slugs.map((slug) => ({
+        track: t.id,
+        slug,
+      })),
+    );
   } catch {
     return [];
   }
 }
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getBlogPostBySlug(params.slug);
+  const { slug, track } = params;
+
+  const post = await getBlogPostBySlug(slug);
   if (!post) return {};
+
   return pageMeta({
     title: post.title,
     description: post.excerpt,
-    path: `/blog/${post.slug}`,
+    path: `/blog/${track}/${post.slug}`,
     keywords: post.keywords,
     type: "article",
     publishedAt: post.publishedAt,
@@ -74,6 +83,7 @@ function md(content: string): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: Props) {
   const post = await getBlogPostBySlug(params.slug);
+  const track = getServerTrack();
   if (!post) notFound();
 
   const [relatedTopics, allPosts] = await Promise.all([
@@ -100,7 +110,7 @@ export default async function BlogPostPage({ params }: Props) {
           __html: articleSchema({
             title: post.title,
             description: post.excerpt,
-            path: `/blog/${post.slug}`,
+            path: `/blog/${track}/${post.slug}`,
             publishedAt: post.publishedAt,
             modifiedAt: post.modifiedAt,
           }),
@@ -111,8 +121,8 @@ export default async function BlogPostPage({ params }: Props) {
         dangerouslySetInnerHTML={{
           __html: breadcrumbSchema([
             { name: "Home", path: "/" },
-            { name: "Blog", path: "/blog" },
-            { name: post.title, path: `/blog/${post.slug}` },
+            { name: "Blog", path: `/blog/${track}` },
+            { name: post.title, path: `/blog/${track}/${post.slug}` },
           ]),
         }}
       />

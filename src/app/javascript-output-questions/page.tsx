@@ -7,10 +7,11 @@ import {
   KEYWORDS,
   SITE,
 } from "@/lib/seo/seo";
-import { outputQuestions } from "@/data/outputQuestions";
 import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
 import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
 import { C } from "@/styles/tokens";
+import { getQuestions } from "@/lib/cachedQueries";
+import { getServerTrack } from "@/lib/getServerTrack";
 
 export const metadata: Metadata = pageMeta({
   title: "JavaScript Output Questions: Predict the Console.log (2025)",
@@ -31,8 +32,6 @@ export const metadata: Metadata = pageMeta({
 });
 
 const FREE_PREVIEW = 5;
-const allQuestions = [...outputQuestions];
-
 const CATEGORIES = [
   "Event Loop & Promises",
   "Closures & Scope",
@@ -74,10 +73,16 @@ const faqItems = [
   },
 ];
 
-export default function JavaScriptOutputQuestionsPage() {
+export default async function JavaScriptOutputQuestionsPage() {
+  const track = await getServerTrack();
+  const outputQuestions = await getQuestions({
+    filters: { track, status: "published", type: "output" },
+    pageSize: 300,
+  }).catch(() => ({ questions: [] }));
+
   const byCategory = CATEGORIES.map((cat) => ({
     cat,
-    questions: allQuestions.filter((q) => q.cat === cat),
+    questions: outputQuestions.questions.filter((q) => q.category === cat),
   }));
   const orderedAll = byCategory.flatMap(({ questions }) => questions);
   const totalCount = orderedAll.length;
@@ -386,7 +391,7 @@ export default function JavaScriptOutputQuestionsPage() {
                         explanation: q.explanation,
                         keyInsight: q.keyInsight,
                         difficulty: q.difficulty,
-                        category: q.cat,
+                        category: q.category,
                         tags: q.tags,
                       }}
                       globalIndex={globalIndex}
@@ -478,7 +483,8 @@ export default function JavaScriptOutputQuestionsPage() {
                 fontSize: "0.9375rem",
               }}
             >
-              View Pro — ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}/mo →
+              View Pro — ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}/mo
+              →
             </Link>
           </div>
         </section>

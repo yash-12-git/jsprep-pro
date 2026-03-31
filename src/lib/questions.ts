@@ -73,10 +73,10 @@ export async function getPublishedQuestionSlugs(): Promise<string[]> {
 }
 
 /** All distinct published categories — replaces static CATEGORIES array */
-export async function getPublishedCategories(): Promise<string[]> {
-  const snap = await getDocs(
-    query(collection(db, QUESTIONS_COL), where("status", "==", "published")),
-  );
+export async function getPublishedCategories({ track }: { track?: string } = {}): Promise<string[]> {
+  const constraints: QueryConstraint[] = [where("status", "==", "published")];
+  if (track) constraints.push(where("track", "==", track));
+  const snap = await getDocs(query(collection(db, QUESTIONS_COL), ...constraints));
   const cats = new Set<string>();
   snap.docs.forEach((d) => {
     const cat = (d.data() as Question).category;
@@ -104,7 +104,7 @@ export async function getQuestions(
 ): Promise<GetQuestionsResult> {
   const {
     filters = {},
-    pageSize = 50,
+    pageSize = 500,
     after: afterDoc,
     orderByField = "order",
     orderDir = "asc",

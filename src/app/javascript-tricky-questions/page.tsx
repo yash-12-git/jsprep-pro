@@ -11,6 +11,7 @@ import { getQuestions } from "@/lib/cachedQueries";
 import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
 import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
 import { C } from "@/styles/tokens";
+import { getServerTrack } from "@/lib/getServerTrack";
 
 export const revalidate = 3600;
 
@@ -93,11 +94,10 @@ function EmptyState() {
 }
 
 export default async function JavaScriptTrickyQuestionsPage() {
+  const track = await getServerTrack();
   const { questions } = await getQuestions({
-    filters: { isTricky: true, status: "published" },
-    pageSize: 200,
-    orderByField: "order",
-    orderDir: "asc",
+    filters: { track, isTricky: true, status: "published" },
+    pageSize: 300
   });
 
   const categories = [...new Set(questions.map((q) => q.category))].sort();
@@ -498,7 +498,8 @@ export default async function JavaScriptTrickyQuestionsPage() {
                   fontSize: "0.9375rem",
                 }}
               >
-                  View Pro — ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}/mo →
+                View Pro — ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}
+                /mo →
               </Link>
             </div>
           </section>

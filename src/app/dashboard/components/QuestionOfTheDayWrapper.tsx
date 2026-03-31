@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { Question } from "@/types/question";
 import { getQuestions } from "@/lib/cachedQueries";
+import { getServerTrack } from "@/lib/getServerTrack";
 
 // ─── Client interactive shell — lazy loaded, never SSR'd ─────────────────────
 
@@ -62,11 +63,12 @@ export function getQOTDStorageKey(dayIndex: number): string {
 async function QOTDContent() {
   let question;
   try {
-  const { questions } = await getQuestions({
-    filters: { status: "published", type: "theory" },
-    pageSize: 300,
-  }).catch(() => ({ questions: [] }));
-  
+    const track = await getServerTrack();
+    const { questions } = await getQuestions({
+      filters: { track, status: "published", type: "theory" },
+      pageSize: 300,
+    }).catch(() => ({ questions: [] }));
+
     question = pickQuestion(questions, getDayIndex());
   } catch (err) {
     // Graceful degradation — Firestore unavailable shouldn't crash the page
@@ -82,15 +84,17 @@ async function QOTDContent() {
   });
 
   return (
-    <QOTDInteractive
-      question={question}
-      storageKey={storageKey}
-      formattedDate={formattedDate}
-    />
+    <>
+      {question && (
+        <QOTDInteractive
+          question={question}
+          storageKey={storageKey}
+          formattedDate={formattedDate}
+        />
+      )}
+    </>
   );
 }
-
-
 
 export default function QuestionOfTheDay() {
   return (

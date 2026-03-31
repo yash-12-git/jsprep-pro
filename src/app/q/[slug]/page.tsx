@@ -16,6 +16,7 @@ import {
 } from "@/lib/seo/seo";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
 import { C } from "@/styles/tokens";
+import { getServerTrack } from "@/lib/getServerTrack";
 
 interface Props {
   params: { slug: string };
@@ -69,8 +70,8 @@ function markdownToHtml(text: string): string {
 
 export default async function QuestionPage({ params }: Props) {
   const question = await getQuestionBySlug(params.slug);
+  const track = await getServerTrack();
   if (!question) notFound();
-
   const dm = DIFF_STYLE[question.difficulty] ?? DIFF_STYLE.core;
   const catSlug = catToSlug(question.category);
   const isOutput = question.type === "output";
@@ -78,7 +79,7 @@ export default async function QuestionPage({ params }: Props) {
   const isTheory = question.type === "theory";
 
   const { questions: allTypeQs } = await getQuestions({
-    filters: { status: "published", type: question.type },
+    filters: { track, status: "published", type: question.type },
     pageSize: 300,
   });
   const related = allTypeQs

@@ -13,6 +13,7 @@ import { pageMeta, faqSchema, breadcrumbSchema } from "@/lib/seo/seo";
 import { TOPIC_FAQS } from "@/data/seo/topicFaqs";
 import TopicQuestionList from "./TopicQuestionList";
 import { C, TOPIC_DIFF_BG, TOPIC_DIFF_COLOR } from "@/styles/tokens";
+import { getServerTrack } from "@/lib/getServerTrack";
 
 export const revalidate = 3600;
 
@@ -22,8 +23,9 @@ interface Props {
 
 export async function generateStaticParams() {
   try {
-    const slugs = await getTopicSlugs();
-    return slugs.map((topic) => ({ topic }));
+    const track = await getServerTrack();
+    const slugs = await getTopicSlugs({ track });
+    return slugs?.map((topic) => ({ topic }));
   } catch {
     return [];
   }
@@ -99,9 +101,9 @@ function SectionHeading({
 export default async function TopicPage({ params }: Props) {
   const topic = await getTopicBySlug(params.topic);
   if (!topic) notFound();
-
+const track = await getServerTrack();
   const { questions } = await getQuestions({
-    filters: { status: "published", topicSlug: topic.slug },
+    filters: { track, status: "published", topicSlug: topic.slug },
     pageSize: 50,
     orderByField: "order",
     orderDir: "asc",

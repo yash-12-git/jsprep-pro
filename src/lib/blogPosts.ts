@@ -39,14 +39,15 @@ export async function getBlogPosts(filters: BlogPostFilters = {}): Promise<BlogP
   if (filters.status)    constraints.push(where('status',    '==', filters.status))
   if (filters.category)  constraints.push(where('category',  '==', filters.category))
   if (filters.topicSlug) constraints.push(where('topicSlug', '==', filters.topicSlug))
+  if (filters.track)     constraints.push(where('track',     '==', filters.track))
 
   constraints.push(orderBy('publishedAt', 'desc'))
   const snap = await getDocs(query(collection(db, COL), ...constraints))
   return snap.docs.map(d => ({ id: d.id, ...d.data() }) as BlogPost)
 }
 
-export async function getPublishedBlogPosts(): Promise<BlogPost[]> {
-  return getBlogPosts({ status: 'published' })
+export async function getPublishedBlogPosts({track}: {track?: string} = {}): Promise<BlogPost[]> {
+  return getBlogPosts({ status: 'published', track })
 }
 
 /** Slugs only — for generateStaticParams */

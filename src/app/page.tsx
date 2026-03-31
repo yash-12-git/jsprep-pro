@@ -10,7 +10,12 @@
 
 import { courseSchema, faqSchema } from "@/lib/seo/seo";
 import HomePageClient from "./HomePageClient";
-
+import { getServerTrack } from "@/lib/getServerTrack";
+import {
+  getPublishedBlogPosts,
+  getPublishedTopics,
+  getQuestions,
+} from "@/lib/cachedQueries";
 
 // ── FAQ data lives here so it's part of the server render ────────────────────
 const HOME_FAQ = [
@@ -42,7 +47,39 @@ const HOME_FAQ = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const track = await getServerTrack();
+  const [theory, output, debug, polyfill, topics, blogs] = await Promise.all([
+    getQuestions({
+      filters: { track, status: "published", type: "theory" },
+      pageSize: 300,
+    }).catch(() => ({ questions: [] })),
+    getQuestions({
+      filters: { track, status: "published", type: "output" },
+      pageSize: 300,
+    }).catch(() => ({ questions: [] })),
+    getQuestions({
+      filters: { track, status: "published", type: "debug" },
+      pageSize: 300,
+    }).catch(() => ({ questions: [] })),
+    getQuestions({
+      filters: { track, status: "published", type: "polyfill" },
+      pageSize: 300,
+    }).catch(() => ({ questions: [] })),
+    getPublishedTopics({ track }),
+    getPublishedBlogPosts({ track }),
+  ]);
+
+  const homepageProps = {
+    track,
+    theory: theory.questions,
+    debug: debug.questions,
+    output: output.questions,
+    polyfill: polyfill.questions,
+    topics,
+    blogs,
+  };
+
   return (
     <>
       {/* Schema injected server-side — crawlers see this immediately */}

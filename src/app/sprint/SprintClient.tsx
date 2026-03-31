@@ -4,7 +4,6 @@
 import { css, keyframes } from "@emotion/react";
 import { useState, useRef, useCallback } from "react";
 import { Loader2 } from "lucide-react";
-import { useAllQuestions } from "@/contexts/QuestionsContext";
 import { awardProgressXP } from "@/lib/userProgress";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -143,11 +142,16 @@ function computeInsights(results: QuestionResult[]) {
 interface Props {
   uid?: string | null;
   isPro?: boolean;
+  allQuestions?: {
+    theory: Question[];
+    output: Question[];
+    debug: Question[];
+  }
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function SprintClient({ uid, isPro }: Props) {
+export default function SprintClient({ uid, isPro , allQuestions }: Props) {
   const [phase, setPhase] = useState<
     "lobby" | "loading" | "active" | "results"
   >("lobby");
@@ -161,23 +165,16 @@ export default function SprintClient({ uid, isPro }: Props) {
   const startTimeRef = useRef<number>(0);
 
   const {
-    theoryQs: ctxTheoryQs,
-    outputQs: ctxOutputQs,
-    debugQs: ctxDebugQs,
-    loading: qLoading,
-  } = useAllQuestions();
+    theory: ctxTheoryQs,
+    output: ctxOutputQs,
+    debug: ctxDebugQs
+  } = allQuestions ?? { theory: [], output: [], debug: [] };
 
   // ── Load and start ──────────────────────────────────────────────────────────
 
   function loadAndStart(cfg: SprintConfig) {
     setConfig(cfg);
     setLoadError(null);
-    if (qLoading) {
-      setLoadError(
-        "Questions are still loading, please try again in a moment.",
-      );
-      return;
-    }
     if (!ctxTheoryQs.length && !ctxOutputQs.length && !ctxDebugQs.length) {
       setLoadError("No questions found. Make sure questions are published.");
       return;

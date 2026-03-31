@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { pageMeta, SITE } from "@/lib/seo/seo";
 import SprintWrapper from "./SprintWrapper";
+import { getServerTrack } from "@/lib/getServerTrack";
+import { getQuestions } from "@/lib/cachedQueries";
 
 export const metadata: Metadata = pageMeta({
   title: "JavaScript Interview Sprint — Are You Truly Interview Ready?",
@@ -9,6 +11,26 @@ export const metadata: Metadata = pageMeta({
   path: `/sprint`,
 });
 
-export default function SprintPage() {
-  return <SprintWrapper />;
+export default async function SprintPage() {
+  const track = await getServerTrack();
+  const [theory, output, debug] = await Promise.all([
+    getQuestions({
+      filters: { track, status: "published", type: "theory" },
+      pageSize: 300,
+    }).catch(() => ({ questions: [] })),
+    getQuestions({
+      filters: { track, status: "published", type: "output" },
+      pageSize: 300,
+    }).catch(() => ({ questions: [] })),
+    getQuestions({
+      filters: { track, status: "published", type: "debug" },
+      pageSize: 300,
+    }).catch(() => ({ questions: [] })),
+  ]);
+  const allQuestions = {
+    theory: theory.questions,
+    debug: debug.questions,
+    output: output.questions,
+  };
+  return <SprintWrapper allQuestions={allQuestions} />;
 }

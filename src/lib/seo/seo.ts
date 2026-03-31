@@ -82,18 +82,6 @@ export function pageMeta(opts: PageMetaOptions): Metadata {
   } = opts;
 
   const url = `${SITE.domain}${path}`;
-
-  // ── CHANGE 3a: fullTitle logic ──────────────────────────────
-  // BEFORE:
-  //   const fullTitle = title.includes('JSPrep') ? title : `${title} | JSPrep Pro`
-  //
-  // Problems:
-  //   - Pipe ( | ) separator is outdated — Google prefers hyphens ( — )
-  //   - Title template should be: "Topic — JSPrep Pro", not "Topic | JSPrep Pro"
-  //   - The check `title.includes('JSPrep')` prevents the template applying when
-  //     a page explicitly passes a full title — that's fine, keep the intent
-  //
-  // ✅ FIXED:
   const fullTitle = title.includes("JSPrep") ? title : `${title} — JSPrep Pro`;
 
   const image = opts.image ?? `${SITE.domain}/og-default.png`;

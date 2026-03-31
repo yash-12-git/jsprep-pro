@@ -30,6 +30,8 @@ import { useState, useRef, useEffect } from "react";
 import * as S from "./styles";
 import { useTheme } from "@/contexts/ThemeContext";
 import { C, RADIUS } from "@/styles/tokens";
+import TrackSwitcher from "../ui/TrackSwitcher";
+import { useTrack } from "@/contexts/TrackContext";
 
 // ─── Local-only styles (not in styles.ts) ─────────────────────────────────────
 
@@ -221,27 +223,35 @@ const AI_LINKS = [
   },
 ];
 
-const LEARN_LINKS = [
+const LEARN_LINKS = (track: string) => [
   {
-    href: "/topics",
+    href: `/topics/${track}`,
     label: "Interview Topics",
     icon: Layers,
     desc: "36 concept pages",
   },
+  ...(track === "javascript"
+    ? [
+        {
+          href: "/javascript-output-questions",
+          label: "Output Questions",
+          icon: Code2,
+          desc: "Predict the console.log",
+        },
+      ]
+    : []),
+  ...(track === "javascript"
+    ? [
+        {
+          href: "/javascript-tricky-questions",
+          label: "Tricky Questions",
+          icon: Zap,
+          desc: "[] == false explained",
+        },
+      ]
+    : []),
   {
-    href: "/javascript-output-questions",
-    label: "Output Questions",
-    icon: Code2,
-    desc: "Predict the console.log",
-  },
-  {
-    href: "/javascript-tricky-questions",
-    label: "Tricky Questions",
-    icon: Zap,
-    desc: "[] == false explained",
-  },
-  {
-    href: "/blog",
+    href: `/blog/${track}`,
     label: "Blog",
     icon: Newspaper,
     desc: "Deep dives & guides",
@@ -253,6 +263,7 @@ const LEARN_LINKS = [
 export default function Navbar() {
   const { user, progress, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const { track } = useTrack();
   const path = usePathname();
 
   // Desktop dropdowns
@@ -289,7 +300,7 @@ export default function Navbar() {
     setOpen((prev) => (prev === menu ? null : menu));
 
   const isAiActive = AI_LINKS.some((l) => path === l.href);
-  const isLearnActive = LEARN_LINKS.some((l) => path.startsWith(l.href));
+  const isLearnActive = LEARN_LINKS(track).some((l) => path.startsWith(l.href));
 
   const learnColor = isDark ? "#22a08a" : C.green;
   const aiColor = isDark ? "#4ea1f3" : C.accentText;
@@ -321,6 +332,8 @@ export default function Navbar() {
               </span>
             </Link>
 
+            <TrackSwitcher />
+
             {/* Learn ▾ — always visible */}
             <div css={S.learnDropdownWrapper} ref={learnRef}>
               <button
@@ -335,25 +348,27 @@ export default function Navbar() {
               </button>
               {open === "learn" && (
                 <div css={S.learnDropdownMenu}>
-                  {LEARN_LINKS.map(({ href, label, icon: Icon, desc }) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      css={[
-                        S.learnDropdownItem,
-                        path.startsWith(href) && S.learnDropdownItemActive,
-                      ]}
-                      onClick={() => setOpen(null)}
-                    >
-                      <div css={S.learnIconBadge}>
-                        <Icon size={13} color={learnColor} />
-                      </div>
-                      <div>
-                        <span css={S.learnDropdownLabel}>{label}</span>
-                        <span css={S.learnDropdownDesc}>{desc}</span>
-                      </div>
-                    </Link>
-                  ))}
+                  {LEARN_LINKS(track).map(
+                    ({ href, label, icon: Icon, desc }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        css={[
+                          S.learnDropdownItem,
+                          path.startsWith(href) && S.learnDropdownItemActive,
+                        ]}
+                        onClick={() => setOpen(null)}
+                      >
+                        <div css={S.learnIconBadge}>
+                          <Icon size={13} color={learnColor} />
+                        </div>
+                        <div>
+                          <span css={S.learnDropdownLabel}>{label}</span>
+                          <span css={S.learnDropdownDesc}>{desc}</span>
+                        </div>
+                      </Link>
+                    ),
+                  )}
                 </div>
               )}
             </div>
@@ -721,7 +736,10 @@ export default function Navbar() {
             {/* Main nav */}
             <Link
               href="/dashboard"
-              css={[S.mobileNavLink, path === "/dashboard" && S.mobileNavLinkActive]}
+              css={[
+                S.mobileNavLink,
+                path === "/dashboard" && S.mobileNavLinkActive,
+              ]}
             >
               <LayoutDashboard size={16} /> Home
             </Link>
@@ -759,7 +777,7 @@ export default function Navbar() {
             <hr css={S.mobileDivider} />
             <p css={S.mobileSectionLabel}>Learn</p>
 
-            {LEARN_LINKS.map(({ href, label, icon: Icon, desc }) => (
+            {LEARN_LINKS(track).map(({ href, label, icon: Icon, desc }) => (
               <Link
                 key={href}
                 href={href}

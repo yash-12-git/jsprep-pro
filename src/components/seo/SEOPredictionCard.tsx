@@ -105,7 +105,7 @@ export default function SEOPredictionCard({
   const ds = q.difficulty
     ? (DIFF_STYLE[q.difficulty] ?? DIFF_STYLE.medium)
     : DIFF_STYLE.medium;
-  const expectedRows = Math.max(3, q.answer.split("\n").length + 1);
+  const expectedRows = Math.max(3, q?.answer?.split("\n").length + 1);
 
   // Card border signals state
   const cardBorder =

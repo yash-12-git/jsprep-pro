@@ -12,6 +12,7 @@ import {
 import type { Question } from "@/types/question";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
 import { C, RADIUS } from "@/styles/tokens";
+import { getServerTrack } from "@/lib/getServerTrack";
 
 interface Props {
   params: { slug: string };
@@ -37,8 +38,9 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const track = await getServerTrack();
   const { questions: qs } = await getQuestions({
-    filters: { status: "published", type: "theory" },
+    filters: { track, status: "published", type: "theory" },
     pageSize: 300,
   }).catch(() => ({ questions: [] }));
   const cats = [...new Set(qs.map((q: any) => q.category))];
@@ -56,8 +58,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryQuestionsPage({ params }: Props) {
+  const track = await getServerTrack();
   const { questions: allTheory } = await getQuestions({
-    filters: { status: "published", type: "theory" },
+    filters: { track, status: "published", type: "theory" },
     pageSize: 300,
   }).catch(() => ({ questions: [] }));
 

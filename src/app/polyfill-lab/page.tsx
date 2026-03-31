@@ -1,255 +1,27 @@
-/** @jsxImportSource @emotion/react */
-"use client";
+import { getQuestions } from "@/lib/cachedQueries";
+import { getServerTrack } from "@/lib/getServerTrack";
+import PolyfillLabClientPage from "./PolyfillClientWrapper";
+import { pageMeta } from "@/lib/seo/seo";
+import { Metadata } from "next";
 
-import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { css } from "@emotion/react";
-import { FlaskConical } from "lucide-react";
-import { C, RADIUS } from "@/styles/tokens";
-import * as Shared from "@/styles/shared";
-import { useAuth } from "@/hooks/useAuth";
-import PolyfillCard from "@/components/ui/QuestionCards/PolyfillCard";
-import PaywallBanner from "@/components/ui/PaywallBanner/page";
-import { useAllQuestions } from "@/contexts/QuestionsContext";
-import { useCategories, useUserProgress } from "@/hooks/useQuestions";
-import PageGuard from "@/components/ui/PageGuard";
-import { usePagination } from "@/hooks/usePagination";
-import PaginationControls from "@/components/ui/PaginationControls";
-import CategoryFilter, {
-  defaultFilters,
-  type FilterState,
-} from "@/app/theory/CategoryFilter";
+export const metadata: Metadata = pageMeta({
+  title: "JavaScript Polyfill Lab — Master JS Concepts by Building Polyfills | JSPrep Pro",
+  description: "Dive into the JavaScript Polyfill Lab on JSPrep Pro. Learn by building polyfills for modern JavaScript features, enhancing your understanding of core concepts and improving your coding skills. Start mastering JavaScript today!",
+  path: `/polyfill-lab`,
+});
 
-const FREE_LIMIT = 5;
-const PAGE_SIZE = 10;
+export default async function PolyfillLabPage() {
+  const track = await getServerTrack();
+  const { questions } = await getQuestions({
+    filters: { track, status: "published", type: "polyfill" },
+    pageSize: 300,
+  });
 
-const COMPANIES = [
-  "Razorpay",
-  "Flipkart",
-  "Google",
-  "Amazon",
-  "Atlassian",
-  "Microsoft",
-  "CRED",
-  "Swiggy",
-];
-
-const companyStrip = css`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.25rem;
-`;
-const coBadge = css`
-  font-size: 0.8125rem;
-  font-weight: 600;
-  padding: 0.25rem 0.75rem;
-  background: ${C.bgSubtle};
-  border: 1px solid ${C.border};
-  border-radius: 9999px;
-  color: ${C.text};
-`;
-
-export default function PolyfillLabPage() {
-  const { user, progress, loading: authLoading } = useAuth();
-  const router = useRouter();
-
-  const { polyfillQs: questions, loading: qLoading } = useAllQuestions();
-  const { categories } = useCategories("polyfill", "javascript");
-  const {
-    isSolved,
-    isRevealed,
-    recordSolved,
-    recordRevealed,
-    solvedIds,
-    bookmarkIds,
-  } = useUserProgress({ uid: user?.uid ?? null });
-
-  const [filters, setFilters] = useState<FilterState>(defaultFilters());
-  const [showPaywall, setShowPaywall] = useState(false);
-
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/auth");
-  }, [user, authLoading, router]);
-
-  const bookmarkedSet = useMemo(
-    () => new Set(bookmarkIds ?? []),
-    [bookmarkIds],
-  );
-
-  const filtered = useMemo(() => {
-    let qs = questions;
-
-    if (filters.showBookmarked) {
-      return qs.filter((q) => bookmarkedSet.has(q.id));
-    }
-    if (filters.category !== "All") {
-      qs = qs.filter((q) => q.category === filters.category);
-    }
-    if (filters.difficulty !== "all") {
-      qs = qs.filter((q) => q.difficulty === filters.difficulty);
-    }
-    if (filters.search.trim()) {
-      const term = filters.search.toLowerCase();
-      qs = qs.filter(
-        (q) =>
-          q.title.toLowerCase().includes(term) ||
-          q.category.toLowerCase().includes(term) ||
-          (q.tags ?? []).some((t) => t.toLowerCase().includes(term)),
-      );
-    }
-    return qs;
-  }, [questions, filters, bookmarkedSet]);
-
-  const { page, totalPages, paginated, goPage } = usePagination(
-    filtered,
-    PAGE_SIZE,
-  );
-
-  const isPro = progress?.isPro ?? false;
-  const solvedCount = solvedIds.filter((id) =>
-    questions.some((q) => q.id === id),
-  ).length;
-  const pct =
-    questions.length > 0
-      ? Math.round((solvedCount / questions.length) * 100)
-      : 0;
+  const categories = Array.from(
+    new Set(questions.map((q) => q.category)),
+  ).sort();
 
   return (
-    <PageGuard loading={authLoading || !user || !progress} ready={!!progress}>
-      <>
-        {showPaywall && (
-          <PaywallBanner
-            reason={`Free users can attempt the first ${FREE_LIMIT} polyfill questions. Upgrade for all!`}
-            onClose={() => setShowPaywall(false)}
-          />
-        )}
-
-        <div css={Shared.pageWrapper}>
-          <div css={Shared.pageHeader}>
-            <div css={Shared.pageHeaderTop}>
-              <div css={Shared.iconBox(C.green)}>
-                <FlaskConical size={18} color={C.green} />
-              </div>
-              <div>
-                <h1 css={Shared.pageTitleText}>Polyfill Lab</h1>
-                <p css={Shared.pageSubtitleText}>
-                  Implement JavaScript built-ins from scratch —{" "}
-                  {questions.length} challenges. Array.map, Function.bind,
-                  Promise.all, debounce, curry, EventEmitter and more.
-                </p>
-              </div>
-            </div>
-            <div css={Shared.pageProgressRow}>
-              <div css={Shared.progressBarTrack}>
-                <div css={Shared.progressBarFill(pct)} />
-              </div>
-              <span css={Shared.pageProgressCount(C.green)}>
-                {solvedCount}/{questions.length} solved
-              </span>
-            </div>
-          </div>
-
-          {/* Company strip — unique to Polyfill */}
-          <div css={companyStrip}>
-            <span
-              css={{
-                fontSize: "0.75rem",
-                color: C.muted,
-                fontWeight: 600,
-                whiteSpace: "nowrap",
-              }}
-            >
-              🏢 Asked at:
-            </span>
-            {COMPANIES.map((c) => (
-              <span key={c} css={coBadge}>
-                {c}
-              </span>
-            ))}
-          </div>
-
-          <CategoryFilter
-            categories={categories}
-            filters={filters}
-            onChange={setFilters}
-            totalShown={filtered.length}
-            totalAll={questions.length}
-            bookmarkCount={bookmarkIds?.length ?? 0}
-            loading={qLoading}
-          />
-
-          {qLoading && (
-            <div
-              css={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
-            >
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  css={{
-                    height: "5rem",
-                    borderRadius: RADIUS.lg,
-                    background: C.bgSubtle,
-                    border: `1px solid ${C.border}`,
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {!qLoading && (
-            <PaginationControls
-              page={page}
-              totalPages={totalPages}
-              totalItems={filtered.length}
-              itemLabel="challenge"
-              onPage={goPage}
-            >
-              <div
-                css={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.75rem",
-                }}
-              >
-                {paginated.map((q) => {
-                  const globalIdx = questions.indexOf(q);
-                  return (
-                    <PolyfillCard
-                      key={q.id}
-                      q={q}
-                      index={globalIdx}
-                      isSolved={isSolved}
-                      isRevealed={isRevealed}
-                      recordSolved={recordSolved}
-                      recordRevealed={recordRevealed}
-                      isLocked={!isPro && globalIdx >= FREE_LIMIT}
-                      isPro={isPro}
-                      onPaywall={() => setShowPaywall(true)}
-                    />
-                  );
-                })}
-              </div>
-            </PaginationControls>
-          )}
-
-          {!isPro && (
-            <div css={Shared.proNudge}>
-              <span>
-                🔒 First {FREE_LIMIT} challenges free —{" "}
-                {questions.length - FREE_LIMIT} more with Pro
-              </span>
-              <button
-                css={Shared.upgradeBtn}
-                onClick={() => setShowPaywall(true)}
-              >
-                Unlock All {questions.length} →
-              </button>
-            </div>
-          )}
-        </div>
-      </>
-    </PageGuard>
+    <PolyfillLabClientPage questions={questions} categories={categories} />
   );
 }
