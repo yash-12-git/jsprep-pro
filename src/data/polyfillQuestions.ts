@@ -1,6 +1,7 @@
 /**
- * src/data/polyfillQuestions.ts
- * 25 polyfill implementation questions.
+ * src/data/reactPolyfillQuestions.ts
+ * 25 React implementation questions — pure JS, runnable in iframe sandbox.
+ * Each question implements a React concept from scratch without React.
  * Sandbox contract: stubCode + testCode concatenated → runs in iframe
  * testCode logs "PASS: X" or "FAIL: X — reason" only
  */
@@ -8,11 +9,11 @@
 export interface PolyfillQuestion {
   id: number;
   cat:
-    | "Array Methods"
-    | "Function Methods"
-    | "Promise Methods"
-    | "Utility Functions"
-    | "Object Methods";
+    | "Hooks Implementation"
+    | "State Management"
+    | "Component Patterns"
+    | "React Utilities"
+    | "Virtual DOM";
   difficulty: "easy" | "medium" | "hard";
   title: string;
   description: string;
@@ -24,549 +25,1829 @@ export interface PolyfillQuestion {
   keyInsight: string;
   companies: string[];
   tags: string[];
-  answer?: string; // for future use if we want to show reference answer in Markdown format
+  answer?: string;
 }
 
 export const POLYFILL_CATEGORIES = [
-  "Array Methods",
-  "Function Methods",
-  "Promise Methods",
-  "Utility Functions",
-  "Object Methods",
+  "Hooks Implementation",
+  "State Management",
+  "Component Patterns",
+  "React Utilities",
+  "Virtual DOM",
 ] as const;
 
 export const polyfillQuestions: PolyfillQuestion[] = [
+
+  // ─── HOOKS IMPLEMENTATION ──────────────────────────────────────────────────
+
   {
-    id: 1001,
-    cat: "Array Methods",
+    id: 2001,
+    cat: "Hooks Implementation",
+    difficulty: "medium",
+    title: "Implement useState",
+    tags: ["useState", "hooks", "closure", "state"],
+    companies: ["Meta", "Google", "Razorpay", "Flipkart", "Microsoft"],
+    description:
+      "Implement a standalone useState(initialValue) that returns [value, setter]. The setter should accept either a new value or an updater function. Simulate React's hook call-order tracking using a module-level cursor.",
+    stubCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useState(initialValue) {
+  // Use the cursor to store state in hooks[]
+  // Return [currentValue, setter]
+  // Setter should accept value OR updater function
+}
+
+function resetCursor() { cursor = 0; }`,
+    solutionCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useState(initialValue) {
+  const idx = cursor++;
+  if (hooks[idx] === undefined) {
+    hooks[idx] = typeof initialValue === 'function' ? initialValue() : initialValue;
+  }
+  const setState = (newVal) => {
+    hooks[idx] = typeof newVal === 'function' ? newVal(hooks[idx]) : newVal;
+  };
+  return [hooks[idx], setState];
+}
+
+function resetCursor() { cursor = 0; }`,
+    testCode:
+      `(function() {
+  try {
+    resetCursor();
+    const [val, setVal] = useState(0);
+    console.log(val === 0 ? 'PASS: initial value' : 'FAIL: initial value — got ' + val);
+
+    setVal(5);
+    resetCursor();
+    const [val2] = useState(0);
+    console.log(val2 === 5 ? 'PASS: setter works' : 'FAIL: setter works — got ' + val2);
+
+    setVal(v => v + 10);
+    resetCursor();
+    const [val3] = useState(0);
+    console.log(val3 === 15 ? 'PASS: updater fn' : 'FAIL: updater fn — got ' + val3);
+
+    resetCursor();
+    const [a] = useState(100);
+    const [b] = useState(200);
+    console.log(a === 15 && b === 200 ? 'PASS: cursor isolation' : 'FAIL: cursor isolation — ' + a + ',' + b);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial value\nPASS: setter works\nPASS: updater fn\nPASS: cursor isolation",
+    explanation:
+      "Each useState call gets a slot in the hooks array indexed by cursor. The cursor must be reset before re-rendering (calling hooks again). This is exactly how React tracks hook state internally.",
+    keyInsight:
+      "React tracks hooks by call ORDER, not by name. The cursor (index) into a flat array is the entire tracking mechanism.",
+  },
+
+  {
+    id: 2002,
+    cat: "Hooks Implementation",
+    difficulty: "hard",
+    title: "Implement useReducer",
+    tags: ["useReducer", "hooks", "reducer", "dispatch"],
+    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
+    description:
+      "Implement useReducer(reducer, initialState). Returns [state, dispatch]. dispatch(action) should call reducer(currentState, action) and store the result. Support lazy initializer (third argument: initFn).",
+    stubCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useReducer(reducer, initialState, initFn) {
+  // initFn(initialState) is called if initFn is provided
+  // dispatch(action) → newState = reducer(currentState, action)
+}
+
+function resetCursor() { cursor = 0; }`,
+    solutionCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useReducer(reducer, initialState, initFn) {
+  const idx = cursor++;
+  if (hooks[idx] === undefined) {
+    hooks[idx] = initFn ? initFn(initialState) : initialState;
+  }
+  const dispatch = (action) => {
+    hooks[idx] = reducer(hooks[idx], action);
+  };
+  return [hooks[idx], dispatch];
+}
+
+function resetCursor() { cursor = 0; }`,
+    testCode:
+      `(function() {
+  try {
+    function counterReducer(state, action) {
+      switch(action.type) {
+        case 'INC': return { count: state.count + 1 };
+        case 'DEC': return { count: state.count - 1 };
+        case 'ADD': return { count: state.count + action.payload };
+        default: return state;
+      }
+    }
+
+    resetCursor();
+    const [state, dispatch] = useReducer(counterReducer, { count: 0 });
+    console.log(state.count === 0 ? 'PASS: initial state' : 'FAIL: initial state — got ' + state.count);
+
+    dispatch({ type: 'INC' });
+    dispatch({ type: 'INC' });
+    dispatch({ type: 'ADD', payload: 8 });
+    resetCursor();
+    const [state2] = useReducer(counterReducer, { count: 0 });
+    console.log(state2.count === 10 ? 'PASS: dispatch updates' : 'FAIL: dispatch updates — got ' + state2.count);
+
+    dispatch({ type: 'DEC' });
+    resetCursor();
+    const [state3] = useReducer(counterReducer, { count: 0 });
+    console.log(state3.count === 9 ? 'PASS: dec works' : 'FAIL: dec works — got ' + state3.count);
+
+    hooks = []; cursor = 0;
+    const [ls] = useReducer((s,a) => s, null, (init) => ({ value: init * 2 }), 5);
+    resetCursor();
+    const [ls2] = useReducer((s,a) => s, 5, (init) => ({ value: init * 2 }));
+    console.log(ls2.value === 10 ? 'PASS: lazy init' : 'FAIL: lazy init — got ' + JSON.stringify(ls2));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial state\nPASS: dispatch updates\nPASS: dec works\nPASS: lazy init",
+    explanation:
+      "useReducer stores state at cursor index. dispatch computes the next state by calling reducer(currentState, action) and stores it. The lazy initializer pattern avoids expensive computation on every render.",
+    keyInsight:
+      "useReducer = useState + externalized transition logic. dispatch is a stable function — reducer is the pure function that describes HOW state changes.",
+  },
+
+  {
+    id: 2003,
+    cat: "Hooks Implementation",
+    difficulty: "medium",
+    title: "Implement useRef",
+    tags: ["useRef", "hooks", "mutable", "ref"],
+    companies: ["Meta", "Flipkart", "Swiggy", "Microsoft"],
+    description:
+      "Implement useRef(initialValue). Returns a stable object { current: initialValue }. The SAME object must be returned on every call (same cursor slot). Mutating .current must NOT re-render (just store the value).",
+    stubCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useRef(initialValue) {
+  // Return the SAME {current} object every time for this cursor slot
+}
+
+function resetCursor() { cursor = 0; }`,
+    solutionCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useRef(initialValue) {
+  const idx = cursor++;
+  if (hooks[idx] === undefined) {
+    hooks[idx] = { current: initialValue };
+  }
+  return hooks[idx];
+}
+
+function resetCursor() { cursor = 0; }`,
+    testCode:
+      `(function() {
+  try {
+    resetCursor();
+    const ref = useRef(0);
+    console.log(ref.current === 0 ? 'PASS: initial value' : 'FAIL: initial value — got ' + ref.current);
+
+    ref.current = 42;
+    resetCursor();
+    const ref2 = useRef(0);
+    console.log(ref2.current === 42 ? 'PASS: mutation persists' : 'FAIL: mutation persists — got ' + ref2.current);
+
+    const refA = ref2;
+    resetCursor();
+    const ref3 = useRef(0);
+    console.log(ref3 === refA ? 'PASS: same object reference' : 'FAIL: same object reference');
+
+    resetCursor();
+    const r1 = useRef('a');
+    const r2 = useRef('b');
+    console.log(r1.current === 42 && r2.current === 'b' ? 'PASS: cursor isolation' : 'FAIL: cursor isolation — ' + r1.current + ',' + r2.current);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial value\nPASS: mutation persists\nPASS: same object reference\nPASS: cursor isolation",
+    explanation:
+      "useRef creates the ref object once and returns the exact same object on every render. This is why refs are stable — you're always reading/writing to the same box in memory, not a new one each render.",
+    keyInsight:
+      "useRef = a box (object) that persists for the lifetime of the component. Same identity every render. Mutating .current doesn't trigger re-render — no setState involved.",
+  },
+
+  {
+    id: 2004,
+    cat: "Hooks Implementation",
+    difficulty: "hard",
+    title: "Implement useMemo",
+    tags: ["useMemo", "hooks", "memoization", "deps"],
+    companies: ["Meta", "Google", "Atlassian", "CRED"],
+    description:
+      "Implement useMemo(factory, deps). Recomputes only when deps change (shallow comparison). Returns cached value otherwise. On first call always compute.",
+    stubCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useMemo(factory, deps) {
+  // Store { value, deps } at cursor slot
+  // Recompute only if deps changed (shallow array compare)
+}
+
+function resetCursor() { cursor = 0; }`,
+    solutionCode:
+      `let hooks = [];
+let cursor = 0;
+
+function shallowEqualDeps(a, b) {
+  if (a === b) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((dep, i) => dep === b[i]);
+}
+
+function useMemo(factory, deps) {
+  const idx = cursor++;
+  const prev = hooks[idx];
+  if (!prev || !shallowEqualDeps(prev.deps, deps)) {
+    hooks[idx] = { value: factory(), deps };
+  }
+  return hooks[idx].value;
+}
+
+function resetCursor() { cursor = 0; }`,
+    testCode:
+      `(function() {
+  try {
+    let computeCount = 0;
+    const expensive = (n) => { computeCount++; return n * 2; };
+
+    resetCursor();
+    const v1 = useMemo(() => expensive(5), [5]);
+    console.log(v1 === 10 ? 'PASS: initial compute' : 'FAIL: initial compute — got ' + v1);
+    console.log(computeCount === 1 ? 'PASS: computed once' : 'FAIL: computed once — count=' + computeCount);
+
+    resetCursor();
+    const v2 = useMemo(() => expensive(5), [5]);
+    console.log(computeCount === 1 ? 'PASS: cached on same deps' : 'FAIL: cached — count=' + computeCount);
+    console.log(v2 === 10 ? 'PASS: returns cached value' : 'FAIL: returns cached — got ' + v2);
+
+    resetCursor();
+    const v3 = useMemo(() => expensive(7), [7]);
+    console.log(computeCount === 2 ? 'PASS: recomputes on dep change' : 'FAIL: recomputes — count=' + computeCount);
+    console.log(v3 === 14 ? 'PASS: new value' : 'FAIL: new value — got ' + v3);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial compute\nPASS: computed once\nPASS: cached on same deps\nPASS: returns cached value\nPASS: recomputes on dep change\nPASS: new value",
+    explanation:
+      "Store both the computed value and the deps array. On subsequent calls, compare old deps to new deps element-by-element. Only recompute if any dep changed.",
+    keyInsight:
+      "Deps comparison is SHALLOW and by reference — [5] !== [5] as new array instances but the dep VALUES (5===5) match. Compare element-by-element with ===, not the array itself.",
+  },
+
+  {
+    id: 2005,
+    cat: "Hooks Implementation",
+    difficulty: "hard",
+    title: "Implement useCallback",
+    tags: ["useCallback", "hooks", "memoization", "function"],
+    companies: ["Meta", "Google", "Flipkart", "Razorpay"],
+    description:
+      "Implement useCallback(fn, deps). Returns the same function reference if deps haven't changed. This is identical to useMemo(() => fn, deps) under the hood.",
+    stubCode:
+      `let hooks = [];
+let cursor = 0;
+
+function shallowEqualDeps(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((dep, i) => dep === b[i]);
+}
+
+function useCallback(fn, deps) {
+  // Hint: this is just useMemo returning fn instead of fn()
+}
+
+function resetCursor() { cursor = 0; }`,
+    solutionCode:
+      `let hooks = [];
+let cursor = 0;
+
+function shallowEqualDeps(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((dep, i) => dep === b[i]);
+}
+
+function useCallback(fn, deps) {
+  const idx = cursor++;
+  const prev = hooks[idx];
+  if (!prev || !shallowEqualDeps(prev.deps, deps)) {
+    hooks[idx] = { fn, deps };
+  }
+  return hooks[idx].fn;
+}
+
+function resetCursor() { cursor = 0; }`,
+    testCode:
+      `(function() {
+  try {
+    const handler = (x) => x * 2;
+
+    resetCursor();
+    const cb1 = useCallback(handler, [1]);
+    console.log(typeof cb1 === 'function' ? 'PASS: returns function' : 'FAIL: returns function');
+    console.log(cb1(5) === 10 ? 'PASS: function works' : 'FAIL: function works — got ' + cb1(5));
+
+    resetCursor();
+    const cb2 = useCallback(handler, [1]);
+    console.log(cb1 === cb2 ? 'PASS: same ref on same deps' : 'FAIL: same ref on same deps');
+
+    resetCursor();
+    const handler2 = (x) => x * 3;
+    const cb3 = useCallback(handler2, [2]);
+    console.log(cb3 !== cb1 ? 'PASS: new ref on dep change' : 'FAIL: new ref on dep change');
+    console.log(cb3(5) === 15 ? 'PASS: new fn works' : 'FAIL: new fn works — got ' + cb3(5));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: returns function\nPASS: function works\nPASS: same ref on same deps\nPASS: new ref on dep change\nPASS: new fn works",
+    explanation:
+      "useCallback stores the function reference alongside deps. Returns the stored function if deps match. useCallback(fn, deps) is literally useMemo(() => fn, deps) — the only difference is we store fn directly, not fn().",
+    keyInsight:
+      "useCallback(fn, deps) === useMemo(() => fn, deps). React's source code implements useCallback this way. The function identity (===) is what React.memo and useEffect dep arrays check.",
+  },
+
+  {
+    id: 2006,
+    cat: "Hooks Implementation",
+    difficulty: "hard",
+    title: "Implement useEffect with cleanup",
+    tags: ["useEffect", "hooks", "lifecycle", "cleanup", "deps"],
+    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
+    description:
+      "Implement useEffect(effect, deps). Run the effect when deps change. If the effect returns a function, call it as cleanup BEFORE the next effect runs. Support three modes: no deps array (every run), empty array (once), and dep array.",
+    stubCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useEffect(effect, deps) {
+  // Store { deps, cleanup } at cursor slot
+  // Run cleanup from previous effect before running new one
+  // deps === undefined → always run
+  // deps === [] → run once
+  // deps changed → run
+}
+
+function resetCursor() { cursor = 0; }
+function runEffects() {
+  // In real React, effects run after paint. Here, call this manually.
+  // This function does NOT need implementation — effects run inline above.
+}`,
+    solutionCode:
+      `let hooks = [];
+let cursor = 0;
+
+function shallowEqualDeps(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((dep, i) => dep === b[i]);
+}
+
+function useEffect(effect, deps) {
+  const idx = cursor++;
+  const prev = hooks[idx];
+  const shouldRun = !prev || deps === undefined || !shallowEqualDeps(prev.deps, deps);
+
+  if (shouldRun) {
+    if (prev && typeof prev.cleanup === 'function') {
+      prev.cleanup();
+    }
+    const cleanup = effect();
+    hooks[idx] = { deps, cleanup: typeof cleanup === 'function' ? cleanup : null };
+  }
+}
+
+function resetCursor() { cursor = 0; }`,
+    testCode:
+      `(function() {
+  try {
+    let log = [];
+
+    // Test 1: runs on first call
+    resetCursor();
+    useEffect(() => { log.push('run1'); }, [1]);
+    console.log(log[log.length-1] === 'run1' ? 'PASS: runs initially' : 'FAIL: runs initially');
+
+    // Test 2: skips when deps unchanged
+    resetCursor();
+    useEffect(() => { log.push('run2'); }, [1]);
+    console.log(log.length === 1 ? 'PASS: skips same deps' : 'FAIL: skips same deps — length=' + log.length);
+
+    // Test 3: runs when deps change
+    resetCursor();
+    useEffect(() => { log.push('run3'); }, [2]);
+    console.log(log[log.length-1] === 'run3' ? 'PASS: runs on dep change' : 'FAIL: runs on dep change');
+
+    // Test 4: cleanup called before re-run
+    let cleanupCount = 0;
+    hooks = []; cursor = 0;
+    resetCursor();
+    useEffect(() => { return () => cleanupCount++; }, ['a']);
+    resetCursor();
+    useEffect(() => { return () => cleanupCount++; }, ['b']);
+    console.log(cleanupCount === 1 ? 'PASS: cleanup on dep change' : 'FAIL: cleanup on dep change — count=' + cleanupCount);
+
+    // Test 5: no deps = always run
+    let alwaysCount = 0;
+    hooks = []; cursor = 0;
+    resetCursor(); useEffect(() => { alwaysCount++; });
+    resetCursor(); useEffect(() => { alwaysCount++; });
+    resetCursor(); useEffect(() => { alwaysCount++; });
+    console.log(alwaysCount === 3 ? 'PASS: no deps runs always' : 'FAIL: no deps — count=' + alwaysCount);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: runs initially\nPASS: skips same deps\nPASS: runs on dep change\nPASS: cleanup on dep change\nPASS: no deps runs always",
+    explanation:
+      "Each slot stores the previous deps and cleanup function. Before running a new effect, check if deps changed. If so, call the old cleanup first, then run the new effect and store its cleanup.",
+    keyInsight:
+      "Cleanup runs BEFORE the next effect, not after. This is why cleanup order matters — it tears down the previous subscription before setting up the new one.",
+  },
+
+  {
+    id: 2007,
+    cat: "Hooks Implementation",
+    difficulty: "medium",
+    title: "Implement usePrevious custom hook",
+    tags: ["usePrevious", "useRef", "custom-hook", "hooks"],
+    companies: ["Flipkart", "Swiggy", "CRED", "Razorpay"],
+    description:
+      "Implement usePrevious(value) using useRef. Returns the value from the PREVIOUS call. On first call returns undefined. The ref should update AFTER returning the previous value (simulating useEffect timing).",
+    stubCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useRef(initialValue) {
+  const idx = cursor++;
+  if (hooks[idx] === undefined) hooks[idx] = { current: initialValue };
+  return hooks[idx];
+}
+
+function usePrevious(value) {
+  // Use useRef to track the previous value
+  // Return previous, then update the ref
+}
+
+function resetCursor() { cursor = 0; }`,
+    solutionCode:
+      `let hooks = [];
+let cursor = 0;
+
+function useRef(initialValue) {
+  const idx = cursor++;
+  if (hooks[idx] === undefined) hooks[idx] = { current: initialValue };
+  return hooks[idx];
+}
+
+function usePrevious(value) {
+  const ref = useRef(undefined);
+  const prev = ref.current;
+  ref.current = value;
+  return prev;
+}
+
+function resetCursor() { cursor = 0; }`,
+    testCode:
+      `(function() {
+  try {
+    resetCursor();
+    const p1 = usePrevious(10);
+    console.log(p1 === undefined ? 'PASS: first call undefined' : 'FAIL: first call — got ' + p1);
+
+    resetCursor();
+    const p2 = usePrevious(20);
+    console.log(p2 === 10 ? 'PASS: returns previous' : 'FAIL: returns previous — got ' + p2);
+
+    resetCursor();
+    const p3 = usePrevious(30);
+    console.log(p3 === 20 ? 'PASS: tracks updates' : 'FAIL: tracks updates — got ' + p3);
+
+    resetCursor();
+    const p4 = usePrevious(30);
+    console.log(p4 === 30 ? 'PASS: same value tracked' : 'FAIL: same value — got ' + p4);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: first call undefined\nPASS: returns previous\nPASS: tracks updates\nPASS: same value tracked",
+    explanation:
+      "Store the current value in a ref. On each call, read the ref (previous value), then update the ref to the new value. Return what you read — not what you just stored.",
+    keyInsight:
+      "usePrevious = read first, write second. This is a common interview question that tests understanding of ref timing: ref.current = value updates AFTER the return.",
+  },
+
+  // ─── STATE MANAGEMENT ─────────────────────────────────────────────────────
+
+  {
+    id: 2008,
+    cat: "State Management",
+    difficulty: "medium",
+    title: "Implement a Redux-like createStore",
+    tags: ["redux", "createStore", "store", "subscribe"],
+    companies: ["Meta", "Google", "Flipkart", "Amazon", "Razorpay"],
+    description:
+      "Implement createStore(reducer, initialState). The store must have: getState(), dispatch(action), and subscribe(listener). subscribe returns an unsubscribe function. Listeners are called after every dispatch.",
+    stubCode:
+      `function createStore(reducer, initialState) {
+  // Return { getState, dispatch, subscribe }
+  // subscribe(listener) → returns unsubscribe fn
+  // All listeners called after each dispatch
+}`,
+    solutionCode:
+      `function createStore(reducer, initialState) {
+  let state = initialState;
+  const listeners = new Set();
+
+  function getState() {
+    return state;
+  }
+
+  function dispatch(action) {
+    state = reducer(state, action);
+    listeners.forEach(l => l());
+  }
+
+  function subscribe(listener) {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  }
+
+  // Dispatch init action to populate state if reducer has defaults
+  dispatch({ type: '@@INIT' });
+
+  return { getState, dispatch, subscribe };
+}`,
+    testCode:
+      `(function() {
+  try {
+    function counterReducer(state = { count: 0 }, action) {
+      switch(action.type) {
+        case 'INC': return { count: state.count + 1 };
+        case 'DEC': return { count: state.count - 1 };
+        default: return state;
+      }
+    }
+
+    const store = createStore(counterReducer);
+    console.log(store.getState().count === 0 ? 'PASS: initial state' : 'FAIL: initial state — ' + store.getState().count);
+
+    store.dispatch({ type: 'INC' });
+    store.dispatch({ type: 'INC' });
+    console.log(store.getState().count === 2 ? 'PASS: dispatch updates' : 'FAIL: dispatch — got ' + store.getState().count);
+
+    let notified = 0;
+    const unsub = store.subscribe(() => notified++);
+    store.dispatch({ type: 'INC' });
+    console.log(notified === 1 ? 'PASS: subscriber notified' : 'FAIL: subscriber — count=' + notified);
+
+    unsub();
+    store.dispatch({ type: 'INC' });
+    console.log(notified === 1 ? 'PASS: unsubscribe works' : 'FAIL: unsubscribe — count=' + notified);
+
+    console.log(store.getState().count === 4 ? 'PASS: state still updates after unsub' : 'FAIL: state — got ' + store.getState().count);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial state\nPASS: dispatch updates\nPASS: subscriber notified\nPASS: unsubscribe works\nPASS: state still updates after unsub",
+    explanation:
+      "Store holds state, a Set of listeners, and exposes three methods. dispatch runs the reducer then notifies all subscribers. subscribe adds to the Set and returns a closure that removes from it.",
+    keyInsight:
+      "Using a Set for listeners prevents duplicate subscriptions and makes unsubscribe O(1). The @@INIT dispatch initializes the reducer's default state.",
+  },
+
+  {
+    id: 2009,
+    cat: "State Management",
+    difficulty: "hard",
+    title: "Implement Redux applyMiddleware",
+    tags: ["redux", "middleware", "applyMiddleware", "compose"],
+    companies: ["Meta", "Google", "Atlassian", "CRED"],
+    description:
+      "Implement applyMiddleware(...middlewares). Each middleware receives { getState, dispatch } and returns next => action => result. The middleware chain wraps the store's dispatch. Implement compose helper too.",
+    stubCode:
+      `function compose(...fns) {
+  // Right-to-left composition: compose(f,g,h)(x) = f(g(h(x)))
+}
+
+function applyMiddleware(...middlewares) {
+  // Returns a store enhancer: (createStore) => (reducer, initialState) => store
+  // Each middleware: ({ getState, dispatch }) => next => action => result
+}`,
+    solutionCode:
+      `function compose(...fns) {
+  if (fns.length === 0) return x => x;
+  if (fns.length === 1) return fns[0];
+  return fns.reduce((a, b) => (...args) => a(b(...args)));
+}
+
+function applyMiddleware(...middlewares) {
+  return (createStore) => (reducer, initialState) => {
+    const store = createStore(reducer, initialState);
+    let dispatch = store.dispatch;
+    const api = { getState: store.getState, dispatch: (...args) => dispatch(...args) };
+    const chain = middlewares.map(m => m(api));
+    dispatch = compose(...chain)(store.dispatch);
+    return { ...store, dispatch };
+  };
+}`,
+    testCode:
+      `(function() {
+  try {
+    function createStore(reducer, initialState) {
+      let state = typeof initialState !== 'undefined' ? initialState : reducer(undefined, {type:'@@INIT'});
+      const listeners = new Set();
+      return {
+        getState: () => state,
+        dispatch: (action) => { state = reducer(state, action); listeners.forEach(l=>l()); return action; },
+        subscribe: (l) => { listeners.add(l); return () => listeners.delete(l); }
+      };
+    }
+
+    const log = [];
+    const loggerMiddleware = ({ getState }) => next => action => {
+      log.push('before:' + action.type);
+      const result = next(action);
+      log.push('after:' + action.type);
+      return result;
+    };
+
+    const thunkMiddleware = ({ dispatch, getState }) => next => action => {
+      if (typeof action === 'function') return action(dispatch, getState);
+      return next(action);
+    };
+
+    function reducer(state = 0, action) {
+      return action.type === 'INC' ? state + 1 : state;
+    }
+
+    const enhancedCreate = applyMiddleware(thunkMiddleware, loggerMiddleware);
+    const store = enhancedCreate(createStore)(reducer);
+
+    store.dispatch({ type: 'INC' });
+    console.log(store.getState() === 1 ? 'PASS: basic dispatch' : 'FAIL: basic dispatch — ' + store.getState());
+    console.log(log.includes('before:INC') && log.includes('after:INC') ? 'PASS: middleware runs' : 'FAIL: middleware — ' + JSON.stringify(log));
+
+    // Thunk dispatch
+    store.dispatch((dispatch, getState) => {
+      dispatch({ type: 'INC' });
+      dispatch({ type: 'INC' });
+    });
+    console.log(store.getState() === 3 ? 'PASS: thunk works' : 'FAIL: thunk — got ' + store.getState());
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: basic dispatch\nPASS: middleware runs\nPASS: thunk works",
+    explanation:
+      "Each middleware receives the api (getState, dispatch) and returns a function that wraps 'next' (the next dispatch in the chain). compose chains them right-to-left so the first middleware runs first.",
+    keyInsight:
+      "Middleware signature: store => next => action => result. 'next' is the next middleware's dispatch. The final 'next' is the real store.dispatch. Compose chains them: each middleware wraps the one after it.",
+  },
+
+  {
+    id: 2010,
+    cat: "State Management",
+    difficulty: "medium",
+    title: "Implement a Zustand-like createStore",
+    tags: ["zustand", "createStore", "subscribe", "selector"],
+    companies: ["Vercel", "Atlassian", "CRED", "Razorpay"],
+    description:
+      "Implement create(setupFn) where setupFn receives set and get. Returns a hook-like function that accepts an optional selector. Subscriptions only fire when the selected value changes.",
+    stubCode:
+      `function create(setup) {
+  // setup receives (set, get) → returns initial state object
+  // set(partial) merges partial into state
+  // The returned 'useStore' accepts optional selector fn
+  // Subscribers receive (newState, oldState)
+}`,
+    solutionCode:
+      `function create(setup) {
+  let state;
+  const listeners = new Set();
+
+  function set(partial) {
+    const prev = state;
+    state = typeof partial === 'function'
+      ? { ...state, ...partial(state) }
+      : { ...state, ...partial };
+    listeners.forEach(l => l(state, prev));
+  }
+
+  function get() { return state; }
+
+  state = setup(set, get);
+
+  function useStore(selector) {
+    if (!selector) return state;
+    return selector(state);
+  }
+
+  useStore.getState = get;
+  useStore.setState = set;
+  useStore.subscribe = (listener, selector) => {
+    if (!selector) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    }
+    let prev = selector(state);
+    const wrapped = (newState) => {
+      const next = selector(newState);
+      if (next !== prev) { listener(next, prev); prev = next; }
+    };
+    listeners.add(wrapped);
+    return () => listeners.delete(wrapped);
+  };
+
+  return useStore;
+}`,
+    testCode:
+      `(function() {
+  try {
+    const useCount = create((set) => ({
+      count: 0,
+      increment: () => set(s => ({ count: s.count + 1 })),
+      decrement: () => set(s => ({ count: s.count - 1 })),
+    }));
+
+    console.log(useCount(s => s.count) === 0 ? 'PASS: initial state' : 'FAIL: initial state');
+
+    useCount.getState().increment();
+    useCount.getState().increment();
+    console.log(useCount(s => s.count) === 2 ? 'PASS: increment' : 'FAIL: increment — got ' + useCount(s=>s.count));
+
+    let notified = 0;
+    const unsub = useCount.subscribe((count) => notified++, s => s.count);
+    useCount.getState().increment();
+    useCount.getState().decrement();
+    console.log(notified === 2 ? 'PASS: selector subscription' : 'FAIL: selector sub — count=' + notified);
+
+    unsub();
+    useCount.getState().increment();
+    console.log(notified === 2 ? 'PASS: unsubscribe works' : 'FAIL: unsub — count=' + notified);
+    console.log(useCount(s => s.count) === 3 ? 'PASS: state correct after unsub' : 'FAIL: state — got ' + useCount(s=>s.count));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial state\nPASS: increment\nPASS: selector subscription\nPASS: unsubscribe works\nPASS: state correct after unsub",
+    explanation:
+      "State is a plain object. set() merges partial updates (or applies an updater function). Subscriptions with selectors only fire when the selected slice changes — this is the key to Zustand's performance.",
+    keyInsight:
+      "Zustand's performance secret: subscriptions run selector(newState) and only notify the listener if the result changed (prev !== next). Components only re-render for the slices they care about.",
+  },
+
+  {
+    id: 2011,
+    cat: "State Management",
+    difficulty: "medium",
+    title: "Implement createContext and useContext",
+    tags: ["createContext", "useContext", "context", "provider"],
+    companies: ["Meta", "Google", "Flipkart", "Razorpay"],
+    description:
+      "Implement createContext(defaultValue) and useContext(context). The context object should have a Provider function that sets a value accessible by useContext within that scope. Use a stack to support nested providers.",
+    stubCode:
+      `function createContext(defaultValue) {
+  // Return a context object with Provider and a way to read it
+}
+
+function useContext(context) {
+  // Return the current value from the nearest Provider
+}`,
+    solutionCode:
+      `function createContext(defaultValue) {
+  const context = {
+    _stack: [defaultValue],
+    Provider(value, fn) {
+      context._stack.push(value);
+      try { fn(); }
+      finally { context._stack.pop(); }
+    },
+    get _currentValue() {
+      return context._stack[context._stack.length - 1];
+    }
+  };
+  return context;
+}
+
+function useContext(context) {
+  return context._currentValue;
+}`,
+    testCode:
+      `(function() {
+  try {
+    const ThemeCtx = createContext('light');
+
+    console.log(useContext(ThemeCtx) === 'light' ? 'PASS: default value' : 'FAIL: default — got ' + useContext(ThemeCtx));
+
+    ThemeCtx.Provider('dark', () => {
+      console.log(useContext(ThemeCtx) === 'dark' ? 'PASS: provider value' : 'FAIL: provider — got ' + useContext(ThemeCtx));
+
+      ThemeCtx.Provider('high-contrast', () => {
+        console.log(useContext(ThemeCtx) === 'high-contrast' ? 'PASS: nested provider' : 'FAIL: nested — got ' + useContext(ThemeCtx));
+      });
+
+      console.log(useContext(ThemeCtx) === 'dark' ? 'PASS: restored after nested' : 'FAIL: restore — got ' + useContext(ThemeCtx));
+    });
+
+    console.log(useContext(ThemeCtx) === 'light' ? 'PASS: default restored' : 'FAIL: default restore — got ' + useContext(ThemeCtx));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: default value\nPASS: provider value\nPASS: nested provider\nPASS: restored after nested\nPASS: default restored",
+    explanation:
+      "A stack models nested providers naturally. Provider pushes the value, runs the subtree function, then pops. useContext always reads the top of the stack — the nearest ancestor's value.",
+    keyInsight:
+      "Context is a stack, not a single value. Provider pushes, useContext peeks at top, Provider's finally block pops. This is why nested providers work — the innermost one wins.",
+  },
+
+  // ─── COMPONENT PATTERNS ───────────────────────────────────────────────────
+
+  {
+    id: 2012,
+    cat: "Component Patterns",
+    difficulty: "medium",
+    title: "Implement a Higher-Order Component (HOC)",
+    tags: ["HOC", "higher-order-component", "withLoading", "patterns"],
+    companies: ["Meta", "Flipkart", "Swiggy", "Amazon"],
+    description:
+      "Implement withLoading(Component). Returns a new function that, when called with { isLoading, ...rest }, renders a loading indicator if isLoading is true, otherwise calls Component with the remaining props.",
+    stubCode:
+      `function withLoading(Component) {
+  // Return a new function (wrapped component)
+  // If props.isLoading is true → return 'Loading...'
+  // Otherwise → call Component with remaining props
+}`,
+    solutionCode:
+      `function withLoading(Component) {
+  return function WithLoadingComponent(props) {
+    const { isLoading, ...rest } = props;
+    if (isLoading) return 'Loading...';
+    return Component(rest);
+  };
+}`,
+    testCode:
+      `(function() {
+  try {
+    function UserCard({ name, age }) {
+      return 'User: ' + name + ', ' + age;
+    }
+
+    const UserCardWithLoading = withLoading(UserCard);
+
+    const r1 = UserCardWithLoading({ isLoading: true, name: 'Alice', age: 30 });
+    console.log(r1 === 'Loading...' ? 'PASS: shows loading' : 'FAIL: shows loading — got ' + r1);
+
+    const r2 = UserCardWithLoading({ isLoading: false, name: 'Alice', age: 30 });
+    console.log(r2 === 'User: Alice, 30' ? 'PASS: renders component' : 'FAIL: renders — got ' + r2);
+
+    const r3 = UserCardWithLoading({ name: 'Bob', age: 25 });
+    console.log(r3 === 'User: Bob, 25' ? 'PASS: default not loading' : 'FAIL: default — got ' + r3);
+
+    // isLoading not passed to wrapped component
+    const spy = (props) => JSON.stringify(props);
+    const WrappedSpy = withLoading(spy);
+    const r4 = JSON.parse(WrappedSpy({ isLoading: false, x: 1 }));
+    console.log(!('isLoading' in r4) ? 'PASS: isLoading not forwarded' : 'FAIL: isLoading forwarded — got ' + JSON.stringify(r4));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: shows loading\nPASS: renders component\nPASS: default not loading\nPASS: isLoading not forwarded",
+    explanation:
+      "An HOC is a function that takes a component and returns a new component with additional behavior. Destructure the HOC-specific props (isLoading) before spreading the rest to the wrapped component.",
+    keyInsight:
+      "HOC convention: HOC-specific props should NOT leak into the wrapped component. Always destructure them out before forwarding — the wrapped component shouldn't know about the HOC's concerns.",
+  },
+
+  {
+    id: 2013,
+    cat: "Component Patterns",
+    difficulty: "hard",
+    title: "Implement withErrorBoundary HOC",
+    tags: ["error-boundary", "HOC", "try-catch", "patterns"],
+    companies: ["Meta", "Atlassian", "CRED", "Google"],
+    description:
+      "Implement withErrorBoundary(Component, FallbackComponent). The wrapper should catch any errors thrown by Component during render. If an error is caught, render FallbackComponent with the error as a prop instead.",
+    stubCode:
+      `function withErrorBoundary(Component, FallbackComponent) {
+  // Return a wrapped function component
+  // If Component() throws, render FallbackComponent({ error })
+  // If no error, render Component normally
+}`,
+    solutionCode:
+      `function withErrorBoundary(Component, FallbackComponent) {
+  return function ErrorBoundaryWrapper(props) {
+    try {
+      return Component(props);
+    } catch (error) {
+      return FallbackComponent({ error });
+    }
+  };
+}`,
+    testCode:
+      `(function() {
+  try {
+    function BrokenComponent({ shouldThrow }) {
+      if (shouldThrow) throw new Error('Something broke');
+      return 'All good';
+    }
+
+    function ErrorFallback({ error }) {
+      return 'Error: ' + error.message;
+    }
+
+    const SafeComponent = withErrorBoundary(BrokenComponent, ErrorFallback);
+
+    const r1 = SafeComponent({ shouldThrow: false });
+    console.log(r1 === 'All good' ? 'PASS: renders normally' : 'FAIL: renders normally — got ' + r1);
+
+    const r2 = SafeComponent({ shouldThrow: true });
+    console.log(r2 === 'Error: Something broke' ? 'PASS: catches error' : 'FAIL: catches error — got ' + r2);
+
+    // Error propagates the actual error object
+    function DetailedFallback({ error }) {
+      return error instanceof Error ? 'proper Error' : 'wrong type';
+    }
+    const Safe2 = withErrorBoundary(BrokenComponent, DetailedFallback);
+    const r3 = Safe2({ shouldThrow: true });
+    console.log(r3 === 'proper Error' ? 'PASS: error is Error instance' : 'FAIL: error type — got ' + r3);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: renders normally\nPASS: catches error\nPASS: error is Error instance",
+    explanation:
+      "Wrap the component call in try/catch. On success, return its result. On error, return the fallback rendered with the error. This is the functional equivalent of React's getDerivedStateFromError.",
+    keyInsight:
+      "React's class-based Error Boundary is necessary in production because hooks can't catch render errors. This functional version shows the concept — in real React you still need the class component.",
+  },
+
+  {
+    id: 2014,
+    cat: "Component Patterns",
+    difficulty: "medium",
+    title: "Implement memoize for components (React.memo equivalent)",
+    tags: ["React.memo", "memo", "shallow-equal", "performance"],
+    companies: ["Meta", "Google", "Flipkart", "Razorpay"],
+    description:
+      "Implement memo(Component, areEqual?). Returns a new component that only re-renders (re-calls) when props change. Default comparison is shallow equality. Accept an optional custom areEqual(prevProps, nextProps) function.",
+    stubCode:
+      `function shallowEqual(obj1, obj2) {
+  // Shallow comparison of two objects
+}
+
+function memo(Component, areEqual) {
+  // areEqual defaults to shallowEqual
+  // Return a memoized component function
+}`,
+    solutionCode:
+      `function shallowEqual(obj1, obj2) {
+  if (obj1 === obj2) return true;
+  if (!obj1 || !obj2) return false;
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  if (keys1.length !== keys2.length) return false;
+  return keys1.every(k => obj1[k] === obj2[k]);
+}
+
+function memo(Component, areEqual = shallowEqual) {
+  let prevProps = null;
+  let prevResult = null;
+
+  return function MemoizedComponent(props) {
+    if (prevProps !== null && areEqual(prevProps, props)) {
+      return prevResult;
+    }
+    prevProps = props;
+    prevResult = Component(props);
+    return prevResult;
+  };
+}`,
+    testCode:
+      `(function() {
+  try {
+    let renderCount = 0;
+    function Greeting({ name }) {
+      renderCount++;
+      return 'Hello ' + name;
+    }
+
+    const MemoGreeting = memo(Greeting);
+
+    MemoGreeting({ name: 'Alice' });
+    console.log(renderCount === 1 ? 'PASS: initial render' : 'FAIL: initial — count=' + renderCount);
+
+    MemoGreeting({ name: 'Alice' });
+    console.log(renderCount === 1 ? 'PASS: skips same props' : 'FAIL: skips — count=' + renderCount);
+
+    MemoGreeting({ name: 'Bob' });
+    console.log(renderCount === 2 ? 'PASS: re-renders on change' : 'FAIL: re-render — count=' + renderCount);
+
+    // Custom areEqual
+    let customCount = 0;
+    function Item({ id, version }) { customCount++; return id; }
+    const MemoItem = memo(Item, (prev, next) => prev.id === next.id);
+
+    MemoItem({ id: 1, version: 1 });
+    MemoItem({ id: 1, version: 2 }); // same id → skip (custom says equal)
+    console.log(customCount === 1 ? 'PASS: custom areEqual' : 'FAIL: custom — count=' + customCount);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial render\nPASS: skips same props\nPASS: re-renders on change\nPASS: custom areEqual",
+    explanation:
+      "Store prevProps and prevResult. On each call, compare new props with prevProps using areEqual. If equal, return the cached result. If different, re-render and update both cached values.",
+    keyInsight:
+      "React.memo uses shallow prop comparison by default. Note the direction: areEqual returns TRUE to SKIP re-render (opposite of shouldComponentUpdate which returns true to re-render).",
+  },
+
+  // ─── REACT UTILITIES ──────────────────────────────────────────────────────
+
+  {
+    id: 2015,
+    cat: "React Utilities",
+    difficulty: "medium",
+    title: "Implement cloneElement",
+    tags: ["cloneElement", "React", "props", "children"],
+    companies: ["Meta", "Atlassian", "Flipkart", "Google"],
+    description:
+      "Implement cloneElement(element, newProps, ...children). Clone a React-like element object, merging newProps over the element's existing props. If children are provided as arguments, override element.props.children.",
+    stubCode:
+      `function cloneElement(element, newProps, ...newChildren) {
+  // Clone element, merge newProps, optionally override children
+  // element shape: { type, props: { children?, ...rest } }
+}`,
+    solutionCode:
+      `function cloneElement(element, newProps, ...newChildren) {
+  const mergedProps = { ...element.props, ...newProps };
+  if (newChildren.length === 1) {
+    mergedProps.children = newChildren[0];
+  } else if (newChildren.length > 1) {
+    mergedProps.children = newChildren;
+  }
+  return { ...element, props: mergedProps };
+}`,
+    testCode:
+      `(function() {
+  try {
+    const el = { type: 'button', props: { className: 'btn', children: 'Click' } };
+
+    const cloned = cloneElement(el, { id: 'submit' });
+    console.log(cloned.props.className === 'btn' && cloned.props.id === 'submit' ? 'PASS: merges props' : 'FAIL: merges — ' + JSON.stringify(cloned.props));
+
+    console.log(cloned !== el ? 'PASS: new object' : 'FAIL: new object');
+    console.log(cloned.type === 'button' ? 'PASS: preserves type' : 'FAIL: type — got ' + cloned.type);
+
+    const withNewChild = cloneElement(el, {}, 'New Text');
+    console.log(withNewChild.props.children === 'New Text' ? 'PASS: overrides children' : 'FAIL: children — got ' + withNewChild.props.children);
+
+    const withOverride = cloneElement(el, { className: 'btn-primary' });
+    console.log(withOverride.props.className === 'btn-primary' ? 'PASS: overrides props' : 'FAIL: override — got ' + withOverride.props.className);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: merges props\nPASS: new object\nPASS: preserves type\nPASS: overrides children\nPASS: overrides props",
+    explanation:
+      "Spread element, then spread props with new props overriding old ones. Children from arguments take priority over children in newProps. Return a new object — never mutate the original element.",
+    keyInsight:
+      "cloneElement = { ...element, props: { ...element.props, ...newProps, children } }. New props win. It's used in patterns where a parent adds behavior to children without knowing their type.",
+  },
+
+  {
+    id: 2016,
+    cat: "React Utilities",
     difficulty: "easy",
-    title: "Implement Array.prototype.map",
-    tags: ["array", "map", "prototype"],
-    companies: ["Razorpay", "Flipkart", "Amazon", "Microsoft"],
+    title: "Implement createElement (JSX transform)",
+    tags: ["createElement", "JSX", "virtual-dom", "React"],
+    companies: ["Meta", "Google", "Atlassian", "Flipkart"],
     description:
-      "Implement Array.prototype.map without using native map. Call callback with (element, index, array) and return a new array.",
+      "Implement createElement(type, props, ...children). Returns a React element object: { type, props: { ...props, children } }. Single child is stored directly; multiple children as an array. Null/undefined children are filtered out.",
     stubCode:
-      "Array.prototype.myMap = function(callback, thisArg) {\n  // Your implementation here\n};",
+      `function createElement(type, props, ...children) {
+  // Return { type, props } where props includes children
+  // Single child → children (not wrapped in array)
+  // Multiple children → array
+  // null/undefined children → filtered out
+}`,
     solutionCode:
-      "Array.prototype.myMap = function(callback, thisArg) {\n  if (typeof callback !== 'function') throw new TypeError(callback + ' is not a function');\n  const result = [];\n  for (let i = 0; i < this.length; i++) {\n    if (i in this) result[i] = callback.call(thisArg, this[i], i, this);\n  }\n  return result;\n};",
+      `function createElement(type, props, ...children) {
+  const filteredChildren = children.flat().filter(c => c != null);
+  const childrenProp =
+    filteredChildren.length === 0 ? undefined :
+    filteredChildren.length === 1 ? filteredChildren[0] :
+    filteredChildren;
+
+  return {
+    type,
+    props: {
+      ...props,
+      ...(childrenProp !== undefined ? { children: childrenProp } : {}),
+    }
+  };
+}`,
     testCode:
-      "(function() {\n  try {\n    const r1 = [1,2,3].myMap(x => x * 2);\n    console.log(JSON.stringify(r1) === '[2,4,6]' ? 'PASS: basic' : 'FAIL: basic \u2014 got ' + JSON.stringify(r1));\n    const r2 = [].myMap(x => x);\n    console.log(JSON.stringify(r2) === '[]' ? 'PASS: empty' : 'FAIL: empty');\n    const r3 = ['a','b','c'].myMap((v,i) => i + ':' + v);\n    console.log(JSON.stringify(r3) === '[\"0:a\",\"1:b\",\"2:c\"]' ? 'PASS: index' : 'FAIL: index \u2014 got ' + JSON.stringify(r3));\n    const obj = { mul: 3 };\n    const r4 = [1,2,3].myMap(function(x) { return x * this.mul; }, obj);\n    console.log(JSON.stringify(r4) === '[3,6,9]' ? 'PASS: thisArg' : 'FAIL: thisArg \u2014 got ' + JSON.stringify(r4));\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: basic\nPASS: empty\nPASS: index\nPASS: thisArg",
+      `(function() {
+  try {
+    const el = createElement('div', { className: 'box' }, 'Hello');
+    console.log(el.type === 'div' && el.props.className === 'box' ? 'PASS: type and props' : 'FAIL: type/props');
+    console.log(el.props.children === 'Hello' ? 'PASS: single child' : 'FAIL: single child — got ' + JSON.stringify(el.props.children));
+
+    const multi = createElement('ul', null, 'a', 'b', 'c');
+    console.log(Array.isArray(multi.props.children) && multi.props.children.length === 3 ? 'PASS: multiple children' : 'FAIL: multiple — got ' + JSON.stringify(multi.props.children));
+
+    const noChild = createElement('br', null);
+    console.log(noChild.props.children === undefined ? 'PASS: no children' : 'FAIL: no children — got ' + noChild.props.children);
+
+    const withNull = createElement('div', null, 'a', null, 'b', undefined);
+    console.log(Array.isArray(withNull.props.children) && withNull.props.children.length === 2 ? 'PASS: filters null' : 'FAIL: filters null — got ' + JSON.stringify(withNull.props.children));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: type and props\nPASS: single child\nPASS: multiple children\nPASS: no children\nPASS: filters null",
     explanation:
-      "Iterate with for loop. Check i in this for sparse arrays. Call callback.call(thisArg, element, index, array). Return the new array.",
+      "createElement produces the plain JS objects that JSX compiles to. Children handling: 0 = omit, 1 = scalar, 2+ = array. Filtering null/undefined children mirrors React's behavior with conditional rendering.",
     keyInsight:
-      "Use i in this to handle sparse arrays. The callback receives (element, index, originalArray).",
+      "JSX is just createElement calls. <div className='x'>Hello</div> compiles to createElement('div', {className:'x'}, 'Hello'). Understanding this makes JSX behavior predictable.",
   },
+
   {
-    id: 1002,
-    cat: "Array Methods",
-    difficulty: "easy",
-    title: "Implement Array.prototype.filter",
-    tags: ["array", "filter", "prototype"],
-    companies: ["Razorpay", "Flipkart", "Google", "Amazon"],
-    description:
-      "Implement Array.prototype.filter. Returns a new array with elements for which callback returns truthy.",
-    stubCode:
-      "Array.prototype.myFilter = function(callback, thisArg) {\n  // Your implementation here\n};",
-    solutionCode:
-      "Array.prototype.myFilter = function(callback, thisArg) {\n  if (typeof callback !== 'function') throw new TypeError(callback + ' is not a function');\n  const result = [];\n  for (let i = 0; i < this.length; i++) {\n    if (i in this && callback.call(thisArg, this[i], i, this)) result.push(this[i]);\n  }\n  return result;\n};",
-    testCode:
-      "(function() {\n  try {\n    const r1 = [1,2,3,4,5].myFilter(x => x % 2 === 0);\n    console.log(JSON.stringify(r1) === '[2,4]' ? 'PASS: basic' : 'FAIL: basic \u2014 got ' + JSON.stringify(r1));\n    const r2 = [].myFilter(x => x);\n    console.log(JSON.stringify(r2) === '[]' ? 'PASS: empty' : 'FAIL: empty');\n    const r3 = [1,2,3].myFilter(x => x > 10);\n    console.log(JSON.stringify(r3) === '[]' ? 'PASS: no match' : 'FAIL: no match');\n    const r4 = ['a','b','c'].myFilter((v,i) => i > 0);\n    console.log(JSON.stringify(r4) === '[\"b\",\"c\"]' ? 'PASS: index' : 'FAIL: index \u2014 got ' + JSON.stringify(r4));\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: basic\nPASS: empty\nPASS: no match\nPASS: index",
-    explanation:
-      "Only push when callback returns truthy. Use push() not index assignment \u2014 result must be dense.",
-    keyInsight:
-      "filter result is always dense \u2014 use push(), not result[i] = ...",
-  },
-  {
-    id: 1003,
-    cat: "Array Methods",
+    id: 2017,
+    cat: "React Utilities",
     difficulty: "medium",
-    title: "Implement Array.prototype.reduce",
-    tags: ["array", "reduce", "accumulator"],
-    companies: ["Razorpay", "Flipkart", "Google", "Amazon", "Microsoft"],
+    title: "Implement a useDebounce hook",
+    tags: ["useDebounce", "debounce", "custom-hook", "hooks"],
+    companies: ["Flipkart", "Swiggy", "Razorpay", "CRED"],
     description:
-      "Implement Array.prototype.reduce. Handle both with and without an initial value. Throw TypeError on empty array with no initial value.",
+      "Implement useDebounce(value, delay). Returns a debounced version of the value that only updates after the value has stopped changing for 'delay' milliseconds. Simulate with a clock you control.",
     stubCode:
-      "Array.prototype.myReduce = function(callback, initialValue) {\n  // Handle both cases: with and without initialValue\n  // Hint: use arguments.length to detect missing initialValue\n};",
+      `function useDebounce(getValue, delay, clock) {
+  // getValue() returns current value
+  // clock.setTimeout / clock.clearTimeout for testability
+  // Returns an object with: { getDebounced(), flush() }
+  // flush() immediately resolves the pending timeout
+}`,
     solutionCode:
-      "Array.prototype.myReduce = function(callback, initialValue) {\n  if (typeof callback !== 'function') throw new TypeError(callback + ' is not a function');\n  const len = this.length;\n  let acc, startIdx;\n  if (arguments.length >= 2) {\n    acc = initialValue; startIdx = 0;\n  } else {\n    if (len === 0) throw new TypeError('Reduce of empty array with no initial value');\n    startIdx = 0;\n    while (startIdx < len && !(startIdx in this)) startIdx++;\n    if (startIdx >= len) throw new TypeError('Reduce of empty array with no initial value');\n    acc = this[startIdx++];\n  }\n  for (let i = startIdx; i < len; i++) {\n    if (i in this) acc = callback(acc, this[i], i, this);\n  }\n  return acc;\n};",
+      `function useDebounce(getValue, delay, clock = { setTimeout, clearTimeout }) {
+  let timer = null;
+  let debounced = getValue();
+
+  function update() {
+    clock.clearTimeout(timer);
+    timer = clock.setTimeout(() => {
+      debounced = getValue();
+      timer = null;
+    }, delay);
+  }
+
+  function flush() {
+    if (timer !== null) {
+      clock.clearTimeout(timer);
+      debounced = getValue();
+      timer = null;
+    }
+  }
+
+  function getDebounced() { return debounced; }
+
+  return { update, getDebounced, flush };
+}`,
     testCode:
-      "(function() {\n  try {\n    const r1 = [1,2,3,4].myReduce((acc,v) => acc + v, 0);\n    console.log(r1 === 10 ? 'PASS: sum' : 'FAIL: sum \u2014 got ' + r1);\n    const r2 = [1,2,3,4].myReduce((acc,v) => acc + v);\n    console.log(r2 === 10 ? 'PASS: no initial' : 'FAIL: no initial \u2014 got ' + r2);\n    const r3 = [{n:1},{n:2},{n:3}].myReduce((acc,v) => acc + v.n, 0);\n    console.log(r3 === 6 ? 'PASS: object' : 'FAIL: object \u2014 got ' + r3);\n    const r4 = ['a','b','c'].myReduce((acc,v) => acc + v);\n    console.log(r4 === 'abc' ? 'PASS: string' : 'FAIL: string \u2014 got ' + r4);\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: sum\nPASS: no initial\nPASS: object\nPASS: string",
+      `(function() {
+  try {
+    let currentValue = 'a';
+    let flushed = [];
+
+    const { update, getDebounced, flush } = useDebounce(() => currentValue, 300);
+
+    console.log(getDebounced() === 'a' ? 'PASS: initial value' : 'FAIL: initial — got ' + getDebounced());
+
+    currentValue = 'b'; update();
+    currentValue = 'c'; update();
+    currentValue = 'd'; update();
+
+    // Value not yet updated (timer pending)
+    console.log(getDebounced() === 'a' ? 'PASS: not yet updated' : 'FAIL: not yet — got ' + getDebounced());
+
+    // Flush simulates timer firing
+    flush();
+    console.log(getDebounced() === 'd' ? 'PASS: flush gets latest' : 'FAIL: flush — got ' + getDebounced());
+
+    // After flush, rapid changes don't update until next flush
+    currentValue = 'e'; update();
+    currentValue = 'f'; update();
+    console.log(getDebounced() === 'd' ? 'PASS: pending after new updates' : 'FAIL: pending — got ' + getDebounced());
+
+    flush();
+    console.log(getDebounced() === 'f' ? 'PASS: second flush correct' : 'FAIL: second flush — got ' + getDebounced());
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial value\nPASS: not yet updated\nPASS: flush gets latest\nPASS: pending after new updates\nPASS: second flush correct",
     explanation:
-      "Use arguments.length >= 2 to distinguish missing initialValue from undefined. Without initial value, use first element as accumulator and start from index 1.",
+      "The hook holds a pending timer and the last debounced value separately. Multiple rapid calls cancel the previous timer. flush() simulates the timer firing immediately — essential for testing debounced behavior.",
     keyInsight:
-      "Use arguments.length >= 2, not initialValue !== undefined. undefined is a valid initial value.",
+      "In real useDebounce, the 'flush' is replaced by useEffect with a setTimeout + cleanup. The pattern is identical: clearTimeout(prev), setTimeout(update, delay), return () => clearTimeout(timer).",
   },
+
   {
-    id: 1004,
-    cat: "Array Methods",
+    id: 2018,
+    cat: "React Utilities",
+    difficulty: "hard",
+    title: "Implement batch updates",
+    tags: ["batch", "unstable_batchedUpdates", "performance", "state"],
+    companies: ["Meta", "Google", "Atlassian"],
+    description:
+      "Implement batch(fn). All state setter calls inside fn should be collected and applied together, triggering only ONE notification to subscribers — not one per setState call.",
+    stubCode:
+      `let isBatching = false;
+let pendingUpdates = [];
+let listeners = new Set();
+let state = { count: 0, name: '' };
+
+function setState(key, value) {
+  // If batching, queue the update
+  // If not batching, apply immediately and notify
+}
+
+function subscribe(listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function batch(fn) {
+  // Set batching flag, run fn, apply all queued updates at once, notify once
+}`,
+    solutionCode:
+      `let isBatching = false;
+let pendingUpdates = [];
+let listeners = new Set();
+let state = { count: 0, name: '' };
+
+function notify() { listeners.forEach(l => l({ ...state })); }
+
+function setState(key, value) {
+  if (isBatching) {
+    pendingUpdates.push({ key, value });
+  } else {
+    state = { ...state, [key]: value };
+    notify();
+  }
+}
+
+function subscribe(listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function batch(fn) {
+  isBatching = true;
+  pendingUpdates = [];
+  try {
+    fn();
+  } finally {
+    isBatching = false;
+    if (pendingUpdates.length > 0) {
+      const updates = Object.fromEntries(pendingUpdates.map(u => [u.key, u.value]));
+      state = { ...state, ...updates };
+      notify();
+    }
+  }
+}`,
+    testCode:
+      `(function() {
+  try {
+    let notifyCount = 0;
+    subscribe(() => notifyCount++);
+
+    // Without batch — 3 separate notifications
+    setState('count', 1);
+    setState('count', 2);
+    setState('count', 3);
+    console.log(notifyCount === 3 ? 'PASS: unbatched notifies each' : 'FAIL: unbatched — count=' + notifyCount);
+
+    // Reset
+    notifyCount = 0; state = { count: 0, name: '' };
+
+    // With batch — only 1 notification
+    batch(() => {
+      setState('count', 10);
+      setState('name', 'Alice');
+      setState('count', 20);
+    });
+    console.log(notifyCount === 1 ? 'PASS: batch notifies once' : 'FAIL: batch notify — count=' + notifyCount);
+    console.log(state.count === 20 && state.name === 'Alice' ? 'PASS: all updates applied' : 'FAIL: updates — ' + JSON.stringify(state));
+
+    // Nested batch still notifies once
+    notifyCount = 0;
+    batch(() => {
+      setState('count', 99);
+      batch(() => { setState('name', 'Bob'); });
+    });
+    console.log(notifyCount === 1 ? 'PASS: nested batch once' : 'FAIL: nested — count=' + notifyCount);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: unbatched notifies each\nPASS: batch notifies once\nPASS: all updates applied\nPASS: nested batch once",
+    explanation:
+      "A flag switches between immediate and queued mode. Inside batch(), updates accumulate in an array. After fn() completes, all updates are merged and a single notification fires. React 18 does this automatically for all updates.",
+    keyInsight:
+      "React 18's automatic batching works exactly this way — a batching flag wraps event handlers and async callbacks. Pre-18, only React event handlers were batched; setTimeout/fetch updates were not.",
+  },
+
+  // ─── VIRTUAL DOM ──────────────────────────────────────────────────────────
+
+  {
+    id: 2019,
+    cat: "Virtual DOM",
+    difficulty: "hard",
+    title: "Implement a Virtual DOM differ (basic reconciler)",
+    tags: ["virtual-dom", "reconciler", "diff", "patch"],
+    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
+    description:
+      "Implement diff(oldVNode, newVNode) that returns a patch array describing changes. Patches types: REPLACE, UPDATE_PROPS, REMOVE, ADD. VNodes are { type, props, children? } objects or string primitives.",
+    stubCode:
+      `const PATCH_TYPES = { REPLACE: 'REPLACE', UPDATE_PROPS: 'UPDATE_PROPS', REMOVE: 'REMOVE', ADD: 'ADD' };
+
+function diff(oldNode, newNode, patches = [], path = '0') {
+  // Compare old and new VNodes
+  // Push patch objects to patches array: { type, path, ...payload }
+  // Return patches
+}`,
+    solutionCode:
+      `const PATCH_TYPES = { REPLACE: 'REPLACE', UPDATE_PROPS: 'UPDATE_PROPS', REMOVE: 'REMOVE', ADD: 'ADD' };
+
+function diff(oldNode, newNode, patches = [], path = '0') {
+  if (newNode === undefined || newNode === null) {
+    patches.push({ type: PATCH_TYPES.REMOVE, path });
+    return patches;
+  }
+
+  if (oldNode === undefined || oldNode === null) {
+    patches.push({ type: PATCH_TYPES.ADD, path, node: newNode });
+    return patches;
+  }
+
+  if (typeof oldNode !== typeof newNode || oldNode.type !== newNode.type) {
+    patches.push({ type: PATCH_TYPES.REPLACE, path, node: newNode });
+    return patches;
+  }
+
+  if (typeof newNode === 'string' || typeof newNode === 'number') {
+    if (oldNode !== newNode) patches.push({ type: PATCH_TYPES.REPLACE, path, node: newNode });
+    return patches;
+  }
+
+  // Same type — check props
+  const propChanges = {};
+  const allKeys = new Set([...Object.keys(oldNode.props || {}), ...Object.keys(newNode.props || {})]);
+  allKeys.forEach(k => {
+    if ((oldNode.props || {})[k] !== (newNode.props || {})[k]) {
+      propChanges[k] = (newNode.props || {})[k];
+    }
+  });
+  if (Object.keys(propChanges).length > 0) {
+    patches.push({ type: PATCH_TYPES.UPDATE_PROPS, path, props: propChanges });
+  }
+
+  // Diff children
+  const oldChildren = oldNode.children || [];
+  const newChildren = newNode.children || [];
+  const max = Math.max(oldChildren.length, newChildren.length);
+  for (let i = 0; i < max; i++) {
+    diff(oldChildren[i], newChildren[i], patches, path + '.' + i);
+  }
+
+  return patches;
+}`,
+    testCode:
+      `(function() {
+  try {
+    const old1 = { type: 'div', props: { id: 'app' }, children: ['Hello'] };
+    const new1 = { type: 'div', props: { id: 'app' }, children: ['World'] };
+    const p1 = diff(old1, new1);
+    const textPatch = p1.find(p => p.type === 'REPLACE' && p.node === 'World');
+    console.log(textPatch ? 'PASS: text change detected' : 'FAIL: text change — ' + JSON.stringify(p1));
+
+    const old2 = { type: 'div', props: { className: 'old' }, children: [] };
+    const new2 = { type: 'div', props: { className: 'new' }, children: [] };
+    const p2 = diff(old2, new2);
+    const propPatch = p2.find(p => p.type === 'UPDATE_PROPS' && p.props.className === 'new');
+    console.log(propPatch ? 'PASS: prop change detected' : 'FAIL: prop change — ' + JSON.stringify(p2));
+
+    const old3 = { type: 'div', props: {}, children: [] };
+    const new3 = { type: 'span', props: {}, children: [] };
+    const p3 = diff(old3, new3);
+    const replacePatch = p3.find(p => p.type === 'REPLACE');
+    console.log(replacePatch ? 'PASS: type change = replace' : 'FAIL: type change — ' + JSON.stringify(p3));
+
+    const old4 = { type: 'ul', props: {}, children: [{ type: 'li', props: {}, children: ['A'] }] };
+    const new4 = { type: 'ul', props: {}, children: [{ type: 'li', props: {}, children: ['A'] }, { type: 'li', props: {}, children: ['B'] }] };
+    const p4 = diff(old4, new4);
+    const addPatch = p4.find(p => p.type === 'ADD');
+    console.log(addPatch ? 'PASS: new child detected' : 'FAIL: new child — ' + JSON.stringify(p4));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: text change detected\nPASS: prop change detected\nPASS: type change = replace\nPASS: new child detected",
+    explanation:
+      "Walk both trees simultaneously. If types differ, emit REPLACE (tear down and rebuild). Same type: diff props, then recurse into children by index. Missing children on new side = REMOVE; extra children on new side = ADD.",
+    keyInsight:
+      "React's diff heuristic: different types = REPLACE (O(n) instead of O(n³)). Keys enable matching children by identity across reorders. Without keys, index-based comparison misidentifies moved elements.",
+  },
+
+  {
+    id: 2020,
+    cat: "Virtual DOM",
+    difficulty: "hard",
+    title: "Implement a simple reconciler render function",
+    tags: ["reconciler", "render", "virtual-dom", "DOM"],
+    companies: ["Meta", "Google", "Atlassian"],
+    description:
+      "Implement render(vnode, container). Takes a virtual DOM node { type, props, children } and returns a real DOM-like node (plain objects simulating DOM: { tag, attrs, children, text }). Handle text nodes, element nodes, and null children.",
+    stubCode:
+      `function render(vnode) {
+  // vnode is: string/number (text) OR { type, props, children[] }
+  // Return a DOM-like object: { tag, attrs, children } or { text }
+  // null/undefined vnodes → return null
+}`,
+    solutionCode:
+      `function render(vnode) {
+  if (vnode == null) return null;
+
+  if (typeof vnode === 'string' || typeof vnode === 'number') {
+    return { text: String(vnode) };
+  }
+
+  const { type, props = {}, children = [] } = vnode;
+  const { children: _ignore, ...attrs } = props;
+
+  const domNode = {
+    tag: type,
+    attrs,
+    children: children.map(child => render(child)).filter(c => c !== null),
+  };
+
+  return domNode;
+}`,
+    testCode:
+      `(function() {
+  try {
+    const vdom = {
+      type: 'div', props: { className: 'app' },
+      children: [
+        { type: 'h1', props: {}, children: ['Hello World'] },
+        { type: 'p', props: { id: 'desc' }, children: ['Some text', null] },
+      ]
+    };
+
+    const result = render(vdom);
+    console.log(result.tag === 'div' && result.attrs.className === 'app' ? 'PASS: root element' : 'FAIL: root — ' + JSON.stringify(result));
+    console.log(result.children.length === 2 ? 'PASS: two children' : 'FAIL: children count — ' + result.children.length);
+
+    const h1 = result.children[0];
+    console.log(h1.tag === 'h1' && h1.children[0].text === 'Hello World' ? 'PASS: nested element' : 'FAIL: nested — ' + JSON.stringify(h1));
+
+    const p = result.children[1];
+    console.log(p.attrs.id === 'desc' ? 'PASS: props preserved' : 'FAIL: props — ' + JSON.stringify(p.attrs));
+    console.log(p.children.length === 1 ? 'PASS: null filtered' : 'FAIL: null filter — children=' + p.children.length);
+
+    const textNode = render('Hello');
+    console.log(textNode.text === 'Hello' ? 'PASS: text node' : 'FAIL: text — got ' + JSON.stringify(textNode));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: root element\nPASS: two children\nPASS: nested element\nPASS: props preserved\nPASS: null filter\nPASS: text node",
+    explanation:
+      "Walk the VNode tree recursively. Text nodes become { text } objects. Element nodes become { tag, attrs, children }. Null children are filtered after mapping — they result from conditional rendering.",
+    keyInsight:
+      "This is the heart of React's render phase. Every component returns a VNode tree. render() walks it once to produce DOM operations. React then batches those operations in the commit phase.",
+  },
+
+  {
+    id: 2021,
+    cat: "React Utilities",
     difficulty: "medium",
-    title: "Implement Array.prototype.flat",
-    tags: ["array", "flat", "recursive"],
-    companies: ["Google", "Atlassian", "CRED", "Flipkart"],
+    title: "Implement a simple React Query-like useFetch",
+    tags: ["useFetch", "react-query", "cache", "async", "hooks"],
+    companies: ["Vercel", "Atlassian", "Razorpay", "Flipkart"],
     description:
-      "Implement Array.prototype.flat(depth). Default depth 1. Infinity flattens completely.",
+      "Implement a cache-backed fetchResource(url, fetcher) function. First call fetches and caches the result. Subsequent calls with the same URL return the cached value immediately. Expose invalidate(url) to clear a cache entry.",
     stubCode:
-      "Array.prototype.myFlat = function(depth = 1) {\n  // Flatten nested arrays to given depth\n};",
+      `const cache = new Map();
+
+function fetchResource(url, fetcher) {
+  // Return Promise<{ data, fromCache }>
+  // On cache hit: resolve immediately with { data, fromCache: true }
+  // On cache miss: call fetcher(url), cache result, resolve with { data, fromCache: false }
+}
+
+function invalidate(url) {
+  // Remove url from cache
+}`,
     solutionCode:
-      "Array.prototype.myFlat = function(depth = 1) {\n  const result = [];\n  const flatten = (arr, d) => {\n    for (let i = 0; i < arr.length; i++) {\n      if (i in arr) {\n        Array.isArray(arr[i]) && d > 0 ? flatten(arr[i], d - 1) : result.push(arr[i]);\n      }\n    }\n  };\n  flatten(this, depth);\n  return result;\n};",
+      `const cache = new Map();
+
+function fetchResource(url, fetcher) {
+  if (cache.has(url)) {
+    return Promise.resolve({ data: cache.get(url), fromCache: true });
+  }
+  return fetcher(url).then(data => {
+    cache.set(url, data);
+    return { data, fromCache: false };
+  });
+}
+
+function invalidate(url) {
+  cache.delete(url);
+}`,
     testCode:
-      "(function() {\n  try {\n    const r1 = [1,[2,[3,[4]]]].myFlat(1);\n    console.log(JSON.stringify(r1) === '[1,2,[3,[4]]]' ? 'PASS: depth 1' : 'FAIL: depth 1 \u2014 got ' + JSON.stringify(r1));\n    const r2 = [1,[2,[3,[4]]]].myFlat(2);\n    console.log(JSON.stringify(r2) === '[1,2,3,[4]]' ? 'PASS: depth 2' : 'FAIL: depth 2 \u2014 got ' + JSON.stringify(r2));\n    const r3 = [1,[2,[3,[4]]]].myFlat(Infinity);\n    console.log(JSON.stringify(r3) === '[1,2,3,4]' ? 'PASS: Infinity' : 'FAIL: Infinity \u2014 got ' + JSON.stringify(r3));\n    const r4 = [].myFlat();\n    console.log(JSON.stringify(r4) === '[]' ? 'PASS: empty' : 'FAIL: empty');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: depth 1\nPASS: depth 2\nPASS: Infinity\nPASS: empty",
+      `(function() {
+  let fetchCount = 0;
+  const mockFetcher = (url) => {
+    fetchCount++;
+    return Promise.resolve({ id: 1, url });
+  };
+
+  fetchResource('/api/user', mockFetcher).then(({ data, fromCache }) => {
+    console.log(!fromCache && data.url === '/api/user' ? 'PASS: fetches on miss' : 'FAIL: fetch — from cache=' + fromCache);
+    console.log(fetchCount === 1 ? 'PASS: fetcher called once' : 'FAIL: fetcher count=' + fetchCount);
+
+    return fetchResource('/api/user', mockFetcher);
+  }).then(({ data, fromCache }) => {
+    console.log(fromCache ? 'PASS: uses cache on hit' : 'FAIL: cache hit — fromCache=' + fromCache);
+    console.log(fetchCount === 1 ? 'PASS: fetcher not called again' : 'FAIL: fetcher count=' + fetchCount);
+
+    invalidate('/api/user');
+    return fetchResource('/api/user', mockFetcher);
+  }).then(({ fromCache }) => {
+    console.log(!fromCache ? 'PASS: refetches after invalidate' : 'FAIL: invalidate — fromCache=' + fromCache);
+    console.log(fetchCount === 2 ? 'PASS: fetcher called again' : 'FAIL: post-invalidate count=' + fetchCount);
+  });
+})();`,
+    expectedOutput: "PASS: fetches on miss\nPASS: fetcher called once\nPASS: uses cache on hit\nPASS: fetcher not called again\nPASS: refetches after invalidate\nPASS: fetcher called again",
     explanation:
-      "Recurse with depth counter. If item is array AND depth > 0, recurse with depth-1. Otherwise push.",
+      "The cache is a Map from URL to resolved data. Cache hit = immediate Promise.resolve. Cache miss = call fetcher, cache the result, resolve. Invalidate removes the entry so the next call re-fetches.",
     keyInsight:
-      "Infinity - 1 === Infinity \u2014 no special case needed for Infinity depth.",
+      "React Query uses this exact pattern — queryKey maps to cached data. staleTime determines when fromCache = true is still acceptable. invalidateQueries() = cache.delete(key).",
   },
+
   {
-    id: 1005,
-    cat: "Array Methods",
-    difficulty: "easy",
-    title: "Implement Array.prototype.forEach",
-    tags: ["array", "forEach", "prototype"],
-    companies: ["Flipkart", "Amazon", "Meesho"],
-    description:
-      "Implement Array.prototype.forEach. Should always return undefined.",
-    stubCode:
-      "Array.prototype.myForEach = function(callback, thisArg) {\n  // Call callback for each element, always return undefined\n};",
-    solutionCode:
-      "Array.prototype.myForEach = function(callback, thisArg) {\n  if (typeof callback !== 'function') throw new TypeError(callback + ' is not a function');\n  for (let i = 0; i < this.length; i++) {\n    if (i in this) callback.call(thisArg, this[i], i, this);\n  }\n};",
-    testCode:
-      "(function() {\n  try {\n    const collected = [];\n    [10,20,30].myForEach(x => collected.push(x));\n    console.log(JSON.stringify(collected) === '[10,20,30]' ? 'PASS: side effects' : 'FAIL: side effects');\n    const indices = [];\n    ['a','b'].myForEach((v,i) => indices.push(i));\n    console.log(JSON.stringify(indices) === '[0,1]' ? 'PASS: index' : 'FAIL: index');\n    const ret = [1,2].myForEach(x => x * 2);\n    console.log(ret === undefined ? 'PASS: returns undefined' : 'FAIL: returns undefined \u2014 got ' + ret);\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: side effects\nPASS: index\nPASS: returns undefined",
-    explanation:
-      "forEach is the simplest iteration. Critical: it must return undefined \u2014 no return statement.",
-    keyInsight:
-      "forEach always returns undefined. No return statement in the function body.",
-  },
-  {
-    id: 1006,
-    cat: "Array Methods",
-    difficulty: "easy",
-    title: "Implement Array.prototype.find and findIndex",
-    tags: ["array", "find", "findIndex"],
-    companies: ["Flipkart", "Swiggy", "Meesho", "Amazon"],
-    description:
-      "Implement both find (returns element or undefined) and findIndex (returns index or -1). Both stop at first match.",
-    stubCode:
-      "Array.prototype.myFind = function(callback, thisArg) {\n  // Return first matching element, or undefined\n};\n\nArray.prototype.myFindIndex = function(callback, thisArg) {\n  // Return index of first match, or -1\n};",
-    solutionCode:
-      "Array.prototype.myFind = function(callback, thisArg) {\n  for (let i = 0; i < this.length; i++) {\n    if (callback.call(thisArg, this[i], i, this)) return this[i];\n  }\n  return undefined;\n};\nArray.prototype.myFindIndex = function(callback, thisArg) {\n  for (let i = 0; i < this.length; i++) {\n    if (callback.call(thisArg, this[i], i, this)) return i;\n  }\n  return -1;\n};",
-    testCode:
-      "(function() {\n  try {\n    console.log([5,12,8,130].myFind(x => x > 10) === 12 ? 'PASS: found' : 'FAIL: found');\n    console.log([1,2,3].myFind(x => x > 10) === undefined ? 'PASS: not found' : 'FAIL: not found');\n    console.log([5,12,8,12].myFind(x => x > 10) === 12 ? 'PASS: first match' : 'FAIL: first match');\n    console.log([5,12,8].myFindIndex(x => x > 10) === 1 ? 'PASS: findIndex' : 'FAIL: findIndex');\n    console.log([1,2,3].myFindIndex(x => x > 10) === -1 ? 'PASS: findIndex -1' : 'FAIL: findIndex -1');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput:
-      "PASS: found\nPASS: not found\nPASS: first match\nPASS: findIndex\nPASS: findIndex -1",
-    explanation:
-      "Both stop at first match. find returns element, findIndex returns index. Sentinels: undefined and -1.",
-    keyInsight:
-      "find and findIndex stop at FIRST match unlike filter which collects all.",
-  },
-  {
-    id: 1007,
-    cat: "Array Methods",
-    difficulty: "easy",
-    title: "Implement Array.prototype.some and every",
-    tags: ["array", "some", "every", "short-circuit"],
-    companies: ["Flipkart", "Amazon", "Meesho", "Paytm"],
-    description:
-      "Implement some (true if any passes) and every (true if all pass). Both must short-circuit.",
-    stubCode:
-      "Array.prototype.mySome = function(callback, thisArg) {\n  // True if ANY element passes\n};\n\nArray.prototype.myEvery = function(callback, thisArg) {\n  // True if ALL elements pass\n};",
-    solutionCode:
-      "Array.prototype.mySome = function(callback, thisArg) {\n  for (let i = 0; i < this.length; i++) {\n    if (i in this && callback.call(thisArg, this[i], i, this)) return true;\n  }\n  return false;\n};\nArray.prototype.myEvery = function(callback, thisArg) {\n  for (let i = 0; i < this.length; i++) {\n    if (i in this && !callback.call(thisArg, this[i], i, this)) return false;\n  }\n  return true;\n};",
-    testCode:
-      "(function() {\n  try {\n    console.log([1,2,3,4].mySome(x => x > 3) === true ? 'PASS: some true' : 'FAIL: some true');\n    console.log([1,2,3,4].mySome(x => x > 10) === false ? 'PASS: some false' : 'FAIL: some false');\n    console.log([2,4,6].myEvery(x => x % 2 === 0) === true ? 'PASS: every true' : 'FAIL: every true');\n    console.log([2,3,6].myEvery(x => x % 2 === 0) === false ? 'PASS: every false' : 'FAIL: every false');\n    console.log([].myEvery(x => false) === true ? 'PASS: every empty' : 'FAIL: every empty');\n    console.log([].mySome(x => true) === false ? 'PASS: some empty' : 'FAIL: some empty');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput:
-      "PASS: some true\nPASS: some false\nPASS: every true\nPASS: every false\nPASS: every empty\nPASS: some empty",
-    explanation:
-      "some returns true on first pass. every returns false on first fail. Empty array: every=true (vacuous truth), some=false.",
-    keyInsight:
-      "every([]) === true (vacuously true). some([]) === false. These edge cases trip up many candidates.",
-  },
-  {
-    id: 1008,
-    cat: "Array Methods",
-    difficulty: "hard",
-    title: "Implement Array.from",
-    tags: ["array", "Array.from", "iterable", "array-like"],
-    companies: ["Google", "Atlassian", "CRED", "Razorpay"],
-    description:
-      "Implement Array.from(arrayLike, mapFn?). Works with array-like objects (length property) and iterables (Set, Map, string).",
-    stubCode:
-      "Array.myFrom = function(arrayLike, mapFn, thisArg) {\n  // Handle array-like objects (.length) and iterables (Symbol.iterator)\n};",
-    solutionCode:
-      "Array.myFrom = function(arrayLike, mapFn, thisArg) {\n  if (arrayLike == null) throw new TypeError('Array.from requires an array-like object');\n  const hasFn = mapFn !== undefined;\n  if (hasFn && typeof mapFn !== 'function') throw new TypeError(mapFn + ' is not a function');\n  if (arrayLike[Symbol.iterator]) {\n    const result = []; let i = 0;\n    for (const item of arrayLike) { result.push(hasFn ? mapFn.call(thisArg, item, i++) : item); }\n    return result;\n  }\n  const len = Math.floor(Math.abs(Number(arrayLike.length))) || 0;\n  const result = new Array(len);\n  for (let i = 0; i < len; i++) result[i] = hasFn ? mapFn.call(thisArg, arrayLike[i], i) : arrayLike[i];\n  return result;\n};",
-    testCode:
-      "(function() {\n  try {\n    const r1 = Array.myFrom({0:'a',1:'b',length:2});\n    console.log(JSON.stringify(r1) === '[\"a\",\"b\"]' ? 'PASS: array-like' : 'FAIL: array-like \u2014 got ' + JSON.stringify(r1));\n    const r2 = Array.myFrom(new Set([1,2,3]));\n    console.log(JSON.stringify(r2) === '[1,2,3]' ? 'PASS: iterable' : 'FAIL: iterable \u2014 got ' + JSON.stringify(r2));\n    const r3 = Array.myFrom({length:3}, (_,i) => i * 2);\n    console.log(JSON.stringify(r3) === '[0,2,4]' ? 'PASS: map fn' : 'FAIL: map fn \u2014 got ' + JSON.stringify(r3));\n    const r4 = Array.myFrom('abc');\n    console.log(JSON.stringify(r4) === '[\"a\",\"b\",\"c\"]' ? 'PASS: string' : 'FAIL: string \u2014 got ' + JSON.stringify(r4));\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput:
-      "PASS: array-like\nPASS: iterable\nPASS: map fn\nPASS: string",
-    explanation:
-      "Check Symbol.iterator first for iterables, fall back to .length for array-likes.",
-    keyInsight:
-      "Check Symbol.iterator before .length. Iterables take priority. Strings are iterable.",
-  },
-  {
-    id: 1009,
-    cat: "Function Methods",
+    id: 2022,
+    cat: "React Utilities",
     difficulty: "medium",
-    title: "Implement Function.prototype.bind",
-    tags: ["function", "bind", "this", "partial-application"],
-    companies: ["Razorpay", "Flipkart", "Google", "Amazon", "Microsoft"],
+    title: "Implement useLocalStorage hook",
+    tags: ["useLocalStorage", "localStorage", "custom-hook", "persistence"],
+    companies: ["Flipkart", "Swiggy", "CRED", "Razorpay"],
     description:
-      "Implement Function.prototype.bind. Permanently set this, optionally pre-fill arguments (partial application). Support new.",
+      "Implement useLocalStorage(key, initialValue, storage). Returns [value, setValue, removeValue]. setValue persists to storage. Reading initializes from storage if the key exists. Use storage.getItem/setItem/removeItem for testability.",
     stubCode:
-      "Function.prototype.myBind = function(thisArg, ...args) {\n  // Return new function with 'this' permanently set\n  // Support partial application and 'new'\n};",
+      `function useLocalStorage(key, initialValue, storage = localStorage) {
+  // Read initial value from storage (parse JSON), fallback to initialValue
+  // setValue: update state AND persist to storage
+  // removeValue: remove from storage and reset to initialValue
+}`,
     solutionCode:
-      "Function.prototype.myBind = function(thisArg, ...args) {\n  if (typeof this !== 'function') throw new TypeError('myBind must be called on a function');\n  const fn = this;\n  function bound(...laterArgs) {\n    return fn.apply(this instanceof bound ? this : thisArg, [...args, ...laterArgs]);\n  }\n  if (fn.prototype) bound.prototype = Object.create(fn.prototype);\n  return bound;\n};",
+      `function useLocalStorage(key, initialValue, storage = localStorage) {
+  function read() {
+    try {
+      const item = storage.getItem(key);
+      return item !== null ? JSON.parse(item) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  }
+
+  let value = read();
+
+  function setValue(newValue) {
+    value = typeof newValue === 'function' ? newValue(value) : newValue;
+    try {
+      storage.setItem(key, JSON.stringify(value));
+    } catch {}
+  }
+
+  function removeValue() {
+    value = initialValue;
+    storage.removeItem(key);
+  }
+
+  function getValue() { return value; }
+
+  return [getValue, setValue, removeValue];
+}`,
     testCode:
-      "(function() {\n  try {\n    function greet(greeting, punct) { return greeting + ', ' + this.name + punct; }\n    const hi = greet.myBind({ name: 'Alice' }, 'Hello');\n    console.log(hi('!') === 'Hello, Alice!' ? 'PASS: basic' : 'FAIL: basic \u2014 got ' + hi('!'));\n    const add = (a,b,c) => a+b+c;\n    const add5 = add.myBind(null, 5);\n    console.log(add5(3,2) === 10 ? 'PASS: partial' : 'FAIL: partial \u2014 got ' + add5(3,2));\n    const obj = { x: 1 };\n    const getX = function() { return this.x; }.myBind(obj);\n    console.log(getX.call({ x: 99 }) === 1 ? 'PASS: permanent' : 'FAIL: permanent \u2014 got ' + getX.call({x:99}));\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: basic\nPASS: partial\nPASS: permanent",
+      `(function() {
+  try {
+    // Mock storage
+    const mockStorage = (() => {
+      const store = {};
+      return {
+        getItem: k => store[k] ?? null,
+        setItem: (k, v) => { store[k] = v; },
+        removeItem: k => { delete store[k]; },
+      };
+    })();
+
+    const [getCount, setCount, removeCount] = useLocalStorage('count', 0, mockStorage);
+
+    console.log(getCount() === 0 ? 'PASS: initial value' : 'FAIL: initial — got ' + getCount());
+
+    setCount(5);
+    console.log(getCount() === 5 ? 'PASS: setValue updates' : 'FAIL: setValue — got ' + getCount());
+    console.log(mockStorage.getItem('count') === '5' ? 'PASS: persisted to storage' : 'FAIL: persist — got ' + mockStorage.getItem('count'));
+
+    // New instance reads persisted value
+    const [getCount2] = useLocalStorage('count', 0, mockStorage);
+    console.log(getCount2() === 5 ? 'PASS: reads from storage' : 'FAIL: reads storage — got ' + getCount2());
+
+    // Updater function
+    setCount(c => c + 10);
+    console.log(getCount() === 15 ? 'PASS: updater fn' : 'FAIL: updater — got ' + getCount());
+
+    removeCount();
+    console.log(getCount() === 0 && mockStorage.getItem('count') === null ? 'PASS: removeValue' : 'FAIL: remove — got ' + getCount());
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial value\nPASS: setValue updates\nPASS: persisted to storage\nPASS: reads from storage\nPASS: updater fn\nPASS: removeValue",
     explanation:
-      "Combine pre-filled args with later args via spread. Check instanceof for new support. bind is permanent \u2014 call cannot override it.",
+      "Read from storage on initialization, falling back to initialValue. Every setValue serializes with JSON.stringify. removeValue clears storage and resets to initialValue. Injectable storage enables testing without real localStorage.",
     keyInsight:
-      "Check this instanceof bound to support new. bind wins over call/apply \u2014 the bound this cannot be overridden.",
+      "Always JSON.parse/stringify for localStorage — it only stores strings. Inject storage as a dependency for testability. In real hooks, trigger re-render by wrapping value in useState and calling setStoredValue.",
   },
+
   {
-    id: 1010,
-    cat: "Function Methods",
+    id: 2023,
+    cat: "State Management",
+    difficulty: "hard",
+    title: "Implement a simple pub/sub (useSubscription pattern)",
+    tags: ["pub-sub", "subscription", "observer", "hooks"],
+    companies: ["Meta", "Google", "Flipkart", "Atlassian"],
+    description:
+      "Implement createSubscription() returning a { publish, subscribe, getSnapshot } object. subscribe(listener) calls listener whenever publish(value) is called. getSnapshot() returns the last published value. Listeners receive the new value and previous value.",
+    stubCode:
+      `function createSubscription(initialValue) {
+  // Return { publish, subscribe, getSnapshot }
+  // subscribe(listener) → returns unsubscribe fn
+  // listener called with (newValue, prevValue) on every publish
+  // getSnapshot() → returns latest value
+}`,
+    solutionCode:
+      `function createSubscription(initialValue) {
+  let current = initialValue;
+  const listeners = new Set();
+
+  function publish(value) {
+    const prev = current;
+    current = value;
+    listeners.forEach(l => l(value, prev));
+  }
+
+  function subscribe(listener) {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  }
+
+  function getSnapshot() {
+    return current;
+  }
+
+  return { publish, subscribe, getSnapshot };
+}`,
+    testCode:
+      `(function() {
+  try {
+    const sub = createSubscription(0);
+
+    console.log(sub.getSnapshot() === 0 ? 'PASS: initial snapshot' : 'FAIL: initial — got ' + sub.getSnapshot());
+
+    sub.publish(42);
+    console.log(sub.getSnapshot() === 42 ? 'PASS: snapshot updates' : 'FAIL: snapshot — got ' + sub.getSnapshot());
+
+    const received = [];
+    const unsub = sub.subscribe((newVal, prevVal) => received.push({ newVal, prevVal }));
+
+    sub.publish(100);
+    sub.publish(200);
+
+    console.log(received.length === 2 ? 'PASS: listener called' : 'FAIL: listener count=' + received.length);
+    console.log(received[0].newVal === 100 && received[0].prevVal === 42 ? 'PASS: receives new and prev' : 'FAIL: values — ' + JSON.stringify(received[0]));
+    console.log(received[1].newVal === 200 && received[1].prevVal === 100 ? 'PASS: prev tracks correctly' : 'FAIL: prev — ' + JSON.stringify(received[1]));
+
+    unsub();
+    sub.publish(999);
+    console.log(received.length === 2 ? 'PASS: unsubscribed' : 'FAIL: unsub — length=' + received.length);
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: initial snapshot\nPASS: snapshot updates\nPASS: listener called\nPASS: receives new and prev\nPASS: prev tracks correctly\nPASS: unsubscribed",
+    explanation:
+      "A publish/subscribe system with value storage. publish updates the current value and notifies all listeners with both new and previous values. getSnapshot enables React's useSyncExternalStore integration.",
+    keyInsight:
+      "This is the pattern behind useSyncExternalStore. React calls getSnapshot() to check if the value changed and subscribe() to register for future changes. External stores (Zustand, Redux) all implement this interface.",
+  },
+
+  {
+    id: 2024,
+    cat: "Component Patterns",
+    difficulty: "hard",
+    title: "Implement a render prop pattern (renderChildren)",
+    tags: ["render-props", "children-as-function", "patterns", "compound"],
+    companies: ["Meta", "Flipkart", "Atlassian", "Google"],
+    description:
+      "Implement DataProvider(data, children). children is a function: (data, { filter, sort }) => result. The provider exposes filter(fn) and sort(fn) utilities that operate on data and pass the processed result to children.",
+    stubCode:
+      `function DataProvider(data, children) {
+  // children is a function: (processedData, utils) => any
+  // utils = { filter(fn), sort(fn) }
+  // Each util returns a NEW processed version without mutating data
+}`,
+    solutionCode:
+      `function DataProvider(data, children) {
+  const utils = {
+    filter(fn) {
+      return data.filter(fn);
+    },
+    sort(fn) {
+      return [...data].sort(fn);
+    },
+  };
+  return children(data, utils);
+}`,
+    testCode:
+      `(function() {
+  try {
+    const items = [3, 1, 4, 1, 5, 9, 2, 6];
+
+    const result1 = DataProvider(items, (data) => data.length);
+    console.log(result1 === 8 ? 'PASS: passes data to children' : 'FAIL: passes data — got ' + result1);
+
+    const filtered = DataProvider(items, (data, { filter }) => filter(x => x > 4));
+    console.log(JSON.stringify(filtered) === '[5,9,6]' ? 'PASS: filter util works' : 'FAIL: filter — got ' + JSON.stringify(filtered));
+
+    const sorted = DataProvider(items, (data, { sort }) => sort((a, b) => a - b));
+    console.log(JSON.stringify(sorted) === '[1,1,2,3,4,5,6,9]' ? 'PASS: sort util works' : 'FAIL: sort — got ' + JSON.stringify(sorted));
+
+    // Original data must not be mutated
+    console.log(JSON.stringify(items) === '[3,1,4,1,5,9,2,6]' ? 'PASS: original not mutated' : 'FAIL: mutated — ' + JSON.stringify(items));
+
+    // Chained usage
+    const result = DataProvider(items, (data, { filter, sort }) => sort((a,b) => a-b).filter ? 'has filter' : 'missing');
+    // filter and sort return arrays, so chaining is natural
+    const chained = DataProvider(items, (_, { sort }) => {
+      const s = sort((a, b) => a - b);
+      return s.filter(x => x > 3);
+    });
+    console.log(JSON.stringify(chained) === '[4,5,6,9]' ? 'PASS: utils chainable' : 'FAIL: chain — got ' + JSON.stringify(chained));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: passes data to children\nPASS: filter util works\nPASS: sort util works\nPASS: original not mutated\nPASS: utils chainable",
+    explanation:
+      "The provider calls children as a function, passing data and a utilities object. Each utility returns a new array — never mutating the original. The caller decides what to do with the result, keeping the provider flexible.",
+    keyInsight:
+      "Render props invert control: the component provides STATE and BEHAVIOR, the caller provides RENDERING. This is why libraries like Downshift and React Table expose render props — consumers control the UI while the library controls the logic.",
+  },
+
+  {
+    id: 2025,
+    cat: "Component Patterns",
     difficulty: "medium",
-    title: "Implement Function.prototype.call and apply",
-    tags: ["function", "call", "apply", "this"],
-    companies: ["Razorpay", "Flipkart", "Google", "Amazon"],
+    title: "Implement pipe for React component transforms",
+    tags: ["pipe", "HOC", "composition", "patterns"],
+    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
     description:
-      "Implement call (args individually) and apply (args as array). Both set this explicitly using the property-on-context trick.",
+      "Implement pipeHOCs(...hocs). Returns a function that applies multiple HOCs left-to-right to a component. pipeHOCs(withLogging, withAuth, withTheme)(MyComponent) should be equivalent to withTheme(withAuth(withLogging(MyComponent))).",
     stubCode:
-      "Function.prototype.myCall = function(thisArg, ...args) {\n  // Call this function with thisArg as 'this'\n};\n\nFunction.prototype.myApply = function(thisArg, argsArray) {\n  // Call with thisArg as 'this', args from array\n};",
+      `function pipeHOCs(...hocs) {
+  // Apply HOCs left-to-right: first HOC wraps innermost
+  // pipeHOCs(A, B, C)(Comp) = C(B(A(Comp)))
+}`,
     solutionCode:
-      "Function.prototype.myCall = function(thisArg, ...args) {\n  const ctx = thisArg ?? globalThis;\n  const sym = Symbol();\n  ctx[sym] = this;\n  const result = ctx[sym](...args);\n  delete ctx[sym];\n  return result;\n};\nFunction.prototype.myApply = function(thisArg, argsArray) {\n  const ctx = thisArg ?? globalThis;\n  const sym = Symbol();\n  ctx[sym] = this;\n  const result = argsArray ? ctx[sym](...argsArray) : ctx[sym]();\n  delete ctx[sym];\n  return result;\n};",
+      `function pipeHOCs(...hocs) {
+  return (Component) => hocs.reduce((wrapped, hoc) => hoc(wrapped), Component);
+}`,
     testCode:
-      "(function() {\n  try {\n    function greet(g) { return g + ', ' + this.name; }\n    console.log(greet.myCall({ name: 'Bob' }, 'Hi') === 'Hi, Bob' ? 'PASS: call basic' : 'FAIL: call basic');\n    function sum(a,b,c) { return a+b+c; }\n    console.log(sum.myCall(null, 1, 2, 3) === 6 ? 'PASS: call args' : 'FAIL: call args');\n    console.log(greet.myApply({ name: 'Bob' }, ['Hi']) === 'Hi, Bob' ? 'PASS: apply basic' : 'FAIL: apply basic');\n    console.log(sum.myApply(null, [1,2,3]) === 6 ? 'PASS: apply args' : 'FAIL: apply args');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput:
-      "PASS: call basic\nPASS: call args\nPASS: apply basic\nPASS: apply args",
+      `(function() {
+  try {
+    const withPrefix = (prefix) => (Component) => (props) => prefix + ':' + Component(props);
+    const withSuffix = (suffix) => (Component) => (props) => Component(props) + ':' + suffix;
+
+    const base = (props) => props.text;
+
+    // pipeHOCs applies left-to-right, each wraps the previous
+    // withPrefix('A')(withPrefix('B')(base)) = A:B:text
+    const enhanced1 = pipeHOCs(withPrefix('B'), withPrefix('A'))(base);
+    console.log(enhanced1({ text: 'hello' }) === 'A:B:hello' ? 'PASS: left-to-right' : 'FAIL: order — got ' + enhanced1({ text: 'hello' }));
+
+    // Single HOC
+    const enhanced2 = pipeHOCs(withSuffix('!'))(base);
+    console.log(enhanced2({ text: 'hi' }) === 'hi:!' ? 'PASS: single HOC' : 'FAIL: single — got ' + enhanced2({ text: 'hi' }));
+
+    // No HOCs → identity
+    const enhanced3 = pipeHOCs()(base);
+    console.log(enhanced3({ text: 'plain' }) === 'plain' ? 'PASS: no HOCs = identity' : 'FAIL: identity — got ' + enhanced3({ text: 'plain' }));
+
+    // Three HOCs
+    const enhanced4 = pipeHOCs(withPrefix('X'), withPrefix('Y'), withSuffix('Z'))(base);
+    console.log(enhanced4({ text: 'val' }) === 'Y:X:val:Z' ? 'PASS: three HOCs' : 'FAIL: three — got ' + enhanced4({ text: 'val' }));
+  } catch(e) { console.log('FAIL: threw — ' + e.message); }
+})();`,
+    expectedOutput: "PASS: left-to-right\nPASS: single HOC\nPASS: no HOCs = identity\nPASS: three HOCs",
     explanation:
-      "Attach function to context object using Symbol (no collision), call it, delete it. The Symbol key guarantees no existing property is overwritten.",
+      "reduce applies each HOC to the accumulator (previously wrapped component) starting with the base component. Left-to-right means the first HOC is innermost — its output feeds the second HOC.",
     keyInsight:
-      "Use Symbol() as the temporary key when attaching the function to context \u2014 guarantees no collision.",
-  },
-  {
-    id: 1011,
-    cat: "Function Methods",
-    difficulty: "medium",
-    title: "Implement once()",
-    tags: ["function", "once", "closure", "cache"],
-    companies: ["Google", "Atlassian", "CRED", "Razorpay"],
-    description:
-      "Implement once(fn) \u2014 returns a wrapper that calls fn only the first time. Subsequent calls return the cached first result without invoking fn.",
-    stubCode:
-      "function once(fn) {\n  // Return a function that calls fn only once\n  // Subsequent calls return the first result\n}",
-    solutionCode:
-      "function once(fn) {\n  let called = false;\n  let result;\n  return function(...args) {\n    if (!called) { called = true; result = fn.apply(this, args); }\n    return result;\n  };\n}",
-    testCode:
-      "(function() {\n  try {\n    let count = 0;\n    const inc = once(() => ++count);\n    inc(); inc(); inc();\n    console.log(count === 1 ? 'PASS: called once' : 'FAIL: called once \u2014 count=' + count);\n    let n = 0;\n    const getN = once(() => ++n);\n    const r1 = getN(), r2 = getN(), r3 = getN();\n    console.log(r1 === 1 && r2 === 1 && r3 === 1 ? 'PASS: returns first' : 'FAIL: returns first \u2014 ' + [r1,r2,r3]);\n    let side = 0;\n    const noOp = once(() => { side = 42; return 'done'; });\n    noOp(); noOp();\n    console.log(side === 42 ? 'PASS: side effect once' : 'FAIL: side effect once');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput:
-      "PASS: called once\nPASS: returns first\nPASS: side effect once",
-    explanation:
-      "Use a called flag and cached result. After first call, return cached result without re-invoking fn.",
-    keyInsight:
-      "Cache the result \u2014 subsequent calls return the exact same value, not undefined.",
-  },
-  {
-    id: 1012,
-    cat: "Promise Methods",
-    difficulty: "hard",
-    title: "Implement Promise.all",
-    tags: ["promise", "Promise.all", "async"],
-    companies: ["Razorpay", "Swiggy", "PhonePe", "Google", "Atlassian"],
-    description:
-      "Implement Promise.all. Resolves with array of values in order. Rejects immediately on first rejection.",
-    stubCode:
-      "function myPromiseAll(promises) {\n  return new Promise((resolve, reject) => {\n    // Resolve with all values, reject on first failure\n  });\n}",
-    solutionCode:
-      "function myPromiseAll(promises) {\n  return new Promise((resolve, reject) => {\n    if (!promises || promises.length === 0) { resolve([]); return; }\n    const results = new Array(promises.length);\n    let remaining = promises.length;\n    promises.forEach((p, i) => {\n      Promise.resolve(p)\n        .then(v => { results[i] = v; if (--remaining === 0) resolve(results); })\n        .catch(reject);\n    });\n  });\n}",
-    testCode:
-      "(function() {\n  myPromiseAll([Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)])\n    .then(v => console.log(JSON.stringify(v) === '[1,2,3]' ? 'PASS: all resolve' : 'FAIL: all resolve \u2014 got ' + JSON.stringify(v)));\n  myPromiseAll([Promise.resolve(1), Promise.reject('err'), Promise.resolve(3)])\n    .then(() => console.log('FAIL: should reject'))\n    .catch(e => console.log(e === 'err' ? 'PASS: rejects on first' : 'FAIL: rejects on first \u2014 got ' + e));\n  myPromiseAll([])\n    .then(v => console.log(JSON.stringify(v) === '[]' ? 'PASS: empty' : 'FAIL: empty'));\n})();",
-    expectedOutput: "PASS: all resolve\nPASS: rejects on first\nPASS: empty",
-    explanation:
-      "Store results by index (preserves order). Use counter for completion. .catch(reject) for fail-fast.",
-    keyInsight:
-      "Order is by index, not resolution order. Use a counter \u2014 not promise chaining \u2014 to track completion.",
-  },
-  {
-    id: 1013,
-    cat: "Promise Methods",
-    difficulty: "hard",
-    title: "Implement Promise.allSettled",
-    tags: ["promise", "Promise.allSettled", "async"],
-    companies: ["Razorpay", "Swiggy", "PhonePe", "Atlassian"],
-    description:
-      "Implement Promise.allSettled. Always resolves with {status, value/reason} objects. Never rejects.",
-    stubCode:
-      "function myPromiseAllSettled(promises) {\n  return new Promise((resolve) => {\n    // Never rejects \u2014 always resolves with status objects\n  });\n}",
-    solutionCode:
-      "function myPromiseAllSettled(promises) {\n  return new Promise(resolve => {\n    if (!promises || promises.length === 0) { resolve([]); return; }\n    const results = new Array(promises.length);\n    let remaining = promises.length;\n    promises.forEach((p, i) => {\n      Promise.resolve(p)\n        .then(value => { results[i] = { status: 'fulfilled', value }; })\n        .catch(reason => { results[i] = { status: 'rejected', reason }; })\n        .finally(() => { if (--remaining === 0) resolve(results); });\n    });\n  });\n}",
-    testCode:
-      "(function() {\n  myPromiseAllSettled([Promise.resolve(1), Promise.reject('oops'), Promise.resolve(3)])\n    .then(r => {\n      const ok = r[0].status === 'fulfilled' && r[0].value === 1 && r[1].status === 'rejected' && r[1].reason === 'oops' && r[2].status === 'fulfilled' && r[2].value === 3;\n      console.log(ok ? 'PASS: mixed' : 'FAIL: mixed \u2014 ' + JSON.stringify(r));\n    });\n  myPromiseAllSettled([Promise.resolve(1), Promise.resolve(2)])\n    .then(r => console.log(r.every(x => x.status === 'fulfilled') ? 'PASS: all fulfilled' : 'FAIL: all fulfilled'));\n  myPromiseAllSettled([Promise.reject('a'), Promise.reject('b')])\n    .then(r => console.log(r.every(x => x.status === 'rejected') ? 'PASS: all rejected' : 'FAIL: all rejected'));\n})();",
-    expectedOutput: "PASS: mixed\nPASS: all fulfilled\nPASS: all rejected",
-    explanation:
-      "Wrap both success and failure in status objects. Use finally to decrement counter. The outer Promise only ever resolves.",
-    keyInsight:
-      "allSettled never rejects. Both .then and .catch produce status objects. .finally tracks completion.",
-  },
-  {
-    id: 1014,
-    cat: "Promise Methods",
-    difficulty: "hard",
-    title: "Implement Promise.race",
-    tags: ["promise", "Promise.race", "async"],
-    companies: ["Google", "Atlassian", "CRED", "Razorpay"],
-    description:
-      "Implement Promise.race. Settles with the first promise to resolve or reject.",
-    stubCode:
-      "function myPromiseRace(promises) {\n  return new Promise((resolve, reject) => {\n    // Settle with whichever promise settles first\n  });\n}",
-    solutionCode:
-      "function myPromiseRace(promises) {\n  return new Promise((resolve, reject) => {\n    for (const p of promises) Promise.resolve(p).then(resolve).catch(reject);\n  });\n}",
-    testCode:
-      "(function() {\n  const fast = new Promise(r => setTimeout(() => r('fast'), 10));\n  const slow = new Promise(r => setTimeout(() => r('slow'), 50));\n  myPromiseRace([slow, fast]).then(v => console.log(v === 'fast' ? 'PASS: fastest wins' : 'FAIL: fastest wins \u2014 got ' + v));\n  myPromiseRace([Promise.reject('first'), Promise.resolve('second')])\n    .then(() => console.log('FAIL: should reject'))\n    .catch(e => console.log(e === 'first' ? 'PASS: rejects first' : 'FAIL: rejects first \u2014 got ' + e));\n  myPromiseRace([Promise.resolve('a'), Promise.resolve('b')])\n    .then(v => console.log(v === 'a' ? 'PASS: resolves first' : 'FAIL: resolves first \u2014 got ' + v));\n})();",
-    expectedOutput:
-      "PASS: rejects first\nPASS: resolves first\nPASS: fastest wins",
-    explanation:
-      "Attach resolve and reject to every promise. First to settle wins \u2014 subsequent calls are no-ops since Promise can only settle once.",
-    keyInsight:
-      "Promise.race is a one-liner: attach the same resolve/reject to all. A Promise settles only once \u2014 subsequent calls are ignored.",
-  },
-  {
-    id: 1015,
-    cat: "Promise Methods",
-    difficulty: "hard",
-    title: "Implement Promise.any",
-    tags: ["promise", "Promise.any", "AggregateError"],
-    companies: ["Google", "Atlassian", "CRED"],
-    description:
-      "Implement Promise.any. Resolves with FIRST fulfilled. Rejects with AggregateError only if ALL reject.",
-    stubCode:
-      "function myPromiseAny(promises) {\n  return new Promise((resolve, reject) => {\n    // Resolve on first success, reject with AggregateError if all fail\n  });\n}",
-    solutionCode:
-      "function myPromiseAny(promises) {\n  return new Promise((resolve, reject) => {\n    if (!promises || promises.length === 0) { reject(new AggregateError([], 'All promises were rejected')); return; }\n    const errors = new Array(promises.length);\n    let rejectedCount = 0;\n    promises.forEach((p, i) => {\n      Promise.resolve(p)\n        .then(resolve)\n        .catch(reason => {\n          errors[i] = reason;\n          if (++rejectedCount === promises.length) reject(new AggregateError(errors, 'All promises were rejected'));\n        });\n    });\n  });\n}",
-    testCode:
-      "(function() {\n  myPromiseAny([Promise.reject('a'), Promise.resolve('first'), Promise.resolve('second')])\n    .then(v => console.log(v === 'first' ? 'PASS: first resolve' : 'FAIL: first resolve \u2014 got ' + v));\n  myPromiseAny([Promise.reject('a'), Promise.reject('b')])\n    .then(() => console.log('FAIL: should reject'))\n    .catch(e => console.log(e instanceof AggregateError ? 'PASS: all reject' : 'FAIL: all reject'));\n  myPromiseAny([Promise.reject('x'), Promise.resolve('ok')])\n    .then(v => console.log(v === 'ok' ? 'PASS: ignores reject' : 'FAIL: ignores reject'));\n})();",
-    expectedOutput:
-      "PASS: first resolve\nPASS: all reject\nPASS: ignores reject",
-    explanation:
-      "Resolve on first success. Collect rejections and only reject when all have rejected.",
-    keyInsight:
-      "Promise.any = opposite of Promise.all. any = first success or all-fail. all = first fail or all-success.",
-  },
-  {
-    id: 1016,
-    cat: "Utility Functions",
-    difficulty: "medium",
-    title: "Implement debounce",
-    tags: ["debounce", "closure", "timer", "utility"],
-    companies: ["Razorpay", "Flipkart", "Swiggy", "Google", "Amazon"],
-    description:
-      "Implement debounce(fn, delay). Delays invoking fn until after delay ms of inactivity.",
-    stubCode:
-      "function debounce(fn, delay) {\n  // Return a debounced version of fn\n  // Only calls fn after 'delay' ms of silence\n}",
-    solutionCode:
-      "function debounce(fn, delay) {\n  let timer = null;\n  return function(...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => { fn.apply(this, args); timer = null; }, delay);\n  };\n}",
-    testCode:
-      "(function() {\n  let callCount = 0;\n  const debounced = debounce(() => callCount++, 50);\n  debounced(); debounced(); debounced(); debounced(); debounced();\n  setTimeout(() => {\n    console.log(callCount === 1 ? 'PASS: delays and batches' : 'FAIL: delays and batches \u2014 called ' + callCount);\n  }, 100);\n  let count2 = 0;\n  const d2 = debounce(() => count2++, 30);\n  d2();\n  setTimeout(() => d2(), 60);\n  setTimeout(() => {\n    console.log(count2 === 2 ? 'PASS: resets after delay' : 'FAIL: resets \u2014 count=' + count2);\n  }, 150);\n})();",
-    expectedOutput: "PASS: delays and batches\nPASS: resets after delay",
-    explanation:
-      "clearTimeout + setTimeout on every call. Only the last in a rapid sequence runs.",
-    keyInsight:
-      "debounce = wait until quiet. clearTimeout then setTimeout. fn only runs after delay ms of silence.",
-  },
-  {
-    id: 1017,
-    cat: "Utility Functions",
-    difficulty: "medium",
-    title: "Implement throttle",
-    tags: ["throttle", "closure", "timer", "utility"],
-    companies: ["Razorpay", "Flipkart", "Swiggy", "Amazon"],
-    description:
-      "Implement throttle(fn, limit). fn executes at most once per limit ms. First call executes immediately.",
-    stubCode:
-      "function throttle(fn, limit) {\n  // Return a throttled version of fn\n  // Execute at most once per 'limit' ms\n}",
-    solutionCode:
-      "function throttle(fn, limit) {\n  let lastCall = 0;\n  return function(...args) {\n    const now = Date.now();\n    if (now - lastCall >= limit) { lastCall = now; return fn.apply(this, args); }\n  };\n}",
-    testCode:
-      "(function() {\n  let count = 0;\n  const throttled = throttle(() => count++, 50);\n  throttled(); throttled(); throttled();\n  console.log(count === 1 ? 'PASS: immediate first call' : 'FAIL: immediate \u2014 count=' + count);\n  setTimeout(() => {\n    throttled();\n    console.log(count === 2 ? 'PASS: fires after limit' : 'FAIL: fires after limit \u2014 count=' + count);\n  }, 60);\n  setTimeout(() => {\n    throttled(); throttled(); throttled();\n  }, 120);\n  setTimeout(() => {\n    console.log(count === 3 ? 'PASS: limits rate' : 'FAIL: limits rate \u2014 count=' + count);\n  }, 130);\n})();",
-    expectedOutput:
-      "PASS: immediate first call\nPASS: fires after limit\nPASS: limits rate",
-    explanation:
-      "Compare Date.now() against lastCall. Execute and update lastCall if enough time has passed.",
-    keyInsight:
-      "throttle = at most once per X ms. FIRST call fires immediately. Subsequent calls within the window are dropped.",
-  },
-  {
-    id: 1018,
-    cat: "Utility Functions",
-    difficulty: "medium",
-    title: "Implement memoize",
-    tags: ["memoize", "cache", "closure", "utility"],
-    companies: ["Google", "Atlassian", "CRED", "Razorpay", "Amazon"],
-    description:
-      "Implement memoize(fn). Caches results by argument. Same args = cached result, no re-execution.",
-    stubCode:
-      "function memoize(fn) {\n  // Return a memoized version \u2014 cache by serialized arguments\n}",
-    solutionCode:
-      "function memoize(fn) {\n  const cache = new Map();\n  return function(...args) {\n    const key = JSON.stringify(args);\n    if (cache.has(key)) return cache.get(key);\n    const result = fn.apply(this, args);\n    cache.set(key, result);\n    return result;\n  };\n}",
-    testCode:
-      "(function() {\n  try {\n    let calls = 0;\n    const exp = memoize(n => { calls++; return n * 2; });\n    exp(5); exp(5); exp(5);\n    console.log(calls === 1 ? 'PASS: caches result' : 'FAIL: caches \u2014 called ' + calls);\n    exp(10);\n    console.log(calls === 2 ? 'PASS: different args' : 'FAIL: different args \u2014 calls=' + calls);\n    const r = exp(5);\n    console.log(r === 10 && calls === 2 ? 'PASS: cache hit returns value' : 'FAIL: cache hit \u2014 got ' + r);\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput:
-      "PASS: caches result\nPASS: different args\nPASS: cache hit returns value",
-    explanation:
-      "Map keyed by JSON.stringify(args). Each unique arg combo stored once.",
-    keyInsight:
-      "JSON.stringify(args) works for primitives. For complex objects use WeakMap or custom serializer.",
-  },
-  {
-    id: 1019,
-    cat: "Utility Functions",
-    difficulty: "hard",
-    title: "Implement curry",
-    tags: ["curry", "closure", "partial-application", "utility"],
-    companies: ["Google", "Atlassian", "CRED", "Razorpay"],
-    description:
-      "Implement curry(fn). curry(add)(1)(2)(3) === add(1,2,3). Can also be called with multiple args.",
-    stubCode:
-      "function curry(fn) {\n  // Return a curried version \u2014 partial application until all args collected\n}",
-    solutionCode:
-      "function curry(fn) {\n  return function curried(...args) {\n    if (args.length >= fn.length) return fn.apply(this, args);\n    return function(...more) { return curried.apply(this, [...args, ...more]); };\n  };\n}",
-    testCode:
-      "(function() {\n  try {\n    const add = (a,b,c) => a+b+c;\n    const c = curry(add);\n    console.log(c(1,2,3) === 6 ? 'PASS: full apply' : 'FAIL: full apply \u2014 got ' + c(1,2,3));\n    console.log(c(1)(2,3) === 6 ? 'PASS: partial' : 'FAIL: partial \u2014 got ' + c(1)(2,3));\n    console.log(c(1)(2)(3) === 6 ? 'PASS: chained' : 'FAIL: chained \u2014 got ' + c(1)(2)(3));\n    console.log(c(10)(5)(2) === 17 ? 'PASS: reusable' : 'FAIL: reusable \u2014 got ' + c(10)(5)(2));\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput:
-      "PASS: full apply\nPASS: partial\nPASS: chained\nPASS: reusable",
-    explanation:
-      "Compare args.length to fn.length. If enough, call fn. Otherwise return a function that accumulates more args.",
-    keyInsight:
-      "fn.length = declared parameter count. Accumulate args until you have enough, then invoke.",
-  },
-  {
-    id: 1020,
-    cat: "Utility Functions",
-    difficulty: "hard",
-    title: "Implement compose and pipe",
-    tags: ["compose", "pipe", "functional", "utility"],
-    companies: ["Google", "Atlassian", "CRED"],
-    description:
-      "compose(f,g,h)(x) = f(g(h(x))) right-to-left. pipe(f,g,h)(x) = h(g(f(x))) left-to-right.",
-    stubCode:
-      "function compose(...fns) {\n  // Right-to-left: compose(f,g,h)(x) === f(g(h(x)))\n}\n\nfunction pipe(...fns) {\n  // Left-to-right: pipe(f,g,h)(x) === h(g(f(x)))\n}",
-    solutionCode:
-      "function compose(...fns) {\n  return x => fns.reduceRight((acc, fn) => fn(acc), x);\n}\nfunction pipe(...fns) {\n  return x => fns.reduce((acc, fn) => fn(acc), x);\n}",
-    testCode:
-      "(function() {\n  try {\n    const double = x => x*2, addOne = x => x+1, square = x => x*x;\n    const c = compose(double, addOne, square);\n    console.log(c(3) === 20 ? 'PASS: compose' : 'FAIL: compose \u2014 got ' + c(3));\n    const p = pipe(double, addOne, square);\n    console.log(p(3) === 49 ? 'PASS: pipe' : 'FAIL: pipe \u2014 got ' + p(3));\n    console.log(compose(double)(5) === 10 ? 'PASS: single fn' : 'FAIL: single fn');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: compose\nPASS: pipe\nPASS: single fn",
-    explanation: "compose = reduceRight. pipe = reduce. Both are one-liners.",
-    keyInsight:
-      "compose = reduceRight (right-to-left). pipe = reduce (left-to-right).",
-  },
-  {
-    id: 1021,
-    cat: "Object Methods",
-    difficulty: "easy",
-    title: "Implement Object.assign",
-    tags: ["object", "Object.assign", "shallow-copy"],
-    companies: ["Flipkart", "Amazon", "Microsoft", "Razorpay"],
-    description:
-      "Implement Object.assign(target, ...sources). Copies own enumerable string-keyed properties. Returns the mutated target.",
-    stubCode:
-      "Object.myAssign = function(target, ...sources) {\n  // Copy own enumerable props from each source to target\n};",
-    solutionCode:
-      "Object.myAssign = function(target, ...sources) {\n  if (target == null) throw new TypeError('Cannot convert undefined or null to object');\n  const to = Object(target);\n  for (const src of sources) {\n    if (src == null) continue;\n    for (const key of Object.keys(src)) to[key] = src[key];\n  }\n  return to;\n};",
-    testCode:
-      "(function() {\n  try {\n    const r1 = Object.myAssign({}, {a:1}, {b:2});\n    console.log(r1.a===1 && r1.b===2 ? 'PASS: basic' : 'FAIL: basic \u2014 ' + JSON.stringify(r1));\n    const r2 = Object.myAssign({a:1,b:2}, {b:99,c:3});\n    console.log(r2.b===99 && r2.c===3 ? 'PASS: override' : 'FAIL: override \u2014 ' + JSON.stringify(r2));\n    const target = {x:1};\n    const result = Object.myAssign(target, {y:2}, {z:3});\n    console.log(result===target && target.y===2 ? 'PASS: returns target' : 'FAIL: returns target');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: basic\nPASS: override\nPASS: returns target",
-    explanation:
-      "Object.keys gives own enumerable string keys. Skip null/undefined sources. Return the same target reference.",
-    keyInsight:
-      "Object.assign mutates and returns target. Symbols NOT copied by Object.keys.",
-  },
-  {
-    id: 1022,
-    cat: "Object Methods",
-    difficulty: "medium",
-    title: "Implement Object.create",
-    tags: ["object", "Object.create", "prototype"],
-    companies: ["Google", "Atlassian", "CRED", "Flipkart"],
-    description:
-      "Implement Object.create(proto). Create new object with proto as its prototype. Support null prototype.",
-    stubCode:
-      "Object.myCreate = function(proto) {\n  // Create new object with proto as [[Prototype]]\n  // Support null prototype\n};",
-    solutionCode:
-      "Object.myCreate = function(proto) {\n  if (proto !== null && typeof proto !== 'object' && typeof proto !== 'function') {\n    throw new TypeError('Object prototype may only be an Object or null');\n  }\n  function F() {}\n  F.prototype = proto;\n  const obj = new F();\n  if (proto === null) Object.setPrototypeOf(obj, null);\n  return obj;\n};",
-    testCode:
-      "(function() {\n  try {\n    const proto = { greet() { return 'hello from ' + this.name; } };\n    const obj = Object.myCreate(proto);\n    obj.name = 'Alice';\n    console.log(obj.greet() === 'hello from Alice' ? 'PASS: prototype' : 'FAIL: prototype');\n    console.log(Object.getPrototypeOf(obj) === proto ? 'PASS: correct proto' : 'FAIL: correct proto');\n    const nullObj = Object.myCreate(null);\n    console.log(Object.getPrototypeOf(nullObj) === null ? 'PASS: null proto' : 'FAIL: null proto');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: prototype\nPASS: correct proto\nPASS: null proto",
-    explanation:
-      "function F(){}; F.prototype = proto; return new F() \u2014 the classic prototype linkage trick without any constructor logic.",
-    keyInsight:
-      "Object.create uses the empty constructor trick: F.prototype = proto; new F(). No initialization side effects.",
-  },
-  {
-    id: 1023,
-    cat: "Object Methods",
-    difficulty: "easy",
-    title: "Implement Object.keys, values, and entries",
-    tags: ["object", "Object.keys", "Object.values", "Object.entries"],
-    companies: ["Flipkart", "Amazon", "Paytm", "Meesho"],
-    description:
-      "Implement Object.myKeys, Object.myValues, Object.myEntries. Own enumerable string-keyed properties only (no inherited, no symbols).",
-    stubCode:
-      "Object.myKeys = function(obj) {\n  // Own enumerable string keys only\n};\n\nObject.myValues = function(obj) {\n  // Corresponding values\n};\n\nObject.myEntries = function(obj) {\n  // [key, value] pairs\n};",
-    solutionCode:
-      "Object.myKeys = function(obj) {\n  if (obj == null) throw new TypeError('Cannot convert undefined or null to object');\n  const keys = [];\n  for (const key in Object(obj)) {\n    if (Object.prototype.hasOwnProperty.call(obj, key)) keys.push(key);\n  }\n  return keys;\n};\nObject.myValues = function(obj) { return Object.myKeys(obj).map(k => obj[k]); };\nObject.myEntries = function(obj) { return Object.myKeys(obj).map(k => [k, obj[k]]); };",
-    testCode:
-      "(function() {\n  try {\n    const obj = {a:1,b:2,c:3};\n    console.log(JSON.stringify(Object.myKeys(obj)) === '[\"a\",\"b\",\"c\"]' ? 'PASS: keys' : 'FAIL: keys');\n    console.log(JSON.stringify(Object.myValues(obj)) === '[1,2,3]' ? 'PASS: values' : 'FAIL: values');\n    const e = Object.myEntries({x:10,y:20});\n    console.log(JSON.stringify(e) === '[[\"x\",10],[\"y\",20]]' ? 'PASS: entries' : 'FAIL: entries');\n    const child = Object.create({inherited:'no'});\n    child.own = 'yes';\n    console.log(JSON.stringify(Object.myKeys(child)) === '[\"own\"]' ? 'PASS: own only' : 'FAIL: own only');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: keys\nPASS: values\nPASS: entries\nPASS: own only",
-    explanation:
-      "for...in includes inherited, so filter with hasOwnProperty. values and entries build on top of keys.",
-    keyInsight:
-      "for...in includes inherited properties. Always filter with hasOwnProperty. Symbols never included.",
-  },
-  {
-    id: 1024,
-    cat: "Utility Functions",
-    difficulty: "hard",
-    title: "Implement deep clone",
-    tags: ["deep-clone", "recursion", "object", "circular"],
-    companies: ["Google", "Razorpay", "Atlassian", "CRED", "Amazon"],
-    description:
-      "Implement deepClone(value). Deep copy objects and arrays. Handle Dates and circular references.",
-    stubCode:
-      "function deepClone(value, seen = new WeakMap()) {\n  // Handle: primitives, null, Date, Array, plain objects\n  // Handle circular references using 'seen' WeakMap\n}",
-    solutionCode:
-      "function deepClone(value, seen = new WeakMap()) {\n  if (value === null || typeof value !== 'object') return value;\n  if (seen.has(value)) return seen.get(value);\n  if (value instanceof Date) return new Date(value.getTime());\n  if (Array.isArray(value)) {\n    const clone = [];\n    seen.set(value, clone);\n    for (let i = 0; i < value.length; i++) clone[i] = deepClone(value[i], seen);\n    return clone;\n  }\n  const clone = Object.create(Object.getPrototypeOf(value));\n  seen.set(value, clone);\n  for (const key of Object.keys(value)) clone[key] = deepClone(value[key], seen);\n  return clone;\n}",
-    testCode:
-      "(function() {\n  try {\n    const orig = { a: 1, b: { c: [1,2,3] } };\n    const clone = deepClone(orig);\n    clone.b.c.push(4);\n    console.log(orig.b.c.length === 3 ? 'PASS: deep independent' : 'FAIL: deep independent');\n    const withDate = { d: new Date('2024-01-01') };\n    const cloneD = deepClone(withDate);\n    console.log(cloneD.d instanceof Date && cloneD.d !== withDate.d ? 'PASS: Date cloned' : 'FAIL: Date cloned');\n    const obj = { name: 'test' };\n    obj.self = obj;\n    const circ = deepClone(obj);\n    console.log(circ.self === circ ? 'PASS: circular' : 'FAIL: circular');\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: deep independent\nPASS: Date cloned\nPASS: circular",
-    explanation:
-      "Recurse into objects/arrays. WeakMap tracks original\u2192clone for circular refs. Handle Date with getTime().",
-    keyInsight:
-      "WeakMap(original \u2192 clone) is the standard circular reference solution. Check seen.has(value) before recursing.",
-  },
-  {
-    id: 1025,
-    cat: "Utility Functions",
-    difficulty: "hard",
-    title: "Implement EventEmitter",
-    tags: ["EventEmitter", "observer", "pub-sub", "utility"],
-    companies: ["Google", "Razorpay", "Atlassian", "CRED", "Amazon"],
-    description: "Implement EventEmitter with on, off, emit, and once methods.",
-    stubCode:
-      "class EventEmitter {\n  constructor() {\n    // Initialize listeners storage\n  }\n\n  on(event, listener) {\n    // Register listener\n  }\n\n  off(event, listener) {\n    // Remove listener\n  }\n\n  emit(event, ...args) {\n    // Call all listeners\n  }\n\n  once(event, listener) {\n    // Register listener that fires only once\n  }\n}",
-    solutionCode:
-      "class EventEmitter {\n  constructor() { this._events = {}; }\n  on(event, listener) {\n    if (!this._events[event]) this._events[event] = [];\n    this._events[event].push(listener);\n    return this;\n  }\n  off(event, listener) {\n    if (!this._events[event]) return this;\n    this._events[event] = this._events[event].filter(l => l !== listener);\n    return this;\n  }\n  emit(event, ...args) {\n    if (!this._events[event]) return false;\n    this._events[event].forEach(l => l.apply(this, args));\n    return true;\n  }\n  once(event, listener) {\n    const wrapper = (...args) => { listener.apply(this, args); this.off(event, wrapper); };\n    return this.on(event, wrapper);\n  }\n}",
-    testCode:
-      "(function() {\n  try {\n    const emitter = new EventEmitter();\n    const results = [];\n    emitter.on('data', x => results.push(x));\n    emitter.emit('data', 1); emitter.emit('data', 2);\n    console.log(JSON.stringify(results) === '[1,2]' ? 'PASS: on and emit' : 'FAIL: on and emit \u2014 got ' + JSON.stringify(results));\n    const handler = x => results.push('off:' + x);\n    emitter.on('test', handler);\n    emitter.emit('test', 'a');\n    emitter.off('test', handler);\n    emitter.emit('test', 'b');\n    console.log(results.includes('off:a') && !results.includes('off:b') ? 'PASS: off' : 'FAIL: off');\n    let onceCount = 0;\n    emitter.once('once', () => onceCount++);\n    emitter.emit('once'); emitter.emit('once'); emitter.emit('once');\n    console.log(onceCount === 1 ? 'PASS: once' : 'FAIL: once \u2014 count=' + onceCount);\n  } catch(e) { console.log('FAIL: threw \u2014 ' + e.message); }\n})();",
-    expectedOutput: "PASS: on and emit\nPASS: off\nPASS: once",
-    explanation:
-      "Store listeners in object keyed by event. once wraps listener to self-remove after first call.",
-    keyInsight:
-      "once is just a wrapper that calls off on itself after firing \u2014 no special storage needed.",
+      "pipeHOCs = left-to-right HOC composition via reduce. It's identical to the pipe() function for values, but applied to HOC transforms. This is how Redux's connect() was composed before hooks.",
   },
 ];

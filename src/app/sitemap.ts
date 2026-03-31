@@ -7,6 +7,7 @@ import {
 } from "@/lib/cachedQueries";
 
 import { catToSlug, SITE } from "@/lib/seo/seo";
+import { getServerTrack } from "@/lib/getServerTrack";
 
 function toSlug(text: string): string {
   return text
@@ -18,6 +19,7 @@ function toSlug(text: string): string {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date().toISOString();
+  const track = await getServerTrack();
 
   const [topicSlugs, blogPosts, questionSlugs, theoryResult] =
     await Promise.all([
@@ -66,13 +68,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${SITE.domain}/topics`,
+      url: `${SITE.domain}/topics/${track}`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
-      url: `${SITE.domain}/blog`,
+      url: `${SITE.domain}/blog/${track}`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.85,
@@ -98,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const topicPages: MetadataRoute.Sitemap = topicSlugs.map((slug) => ({
-    url: `${SITE.domain}/${slug}`,
+    url: `${SITE.domain}/${track}/${slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.9,
@@ -119,7 +121,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${SITE.domain}/blog/${post.slug}`,
+    url: `${SITE.domain}/blog/${track}/${post.slug}`,
     lastModified: new Date(
       post.modifiedAt ?? post.publishedAt ?? now,
     ).toISOString(),
