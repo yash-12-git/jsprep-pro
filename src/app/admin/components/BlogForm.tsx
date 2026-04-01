@@ -6,9 +6,14 @@ import { css } from "@emotion/react";
 import { Save, Loader2, Trash2, CheckCircle, X, Plus } from "lucide-react";
 import { C, RADIUS, BP } from "@/styles/tokens";
 import MarkdownEditor from "@/components/md/MarkdownEditor";
-import type { BlogPost, BlogPostInput, BlogStatus } from "@/types/blogPost";
+import type {
+  BlogPost,
+  BlogPostInput,
+  BlogStatus,
+} from "@/types/blogPost";
 import type { Topic } from "@/types/topic";
 import { getPublishedTopics } from "@/lib/topics";
+import { useTrack } from "@/contexts/TrackContext";
 
 export type FormMode = "create" | "edit";
 
@@ -331,6 +336,7 @@ const EMPTY: BlogPostInput = {
   relatedTopicSlugs: [],
   questionCategories: [],
   status: "draft",
+  track: "javascript",
 };
 
 const ACCENT_PRESETS = [
@@ -368,12 +374,13 @@ export default function BlogForm({
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [topics, setTopics] = useState<Topic[]>([]);
+  const { track } = useTrack();
 
   useEffect(() => {
-    getPublishedTopics()
+    getPublishedTopics({ track })
       .then(setTopics)
       .catch(() => {});
-  }, []);
+  }, [track]);
 
   function set<K extends keyof BlogPostInput>(key: K, val: BlogPostInput[K]) {
     setForm((f) => {
@@ -447,7 +454,11 @@ export default function BlogForm({
         form.topicSlug && !form.relatedTopicSlugs.includes(form.topicSlug)
           ? [form.topicSlug, ...form.relatedTopicSlugs]
           : form.relatedTopicSlugs;
-      await onSubmit({ ...form, relatedTopicSlugs: syncedRelated });
+      await onSubmit({
+        ...form,
+        track: track,
+        relatedTopicSlugs: syncedRelated,
+      });
       setSuccess(true);
       if (mode === "create") setForm(EMPTY);
       setTimeout(() => setSuccess(false), 4000);

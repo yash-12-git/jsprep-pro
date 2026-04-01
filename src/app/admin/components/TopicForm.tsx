@@ -11,6 +11,7 @@ import type {
   TopicDifficulty,
   TopicStatus,
 } from "@/types/topic";
+import { useTrack } from "@/contexts/TrackContext";
 
 export type FormMode = "create" | "edit";
 
@@ -330,6 +331,7 @@ const EMPTY: TopicInput = {
   deepDive: "",
   misconceptions: [],
   realWorldExamples: [],
+  track: "javascript",
 };
 
 // ─── Array editor — reusable for cheatSheet, interviewTips, related, etc ───────
@@ -397,6 +399,7 @@ export default function TopicForm({
   onDelete,
 }: Props) {
   const [form, setForm] = useState<TopicInput>({ ...EMPTY, ...initial });
+  const { track } = useTrack();
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -407,7 +410,7 @@ export default function TopicForm({
     setForm((f) => {
       const next = { ...f, [key]: val };
       if (key === "keyword" && mode === "create") {
-        next.slug = `javascript-${slugify(val as string)}-interview-questions`;
+        next.slug = `${track}-${slugify(val as string)}-interview-questions`;
       }
       return next;
     });
@@ -443,6 +446,7 @@ export default function TopicForm({
         related: form.related.filter((s) => s.trim()),
         relatedBlogSlugs: (form.relatedBlogSlugs ?? []).filter((s) => s.trim()),
         extraKeywords: (form.extraKeywords ?? []).filter((s) => s.trim()),
+        track: track,
       });
       setSuccess(true);
       if (mode === "create") setForm(EMPTY);

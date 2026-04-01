@@ -2,7 +2,6 @@
 // Blog posts live in Firestore `blog_posts` collection.
 
 export type BlogStatus = 'draft' | 'published' | 'archived'
-
 export interface BlogPost {
   // Identity
   id: string                     // Firestore doc ID

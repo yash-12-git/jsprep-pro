@@ -41,11 +41,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       : `${topic.description} Covers ${topic.cheatSheet.slice(0, 2).join(". ")}. Practice with AI feedback.`,
     path: `/${topic.slug}`,
     keywords: [
-      `${topic.keyword} javascript`,
+      `${topic.keyword} interview questions`,
       `how does ${topic.keyword} work`,
       `${topic.keyword} explained`,
       `${topic.keyword} interview questions`,
-      `javascript ${topic.keyword} questions`,
+      `${topic.keyword} questions`,
       ...(topic.extraKeywords ?? []),
     ],
   });

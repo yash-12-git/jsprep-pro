@@ -242,7 +242,7 @@ export const TRACK_MODES: Record<
       emoji: "💻",
       href: "/output-quiz",
       c: C.amber,
-      free: true,
+      free: false,
       desc: "Predict what renders. Re-render traps, stale closures, batching — all covered.",
       tags: ["Re-renders", "Batching", "Stale state", "Refs"],
     },
@@ -417,6 +417,6 @@ export const FREE_F = [
   "First 5 output + 5 debug questions",
   "First 5 polyfill challenges",
   "Weekly XP leaderboard",
-  "Interview Cheat Sheet (36 topics)",
-  "JavaScript Deep Dives (in-depth concept explanations)",
+  "Interview Cheat Sheet",
+  "Deep Dives (in-depth concept explanations)",
 ];

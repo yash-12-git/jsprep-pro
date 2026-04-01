@@ -10,6 +10,7 @@ import type { Question } from '@/types/question'
 import type { Topic } from '@/types/topic'
 import { C, RADIUS } from '@/styles/tokens'
 import { Tag, CheckCircle2, Search, Filter, Loader2, AlertTriangle, X } from 'lucide-react'
+import { useTrack } from '@/contexts/TrackContext'
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const S = {
@@ -131,7 +132,7 @@ type SaveState = 'idle' | 'saving' | 'saved'
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function TagQuestionsPage() {
   const { user } = useAuth()
-
+  const {track} = useTrack()
   const [questions, setQuestions] = useState<Question[]>([])
   const [topics, setTopics]       = useState<Topic[]>([])
   const [loading, setLoading]     = useState(true)
@@ -149,13 +150,16 @@ export default function TagQuestionsPage() {
 
   useEffect(() => {
     Promise.all([
-      getQuestions({ filters: { status: 'published' }, pageSize: 500 }),
-      getPublishedTopics(),
+      getQuestions({ filters: { status: 'published', track }, pageSize: 500 }),
+      getPublishedTopics({ track }),
     ]).then(([qResult, topicList]) => {
       setQuestions(qResult.questions)
       setTopics(topicList)
-    }).finally(() => setLoading(false))
-  }, [])
+    }).finally(() => setLoading(false)).catch(e => {
+    }).catch((e) => {
+      console.error(e);
+    })
+  }, [track])
 
   const categories = useMemo(() =>
     [...new Set(questions.map(q => q.category))].sort(),

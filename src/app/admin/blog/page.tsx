@@ -174,7 +174,7 @@ export default function AdminBlogPage() {
   async function load() {
     setLoading(true);
     try {
-      const all = await getBlogPosts();
+      const all = await getBlogPosts({ track });
       setPosts(all);
       setFiltered(all);
     } catch (e: any) {
@@ -186,7 +186,7 @@ export default function AdminBlogPage() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [track]);
 
   useEffect(() => {
     const q = search.toLowerCase();

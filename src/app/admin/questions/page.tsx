@@ -1,9 +1,16 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { getDocs, collection, query, orderBy } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  query,
+  orderBy,
+  QueryConstraint,
+  where,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
   deleteQuestion,
@@ -22,6 +29,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import type { Question } from "@/types/question";
+import { useTrack } from "@/contexts/TrackContext";
 
 const S = {
   topRow: css`
@@ -183,12 +191,17 @@ export default function AdminQuestionsPage() {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const { track } = useTrack();
 
   async function load() {
     setLoading(true);
     try {
       const snap = await getDocs(
-        query(collection(db, "questions"), orderBy("order", "asc")),
+        query(
+          collection(db, "questions"),
+          where("track", "==", track),
+          orderBy("order", "asc"),
+        ),
       );
       setQuestions(
         snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Question),
@@ -202,7 +215,7 @@ export default function AdminQuestionsPage() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [track]);
 
   async function handleDelete(id: string, title: string) {
     if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;

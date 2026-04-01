@@ -21,6 +21,7 @@ import {
   archiveTopic,
 } from "@/lib/topics";
 import type { Topic } from "@/types/topic";
+import { useTrack } from "@/contexts/TrackContext";
 
 const S = {
   topRow: css`
@@ -150,11 +151,12 @@ export default function AdminTopicsPage() {
   const [filtered, setFiltered] = useState<Topic[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const { track } = useTrack();
 
   async function load() {
     setLoading(true);
     try {
-      const all = await getTopics();
+      const all = await getTopics({ track });
       setTopics(all);
       setFiltered(all);
     } catch (e: any) {
@@ -166,7 +168,7 @@ export default function AdminTopicsPage() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [track]);
 
   useEffect(() => {
     const q = search.toLowerCase();
