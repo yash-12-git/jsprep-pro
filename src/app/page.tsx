@@ -161,7 +161,7 @@ export default async function HomePage() {
       {/* Schema injected server-side — crawlers see this immediately */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: courseSchema() }}
+        dangerouslySetInnerHTML={{ __html: courseSchema(track) }}
       />
       <script
         type="application/ld+json"

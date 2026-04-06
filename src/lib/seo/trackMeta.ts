@@ -17,7 +17,7 @@ export const TRACK_META: Record<
   javascript: {
     label: "JavaScript",
     topicsTitle:
-      "JavaScript Interview Topics — Practice by Concept | JSPrep Pro",
+      "JavaScript Interview Topics — Practice by Concept",
     topicsDescription:
       "Browse all JavaScript interview topics organised by concept. Closures, event loop, promises, prototypes, and 30+ more.",
     topicsKeywords: [
@@ -38,7 +38,7 @@ export const TRACK_META: Record<
   },
   react: {
     label: "React",
-    topicsTitle: "React Interview Topics — Practice by Concept | JSPrep Pro",
+    topicsTitle: "React Interview Topics — Practice by Concept",
     topicsDescription:
       "Browse all React interview topics. Hooks, state management, component patterns, and 20+ more — each with cheat sheets and practice questions.",
     topicsKeywords: [
@@ -58,22 +58,22 @@ export const TRACK_META: Record<
   },
   typescript: {
     label: "TypeScript",
-    topicsTitle: "TypeScript Interview Topics | JSPrep Pro",
+    topicsTitle: "TypeScript Interview Topics",
     topicsDescription:
       "TypeScript interview topics — generics, utility types, and more.",
     topicsKeywords: ["typescript interview topics"],
-    blogTitle: "TypeScript Interview Blog | JSPrep Pro",
+    blogTitle: "TypeScript Interview Blog",
     blogDescription: "Guides on TypeScript interview concepts.",
     blogKeywords: ["typescript interview blog", "typescript tutorials"],
     heroTagline: "Types, generics, utility types and more",
   },
   "system-design": {
     label: "System Design",
-    topicsTitle: "System Design Interview Topics | JSPrep Pro",
+    topicsTitle: "System Design Interview Topics",
     topicsDescription:
       "Frontend system design interview topics — architecture, scalability, and more.",
     topicsKeywords: ["system design interview topics"],
-    blogTitle: "System Design Interview Blog | JSPrep Pro",
+    blogTitle: "System Design Interview Blog",
     blogDescription: "Guides on frontend system design concepts.",
     blogKeywords: ["system design interview blog", "system design tutorials"],
     heroTagline: "Architecture, scalability and more",
