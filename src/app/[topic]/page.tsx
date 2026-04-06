@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { pageMeta, faqSchema, breadcrumbSchema } from "@/lib/seo/seo";
-import { TOPIC_FAQS } from "@/data/seo/topicFaqs";
+import { getTopicFaqs, TOPIC_FAQS } from "@/data/seo/topicFaqs";
 import TopicQuestionList from "./TopicQuestionList";
 import { C, TOPIC_DIFF_BG, TOPIC_DIFF_COLOR } from "@/styles/tokens";
 import { getServerTrack } from "@/lib/getServerTrack";
@@ -119,7 +119,7 @@ export default async function TopicPage({ params }: Props) {
     TOPIC_DIFF_BG[topic.difficulty] ?? TOPIC_DIFF_BG["Intermediate"];
   const hasConceptHub = !!(topic.mentalModel || topic.deepDive);
 
-  const dedicatedFaqs = TOPIC_FAQS[topic.slug] ?? [];
+  const dedicatedFaqs = getTopicFaqs(topic.slug, track) ?? [];
   const faqItems = dedicatedFaqs.length > 0 ? faqSchema(dedicatedFaqs) : null;
 
   const tocItems = [

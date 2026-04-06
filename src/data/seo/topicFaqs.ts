@@ -878,10 +878,270 @@ export const TOPIC_FAQS: Record<string, FAQItem[]> = {
   ],
 };
 
+export const REACT_TOPIC_FAQS: Record<string, FAQItem[]> = {
+  "react-usestate-interview-questions": [
+    {
+      question: "What is the useState hook in React?",
+      answer:
+        "useState gives a component a slot in React's memory that persists across renders. It returns a pair — the current state value (a snapshot of this render) and a setter function. Calling the setter does not change the variable immediately; it schedules a re-render. During that next render, React hands back the updated value. Every read of state within one render sees exactly the same snapshot.",
+    },
+    {
+      question: "Why do multiple setState calls in one handler not add up?",
+      answer:
+        "State variables are snapshots — they hold the value from the current render and never change within it. Calling setCount(count + 1) three times in one handler schedules count + 1 three times using the same stale value of count, so the net result is an increment of 1, not 3. The fix is the functional update form: setCount(prev => prev + 1), which reads from React's pending state queue rather than the snapshot, correctly producing an increment of 3.",
+    },
+    {
+      question: "What is lazy initialisation in useState?",
+      answer:
+        "If you pass a value directly to useState, the expression is evaluated on every render even though React ignores the result after the first. For expensive computations, pass a function instead: useState(() => expensiveSetup()). React calls it once on mount and uses the return value as the initial state. This avoids running costly logic — like parsing localStorage or building a large matrix — on every re-render.",
+    },
+    {
+      question:
+        "Why must object and array state be updated immutably in React?",
+      answer:
+        "React uses Object.is comparison to decide whether to re-render. If you mutate an existing object and pass the same reference back to the setter, React sees no change and silently skips the re-render — the UI does not update. You must always produce a new reference: use spread for objects (setUser(prev => ({ ...prev, name: 'Bob' }))), and non-mutating array methods like map, filter, and spread for arrays.",
+    },
+    {
+      question:
+        "What is derived state and why should it not be stored in useState?",
+      answer:
+        "Derived state is any value that can be computed from existing props or state. Storing it in useState and syncing it with useEffect causes an unnecessary extra render, introduces a period where the value is stale, and creates a useEffect that can be forgotten or incorrectly updated. Instead, compute the value directly during render — or wrap it in useMemo if the computation is expensive.",
+    },
+    {
+      question:
+        "What is the key prop reset pattern for resetting component state?",
+      answer:
+        "Changing a key prop tells React to destroy the existing component instance and create a completely new one — all state resets to initial values, effects are cleaned up, and the DOM element is replaced. It is the cleanest way to reset a child's state from a parent: give the child a key tied to the relevant identifier (e.g., key={userId}), and React handles the full remount automatically with no useEffect needed.",
+    },
+  ],
+
+  "react-useeffect-interview-questions": [
+    {
+      question:
+        "What is useEffect and what is the correct mental model for it?",
+      answer:
+        "useEffect is a synchronisation tool, not a lifecycle method. Its job is to keep an external system — a DOM API, fetch request, timer, or subscription — in sync with React state. The dependency array declares what values the effect uses. After every render where those values changed, React runs the cleanup from the previous effect and then runs the new effect. Thinking in 'run on mount / update / unmount' leads to dependency array mistakes; thinking in 'what external thing needs to stay in sync' leads to correct code.",
+    },
+    {
+      question: "What does each dependency array signature mean in useEffect?",
+      answer:
+        "No dependency array means the effect runs after every render. An empty array [] means the effect has no dependencies — it runs once after mount and its cleanup runs on unmount. An array with values means the effect re-runs whenever any of those values change between renders. The array is a declaration of what the effect reads from the component's scope, not an optimisation hint — omitting a dependency creates a stale closure bug.",
+    },
+    {
+      question: "What is the stale closure problem in useEffect?",
+      answer:
+        "A stale closure is when an effect captures a value at the time it runs, that value later changes, but the effect never re-runs so it still uses the old value. The classic example is a setInterval with an empty dependency array that reads count — count is permanently captured as its initial value. Fixes include: adding the variable to the dependency array, using a functional state update (prev => prev + 1) to avoid reading the variable at all, or storing the latest value in a ref updated via useEffect.",
+    },
+    {
+      question: "When does the cleanup function in useEffect run?",
+      answer:
+        "The cleanup function runs in two situations: before the next effect execution (to tear down the previous setup), and when the component unmounts. It does not only run on unmount. If a useEffect with [userId] fires five times as userId changes, the cleanup runs four times — once before each new execution. This means cleanup must correctly undo whatever the previous effect set up, every single time, not just at the end.",
+    },
+    {
+      question: "How do you handle race conditions in useEffect data fetching?",
+      answer:
+        "Race conditions occur when a dependency (like userId) changes rapidly — earlier requests can resolve after later ones, overwriting fresh data with stale data. The correct fix is an AbortController: create one at the start of the effect, pass its signal to fetch, and call controller.abort() in the cleanup. This cancels the in-flight request when the effect re-runs, ensuring only the latest request's result is applied.",
+    },
+    {
+      question: "What is the difference between useEffect and useLayoutEffect?",
+      answer:
+        "useEffect runs asynchronously after the browser has already painted the updated UI — it is the right choice for data fetching, subscriptions, and analytics. useLayoutEffect runs synchronously after React updates the DOM but before the browser paints. Use it when you need to read DOM layout (getBoundingClientRect, offsetHeight) and apply changes before the user sees the screen — for example, positioning a tooltip to prevent a visible flicker.",
+    },
+  ],
+
+  "react-useref-interview-questions": [
+    {
+      question:
+        "What does useRef return and what makes it different from useState?",
+      answer:
+        "useRef(initialValue) returns a plain object { current: initialValue } that is created once on mount and returned as the same object on every subsequent render. Mutating ref.current is completely invisible to React — it does not trigger a re-render. This is the fundamental difference from useState: use state when the UI must update when the value changes, use a ref when the value needs to persist across renders silently.",
+    },
+    {
+      question: "What are the two main use cases for useRef?",
+      answer:
+        "The first is DOM access: attach the ref to a JSX element's ref attribute, and React writes the actual DOM node into ref.current after mount — allowing imperative calls like focus(), play(), or getBoundingClientRect(). The second is storing mutable instance variables that should not trigger re-renders: timer IDs, WebSocket connections, previous render values, abort controllers, and mounted/cancelled flags.",
+    },
+    {
+      question: "Why is ref.current null during render?",
+      answer:
+        "React sets ref.current to the DOM node after the component mounts and commits to the DOM. During the render phase itself, the DOM element does not yet exist (or has been unmounted), so ref.current is null. Only access DOM refs inside useEffect, useLayoutEffect, or event handlers — never read ref.current in the render body expecting a DOM node to be there.",
+    },
+    {
+      question: "How does useRef break stale closures in effects?",
+      answer:
+        "Store the latest value in a ref and update it after every render with a simple useEffect: useEffect(() => { valueRef.current = value }). Closures inside setInterval, WebSocket callbacks, or other long-lived functions can then read ref.current instead of a captured snapshot — they always get the current value without needing to list it as a dependency and without causing the effect to restart.",
+    },
+    {
+      question: "What is forwardRef and when is it needed?",
+      answer:
+        "By default, you cannot attach a ref from a parent to a DOM element inside a child functional component — ref.current will be null. React.forwardRef wraps the child and gives it a second argument (the forwarded ref) that it can attach to any DOM element inside. It is used when building reusable input, button, or modal components where the consuming parent needs imperative control like focusing or measuring. React 19 removes the need for forwardRef — refs become regular props.",
+    },
+  ],
+
+  "react-usememo-interview-questions": [
+    {
+      question: "What does useMemo do and what are its two use cases?",
+      answer:
+        "useMemo memoizes the result of a computation and returns the cached result on subsequent renders until its dependencies change. Its first use case is avoiding expensive recomputation — sorting large arrays, filtering datasets, building complex data structures. Its second, equally important use case is referential stability: returning the same object or array reference when inputs have not changed, which is what makes React.memo comparisons and useEffect dependency checks work correctly for non-primitive values.",
+    },
+    {
+      question: "Does useMemo always improve performance?",
+      answer:
+        "No. useMemo has its own overhead on every render: it allocates memory for the cache, runs the dependency comparison, and retains the previous value. For trivial computations like string concatenation or simple arithmetic, the memoization cost exceeds the computation cost — useMemo makes things slower. It is only beneficial when the computation cost clearly exceeds the comparison overhead, which requires profiling with React DevTools to confirm.",
+    },
+    {
+      question: "How does useMemo help React.memo work correctly?",
+      answer:
+        "React.memo does a shallow prop comparison. If you pass an object or array created inline as a prop, it is a new reference every render — React.memo can never skip. Wrapping the object in useMemo returns the same reference when the inputs have not changed, allowing React.memo to correctly detect no change and bail out of re-rendering the child. The pattern requires both useMemo on the parent and React.memo on the child.",
+    },
+    {
+      question: "What is the difference between useMemo and useCallback?",
+      answer:
+        "useMemo memoizes the result of calling a function — it runs the function and caches its return value (a computed object, array, or primitive). useCallback memoizes the function itself — it returns a stable function reference without calling it. They are implemented identically under the hood: useCallback(fn, deps) is equivalent to useMemo(() => fn, deps). The distinction is intent: useMemo for computed values, useCallback for stable function references.",
+    },
+    {
+      question: "How does the React Compiler change the need for useMemo?",
+      answer:
+        "The React Compiler, shipping in React 19, automatically inserts memoization where it would be beneficial by statically analysing component code. It applies the equivalent of useMemo and useCallback calls without you writing them manually. The recommended practice is to write clean, unmemoised code first, then add manual useMemo only where profiling confirms a real bottleneck — the compiler handles the common cases automatically.",
+    },
+  ],
+
+  "react-usecallback-interview-questions": [
+    {
+      question:
+        "What does useCallback do and why does it not make functions faster?",
+      answer:
+        "useCallback returns the same function reference across renders until its dependencies change. It does nothing to the function's execution speed — the function body runs identically with or without useCallback. Its sole purpose is referential stability: ensuring the function reference does not change between renders so that downstream comparisons (React.memo prop checks, useEffect dependency arrays) see no change when nothing meaningful has changed.",
+    },
+    {
+      question: "When does useCallback actually prevent a re-render?",
+      answer:
+        "useCallback alone never prevents a child re-render. The child must also be wrapped in React.memo. React.memo does a shallow comparison of props — if the function prop is a new reference every render, the comparison always fails and the child always re-renders. useCallback provides the stable reference; React.memo uses it to skip the render. Without React.memo on the child, useCallback adds comparison overhead with zero benefit.",
+    },
+    {
+      question: "What is the stale callback problem with useCallback?",
+      answer:
+        "If a callback closes over state or props but does not list them as dependencies, the callback is created once and captures the values from that first render — they are stale for all future renders. The fix is to add the captured values to the dependency array. The alternative is the stable-callback pattern: store the latest function in a ref updated via useEffect, and expose a stable useCallback wrapper that calls ref.current — giving a stable reference that always invokes the latest version.",
+    },
+    {
+      question: "Why should custom hooks always return memoised functions?",
+      answer:
+        "When a custom hook returns a function, the hook author does not know how consumers will use it. If the function is returned without useCallback, any consumer that puts it in a useEffect dependency array will have that effect re-run on every render — because the hook recreates the function every time. Wrapping returned functions in useCallback is a contract that the hook will not cause inadvertent infinite loops or excessive re-renders in consuming components.",
+    },
+    {
+      question: "How is useCallback related to useMemo?",
+      answer:
+        "They are the same mechanism: useCallback(fn, deps) is exactly equivalent to useMemo(() => fn, deps). Both memoize based on dependencies — useMemo runs the function and caches its return value, while useCallback caches the function reference itself without calling it. The distinction is readability of intent, not any underlying difference in how React implements them.",
+    },
+  ],
+
+  "react-usereducer-interview-questions": [
+    {
+      question: "What is useReducer and how is it different from useState?",
+      answer:
+        "useReducer manages state through a pure reducer function: (state, action) => newState. Instead of calling a setter with the new value directly (setState(42)), you dispatch a named action (dispatch({ type: 'INCREMENT' })) that describes what happened, and the reducer decides what changes. This separates 'what event occurred' from 'what state changes as a result', making complex state transitions explicit, named, and independently testable.",
+    },
+    {
+      question: "When should you use useReducer instead of useState?",
+      answer:
+        "Reach for useReducer when multiple state fields update together based on the same event, when the next state depends on the previous in non-trivial ways, or when you want named transitions that serve as documentation. The clearest signal is finding yourself calling three or more state setters in a single event handler — those coordinated updates belong in a single reducer action that transitions the entire state atomically.",
+    },
+    {
+      question: "Why must a reducer be a pure function?",
+      answer:
+        "React may call the reducer more than once for the same action (in Strict Mode during development). A pure reducer — no fetch calls, no localStorage writes, no console.log side effects — produces the same output for the same input regardless of how many times it is called. Side effects belong in the event handlers that dispatch actions or in useEffect that reacts to state changes. The reducer only handles state transitions.",
+    },
+    {
+      question: "What is the lazy initialisation pattern in useReducer?",
+      answer:
+        "useReducer accepts an optional third argument: an init function. React calls init(initialArg) once on mount and uses the result as the initial state, avoiding re-running expensive setup on every render. The same init function can be reused inside the reducer for reset actions — dispatch({ type: 'RESET', payload: initialArg }) returns init(action.payload) — eliminating duplicated initial state construction logic.",
+    },
+    {
+      question: "How does the useReducer + useContext pattern replace Redux?",
+      answer:
+        "Pair useReducer with two separate contexts: one for state and one for dispatch. Because useReducer's dispatch function is always a stable reference, components that only dispatch actions (buttons, forms) can consume the dispatch context and never re-render when state changes. Components that read state consume the state context and re-render when it updates. This gives a global state architecture — actions, reducer, single source of truth — without any external library.",
+    },
+    {
+      question: "What is the key advantage of testing reducers separately?",
+      answer:
+        "A reducer is a pure JavaScript function — no React imports, no rendering, no async. You can import it directly and call it with different state and action combinations in plain unit tests: const next = cartReducer(state, { type: 'ADD', item }). This lets you cover every state transition exhaustively without mounting components, without act(), and without async overhead. Testing state logic in isolation is faster and catches edge cases that integration tests often miss.",
+    },
+  ],
+
+  "react-usecontext-interview-questions": [
+    {
+      question: "What is React Context and what is it not?",
+      answer:
+        "Context is a transmission mechanism: it takes whatever value you give a Provider and makes it available to any component in that subtree that calls useContext, regardless of nesting depth. Context is not state management — it does not decide when or how state changes. useState and useReducer manage state; Context distributes it. Conflating the two leads to architectural mistakes like putting all application state in a single context object.",
+    },
+    {
+      question: "What is the re-render trap with useContext?",
+      answer:
+        "Every component that calls useContext re-renders whenever the Provider's value prop reference changes — regardless of which fields the component actually reads. A component reading only user.name still re-renders when theme changes if both are in the same context object. This is the most important performance characteristic of Context and the reason large, frequently changing values should never go into a single shared context.",
+    },
+    {
+      question: "How do you fix unnecessary re-renders caused by Context?",
+      answer:
+        "Split contexts by update frequency: theme changes infrequently (one context), notifications change constantly (another context). This way a component reading theme does not re-render when a notification arrives. A second technique is separating state from dispatch — useReducer's dispatch is always a stable reference, so components that only dispatch can read a dispatch-only context and never re-render when state changes.",
+    },
+    {
+      question: "What is the custom hook wrapper pattern for Context?",
+      answer:
+        "Instead of calling useContext directly in components, export a custom hook that calls useContext internally and throws a clear error if the context is null: if (!ctx) throw new Error('useAuth must be inside AuthProvider'). This converts a silent undefined crash at runtime into an immediate, descriptive error during development. It also lets you add selectors, memoisation, or derived values in one place without changing consuming components.",
+    },
+    {
+      question:
+        "When should you use Context versus a dedicated state management library?",
+      answer:
+        "Context is appropriate for infrequently changing global values — authentication state, theme, locale, and feature flags that change once or twice per session. For values that update frequently (cart items on every interaction, search results on every keystroke, real-time data on every WebSocket message), use Zustand, Jotai, or Redux. These libraries have subscription optimisation that only re-renders components subscribed to the specific slice that changed — something Context cannot do.",
+    },
+  ],
+
+  "react-custom-hook-interview-questions": [
+    {
+      question: "What is a custom hook in React?",
+      answer:
+        "A custom hook is a function whose name starts with 'use' and that calls other hooks inside it. It extracts a stateful behaviour — logic that spans multiple renders — and gives it a descriptive name. Custom hooks share logic, not state: two components using the same hook each get completely independent copies of all the hook's state and effects. To share state between components, you still need Context, a global store, or lifting state to a common ancestor.",
+    },
+    {
+      question: "Why does the 'use' prefix matter beyond naming convention?",
+      answer:
+        "The 'use' prefix tells the React linter to enforce Rules of Hooks on that function — specifically the exhaustive-deps and rules-of-hooks checks. A function named fetchData that calls useState inside it silently loses all linting protection. The prefix is also what React DevTools uses to identify and display hook state. Omitting it does not just violate a convention — it causes real bugs that are hard to trace.",
+    },
+    {
+      question: "What is the correct return shape for a custom hook?",
+      answer:
+        "Return an array (like useState) when the hook returns at most two values that consumers will typically rename — const [value, setValue] = useLocalStorage('key', 'default'). Return an object when the hook returns three or more values or when the names carry meaning that should not be lost — const { data, loading, error, refetch } = useFetch(url). Mixing the two or returning inconsistently makes hooks harder to use and document.",
+    },
+    {
+      question: "How do you implement useFetch correctly?",
+      answer:
+        "A correct useFetch manages three state variables (data, loading, error), runs a fetch inside useEffect keyed to the URL, handles both loading and error states, guards against setting state after the component unmounts using a cancelled flag, and cancels in-flight requests using AbortController in the cleanup function. The cleanup aborts the request when the URL changes or the component unmounts, preventing race conditions and the 'state update on unmounted component' warning.",
+    },
+    {
+      question: "Can custom hooks call other custom hooks?",
+      answer:
+        "Yes, and this composability is the key to a layered hook architecture. You can build domain-level hooks (useUserProfile, useCartItem) by composing infrastructure-level hooks (useFetch, useLocalStorage), which themselves compose primitive React hooks (useState, useEffect). Each layer hides the complexity of the layer below it. The consuming component calls a single domain hook and gets a clean API — all the fetch, caching, and storage logic is encapsulated inside.",
+    },
+    {
+      question: "How do you test custom hooks?",
+      answer:
+        "Use renderHook from @testing-library/react. It creates a minimal host component specifically for running the hook inside React's runtime. Read the current values from result.current and wrap any calls that trigger state updates in act() to flush React's state queue. Test each returned value and function independently, and test cleanup by unmounting the renderHook result and verifying subscriptions or timers were correctly torn down.",
+    },
+  ],
+};
+
 /**
  * Get FAQs for a topic slug.
  * Falls back to an empty array if the topic has no dedicated FAQs.
  */
-export function getTopicFaqs(slug: string): FAQItem[] {
-  return TOPIC_FAQS[slug] ?? [];
+export function getTopicFaqs(slug: string, track = "javascript"): FAQItem[] {
+  switch (track) {
+    case "javascript":
+      return TOPIC_FAQS[slug] ?? [];
+    case "react":
+      return REACT_TOPIC_FAQS[slug] ?? [];
+    default:
+      return [];
+  }
 }
