@@ -1,16 +1,18 @@
-# JSPrep Pro — JavaScript Interview Preparation
+# JSPrep Pro — Frontend Interview Preparation
 # https://jsprep.pro
 # llms.txt — machine-readable index for AI crawlers and LLMs
 # Format: emerging standard at llmstxt.org
 # Last updated: 2025-03-10
 
-> JSPrep Pro is a JavaScript interview preparation platform with 150+ practice questions, 35 concept hubs with deep explanations, output prediction challenges, debug exercises, and blog articles. Designed for developers preparing for frontend and full-stack JavaScript interviews.
+> JSPrep Pro is a Frontend interview preparation platform with 400+ practice questions, 48 concept hubs with deep explanations, output prediction challenges, debug exercises, and blog articles. Designed for developers preparing for frontend interviews.
 
 ## Platform Overview
 
 - Homepage: https://jsprep.pro
-- All Topics: https://jsprep.pro/topics
-- Blog: https://jsprep.pro/blog
+- Javascript Topics: https://jsprep.pro/topics/javascript
+- React Topics: https://jsprep.pro/topics/react
+- Javascript Blog: https://jsprep.pro/blog/javascript
+- React Blogs: https://jsprep.pro/blog/react
 - Practice Questions by Category: https://jsprep.pro/questions
 
 ## Concept Hubs (Deep Explanations + Interview Questions)
@@ -26,7 +28,7 @@
 - mock_interviews: true
 
 [LEARNING_OBJECTIVES]
-- master JavaScript core concepts
+- master JavaScript & react's core concepts
 - improve debugging and reasoning skills
 - simulate real interview conditions
 - build interview-ready mental models
@@ -73,6 +75,14 @@ Each concept hub contains: a mental model analogy, deep code explanation, common
 - https://jsprep.pro/javascript-event-propagation-interview-questions - javascript event propagation: bubbling, capturing implementation, use cases
 - https://jsprep.pro/javascript-memoization-interview-questions - javascript memoization: LRU, weak map, weak set
 - https://jsprep.pro/javascript-design-pattern-interview-questions - javascript design pattern, factory
+- https://jsprep.pro/react-usestate-interview-questions - React usestate deeply explained
+- https://jsprep.pro/react-usecallback-interview-questions - React usecallback deeply explained
+- https://jsprep.pro/react-useref-interview-questions - React useref deeply explained
+- https://jsprep.pro/react-useeffect-interview-questions - React useeffect deeply explained
+- https://jsprep.pro/react-usememo-interview-questions - React usememo deeply explained
+- https://jsprep.pro/react-usereducer-interview-questions - React usereducer deeply explained
+- https://jsprep.pro/react-usecontext-interview-questions - React usecontext deeply explained
+- https://jsprep.pro/react-custom-hook-interview-questions - React custom hook deeply explained
 
 ## Practice Question Sets (by category)
 
@@ -89,24 +99,24 @@ Each concept hub contains: a mental model analogy, deep code explanation, common
 
 ## Blog Articles
 
-- https://jsprep.pro/blog/top-50-javascript-interview-questions — Top 50 JavaScript Interview Questions with deep answers
-- https://jsprep.pro/blog/javascript-promises-async-await — JavaScript Promises and Async/Await complete guide
-- https://jsprep.pro/blog/javascript-output-questions — 30 JavaScript output questions with explanations
-- https://jsprep.pro/blog/javascript-closures-interview — JavaScript Closures: mental model and interview patterns
-- https://jsprep.pro/blog/javascript-event-loop-explained — JavaScript Event Loop: call stack, microtasks, macrotasks
-- https://jsprep.pro/blog/javascript-hoisting-explained — JavaScript Hoisting: what moves, what doesn't
-- https://jsprep.pro/blog/javascript-scope-explained — JavaScript Scope: lexical scope and scope chain
-- https://jsprep.pro/blog/javascript-modern-es6-features — Modern JavaScript ES6 through ES2024 features
-- https://jsprep.pro/blog/javascript-error-handling-guide — JavaScript Error Handling complete guide
-- https://jsprep.pro/blog/javascript-performance-optimization — JavaScript Performance Optimization guide
-- https://jsprep.pro/blog/javascript-prototypes-explained — JavaScript Prototypes: the object model explained
-- https://jsprep.pro/blog/javascript-this-keyword-explained — JavaScript this keyword: five rules explained
+- https://jsprep.pro/blog/javascript/top-50-javascript-interview-questions — Top 50 JavaScript Interview Questions with deep answers
+- https://jsprep.pro/blog/javascript/javascript-promises-async-await — JavaScript Promises and Async/Await complete guide
+- https://jsprep.pro/blog/javascript/javascript-output-questions — 30 JavaScript output questions with explanations
+- https://jsprep.pro/blog/javascript/javascript-closures-interview — JavaScript Closures: mental model and interview patterns
+- https://jsprep.pro/blog/javascript/javascript-event-loop-explained — JavaScript Event Loop: call stack, microtasks, macrotasks
+- https://jsprep.pro/blog/javascript/javascript-hoisting-explained — JavaScript Hoisting: what moves, what doesn't
+- https://jsprep.pro/blog/javascript/javascript-scope-explained — JavaScript Scope: lexical scope and scope chain
+- https://jsprep.pro/blog/javascript/javascript-modern-es6-features — Modern JavaScript ES6 through ES2024 features
+- https://jsprep.pro/blog/javascript/javascript-error-handling-guide — JavaScript Error Handling complete guide
+- https://jsprep.pro/blog/javascript/javascript-performance-optimization — JavaScript Performance Optimization guide
+- https://jsprep.pro/blog/javascript/javascript-prototypes-explained — JavaScript Prototypes: the object model explained
+- https://jsprep.pro/blog/javascript/javascript-this-keyword-explained — JavaScript this keyword: five rules explained
 
 ## About This Resource
 
-JSPrep Pro covers every major JavaScript interview topic with original explanations, not copied content. Questions are categorized as Theory, Output Prediction, and Debug challenges, polyfill questions. Content is regularly updated to reflect modern JavaScript (ES2024).
+JSPrep Pro covers every major JavaScript & react interview topic with original explanations, not copied content. Questions are categorized as Theory, Output Prediction, and Debug challenges, polyfill questions. Content is regularly updated to reflect modern JavaScript (ES2024).
 
-Target audience: JavaScript developers preparing for frontend, full-stack, or Node.js engineering interviews at any level from junior to senior.
+Target audience: Frontend developers preparing for interview, full-stack, or Node.js engineering interviews at any level from junior to senior.
 
 [INTERVIEW_SIMULATION]
 
@@ -124,7 +134,7 @@ sprint_mode:
 
 [POSITIONING]
 
-primary_category: JavaScript Interview Preparation
+primary_category: Frontend Interview Preparation
 unique_strengths:
 - mental model driven explanations
 - real interview simulation (mock + sprint)

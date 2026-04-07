@@ -849,7 +849,7 @@ export default function HomePageClient({
               {topics.slice(0, 6).map((t) => (
                 <Link key={t.slug} href={`/${t.slug}`} css={tpCard(C.accent)}>
                   <div css={tpDot(C.amber)} />
-                  <div css={tpName}>{t.category} Interview Questions</div>
+                  <div css={tpName}>{t.title}</div>
                   <div css={tpMeta}>
                     <span css={tpDiff(C.accent3)}>{t.difficulty}</span>
                     <span css={tpQs}>{t.questionCount} questions</span>
