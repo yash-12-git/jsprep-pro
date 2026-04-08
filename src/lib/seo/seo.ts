@@ -14,9 +14,7 @@ export const SITE = {
   domain: "https://jsprep.pro",
   twitterHandle: "@jspreppro",
   description:
-    "500+ frontend interview questions covering JavaScript, React, TypeScript & System Design. " +
-    "AI scoring, Mock interviews, output prediction, debug challenges, theory questions, polyfills, and Interview Sprint mode. " +
-    "Free to start — no card needed.",
+    "500+ frontend interview questions covering JavaScript, React & core concepts. AI scoring, mock interviews, output prediction & debugging.",
 };
 
 // ─── Keywords ─────────────────────────────────────────────────────────────────
