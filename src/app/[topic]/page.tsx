@@ -119,7 +119,7 @@ export default async function TopicPage({ params }: Props) {
     TOPIC_DIFF_BG[topic.difficulty] ?? TOPIC_DIFF_BG["Intermediate"];
   const hasConceptHub = !!(topic.mentalModel || topic.deepDive);
 
-  const dedicatedFaqs = getTopicFaqs(topic.slug, track) ?? [];
+  const dedicatedFaqs = getTopicFaqs(topic.slug, topic.track) ?? [];
   const faqItems = dedicatedFaqs.length > 0 ? faqSchema(dedicatedFaqs) : null;
 
   const tocItems = [
