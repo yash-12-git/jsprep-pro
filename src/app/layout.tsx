@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TrackProvider } from "@/contexts/TrackContext";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.domain),
@@ -111,6 +112,7 @@ export default function RootLayout({
             </AuthProvider>
           </ThemeProvider>
         </TrackProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
