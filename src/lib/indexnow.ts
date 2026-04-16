@@ -1,6 +1,6 @@
 export async function submitToIndexNow(urls: string[]) {
   try {
-    await fetch("https://api.indexnow.org/IndexNow", {
+    const res = await fetch("https://api.indexnow.org/IndexNow", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -13,6 +13,17 @@ export async function submitToIndexNow(urls: string[]) {
         urlList: urls,
       }),
     });
+
+    const text = await res.text();
+
+    console.log("IndexNow status:", res.status);
+    console.log("IndexNow response:", text);
+
+    if (!res.ok) {
+      console.error("❌ IndexNow failed");
+    } else {
+      console.log("✅ IndexNow success");
+    }
   } catch (err) {
     console.error("IndexNow error:", err);
   }

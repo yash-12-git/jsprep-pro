@@ -1129,6 +1129,68 @@ export const REACT_TOPIC_FAQS: Record<string, FAQItem[]> = {
         "Use renderHook from @testing-library/react. It creates a minimal host component specifically for running the hook inside React's runtime. Read the current values from result.current and wrap any calls that trigger state updates in act() to flush React's state queue. Test each returned value and function independently, and test cleanup by unmounting the renderHook result and verifying subscriptions or timers were correctly torn down.",
     },
   ],
+  "react-rendering-performance-interview-questions": [
+  {
+    question: "What is rendering in React?",
+    answer:
+      "Rendering in React is the process of calling a component function to produce JSX, which is then converted into a Virtual DOM representation. On initial render, React builds the DOM from scratch. On updates, React re-renders components to compute the new Virtual DOM and then efficiently updates only the changed parts in the real DOM.",
+  },
+  {
+    question: "What is reconciliation in React?",
+    answer:
+      "Reconciliation is the process React uses to compare the previous Virtual DOM with the new Virtual DOM after a re-render. It identifies what has changed and updates only those parts in the real DOM. React uses an optimized O(n) diffing algorithm based on assumptions like stable element types and the use of keys for list items.",
+  },
+  {
+    question: "Why does React re-render components?",
+    answer:
+      "React re-renders a component when its state changes, its props change, or when a parent component re-renders. Context updates can also trigger re-renders. Importantly, a re-render does not always mean a DOM update — React first compares the new output with the previous one and only applies actual DOM changes if needed.",
+  },
+  {
+    question: "What is the difference between render phase and commit phase?",
+    answer:
+      "The render phase is where React calculates what changes are needed by building and diffing the Virtual DOM. This phase can be paused or interrupted in concurrent mode. The commit phase is where React applies those changes to the real DOM and runs lifecycle methods or effects. The commit phase is synchronous and cannot be interrupted.",
+  },
+  {
+    question: "How do keys improve performance in lists?",
+    answer:
+      "Keys help React uniquely identify elements in a list during reconciliation. When keys are stable, React can match elements between renders and update only the changed ones. Without proper keys or when using array indices, React may re-render or recreate unnecessary elements, leading to performance issues and UI bugs.",
+  },
+  {
+    question: "What causes unnecessary re-renders in React?",
+    answer:
+      "Unnecessary re-renders are commonly caused by parent re-renders propagating to children, changing function or object references on every render, improper use of context, and missing memoization. Inline functions, new object literals, and unstable dependencies in hooks often trigger avoidable re-renders.",
+  },
+  {
+    question: "How does React.memo help with performance?",
+    answer:
+      "React.memo is a higher-order component that prevents a functional component from re-rendering if its props have not changed. It performs a shallow comparison of props and skips rendering if they are equal. It is useful for optimizing pure components but should be used carefully to avoid unnecessary complexity.",
+  },
+  {
+    question: "When should you use useMemo and useCallback?",
+    answer:
+      "useMemo is used to memoize expensive computations so they are only recalculated when dependencies change. useCallback is used to memoize function references to prevent unnecessary re-renders of child components. Both should be used only when there is a measurable performance issue, as overusing them can add complexity without real benefits.",
+  },
+  {
+    question: "What is batching in React?",
+    answer:
+      "Batching is the process of grouping multiple state updates into a single re-render for performance optimization. In modern React, updates inside event handlers, timeouts, promises, and other async operations are automatically batched, reducing the number of renders and improving efficiency.",
+  },
+  {
+    question: "What is concurrent rendering in React?",
+    answer:
+      "Concurrent rendering is a feature introduced in React 18 that allows React to interrupt, pause, and resume rendering work. It enables prioritization of updates, making the UI more responsive. Features like startTransition and useDeferredValue help mark non-urgent updates so React can handle them more efficiently.",
+  },
+  {
+    question: "How can you optimize large lists in React?",
+    answer:
+      "Large lists can be optimized using techniques like virtualization (react-window or react-virtualized), pagination, and lazy loading. Virtualization renders only the visible portion of the list, significantly reducing DOM nodes and improving performance.",
+  },
+  {
+    question: "Does React always update the DOM after re-render?",
+    answer:
+      "No, React does not always update the DOM after a re-render. It first compares the new Virtual DOM with the previous one using reconciliation. If there are no differences, React skips DOM updates entirely, making rendering efficient.",
+  }
+]
 };
 
 /**
