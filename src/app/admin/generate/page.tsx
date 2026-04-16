@@ -107,6 +107,13 @@ const OUTPUT_CATEGORIES: Partial<Record<Track, string[]>> = {
     "'this' Binding",
     "Hoisting",
     "Type Coercion",
+    "Type Conversion",
+    "Async/Await",
+    "Prototypes & Inheritance",
+    "Destructuring & Rest/Spread",
+    "Logical Operators",
+    "Modules & Imports",
+    "Misc Quirks",
   ],
   react: [
     "Hooks & Closures",

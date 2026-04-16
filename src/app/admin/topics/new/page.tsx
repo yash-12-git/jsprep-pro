@@ -8,6 +8,7 @@ import type { TopicInput } from '@/types/topic'
 import { C } from '@/styles/tokens'
 import { ArrowLeft } from 'lucide-react'
 import { revalidateTopics } from '@/lib/adminRevalidate'
+import { submitToIndexNow } from '@/lib/indexnow'
 
 export default function NewTopicPage() {
   const { user } = useAuth()
@@ -16,6 +17,8 @@ export default function NewTopicPage() {
   async function handleSubmit(data: TopicInput) {
     if (!user) return
     await createTopic(data, user.uid)
+    await submitToIndexNow([`https://jsprep.pro/${data.slug}`]);
+    
     await revalidateTopics()
     router.push('/admin/topics')
   }
