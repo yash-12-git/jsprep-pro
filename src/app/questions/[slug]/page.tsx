@@ -47,11 +47,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cat = cats.find((c: string) => catToSlug(c) === params.slug);
   if (!cat) return {};
   return pageMeta({
-    title: `${cat} JavaScript Interview Questions (Questions With Answers)`,
-    description: `${cat} interview questions with detailed answers and code examples. Master ${cat} concepts for your JavaScript frontend interview.`,
+    title: `${cat} ${track} Interview Questions (Questions With Answers)`,
+    description: `${cat} interview questions with detailed answers and code examples. Master ${cat} concepts for your ${track} frontend interview.`,
     path: `/questions/${params.slug}`,
     keywords: [
-      `${cat.toLowerCase()} javascript interview`,
+      `${cat.toLowerCase()} ${track} interview`,
       `${cat.toLowerCase()} interview questions`,
     ],
   });
@@ -119,8 +119,8 @@ export default async function CategoryQuestionsPage({ params }: Props) {
           __html: breadcrumbSchema([
             { name: "Home", path: "/" },
             {
-              name: "JavaScript Interview Questions",
-              path: "/javascript-interview-questions",
+              name: `${track} Interview Questions`,
+              path: `/${track}-interview-questions`,
             },
             { name: `${cat} Questions`, path: `/questions/${params.slug}` },
           ]),
@@ -148,10 +148,10 @@ export default async function CategoryQuestionsPage({ params }: Props) {
           </Link>
           <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
           <Link
-            href="/javascript-interview-questions"
+            href={`/${track}-interview-questions`}
             style={{ color: C.accent, textDecoration: "none" }}
           >
-            JS Interview Questions
+            {track.charAt(0).toUpperCase() + track.slice(1)} Interview Questions
           </Link>
           <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
           <span style={{ color: C.muted }}>{cat}</span>
@@ -169,7 +169,7 @@ export default async function CategoryQuestionsPage({ params }: Props) {
               marginBottom: "0.625rem",
             }}
           >
-            JavaScript · {cat}
+            {track.charAt(0).toUpperCase() + track.slice(1)} · {cat}
           </div>
           <h1
             style={{
@@ -219,7 +219,7 @@ export default async function CategoryQuestionsPage({ params }: Props) {
               Practice Interactively →
             </Link>
             <Link
-              href="/javascript-interview-questions"
+              href={`/${track}-interview-questions`}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -434,7 +434,7 @@ export default async function CategoryQuestionsPage({ params }: Props) {
               borderBottom: `1px solid ${C.border}`,
             }}
           >
-            Other JavaScript Interview Topics
+            Other {track.charAt(0).toUpperCase() + track.slice(1)} Interview Topics
           </h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
             {allCats

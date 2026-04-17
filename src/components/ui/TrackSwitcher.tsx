@@ -44,6 +44,23 @@ export default function TrackSwitcher() {
     if (!TRACK_MAP[id]?.available) return;
     setTrack(id);
 
+    if (
+    pathname === "/react-interview-cheatsheet" ||
+    pathname === "/javascript-interview-cheatsheet"
+  ) {
+    router.push(`/${id}-interview-cheatsheet`);
+    return;
+  }
+
+  // 👉 Case 3: interview questions (hardcoded)
+   if (
+    pathname === "/react-interview-questions" ||
+    pathname === "/javascript-interview-questions"
+  ) {
+    router.push(`/${id}-interview-questions`);
+    return;
+  }
+
     const navigable = TRACK_NAVIGABLE_PATTERNS.find((p) =>
       p.pattern.test(pathname),
     );

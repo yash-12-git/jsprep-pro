@@ -99,14 +99,14 @@ const LEARN_LINKS = (track: string) => [
     icon: Layers,
     desc: "36 concept pages",
   },
+  {
+    href: `/${track}-interview-questions`,
+    label: `${track.charAt(0).toUpperCase() + track.slice(1)} Interview Questions`,
+    icon: Code2,
+    desc: "Predict the console.log",
+  },
   ...(track === "javascript"
     ? [
-        {
-          href: "/javascript-output-questions",
-          label: "Output Questions",
-          icon: Code2,
-          desc: "Predict the console.log",
-        },
         {
           href: "/javascript-tricky-questions",
           label: "Tricky Questions",

@@ -1243,7 +1243,7 @@ export const REACT_TOPIC_FAQS: Record<string, FAQItem[]> = {
         "If keys are missing or unstable (like using array index), React cannot correctly match elements during reconciliation. This can lead to unnecessary re-renders, performance issues, and bugs like incorrect state being preserved.",
     },
   ],
-  "react-react-fiber-interview-questions": [
+  "react-fiber-interview-questions": [
     {
       question: "What is React Fiber architecture?",
       answer:

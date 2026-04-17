@@ -22,7 +22,9 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "Googlebot",
         allow: [
           "/javascript-interview-questions",
+          "/react-interview-questions",
           "/javascript-interview-cheatsheet",
+          "/react-interview-cheatsheet",
           "/questions/",
           "/blog/",
         ],

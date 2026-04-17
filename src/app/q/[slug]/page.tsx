@@ -31,6 +31,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const q = await getQuestionBySlug(params.slug);
+  const track = await getServerTrack();
   if (!q) return {};
   const diff = DIFF_LABEL[q.difficulty] ?? "Core";
   const typeLabel =
@@ -40,13 +41,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         ? "Debug Challenge"
         : "Interview Question";
   return pageMeta({
-    title: `${q.title} — JavaScript ${typeLabel}`,
-    description: `${diff} JavaScript ${typeLabel.toLowerCase()}: ${q.title} — Detailed answer with code examples and interview tips. Part of the ${q.category} category.`,
+    title: `${q.title} — ${track} ${typeLabel}`,
+    description: `${diff} ${track} ${typeLabel.toLowerCase()}: ${q.title} — Detailed answer with code examples and interview tips. Part of the ${q.category} category.`,
     path: `/q/${params.slug}`,
     keywords: [
       q.title.toLowerCase(),
-      `${q.category.toLowerCase()} javascript`,
-      "javascript interview question",
+      `${q.category.toLowerCase()} ${track}`,
+      `${track.toLowerCase()} interview question`,
       `${params.slug.replace(/-/g, " ")}`,
     ],
   });
@@ -103,7 +104,7 @@ export default async function QuestionPage({ params }: Props) {
   const categoryPath = isTheory
     ? `/questions/${catSlug}`
     : isOutput
-      ? "/javascript-output-questions"
+      ? `/${track.toLowerCase()}-output-questions`
       : "/debug-lab";
   const categoryLabel = isTheory
     ? question.category
@@ -132,8 +133,8 @@ export default async function QuestionPage({ params }: Props) {
           __html: breadcrumbSchema([
             { name: "Home", path: "/" },
             {
-              name: "JS Interview Questions",
-              path: "/javascript-interview-questions",
+              name: `${track} Interview Questions`,
+              path: `/${track.toLowerCase()}-interview-questions`,
             },
             { name: categoryLabel, path: categoryPath },
             {
@@ -557,7 +558,7 @@ export default async function QuestionPage({ params }: Props) {
           <Link
             href={
               isOutput
-                ? "/javascript-output-questions"
+                ? `/${track.toLowerCase()}-output-questions`
                 : isDebug
                   ? "/debug-lab"
                   : "/sprint"

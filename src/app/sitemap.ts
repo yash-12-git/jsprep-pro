@@ -48,6 +48,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.95,
     },
     {
+      url: `${SITE.domain}/react-interview-questions`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
+    {
       url: `${SITE.domain}/javascript-output-questions`,
       lastModified: now,
       changeFrequency: "weekly",
@@ -61,6 +67,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${SITE.domain}/javascript-interview-cheatsheet`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE.domain}/react-interview-cheatsheet`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.9,

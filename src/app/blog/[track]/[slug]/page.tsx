@@ -83,7 +83,7 @@ function md(content: string): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: Props) {
   const post = await getBlogPostBySlug(params.slug);
-  const track = getServerTrack();
+  const track = await getServerTrack();
   if (!post) notFound();
 
   const [relatedTopics, allPosts] = await Promise.all([
@@ -389,7 +389,7 @@ export default async function BlogPostPage({ params }: Props) {
               Start Free →
             </Link>
             <Link
-              href="/javascript-interview-questions"
+              href={`/${track}-interview-questions`}
               style={{
                 padding: "0.625rem 1.375rem",
                 background: C.bg,
