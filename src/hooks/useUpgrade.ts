@@ -28,12 +28,41 @@ async function loadRazorpay(): Promise<void> {
   });
 }
 
+interface OrderResponse {
+  orderId: string;
+  currency: string;
+  amount: number;
+  symbol: string;
+  display: string;
+}
+
+async function createOrder(userId: string): Promise<OrderResponse> {
+  const res = await fetch("/api/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error ?? `Order creation failed (${res.status})`);
+  }
+  return res.json();
+}
+
 interface UseUpgradeOptions {
   /** Called after payment + Firestore update succeed */
   onSuccess?: () => void;
 }
 
-export function useUpgrade({ onSuccess }: UseUpgradeOptions = {}) {
+interface UseUpgradeReturn {
+  handleUpgrade: () => Promise<void>;
+  loading: boolean;
+  error: string | null;
+}
+
+export function useUpgrade({
+  onSuccess,
+}: UseUpgradeOptions = {}): UseUpgradeReturn {
   const { user, refreshProgress } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,12 +77,17 @@ export function useUpgrade({ onSuccess }: UseUpgradeOptions = {}) {
     setError(null);
 
     try {
-      await loadRazorpay();
+      // Create a fresh order every time — orders are single-use and expire
+      const [order] = await Promise.all([
+        createOrder(user.uid),
+        loadRazorpay(),
+      ]);
 
       const rzp = new window.Razorpay({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: Number(process.env.NEXT_PUBLIC_PRO_PRICE_PAISE || 19900), // 199 INR = 19900 paise
-        currency: "INR",
+        order_id: order.orderId, // ← required for international currencies
+        amount: order.amount,
+        currency: order.currency,
         name: "JSPrep Pro",
         description: "Monthly Pro Subscription",
         prefill: {
@@ -64,7 +98,11 @@ export function useUpgrade({ onSuccess }: UseUpgradeOptions = {}) {
         modal: {
           ondismiss: () => setLoading(false),
         },
-        handler: async (response: { razorpay_payment_id: string }) => {
+        handler: async (response: {
+          razorpay_payment_id: string;
+          razorpay_order_id: string;
+          razorpay_signature: string;
+        }) => {
           try {
             await activatePro(user.uid, response.razorpay_payment_id);
             await refreshProgress();
@@ -79,14 +117,24 @@ export function useUpgrade({ onSuccess }: UseUpgradeOptions = {}) {
         },
       });
 
-      rzp.on("payment.failed", () => {
-        setError("Payment failed. Please try again.");
-        setLoading(false);
-      });
+      rzp.on(
+        "payment.failed",
+        (response: { error: { description: string } }) => {
+          setError(
+            response.error?.description ?? "Payment failed. Please try again.",
+          );
+          setLoading(false);
+        },
+      );
 
       rzp.open();
-    } catch {
-      setError("Could not load payment. Check your connection and try again.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setError(
+        message.startsWith("Order creation failed")
+          ? "Could not initiate payment — please try again."
+          : "Could not load payment. Check your connection and try again.",
+      );
       setLoading(false);
     }
   }, [user, refreshProgress, onSuccess]);

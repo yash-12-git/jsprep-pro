@@ -280,7 +280,7 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
   ctx.fillStyle = "rgba(255,255,255,0.3)";
   ctx.textAlign = "right";
   ctx.fillText(
-    "JavaScript Interview Sprint  •  Can you beat my score?",
+    "Interview Sprint  •  Can you beat my score?",
     W - 72,
     651,
   );

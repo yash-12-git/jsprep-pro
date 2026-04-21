@@ -207,6 +207,7 @@ import {
 import ProCTA from "@/components/home/ProCTA";
 import { Track, TRACK_MAP } from "@/lib/tracks";
 import { Topic } from "@/types/topic";
+import { usePricing } from "@/hooks/usePricing";
 
 // ─── Track-specific content config ────────────────────────────────────────────
 
@@ -231,6 +232,7 @@ export default function HomePageClient({
 }: HomePageClientProps) {
   const { user, progress } = useAuth();
   const { track } = useTrack();
+  const pricing = usePricing();
   const router = useRouter();
   const prevTrack = useRef(track);
 
@@ -921,7 +923,7 @@ export default function HomePageClient({
                   letterSpacing: "-0.03em",
                 }}
               >
-                ₹0
+                {pricing.symbol}0<span css={pPer}>/month</span>
               </div>
               <div css={pNote}>Forever free — no card needed</div>
               <ul css={pFeats}>
@@ -963,7 +965,7 @@ export default function HomePageClient({
                   letterSpacing: "-0.03em",
                 }}
               >
-                ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}
+                {pricing.symbol}{pricing.display || process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}
                 <span css={pPer}>/month</span>
               </div>
               <div css={pNote}>Less than a coffee. Cancel anytime.</div>

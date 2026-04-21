@@ -453,7 +453,7 @@ export default function CheatSheetClientPage({
 
         {/* Header */}
         <div css={pageHeader}>
-          <h1 css={pageTitle}>JavaScript Interview Cheat Sheet</h1>
+          <h1 css={pageTitle}>{`${topics?.[0]?.track} Interview Cheat Sheet`}</h1>
           <p css={pageSubtitle}>
             {totalTopics} topics · crisp bullet points for every concept you
             need to know. Use this the night before your interview.

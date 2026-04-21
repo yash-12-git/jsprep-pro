@@ -6,8 +6,11 @@
  */
 
 import { proFeatures } from "@/data/homepageStaticData";
+import { getPricingForCountry, PricingInfo } from "@/lib/pricing";
 import type { Metadata } from "next";
 import { Track } from "../tracks";
+
+const DEFAULT_PRICING = getPricingForCountry("IN");
 
 export const SITE = {
   name: "JSPrep Pro",
@@ -244,7 +247,7 @@ export function articleSchema(opts: {
 
 // ─── Software schema ──────────────────────────────────────────────────────────
 
-export function softwareSchema(): string {
+export function softwareSchema(pricing: PricingInfo = DEFAULT_PRICING): string {
   return JSON.stringify({
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -254,11 +257,16 @@ export function softwareSchema(): string {
     description: SITE.description,
     url: SITE.domain,
     offers: [
-      { "@type": "Offer", price: "0", priceCurrency: "INR", name: "Free Plan" },
       {
         "@type": "Offer",
-        price: process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199,
-        priceCurrency: "INR",
+        price: "0",
+        priceCurrency: pricing.currency,
+        name: "Free Plan",
+      },
+      {
+        "@type": "Offer",
+        price: pricing.display,
+        priceCurrency: pricing.currency,
         name: "Pro Plan",
         billingDuration: "P1M",
       },
@@ -336,7 +344,10 @@ const TRACK_COURSE_META: Record<
   },
 };
 
-export function courseSchema(track: Track = "javascript"): string {
+export function courseSchema(
+  track: Track = "javascript",
+  pricing: PricingInfo = DEFAULT_PRICING,
+): string {
   const meta = TRACK_COURSE_META[track];
   return JSON.stringify({
     "@context": "https://schema.org",
@@ -361,14 +372,14 @@ export function courseSchema(track: Track = "javascript"): string {
         "@type": "Offer",
         name: "Free Plan",
         price: "0",
-        priceCurrency: "INR",
+        priceCurrency: pricing.currency,
         availability: "https://schema.org/InStock",
       },
       {
         "@type": "Offer",
         name: "Pro Plan",
-        price: process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199,
-        priceCurrency: "INR",
+        price: pricing.display,
+        priceCurrency: pricing.currency,
         billingIncrement: "P1M",
         availability: "https://schema.org/InStock",
       },

@@ -12,6 +12,8 @@ import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
 import { C } from "@/styles/tokens";
 import { getQuestions } from "@/lib/cachedQueries";
 import { getServerTrack } from "@/lib/getServerTrack";
+import { headers } from "next/headers";
+import { getPricingForCountry } from "@/lib/pricing";
 
 export const metadata: Metadata = pageMeta({
   title: "JavaScript Output Questions: Predict the Console.log (2025)",
@@ -75,6 +77,8 @@ const faqItems = [
 
 export default async function JavaScriptOutputQuestionsPage() {
   const track = await getServerTrack();
+  const country = (await headers()).get("x-vercel-ip-country");
+  const pricing = getPricingForCountry(country);
   const outputQuestions = await getQuestions({
     filters: { track, status: "published", type: "output" },
     pageSize: 300,
@@ -483,8 +487,8 @@ export default async function JavaScriptOutputQuestionsPage() {
                 fontSize: "0.9375rem",
               }}
             >
-              View Pro — ₹{process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}/mo
-              →
+              View Pro — {pricing.symbol}
+              {pricing.display}/mo →
             </Link>
           </div>
         </section>

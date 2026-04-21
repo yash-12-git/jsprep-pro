@@ -95,12 +95,12 @@ const SHARED_FAQ: FAQItem[] = [
   {
     question: "What is JSPrep Pro?",
     answer:
-      "JSPrep Pro is a frontend interview preparation platform with 500+ questions covering JavaScript, React, TypeScript, and System Design. It includes AI-scored written answers, output prediction, debug challenges, Interview Sprint, and 40+ topic deep-dives — all tailored for frontend developers.",
+      "JSPrep Pro is a frontend interview preparation platform with 600+ questions covering JavaScript, React, TypeScript, and System Design. It includes AI-scored written answers, output prediction, debug challenges, Interview Sprint, and 40+ topic deep-dives — all tailored for frontend developers.",
   },
   {
     question: "Is JSPrep Pro free to use?",
     answer:
-      "Yes. JSPrep Pro offers 100+ theory questions completely free across JavaScript, React, TypeScript, and System Design — forever, no credit card required. The Pro plan (₹199/month) unlocks all 500+ questions, unlimited Interview Sprints, AI tools, Study Plan, Cheat Sheet, and more.",
+      "Yes. JSPrep Pro offers 200+ theory questions completely free across JavaScript, React, TypeScript, and System Design — forever, no credit card required. The Pro plan unlocks all 900+ questions, unlimited Interview Sprints, AI tools, Study Plan, Cheat Sheet, and more.",
   },
   {
     question: "What is the Interview Sprint?",

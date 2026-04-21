@@ -2,10 +2,12 @@
 "use client";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePricing } from "@/hooks/usePricing";
 import { activatePro } from "@/lib/userProgress";
 import { Zap, X, CheckCircle } from "lucide-react";
 import * as S from "./styles";
 import { C } from "@/styles/tokens";
+import { proFeatures } from "@/data/homepageStaticData";
 
 declare global {
   interface Window {
@@ -17,49 +19,68 @@ interface Props {
   onClose?: () => void;
   reason?: string;
 }
-
-const features = [
-  "Unlimited mastery tracking",
-  "Bookmarks for quick review",
-  "Timed quiz / flashcard mode",
-  "Progress analytics & charts",
-  "Daily streak tracking",
-  "All 6 AI features",
-];
-
 export default function PaywallBanner({ onClose, reason }: Props) {
   const { user, refreshProgress } = useAuth();
+  const pricing = usePricing();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleUpgrade() {
-    if (!user) return;
+    if (!user) {
+      window.location.href = "/auth";
+      return;
+    }
+
     setLoading(true);
+    setError(null);
+
     try {
-      await new Promise<void>((resolve) => {
-        if (window.Razorpay) return resolve();
-        const s = document.createElement("script");
-        s.src = "https://checkout.razorpay.com/v1/checkout.js";
-        s.onload = () => resolve();
-        document.body.appendChild(s);
-      });
+      // Load SDK and create a fresh order in parallel
+      const [, order] = await Promise.all([
+        loadRazorpay(),
+        fetch("/api/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: user.uid }),
+        }).then(async (r) => {
+          if (!r.ok) throw new Error(`order ${r.status}`);
+          return r.json();
+        }),
+      ]);
+
       const rzp = new window.Razorpay({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: Number(process.env.NEXT_PUBLIC_PRO_PRICE_PAISE || 19900),
-        currency: "INR",
+        order_id: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
         name: "JSPrep Pro",
         description: "Monthly Pro Subscription",
-        prefill: { email: user.email || "", name: user.displayName || "" },
-        theme: { color: C.accent }, // uses the live token value
-        handler: async (response: any) => {
-          await activatePro(user.uid, response.razorpay_payment_id);
-          await refreshProgress();
-          onClose?.();
+        prefill: { email: user.email ?? "", name: user.displayName ?? "" },
+        theme: { color: C.accent },
+        modal: { ondismiss: () => setLoading(false) },
+        handler: async (response: { razorpay_payment_id: string }) => {
+          try {
+            await activatePro(user.uid, response.razorpay_payment_id);
+            await refreshProgress();
+            onClose?.();
+          } catch {
+            setError(
+              "Payment received but activation failed — contact support.",
+            );
+          } finally {
+            setLoading(false);
+          }
         },
       });
+
+      rzp.on("payment.failed", (res: { error: { description: string } }) => {
+        setError(res.error?.description ?? "Payment failed. Please try again.");
+        setLoading(false);
+      });
+
       rzp.open();
-    } catch (err) {
-      console.error("Payment error:", err);
-    } finally {
+    } catch {
+      setError("Could not start payment. Check your connection and try again.");
       setLoading(false);
     }
   }
@@ -78,7 +99,6 @@ export default function PaywallBanner({ onClose, reason }: Props) {
         </div>
 
         <h2 css={S.title}>Unlock Pro Features</h2>
-
         {reason && <p css={S.reasonText}>{reason}</p>}
 
         <p css={S.desc}>
@@ -87,7 +107,7 @@ export default function PaywallBanner({ onClose, reason }: Props) {
         </p>
 
         <ul css={S.featureList}>
-          {features.map((f) => (
+          {proFeatures.map((f) => (
             <li key={f} css={S.featureItem}>
               <CheckCircle
                 size={14}
@@ -99,13 +119,19 @@ export default function PaywallBanner({ onClose, reason }: Props) {
           ))}
         </ul>
 
-        <button css={S.upgradeBtn} onClick={handleUpgrade} disabled={loading}>
+        {error && <p>{error}</p>}
+
+        <button
+          css={S.upgradeBtn}
+          onClick={handleUpgrade}
+          disabled={loading || pricing.isLoading}
+        >
           {loading ? (
             "Loading…"
           ) : (
             <>
-              <Zap size={16} /> Upgrade for ₹
-              {process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}/mo
+              <Zap size={16} />
+              Upgrade for {pricing.isLoading ? "…" : pricing.label}
             </>
           )}
         </button>
@@ -114,4 +140,15 @@ export default function PaywallBanner({ onClose, reason }: Props) {
       </div>
     </div>
   );
+}
+
+async function loadRazorpay(): Promise<void> {
+  if (window.Razorpay) return;
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "https://checkout.razorpay.com/v1/checkout.js";
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("Failed to load Razorpay SDK"));
+    document.body.appendChild(s);
+  });
 }

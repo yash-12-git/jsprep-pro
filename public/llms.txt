@@ -1,154 +1,115 @@
-# JSPrep Pro — Frontend Interview Preparation
-# https://jsprep.pro
-# llms.txt — machine-readable index for AI crawlers and LLMs
-# Format: emerging standard at llmstxt.org
-# Last updated: 2025-03-10
+# JSPrep Pro
 
-> JSPrep Pro is a Frontend interview preparation platform with 400+ practice questions, 48 concept hubs with deep explanations, output prediction challenges, debug exercises, and blog articles. Designed for developers preparing for frontend interviews.
+> JSPrep Pro is a frontend interview preparation platform for JavaScript and React developers. It offers 400+ practice questions across four modes (theory, output prediction, debug lab, polyfill lab), 50+ concept deep-dives with mental models, an AI answer evaluator, AI mock interviewer, timed Interview Sprint, and daily streak tracking. Designed for developers at any level preparing for frontend engineering interviews.
 
-## Platform Overview
+Platform URL: https://jsprep.pro
+Target audience: Frontend and full-stack developers preparing for junior-to-senior engineering interviews.
+Content coverage: JavaScript (ES6–ES2024), React hooks, TypeScript, Frontend System Design.
 
-- Homepage: https://jsprep.pro
-- Javascript Topics: https://jsprep.pro/topics/javascript
-- React Topics: https://jsprep.pro/topics/react
-- Javascript Blog: https://jsprep.pro/blog/javascript
-- React Blogs: https://jsprep.pro/blog/react
-- Practice Questions by Category: https://jsprep.pro/questions
+Question types:
+- Theory: written answers graded by AI 1–10 with specific gaps identified
+- Output prediction: predict what console.log prints — the most common real interview format
+- Debug lab: find and fix real bugs with AI feedback
+- Polyfill lab: implement Array.map, Promise.all, bind from scratch with test runner feedback
 
-## Concept Hubs (Deep Explanations + Interview Questions)
+AI features: Answer Evaluator, AI Tutor, Code Checker, Mock Interviewer, Study Plan generator, Cheat Sheet.
 
-[FEATURES]
-- mental_models: true
-- misconceptions: true
-- interview_framing: true
-- output_prediction: true
-- debugging_questions: true
-- polyfills: true
-- timed_sprint: true
-- mock_interviews: true
+## Core Platform
 
-[LEARNING_OBJECTIVES]
-- master JavaScript & react's core concepts
-- improve debugging and reasoning skills
-- simulate real interview conditions
-- build interview-ready mental models
+- [Homepage](https://jsprep.pro): Platform overview, pricing, and feature summary
+- [Interview Sprint](https://jsprep.pro/sprint): Timed mixed-question challenge — theory + output + debug under pressure, AI-scored, shareable result card
+- [Theory Questions](https://jsprep.pro/theory): 93 core JavaScript theory questions with AI-graded written answers
+- [Output Quiz](https://jsprep.pro/output-quiz): 106 output prediction questions — predict what the console prints
+- [Debug Lab](https://jsprep.pro/debug-lab): 28 real bug-fixing challenges with AI feedback
+- [Polyfill Lab](https://jsprep.pro/polyfill-lab): 25 questions — implement Array methods, Promise utilities, and Function methods from scratch
+- [Topic Guides — JavaScript](https://jsprep.pro/topics/javascript): Index of all JavaScript concept hubs
+- [Topic Guides — React](https://jsprep.pro/topics/react): Index of all React concept hubs
+- [Pricing](https://jsprep.pro/#pricing): Free tier (93 questions forever) and Pro tier with all AI features
 
+## JavaScript Concept Hubs
 
+Each hub contains: a mental model analogy, deep code walkthrough, common misconceptions, real-world examples, and 10–25 practice questions.
 
-Each concept hub contains: a mental model analogy, deep code explanation, common misconceptions, real-world framework examples, and 10-25 practice questions, related_concepts.
+- [JavaScript Closures](https://jsprep.pro/javascript-closure-interview-questions): Lexical scope, closure patterns, private state, memory implications
+- [JavaScript Hoisting](https://jsprep.pro/javascript-hoisting-interview-questions): var/let/const hoisting rules, temporal dead zone, function declaration hoisting
+- [JavaScript Scope](https://jsprep.pro/javascript-scope-interview-questions): Lexical scope, scope chain, block vs function scope, module scope
+- [var vs let vs const](https://jsprep.pro/javascript-var-let-const-interview-questions): Scoping rules, hoisting differences, TDZ, when to use each
+- [Execution Context](https://jsprep.pro/javascript-execution-context-interview-questions): Call stack, global context, function context, creation vs execution phase
+- [Type Coercion](https://jsprep.pro/javascript-type-coercion-interview-questions): Implicit vs explicit coercion, == rules, truthy/falsy values
+- [Equality (== vs ===)](https://jsprep.pro/javascript-equality-interview-questions): Strict equality, loose equality coercion algorithm, Object.is
+- [this Keyword](https://jsprep.pro/javascript-this-keyword-interview-questions): Five binding rules, call/apply/bind, arrow functions, class context
+- [Arrow Functions](https://jsprep.pro/javascript-arrow-function-interview-questions): Lexical this, differences from regular functions, when not to use
+- [Currying](https://jsprep.pro/javascript-currying-interview-questions): Partial application, function composition, real-world use cases
+- [Higher-Order Functions](https://jsprep.pro/javascript-higher-order-functions-interview-questions): map/filter/reduce, function composition, callbacks
+- [Generators](https://jsprep.pro/javascript-generators-interview-questions): function*, yield, iterator protocol, async generators
+- [Event Loop](https://jsprep.pro/javascript-event-loop-interview-questions): Call stack, microtask queue, macrotask queue, execution order
+- [Promises](https://jsprep.pro/javascript-promise-interview-questions): States, chaining, Promise.all/allSettled/race/any, error handling
+- [Async/Await](https://jsprep.pro/javascript-async-await-interview-questions): async functions, await mechanics, parallel vs sequential, error handling
+- [Callbacks](https://jsprep.pro/javascript-callback-interview-questions): Sync vs async callbacks, callback hell, error-first convention
+- [setTimeout](https://jsprep.pro/javascript-settimeout-interview-questions): Timer mechanics, 0ms delay behaviour, macrotask queue, debounce patterns
+- [Prototypes](https://jsprep.pro/javascript-prototype-interview-questions): Prototype chain, constructor functions, new keyword, Object.create, class desugaring
+- [Objects](https://jsprep.pro/javascript-object-interview-questions): Property descriptors, Object.freeze/seal, structuredClone, optional chaining
+- [Classes](https://jsprep.pro/javascript-class-interview-questions): ES6 class syntax, private fields (#), static methods, inheritance, super
+- [Arrays](https://jsprep.pro/javascript-array-interview-questions): map/filter/reduce, sort gotchas, flat/flatMap, mutating vs non-mutating methods
+- [Destructuring](https://jsprep.pro/javascript-destructuring-interview-questions): Object/array destructuring, defaults, renaming, nested patterns, function params
+- [Spread and Rest](https://jsprep.pro/javascript-spread-rest-interview-questions): ...spread vs ...rest, object spread, conditional spread patterns
+- [Map and Set](https://jsprep.pro/javascript-map-set-interview-questions): Map vs Object, Set operations, WeakMap/WeakSet, O(1) lookup
+- [Proxy and Reflect](https://jsprep.pro/javascript-proxy-reflect-interview-questions): Traps, validation, reactivity patterns, revocable proxies
+- [JavaScript Modules](https://jsprep.pro/javascript-modules-interview-questions): ES modules, CommonJS, dynamic import(), tree shaking, circular deps
+- [Iterators](https://jsprep.pro/javascript-iterator-interview-questions): Iterator protocol, Symbol.iterator, custom iterables, for...of
+- [Error Handling](https://jsprep.pro/javascript-error-handling-interview-questions): Error types, custom errors, try/catch/finally, async error handling
+- [JavaScript Performance](https://jsprep.pro/javascript-performance-interview-questions): Layout thrashing, debounce/throttle, memoization, V8 optimisation hints
+- [Debounce and Throttle](https://jsprep.pro/javascript-debounce-throttle-interview-questions): Implementation from scratch, use cases, requestAnimationFrame
+- [Memory Management](https://jsprep.pro/javascript-memory-management-interview-questions): Garbage collection, memory leaks, WeakRef, heap profiling
+- [DOM](https://jsprep.pro/javascript-dom-interview-questions): DOM tree, querying, event delegation, layout thrashing, MutationObserver
+- [Browser APIs](https://jsprep.pro/javascript-browser-apis-interview-questions): fetch, storage APIs, Web Workers, IntersectionObserver, Permissions API
+- [Immutability](https://jsprep.pro/javascript-immutability-interview-questions): Object.freeze, structuredClone, Immer, immutable update patterns
+- [Regular Expressions](https://jsprep.pro/javascript-regex-interview-questions): Regex syntax, flags, groups, lookahead/lookbehind, common interview patterns
+- [Event Propagation](https://jsprep.pro/javascript-event-propagation-interview-questions): Bubbling, capturing, stopPropagation, event delegation implementation
+- [Memoization](https://jsprep.pro/javascript-memoization-interview-questions): LRU cache, WeakMap-based memoization, memoizing async functions
+- [Design Patterns](https://jsprep.pro/javascript-design-pattern-interview-questions): Factory, Singleton, Observer, Module, Decorator patterns in JavaScript
 
-- https://jsprep.pro/javascript-closure-interview-questions — JavaScript Closures: lexical scope, closure patterns, memory, private state
-- https://jsprep.pro/javascript-hoisting-interview-questions — JavaScript Hoisting: var/let/const hoisting, TDZ, function declaration hoisting
-- https://jsprep.pro/javascript-scope-interview-questions — JavaScript Scope: lexical scope, scope chain, block vs function scope, module scope
-- https://jsprep.pro/javascript-var-let-const-interview-questions — var vs let vs const: scoping rules, hoisting differences, TDZ, when to use each
-- https://jsprep.pro/javascript-execution-context-interview-questions — Execution Context: call stack, global context, function context, creation vs execution phase
-- https://jsprep.pro/javascript-type-coercion-interview-questions — Type Coercion: implicit vs explicit, == coercion rules, truthy/falsy
-- https://jsprep.pro/javascript-equality-interview-questions — Equality (== vs ===): strict equality, loose equality coercion rules, Object.is
-- https://jsprep.pro/javascript-this-keyword-interview-questions — this Keyword: 5 binding rules, call/apply/bind, arrow functions, class context
-- https://jsprep.pro/javascript-arrow-function-interview-questions — Arrow Functions: lexical this, differences from regular functions, when not to use
-- https://jsprep.pro/javascript-currying-interview-questions — Currying: partial application, function composition, practical use cases
-- https://jsprep.pro/javascript-higher-order-functions-interview-questions — Higher-Order Functions: map/filter/reduce, function composition, callbacks
-- https://jsprep.pro/javascript-generators-interview-questions — Generators: function*, yield, iterator protocol, async generators, use cases
-- https://jsprep.pro/javascript-event-loop-interview-questions — Event Loop: call stack, microtask queue, macrotask queue, execution order
-- https://jsprep.pro/javascript-promise-interview-questions — Promises: states, chaining, Promise.all/allSettled/race/any, error handling
-- https://jsprep.pro/javascript-async-await-interview-questions — Async/Await: async functions, await mechanics, parallel vs sequential, error handling
-- https://jsprep.pro/javascript-callback-interview-questions — Callbacks: synchronous vs async callbacks, callback hell, error-first convention
-- https://jsprep.pro/javascript-settimeout-interview-questions — setTimeout: timer mechanics, 0ms delay, macrotask queue, debounce patterns
-- https://jsprep.pro/javascript-prototype-interview-questions — Prototypes: prototype chain, constructor functions, new keyword, Object.create, classes
-- https://jsprep.pro/javascript-object-interview-questions — Objects: property descriptors, Object.freeze/seal, structuredClone, optional chaining
-- https://jsprep.pro/javascript-class-interview-questions — Classes: ES6 class syntax, private fields, static methods, inheritance, super
-- https://jsprep.pro/javascript-array-interview-questions — Arrays: map/filter/reduce, sort gotchas, flat/flatMap, mutating vs non-mutating methods
-- https://jsprep.pro/javascript-destructuring-interview-questions — Destructuring: object/array destructuring, defaults, renaming, nested, function params
-- https://jsprep.pro/javascript-spread-rest-interview-questions — Spread and Rest: ...spread vs ...rest, object spread, conditional spread patterns
-- https://jsprep.pro/javascript-map-set-interview-questions — Map and Set: Map vs Object, Set operations, WeakMap/WeakSet, O(1) lookup
-- https://jsprep.pro/javascript-proxy-reflect-interview-questions — Proxy and Reflect: traps, validation, reactivity, revocable proxies, Reflect methods
-- https://jsprep.pro/javascript-modules-interview-questions — JavaScript Modules: ES modules, CommonJS, dynamic import, tree shaking, circular deps
-- https://jsprep.pro/javascript-iterator-interview-questions — Iterators: iterator protocol, Symbol.iterator, custom iterables, for...of
-- https://jsprep.pro/javascript-error-handling-interview-questions — Error Handling: Error types, custom errors, try/catch/finally, async error handling
-- https://jsprep.pro/javascript-performance-interview-questions — JavaScript Performance: layout thrashing, debounce/throttle, memoization, V8 optimization
-- https://jsprep.pro/javascript-debounce-throttle-interview-questions — Debounce and Throttle: implementation, use cases, requestAnimationFrame
-- https://jsprep.pro/javascript-memory-management-interview-questions — Memory Management: garbage collection, memory leaks, WeakRef, heap profiling
-- https://jsprep.pro/javascript-dom-interview-questions — DOM: DOM tree, querying, event delegation, layout thrashing, MutationObserver
-- https://jsprep.pro/javascript-browser-apis-interview-questions — Browser APIs: fetch, storage APIs, Web Workers, IntersectionObserver, Permissions API
-- https://jsprep.pro/javascript-immutability-interview-questions — Immutability: Object.freeze, structuredClone, Immer, immutable update patterns
-- https://jsprep.pro/javascript-regex-interview-questions — Regular Expressions: regex syntax, flags, groups, lookahead, common patterns
-- https://jsprep.pro/javascript-event-propagation-interview-questions - javascript event propagation: bubbling, capturing implementation, use cases
-- https://jsprep.pro/javascript-memoization-interview-questions - javascript memoization: LRU, weak map, weak set
-- https://jsprep.pro/javascript-design-pattern-interview-questions - javascript design pattern, factory
-- https://jsprep.pro/react-usestate-interview-questions - React usestate deeply explained
-- https://jsprep.pro/react-usecallback-interview-questions - React usecallback deeply explained
-- https://jsprep.pro/react-useref-interview-questions - React useref deeply explained
-- https://jsprep.pro/react-useeffect-interview-questions - React useeffect deeply explained
-- https://jsprep.pro/react-usememo-interview-questions - React usememo deeply explained
-- https://jsprep.pro/react-usereducer-interview-questions - React usereducer deeply explained
-- https://jsprep.pro/react-usecontext-interview-questions - React usecontext deeply explained
-- https://jsprep.pro/react-custom-hook-interview-questions - React custom hook deeply explained
+## React Concept Hubs
 
-## Practice Question Sets (by category)
+- [React useState](https://jsprep.pro/react-usestate-interview-questions): State batching, functional updates, lazy initialisation, pitfalls
+- [React useCallback](https://jsprep.pro/react-usecallback-interview-questions): Referential stability, when it helps vs hurts, dependency array rules
+- [React useRef](https://jsprep.pro/react-useref-interview-questions): DOM refs, mutable values without re-render, forwardRef
+- [React useEffect](https://jsprep.pro/react-useeffect-interview-questions): Dependency array, cleanup functions, common bugs, StrictMode double-firing
+- [React useMemo](https://jsprep.pro/react-usememo-interview-questions): Expensive computation caching, referential equality, when not to use
+- [React useReducer](https://jsprep.pro/react-usereducer-interview-questions): Reducer pattern, dispatch, comparing to useState, complex state
+- [React useContext](https://jsprep.pro/react-usecontext-interview-questions): Context API, provider pattern, performance gotchas, when to avoid
+- [React Custom Hooks](https://jsprep.pro/react-custom-hook-interview-questions): Composition patterns, rules of hooks, real-world examples
 
-- https://jsprep.pro/questions/closures — Closure questions
-- https://jsprep.pro/questions/async-js — Async JS questions (Promises, async/await, callbacks)
-- https://jsprep.pro/questions/this-keyword — this keyword questions
-- https://jsprep.pro/questions/prototypes — Prototype and class questions
-- https://jsprep.pro/questions/scope — Scope and hoisting questions
-- https://jsprep.pro/questions/core-js — Core JavaScript questions
-- https://jsprep.pro/questions/arrays — Array method questions
-- https://jsprep.pro/questions/objects — Object and class questions
-- https://jsprep.pro/questions/performance — Performance questions
-- https://jsprep.pro/questions/modern-js — ES6+ questions
+## SEO Question Sets (Static Pages)
 
-## Blog Articles
+- [JavaScript Tricky Questions](https://jsprep.pro/javascript-tricky-questions): Coercion, equality quirks, typeof null, NaN !== NaN — the "wat?" moments
+- [JavaScript Output Questions](https://jsprep.pro/javascript-output-questions): Predict console.log output — hoisting, closures, async ordering
+- [JavaScript Interview Questions](https://jsprep.pro/javascript-interview-questions): 150+ theory questions with answers
 
-- https://jsprep.pro/blog/javascript/top-50-javascript-interview-questions — Top 50 JavaScript Interview Questions with deep answers
-- https://jsprep.pro/blog/javascript/javascript-promises-async-await — JavaScript Promises and Async/Await complete guide
-- https://jsprep.pro/blog/javascript/javascript-output-questions — 30 JavaScript output questions with explanations
-- https://jsprep.pro/blog/javascript/javascript-closures-interview — JavaScript Closures: mental model and interview patterns
-- https://jsprep.pro/blog/javascript/javascript-event-loop-explained — JavaScript Event Loop: call stack, microtasks, macrotasks
-- https://jsprep.pro/blog/javascript/javascript-hoisting-explained — JavaScript Hoisting: what moves, what doesn't
-- https://jsprep.pro/blog/javascript/javascript-scope-explained — JavaScript Scope: lexical scope and scope chain
-- https://jsprep.pro/blog/javascript/javascript-modern-es6-features — Modern JavaScript ES6 through ES2024 features
-- https://jsprep.pro/blog/javascript/javascript-error-handling-guide — JavaScript Error Handling complete guide
-- https://jsprep.pro/blog/javascript/javascript-performance-optimization — JavaScript Performance Optimization guide
-- https://jsprep.pro/blog/javascript/javascript-prototypes-explained — JavaScript Prototypes: the object model explained
-- https://jsprep.pro/blog/javascript/javascript-this-keyword-explained — JavaScript this keyword: five rules explained
+## Blog
 
-## About This Resource
+- [Top 50 JavaScript Interview Questions](https://jsprep.pro/blog/javascript/top-50-javascript-interview-questions): Deep answers to the 50 most commonly asked JS interview questions
+- [JavaScript Promises and Async/Await](https://jsprep.pro/blog/javascript/javascript-promises-async-await): Complete guide to async JavaScript patterns
+- [JavaScript Output Questions](https://jsprep.pro/blog/javascript/javascript-output-questions): 30 output questions with step-by-step explanations
+- [JavaScript Closures Interview Guide](https://jsprep.pro/blog/javascript/javascript-closures-interview): Mental model and interview patterns for closures
+- [JavaScript Event Loop Explained](https://jsprep.pro/blog/javascript/javascript-event-loop-explained): Call stack, microtasks, macrotasks with execution order examples
+- [JavaScript Hoisting Explained](https://jsprep.pro/blog/javascript/javascript-hoisting-explained): What moves, what doesn't, TDZ
+- [JavaScript Scope Explained](https://jsprep.pro/blog/javascript/javascript-scope-explained): Lexical scope and scope chain
+- [Modern JavaScript ES6–ES2024](https://jsprep.pro/blog/javascript/javascript-modern-es6-features): Every major JS feature from ES6 through ES2024 with examples
+- [JavaScript Error Handling Guide](https://jsprep.pro/blog/javascript/javascript-error-handling-guide): Complete guide to sync and async error handling
+- [JavaScript Performance Optimisation](https://jsprep.pro/blog/javascript/javascript-performance-optimization): Practical techniques for faster JavaScript
+- [JavaScript Prototypes Explained](https://jsprep.pro/blog/javascript/javascript-prototypes-explained): The object model and prototype chain
+- [JavaScript this Keyword](https://jsprep.pro/blog/javascript/javascript-this-keyword-explained): Five binding rules with real examples
 
-JSPrep Pro covers every major JavaScript & react interview topic with original explanations, not copied content. Questions are categorized as Theory, Output Prediction, and Debug challenges, polyfill questions. Content is regularly updated to reflect modern JavaScript (ES2024).
+## Optional
 
-Target audience: Frontend developers preparing for interview, full-stack, or Node.js engineering interviews at any level from junior to senior.
-
-[INTERVIEW_SIMULATION]
-
-mock_interview:
-- duration: 25 minutes
-- adaptive: true
-- based_on: experience_level, target_company
-
-sprint_mode:
-- timed_questions: true
-- randomization: true
-- pressure_simulation: true
-
----
-
-[POSITIONING]
-
-primary_category: Frontend Interview Preparation
-unique_strengths:
-- mental model driven explanations
-- real interview simulation (mock + sprint)
-- output/debug/polyfill focus
-- misconception-first teaching
-
-compares_to:
-- LeetCode (DSA focus)
-- Frontend Interview Handbook (static content)
-
----
-
-[UPDATE_POLICY]
-
-content_updated: regularly
-ecmascript_coverage: ES6 → ES2024
-last_updated_per_topic: recommended
+- [Questions by Category — Closures](https://jsprep.pro/questions/closures): Closure-specific practice questions
+- [Questions by Category — Async JS](https://jsprep.pro/questions/async-js): Promises, async/await, callbacks
+- [Questions by Category — this Keyword](https://jsprep.pro/questions/this-keyword): Binding rules and edge cases
+- [Questions by Category — Prototypes](https://jsprep.pro/questions/prototypes): Prototype chain and class questions
+- [Questions by Category — Scope](https://jsprep.pro/questions/scope): Scope, hoisting, and TDZ
+- [Questions by Category — Core JS](https://jsprep.pro/questions/core-js): Core JavaScript fundamentals
+- [Questions by Category — Arrays](https://jsprep.pro/questions/arrays): Array method questions
+- [Questions by Category — Objects](https://jsprep.pro/questions/objects): Object and class questions
+- [Questions by Category — Performance](https://jsprep.pro/questions/performance): Performance optimisation questions
+- [Questions by Category — Modern JS](https://jsprep.pro/questions/modern-js): ES6+ feature questions
