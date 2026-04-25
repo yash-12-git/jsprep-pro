@@ -208,6 +208,7 @@ import ProCTA from "@/components/home/ProCTA";
 import { Track, TRACK_MAP } from "@/lib/tracks";
 import { Topic } from "@/types/topic";
 import { usePricing } from "@/hooks/usePricing";
+import { RoadmapBanner } from "@/components/home/RoadmapBanner";
 
 // ─── Track-specific content config ────────────────────────────────────────────
 
@@ -674,6 +675,10 @@ export default function HomePageClient({
           </div>
         </div>
 
+        <hr css={hr} id="roadmap" />
+        <div css={sec}>
+          <RoadmapBanner />
+        </div>
         <hr css={hr} />
 
         {/* ── 4 MODES ── */}
@@ -965,7 +970,10 @@ export default function HomePageClient({
                   letterSpacing: "-0.03em",
                 }}
               >
-                {pricing.symbol}{pricing.display || process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY || 199}
+                {pricing.symbol}
+                {pricing.display ||
+                  process.env.NEXT_PUBLIC_PRO_PRICE_DISPLAY ||
+                  199}
                 <span css={pPer}>/month</span>
               </div>
               <div css={pNote}>Less than a coffee. Cancel anytime.</div>

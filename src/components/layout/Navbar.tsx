@@ -30,6 +30,7 @@ import {
   BookMarked,
   BarChart2,
   User,
+  Route,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import * as S from "./styles";
@@ -121,15 +122,6 @@ const LEARN_LINKS = (track: string) => [
     icon: Newspaper,
     desc: "Deep dives & guides",
   },
-];
-
-// Bottom nav tabs for mobile
-const MOBILE_BOTTOM_TABS = [
-  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/theory", label: "Practice", icon: FlaskConical, matchPrefix: true },
-  { href: "/mock-interview", label: "Mock", icon: Mic },
-  { href: "/study-plan", label: "AI", icon: Sparkles, matchPrefix: false },
-  { href: "/analytics", label: "Profile", icon: User },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -287,12 +279,12 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* Mock Interview — promoted top-level */}
+              {/* Roadmap — promoted top-level */}
               <Link
-                href="/mock-interview"
-                css={[S.navLink, path === "/mock-interview" && S.navLinkActive]}
+                href="/roadmap"
+                css={[S.navLink, path === "/roadmap" && S.navLinkActive]}
               >
-                <Mic size={13} /> Mock
+                <Route size={13} /> Roadmap
               </Link>
 
               <span css={S.sep} />
@@ -353,6 +345,7 @@ export default function Navbar() {
                 { href: "/#features", label: "Features" },
                 { href: "/#practice", label: "Practice" },
                 { href: "/topics", label: "Topics" },
+                {href: "/#roadmap", label: "Roadmap" },
                 { href: "/blog", label: "Blog" },
                 { href: "/#pricing", label: "Pricing" },
               ].map(({ href, label }) => (
@@ -703,16 +696,16 @@ export default function Navbar() {
             );
           })()}
 
-          {/* Mock */}
+          {/* Roadmap */}
           {(() => {
-            const isActive = path === "/mock-interview";
+            const isActive = path === "/roadmap";
             return (
               <Link
-                href="/mock-interview"
+                href="/roadmap"
                 css={[S.mobileTabItem, isActive && S.mobileTabItemActive]}
               >
-                <Mic size={20} />
-                <span css={S.mobileTabLabel}>Mock</span>
+                <Route size={20} />
+                <span css={S.mobileTabLabel}>Roadmap</span>
               </Link>
             );
           })()}

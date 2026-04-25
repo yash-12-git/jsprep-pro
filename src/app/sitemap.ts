@@ -24,12 +24,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       getTopicSlugs().catch(() => [] as string[]),
       getPublishedBlogPosts().catch(() => []),
       getPublishedQuestionSlugs().catch(() => [] as string[]),
-      // Only theory categories — output/debug have dedicated pages not /questions/[slug]
       getQuestions({
         filters: { status: "published", type: "theory" },
         pageSize: 300,
-      }).catch((error) => ({ questions: [] })),
+      }).catch(() => ({ questions: [] })),
     ]);
+
   const categories = [
     ...new Set((theoryResult.questions as any[]).map((q) => q.category)),
   ] as string[];
@@ -40,6 +40,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1.0,
+    },
+    // ── Roadmap — high priority, targets "frontend roadmap 2026" cluster ──
+    {
+      url: `${SITE.domain}/roadmap`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.95,
     },
     {
       url: `${SITE.domain}/javascript-interview-questions`,
