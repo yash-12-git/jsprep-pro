@@ -5,8 +5,26 @@
 //   2. Injects JSON-LD schema tags (crawlers see this in initial HTML)
 //   3. Renders <HomePageClient> which handles all Emotion / client logic
 
-import { courseSchema, faqSchema } from "@/lib/seo/seo";
+import type { Metadata } from "next";
+import { courseSchema, faqSchema, pageMeta } from "@/lib/seo/seo";
 import HomePageClient from "./HomePageClient";
+
+export const metadata: Metadata = pageMeta({
+  title: "JavaScript Interview Questions & React Interview Prep — JSPrep Pro",
+  description:
+    "600+ frontend interview questions with AI scoring. Practice JavaScript closures, event loop, promises, React hooks, output prediction, and debugging. Used by developers at Razorpay, Flipkart, Google, and Atlassian.",
+  path: "/",
+  keywords: [
+    "javascript interview questions",
+    "react interview questions",
+    "frontend interview preparation",
+    "javascript output questions",
+    "javascript closures interview",
+    "react hooks interview questions",
+    "javascript event loop interview",
+    "frontend developer interview india",
+  ],
+});
 import { getServerTrack } from "@/lib/getServerTrack";
 import {
   getPublishedBlogPosts,

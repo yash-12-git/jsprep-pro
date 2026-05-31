@@ -16,6 +16,17 @@ function toSlug(text: string): string {
     .slice(0, 80);
 }
 
+// Approximate dates pages were last significantly updated.
+// Better than `now` (which makes Google think everything changed on every deploy).
+const DATES = {
+  home: new Date("2026-05-01").toISOString(),
+  questionsPages: new Date("2026-05-01").toISOString(),
+  cheatsheets: new Date("2026-03-01").toISOString(),
+  tools: new Date("2026-04-01").toISOString(),
+  topics: new Date("2026-04-01").toISOString(),
+  blog: new Date("2026-04-01").toISOString(),
+};
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date().toISOString();
 
@@ -37,114 +48,113 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: SITE.domain,
-      lastModified: now,
+      lastModified: DATES.home,
       changeFrequency: "weekly",
       priority: 1.0,
     },
-    // ── Roadmap — high priority, targets "frontend roadmap 2026" cluster ──
     {
       url: `${SITE.domain}/roadmap`,
-      lastModified: now,
+      lastModified: DATES.questionsPages,
       changeFrequency: "monthly",
       priority: 0.95,
     },
     {
       url: `${SITE.domain}/javascript-interview-questions`,
-      lastModified: now,
+      lastModified: DATES.questionsPages,
       changeFrequency: "weekly",
       priority: 0.95,
     },
     {
       url: `${SITE.domain}/react-interview-questions`,
-      lastModified: now,
+      lastModified: DATES.questionsPages,
       changeFrequency: "weekly",
       priority: 0.95,
     },
     {
       url: `${SITE.domain}/javascript-output-questions`,
-      lastModified: now,
+      lastModified: DATES.questionsPages,
       changeFrequency: "weekly",
       priority: 0.95,
     },
     {
       url: `${SITE.domain}/javascript-tricky-questions`,
-      lastModified: now,
+      lastModified: DATES.questionsPages,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: `${SITE.domain}/javascript-interview-cheatsheet`,
-      lastModified: now,
+      lastModified: DATES.cheatsheets,
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${SITE.domain}/react-interview-cheatsheet`,
-      lastModified: now,
+      lastModified: DATES.cheatsheets,
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${SITE.domain}/topics/javascript`,
-      lastModified: now,
+      lastModified: DATES.topics,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: `${SITE.domain}/topics/react`,
-      lastModified: now,
+      lastModified: DATES.topics,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: `${SITE.domain}/blog/javascript`,
-      lastModified: now,
+      lastModified: DATES.blog,
       changeFrequency: "weekly",
       priority: 0.85,
     },
     {
       url: `${SITE.domain}/blog/react`,
-      lastModified: now,
+      lastModified: DATES.blog,
       changeFrequency: "weekly",
       priority: 0.85,
     },
     {
       url: `${SITE.domain}/output-quiz`,
-      lastModified: now,
-      changeFrequency: "weekly",
+      lastModified: DATES.tools,
+      changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${SITE.domain}/sprint`,
-      lastModified: now,
+      lastModified: DATES.tools,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: `${SITE.domain}/debug-lab`,
-      lastModified: now,
-      changeFrequency: "weekly",
+      lastModified: DATES.tools,
+      changeFrequency: "monthly",
       priority: 0.8,
     },
   ];
 
   const topicPages: MetadataRoute.Sitemap = topicSlugs.map((slug) => ({
     url: `${SITE.domain}/${slug}`,
-    lastModified: now,
+    lastModified: DATES.topics,
     changeFrequency: "weekly" as const,
     priority: 0.9,
   }));
 
   const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
     url: `${SITE.domain}/questions/${catToSlug(cat)}`,
-    lastModified: now,
+    lastModified: DATES.topics,
     changeFrequency: "weekly" as const,
     priority: 0.85,
   }));
 
   const questionPages: MetadataRoute.Sitemap = questionSlugs.map((slug) => ({
     url: `${SITE.domain}/q/${slug}`,
-    lastModified: now,
+    lastModified: DATES.questionsPages,
     changeFrequency: "monthly" as const,
     priority: 0.75,
   }));

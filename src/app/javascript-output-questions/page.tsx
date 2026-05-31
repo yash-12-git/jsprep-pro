@@ -16,7 +16,7 @@ import { headers } from "next/headers";
 import { getPricingForCountry } from "@/lib/pricing";
 
 export const metadata: Metadata = pageMeta({
-  title: "JavaScript Output Questions: Predict the Console.log (2025)",
+  title: "JavaScript Output Questions: Predict the Console.log (2026)",
   description:
     "Practice 70+ JavaScript output prediction questions. See the code, predict what console.log prints — covers event loop, closures, hoisting, type coercion, and this binding.",
   path: "/javascript-output-questions",

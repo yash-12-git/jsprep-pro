@@ -9,7 +9,7 @@ import { getServerTrack } from "@/lib/getServerTrack";
 // ─── Static metadata ──────────────────────────────────────────────────────────
 
 export const metadata: Metadata = pageMeta({
-  title: "150+ JavaScript Interview Questions With Answers (2025)",
+  title: "150+ JavaScript Interview Questions With Answers (2026)",
   description:
     "The most complete list of JavaScript interview questions with detailed answers and code examples. Covers closures, event loop, promises, async/await, prototypes, this keyword, type coercion and more. Asked at Razorpay, Flipkart, Google, Atlassian.",
   path: "/javascript-interview-questions",

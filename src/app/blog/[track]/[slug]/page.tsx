@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getBlogPostBySlug,
-  getBlogPostSlugs,
   getPublishedBlogPosts,
   getRelatedTopics,
 } from "@/lib/cachedQueries";
@@ -15,7 +14,7 @@ import {
 } from "@/lib/seo/seo";
 import { BLOG_FAQS } from "@/data/seo/blogFaqs";
 import { C } from "@/styles/tokens";
-import { Track, TRACKS } from "@/lib/tracks";
+import { Track } from "@/lib/tracks";
 import { getServerTrack } from "@/lib/getServerTrack";
 
 export const revalidate = 3600;
@@ -26,32 +25,34 @@ interface Props {
 
 export async function generateStaticParams() {
   try {
-    const slugs = await getBlogPostSlugs();
-    return TRACKS.filter((t) => t.available).flatMap((t) =>
-      slugs.map((slug) => ({
-        track: t.id,
-        slug,
-      })),
-    );
+    const posts = await getPublishedBlogPosts();
+    return posts.map((post) => ({
+      track: post.track ?? "javascript",
+      slug: post.slug,
+    }));
   } catch {
     return [];
   }
 }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, track } = params;
+  const { slug } = params;
 
   const post = await getBlogPostBySlug(slug);
   if (!post) return {};
 
-  return pageMeta({
-    title: post.title,
-    description: post.excerpt,
-    path: `/blog/${track}/${post.slug}`,
-    keywords: post.keywords,
-    type: "article",
-    publishedAt: post.publishedAt,
-    modifiedAt: post.modifiedAt,
-  });
+  const canonicalTrack = post.track ?? "javascript";
+  return {
+    ...pageMeta({
+      title: post.title,
+      description: post.excerpt,
+      path: `/blog/${canonicalTrack}/${post.slug}`,
+      keywords: post.keywords,
+      type: "article",
+      publishedAt: post.publishedAt,
+      modifiedAt: post.modifiedAt,
+    }),
+    alternates: { canonical: `/blog/${canonicalTrack}/${post.slug}` },
+  };
 }
 
 // ─── Lightweight Markdown → HTML ─────────────────────────────────────────────
@@ -432,7 +433,7 @@ export default async function BlogPostPage({ params }: Props) {
               {relatedPosts.map((p) => (
                 <Link
                   key={p.slug}
-                  href={`/blog/${p.slug}`}
+                  href={`/blog/${p.track ?? "javascript"}/${p.slug}`}
                   style={{
                     textDecoration: "none",
                     display: "block",

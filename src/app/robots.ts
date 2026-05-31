@@ -14,21 +14,8 @@ export default function robots(): MetadataRoute.Robots {
           "/mock-interview",
           "/study-plan",
           "/api/",
-          "/auth"
+          "/auth",
         ],
-      },
-      {
-        // Allow Google to index the content pages
-        userAgent: "Googlebot",
-        allow: [
-          "/javascript-interview-questions",
-          "/react-interview-questions",
-          "/javascript-interview-cheatsheet",
-          "/react-interview-cheatsheet",
-          "/questions/",
-          "/blog/",
-        ],
-        disallow: ["/admin", "/api/", "/auth"],
       },
     ],
     sitemap: `${SITE.domain}/sitemap.xml`,

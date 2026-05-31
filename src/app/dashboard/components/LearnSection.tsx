@@ -116,7 +116,7 @@ export default async function LearnSection() {
               From the Blog
             </div>
 
-            <Link href="/blog" style={{ fontSize: "0.75rem", color: C.muted }}>
+            <Link href={`/blog/${track}`} style={{ fontSize: "0.75rem", color: C.muted }}>
               All posts →
             </Link>
           </div>
@@ -127,7 +127,7 @@ export default async function LearnSection() {
             {featuredPosts.map((post) => (
               <Link
                 key={post.slug}
-                href={`/blog/${post.slug}`}
+                href={`/blog/${track}/${post.slug}`}
                 style={{
                   display: "flex",
                   alignItems: "center",

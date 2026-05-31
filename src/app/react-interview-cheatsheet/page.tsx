@@ -5,7 +5,7 @@ import { C } from "@/styles/tokens";
 import DownloadPDFButton from "../javascript-interview-cheatsheet/DownloadPdfButton";
 
 export const metadata: Metadata = pageMeta({
-  title: "React Interview Cheat Sheet 2025 (Printable PDF)",
+  title: "React Interview Cheat Sheet 2026 (Printable PDF)",
   description:
     "The ultimate React interview cheat sheet. Covers hooks, state management, lifecycle methods, context, and more. Free printable PDF.",
   path: "/react-interview-cheatsheet",

@@ -1,19 +1,10 @@
 import { getQuestions } from "@/lib/cachedQueries";
 import { getServerTrack } from "@/lib/getServerTrack";
-import { pageMeta } from "@/lib/seo/seo";
-import { Metadata } from "next";
+import { Track } from "@/lib/tracks";
 import QuestionListClientWrapper from "./QuestionListClientWrapper";
 
-export const metadata: Metadata = pageMeta({
-  title:
-    "JavaScript Interview Questions — Comprehensive List for JS Prep | JSPrep Pro",
-  description:
-    "Dive into the JavaScript Interview Questions on JSPrep Pro. Learn by exploring a comprehensive list of questions, enhancing your understanding of core JavaScript concepts and improving your coding skills. Start mastering JavaScript today!",
-  path: `/javascript-interview-questions`,
-});
-
-export default async function InterviewQuestionList() {
-  const track = await getServerTrack();
+export default async function InterviewQuestionList({ forcedTrack }: { forcedTrack?: Track } = {}) {
+  const track = forcedTrack ?? (await getServerTrack());
   const [theory, output, debug] = await Promise.all([
     getQuestions({
       filters: { track, status: "published", type: "theory" },

@@ -240,7 +240,7 @@ export default async function ReactInterviewQuestionsPage() {
             </div>
           }
         >
-          <InterviewQuestionList />
+          <InterviewQuestionList forcedTrack="react" />
         </Suspense>
 
         {/* ── Static topic overview (always visible, good for SEO + fallback) ── */}

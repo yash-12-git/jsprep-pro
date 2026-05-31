@@ -235,7 +235,7 @@ export function articleSchema(opts: {
     publisher: {
       "@type": "Organization",
       name: SITE.name,
-      logo: { "@type": "ImageObject", url: `${SITE.domain}/logo.png` },
+      logo: { "@type": "ImageObject", url: `${SITE.domain}/og-default.png` },
     },
     image: opts.image ?? `${SITE.domain}/og-default.png`,
     mainEntityOfPage: {
@@ -265,7 +265,7 @@ export function softwareSchema(pricing: PricingInfo = DEFAULT_PRICING): string {
       },
       {
         "@type": "Offer",
-        price: pricing.display,
+        price: parseFloat(pricing.display),
         priceCurrency: pricing.currency,
         name: "Pro Plan",
         billingDuration: "P1M",
@@ -378,7 +378,7 @@ export function courseSchema(
       {
         "@type": "Offer",
         name: "Pro Plan",
-        price: pricing.display,
+        price: parseFloat(pricing.display),
         priceCurrency: pricing.currency,
         billingIncrement: "P1M",
         availability: "https://schema.org/InStock",
@@ -395,14 +395,6 @@ export function websiteSchema(): string {
     "@type": "WebSite",
     name: SITE.name,
     url: SITE.domain,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${SITE.domain}/topics?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
   });
 }
 

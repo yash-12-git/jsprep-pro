@@ -610,7 +610,7 @@ export default async function TopicPage({ params }: Props) {
               {relatedPosts.map((post, i) => (
                 <Link
                   key={post.slug}
-                  href={`/blog/${post.slug}`}
+                  href={`/blog/${post.track ?? "javascript"}/${post.slug}`}
                   style={{
                     display: "flex",
                     alignItems: "center",
