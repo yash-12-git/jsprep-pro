@@ -46,7 +46,7 @@ const PRACTICE_LINKS = [
     href: "/theory",
     label: "Concepts",
     icon: BookOpen,
-    desc: "Core JS theory",
+    desc: "Core theory",
     color: C.accent,
   },
   {

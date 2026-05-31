@@ -16,9 +16,11 @@ import { C, RADIUS } from "@/styles/tokens";
 import { seedTopicsFromArray } from "@/lib/topics";
 import { seedBlogPostsFromArray } from "@/lib/blogPosts";
 
-// ── Import legacy static data ─────────────────────────────────────────────────
+// ── Import static data ────────────────────────────────────────────────────────
 import { TOPICS as STATIC_TOPICS } from "@/data/seo/topics";
 import { BLOG_POSTS as STATIC_POSTS } from "@/data/seo/blogPosts";
+import { REACT_TOPICS } from "@/data/seo/reactTopics";
+import { revalidateTopics } from "@/lib/adminRevalidate";
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -221,35 +223,42 @@ interface LogEntry {
   text: string;
 }
 interface DoneState {
-  topics?: boolean;
+  jsTopics?: boolean;
   blogs?: boolean;
+  reactTopics?: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function MigratePage() {
   const { user } = useAuth();
-  const [migrating, setMigrating] = useState(false);
-  const [done, setDone] = useState<DoneState>({});
-  const [log, setLog] = useState<LogEntry[]>([]);
 
-  function addLog(type: LogEntry["type"], text: string) {
-    setLog((prev) => [...prev, { type, text }]);
+  // Separate loading + log state for each section
+  const [migratingJs, setMigratingJs] = useState(false);
+  const [migratingReact, setMigratingReact] = useState(false);
+  const [done, setDone] = useState<DoneState>({});
+  const [jsLog, setJsLog] = useState<LogEntry[]>([]);
+  const [reactLog, setReactLog] = useState<LogEntry[]>([]);
+
+  function addJsLog(type: LogEntry["type"], text: string) {
+    setJsLog((prev) => [...prev, { type, text }]);
+  }
+  function addReactLog(type: LogEntry["type"], text: string) {
+    setReactLog((prev) => [...prev, { type, text }]);
   }
 
-  async function handleMigrate() {
+  // ── Section A: JS topics + blog posts (legacy, run once) ─────────────────
+  async function handleMigrateJs() {
     if (!user) return;
-    setMigrating(true);
-    setLog([]);
+    setMigratingJs(true);
+    setJsLog([]);
 
     try {
-      addLog(
-        "info",
-        `── Migrating ${STATIC_TOPICS.length} topics ──────────────────────`,
-      );
+      addJsLog("info", `── Migrating ${STATIC_TOPICS.length} JS topics ──────────────────────`);
 
       const topicsToSeed = STATIC_TOPICS.map((t, i) => ({
         ...t,
+        track: "javascript" as const,
         status: "published" as const,
         order: i,
         relatedBlogSlugs: [] as string[],
@@ -257,14 +266,11 @@ export default function MigratePage() {
 
       const { created: topicsCreated, errors: topicErrors } =
         await seedTopicsFromArray(topicsToSeed, user.uid);
-      topicErrors.forEach((e) => addLog("error", `  ✗ ${e}`));
-      addLog("success", `  ✓ ${topicsCreated} topics written to Firestore`);
-      setDone((prev) => ({ ...prev, topics: true }));
+      topicErrors.forEach((e) => addJsLog("error", `  ✗ ${e}`));
+      addJsLog("success", `  ✓ ${topicsCreated} JS topics written to Firestore`);
+      setDone((prev) => ({ ...prev, jsTopics: true }));
 
-      addLog(
-        "info",
-        `── Migrating ${STATIC_POSTS.length} blog posts ─────────────────`,
-      );
+      addJsLog("info", `── Migrating ${STATIC_POSTS.length} blog posts ─────────────────`);
 
       const postsToSeed = STATIC_POSTS.map((p) => ({
         ...p,
@@ -276,57 +282,71 @@ export default function MigratePage() {
 
       const { created: postsCreated, errors: postErrors } =
         await seedBlogPostsFromArray(postsToSeed, user.uid);
-      postErrors.forEach((e) => addLog("error", `  ✗ ${e}`));
-      addLog("success", `  ✓ ${postsCreated} blog posts written to Firestore`);
+      postErrors.forEach((e) => addJsLog("error", `  ✗ ${e}`));
+      addJsLog("success", `  ✓ ${postsCreated} blog posts written to Firestore`);
       setDone((prev) => ({ ...prev, blogs: true }));
 
-      addLog("info", "─────────────────────────────────────────────────");
-      addLog(
-        "success",
-        `🎉 Done! ${topicsCreated} topics + ${postsCreated} posts in Firestore.`,
-      );
-      addLog("warn", "Next: open /admin/blog and set topicSlug on each post.");
+      addJsLog("info", "─────────────────────────────────────────────────");
+      addJsLog("success", `🎉 Done! ${topicsCreated} topics + ${postsCreated} posts in Firestore.`);
+      addJsLog("warn", "Next: open /admin/blog and set topicSlug on each post.");
     } catch (e: any) {
-      addLog("error", `❌ ${e.message}`);
-      addLog(
-        "warn",
-        "Check: are Firestore security rules deployed? See instructions below.",
-      );
+      addJsLog("error", `❌ ${e.message}`);
     } finally {
-      setMigrating(false);
+      setMigratingJs(false);
     }
   }
 
-  const allDone = done.topics && done.blogs;
+  // ── Section B: React topics (new full-content topics, safe to run per batch) ─
+  async function handleMigrateReact() {
+    if (!user) return;
+    setMigratingReact(true);
+    setReactLog([]);
+
+    try {
+      addReactLog("info", `── Migrating ${REACT_TOPICS.length} React topics ──────────────────`);
+      REACT_TOPICS.forEach((t) => addReactLog("info", `  · ${t.slug}`));
+
+      const { created, errors } = await seedTopicsFromArray(REACT_TOPICS, user.uid);
+      errors.forEach((e) => addReactLog("error", `  ✗ ${e}`));
+      addReactLog("success", `  ✓ ${created} React topics written to Firestore`);
+      setDone((prev) => ({ ...prev, reactTopics: true }));
+      await revalidateTopics()
+      addReactLog("info", "─────────────────────────────────────────────────");
+      addReactLog("success", "🎉 Done! Verify at /topics/react");
+      addReactLog("warn", "If a shell topic already existed for this slug, delete the old one in Firebase Console → Firestore → topics.");
+    } catch (e: any) {
+      addReactLog("error", `❌ ${e.message}`);
+    } finally {
+      setMigratingReact(false);
+    }
+  }
 
   return (
     <div css={S.page}>
       <h1 css={S.heading}>Migrate Content to Firestore</h1>
       <p css={S.sub}>
-        One-time migration of your static{" "}
-        <code style={{ color: C.accent3 }}>.ts</code> data files into Firestore.
-        After this runs, topics and blog posts are managed entirely from the
-        admin panel — no code changes needed to add, edit, or delete content.
+        Seed static <code style={{ color: C.accent3 }}>.ts</code> data files into
+        Firestore. Each section is independent — run only the ones you need.
+        Running a section twice creates duplicates; delete the old docs in Firebase
+        Console first if you need to re-run.
       </p>
 
-      {allDone && (
-        <div css={S.successBox}>
-          <CheckCircle2 size={18} />
-          Migration complete! Topics and blog posts are now in Firestore.
-        </div>
-      )}
+      {/* ── SECTION A: JS Topics + Blog Posts ──────────────────────────────── */}
+      <div css={S.sectionTitle}>Section A — JavaScript Topics + Blog Posts</div>
+      <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
+        Legacy migration. Run once. These are the 37 core JS topics and 12 blog posts
+        from the original static data. If these are already in Firestore, skip this section.
+      </p>
 
-      {/* Data overview */}
-      <div css={S.sectionTitle}>Data to migrate</div>
       <div css={S.grid}>
         {[
           {
-            key: "topics",
-            label: "Topics",
+            key: "jsTopics",
+            label: "JS Topics",
             count: STATIC_TOPICS.length,
             Icon: Layers,
             color: C.accent,
-            desc: "36 interview topic pages with cheat sheets",
+            desc: "Core JS interview topics with cheat sheets",
           },
           {
             key: "blogs",
@@ -334,7 +354,7 @@ export default function MigratePage() {
             count: STATIC_POSTS.length,
             Icon: Newspaper,
             color: C.purple,
-            desc: "12 deep-dive articles with full content",
+            desc: "JavaScript deep-dive blog articles",
           },
         ].map(({ key, label, count, Icon, color, desc }) => (
           <div key={key} css={S.card(color, !!done[key as keyof DoneState])}>
@@ -353,78 +373,34 @@ export default function MigratePage() {
         ))}
       </div>
 
-      <div css={S.sectionTitle}>Before migrating — deploy security rules</div>
       <div css={S.warningBox}>
         <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
         <span>
-          <strong>Deploy Firestore rules first.</strong> The <code>topics</code>{" "}
-          and <code>blog_posts</code> collections are new — Firestore will deny
-          writes until the rules are deployed. Run this once from your project
-          root:
-          <pre
-            style={{
-              margin: "0.5rem 0 0",
-              fontFamily: "monospace",
-              fontSize: "0.8125rem",
-              background: "rgba(0,0,0,0.3)",
-              padding: "0.5rem 0.75rem",
-              borderRadius: "0.375rem",
-              color: C.accent3,
-            }}
-          >
-            firebase deploy --only firestore:rules
-          </pre>
-        </span>
-      </div>
-
-      <div css={S.warningBox}>
-        <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
-        <span>
-          <strong>Run this only once.</strong> Running it again will create
-          duplicates in Firestore. If you need to re-run, go to Firebase Console
-          → Firestore and delete the <code>topics</code> and{" "}
-          <code>blog_posts</code> collections first.
+          <strong>Run once only.</strong> If JS topics are already in Firestore,
+          skip this. Re-running creates duplicate docs.
         </span>
       </div>
 
       <button
-        css={S.migrateBtn(migrating)}
-        onClick={handleMigrate}
-        disabled={migrating}
+        css={S.migrateBtn(migratingJs)}
+        onClick={handleMigrateJs}
+        disabled={migratingJs}
       >
-        {migrating ? (
-          <>
-            <Loader2
-              size={16}
-              style={{ animation: "spin 1s linear infinite" }}
-            />{" "}
-            Migrating…
-          </>
+        {migratingJs ? (
+          <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Migrating JS…</>
         ) : (
-          <>
-            <Database size={16} /> Migrate{" "}
-            {STATIC_TOPICS.length + STATIC_POSTS.length} items to Firestore
-          </>
+          <><Database size={16} /> Migrate {STATIC_TOPICS.length + STATIC_POSTS.length} JS items</>
         )}
       </button>
 
-      {log.length > 0 && (
+      {jsLog.length > 0 && (
         <div css={S.log}>
-          {log.map((entry, i) => (
-            <div key={i} css={S.logLine(entry.type)}>
-              {entry.text}
-            </div>
+          {jsLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
           ))}
-          {migrating && (
+          {migratingJs && (
             <div css={S.logLine("info")}>
-              <Loader2
-                size={11}
-                style={{
-                  display: "inline",
-                  animation: "spin 1s linear infinite",
-                  marginRight: "0.25rem",
-                }}
-              />
+              <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.25rem" }} />
               running…
             </div>
           )}
@@ -433,64 +409,109 @@ export default function MigratePage() {
 
       <hr css={S.divider} />
 
-      {/* After migration instructions */}
-      <div css={S.sectionTitle}>After migrating</div>
-      <ol
-        style={{
-          paddingLeft: "1.25rem",
-          fontSize: "0.875rem",
-          lineHeight: 2.2,
-          color: C.text,
-        }}
-      >
-        <li>
-          Go to{" "}
-          <a href="/admin/topics" style={{ color: C.accent }}>
-            Admin → Topics
-          </a>{" "}
-          to verify all 36 topics appear.
-        </li>
-        <li>
-          Go to{" "}
-          <a href="/admin/blog" style={{ color: C.accent }}>
-            Admin → Blog Posts
-          </a>{" "}
-          and set <code style={{ color: C.accent3 }}>topicSlug</code> and{" "}
-          <code style={{ color: C.accent3 }}>relatedTopicSlugs</code> on each
-          post.
-        </li>
-        <li>
-          When adding new questions via{" "}
-          <a href="/admin/questions/new" style={{ color: C.accent }}>
-            Add Question
+      {/* ── SECTION B: React Topics ─────────────────────────────────────────── */}
+      <div css={S.sectionTitle}>Section B — React Topics (Full Concept Hub)</div>
+      <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
+        New React topics written with all 8 sections: Mental Model, Deep Explanation,
+        Common Mistakes, Real-World Usage, Cheat Sheet, Interview Tips, Questions, and
+        Related Topics. Add topics to <code style={{ color: C.accent3 }}>src/data/seo/reactTopics.ts</code>,
+        then run this to seed them. Each run only seeds the topics currently in the file.
+      </p>
+
+      <div css={S.grid}>
+        <div css={S.card(C.accent3, !!done.reactTopics)}>
+          <div css={S.cardIcon(C.accent3)}>
+            <Layers size={16} color={C.accent3} />
+          </div>
+          <div css={S.cardTitle}>React Topics</div>
+          <div css={S.cardCount(C.accent3)}>{REACT_TOPICS.length}</div>
+          <div css={S.cardMeta}>
+            {REACT_TOPICS.map((t) => t.keyword).join(", ")}
+          </div>
+          {done.reactTopics && (
+            <div css={S.doneBadge}>
+              <CheckCircle2 size={9} /> Migrated
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div css={S.warningBox}>
+        <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+        <span>
+          <strong>Check for existing shells first.</strong> If a topic with this slug
+          already exists in Firestore as a shell (created via admin panel), delete it
+          in Firebase Console → Firestore → topics before running — otherwise you will
+          have two docs for the same slug.
+        </span>
+      </div>
+
+      {done.reactTopics && (
+        <div css={S.successBox}>
+          <CheckCircle2 size={18} />
+          React topics seeded! Verify at{" "}
+          <a href="/topics/react" style={{ color: C.accent3 }}>
+            /topics/react
           </a>
-          , use the "Topic Page" dropdown — questions will appear on that
-          topic's page automatically.
+        </div>
+      )}
+
+      <button
+        css={S.migrateBtn(migratingReact)}
+        onClick={handleMigrateReact}
+        disabled={migratingReact}
+      >
+        {migratingReact ? (
+          <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Seeding React Topics…</>
+        ) : (
+          <><Database size={16} /> Seed {REACT_TOPICS.length} React Topic{REACT_TOPICS.length !== 1 ? "s" : ""}</>
+        )}
+      </button>
+
+      {reactLog.length > 0 && (
+        <div css={S.log}>
+          {reactLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
+          ))}
+          {migratingReact && (
+            <div css={S.logLine("info")}>
+              <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.25rem" }} />
+              running…
+            </div>
+          )}
+        </div>
+      )}
+
+      <hr css={S.divider} />
+
+      {/* ── After migration notes ─────────────────────────────────────────── */}
+      <div css={S.sectionTitle}>After seeding React topics</div>
+      <ol style={{ paddingLeft: "1.25rem", fontSize: "0.875rem", lineHeight: 2.2, color: C.text }}>
+        <li>
+          Visit{" "}
+          <a href="/react-useeffect-interview-questions" style={{ color: C.accent }}>
+            /react-useeffect-interview-questions
+          </a>{" "}
+          to verify the Mental Model, Deep Explanation, Cheat Sheet, and all sections render correctly.
         </li>
         <li>
-          Create these Firestore composite indexes (Firebase Console → Firestore
-          → Indexes):
+          Go to{" "}
+          <a href="/admin/topics" style={{ color: C.accent }}>Admin → Topics</a>{" "}
+          and confirm the new topic appears. If an old shell exists for the same slug, delete it.
+        </li>
+        <li>
+          To add the next React topic: write the data in{" "}
+          <code style={{ color: C.accent3 }}>src/data/seo/reactTopics.ts</code>,
+          add it to the <code style={{ color: C.accent3 }}>REACT_TOPICS</code> array,
+          then re-run Section B (only new slugs need seeding — check Firestore first to avoid duplicates).
+        </li>
+        <li>
+          Firestore composite indexes required (if not already created):
           <pre css={S.indexBox}>
             {`Collection: topics
 Index 1:  status ASC + order ASC
-Index 2:  status ASC + difficulty ASC + order ASC
-
-Collection: blog_posts
-Index 1:  status ASC + publishedAt DESC
-Index 2:  status ASC + topicSlug ASC + publishedAt DESC
-Index 3:  status ASC + relatedTopicSlugs ARRAY + publishedAt DESC
-Index 4:  status ASC + questionCategories ARRAY + publishedAt DESC`}
+Index 2:  status ASC + track ASC + order ASC`}
           </pre>
-        </li>
-        <li>
-          Visit a topic page like{" "}
-          <a
-            href="/javascript-closure-interview-questions"
-            style={{ color: C.accent }}
-          >
-            /javascript-closure-interview-questions
-          </a>{" "}
-          to confirm it loads from Firestore.
         </li>
       </ol>
     </div>

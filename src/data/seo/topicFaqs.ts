@@ -1299,6 +1299,346 @@ export const REACT_TOPIC_FAQS: Record<string, FAQItem[]> = {
         "No, concurrent rendering does not mean parallel execution. JavaScript is still single-threaded. Instead, React breaks rendering into smaller tasks and schedules them intelligently, allowing interruption and prioritization without blocking the main thread.",
     },
   ],
+
+  "react-component-lifecycle-interview-questions": [
+    {
+      question: "What are the three phases of a React component's lifecycle?",
+      answer:
+        "Every React component passes through three phases: mounting (created and inserted into the DOM for the first time), updating (re-rendered because props or state changed), and unmounting (removed from the DOM). Class components expose explicit methods for each phase; functional components express the same phases through useEffect hooks.",
+    },
+    {
+      question: "What is componentDidMount used for in React?",
+      answer:
+        "componentDidMount fires once after the component is first inserted into the DOM. It is the safe place to start data fetching, add event listeners, access DOM nodes via refs, and initialise third-party libraries that require the DOM to exist. The hooks equivalent is useEffect(fn, []) — an empty dependency array.",
+    },
+    {
+      question: "What is the hooks equivalent of the class component lifecycle?",
+      answer:
+        "componentDidMount maps to useEffect(fn, []), componentDidUpdate maps to useEffect(fn, [deps]), and componentWillUnmount maps to the cleanup function returned from useEffect. shouldComponentUpdate maps to React.memo. There is no hooks equivalent for getSnapshotBeforeUpdate (approximate with useLayoutEffect + ref) or for getDerivedStateFromError and componentDidCatch (must use a class component).",
+    },
+    {
+      question:
+        "Why must you guard setState calls inside componentDidUpdate with a condition?",
+      answer:
+        "componentDidUpdate fires after every re-render. Calling setState inside it without comparing prevProps or prevState causes an infinite loop: setState triggers a re-render, which triggers componentDidUpdate, which calls setState again. The guard — if (prevProps.userId !== this.props.userId) — ensures setState only fires when a specific, meaningful change occurred.",
+    },
+    {
+      question:
+        "Why were componentWillMount, componentWillReceiveProps, and componentWillUpdate deprecated?",
+      answer:
+        "React's concurrent rendering can start a render, pause it, and restart — causing these methods to fire multiple times before anything is committed to the DOM. Any side effects inside them (data fetching, subscriptions, setState) would run multiple times unexpectedly. They were renamed with the UNSAFE_ prefix to signal this danger and are scheduled for full removal in a future React version.",
+    },
+    {
+      question:
+        "What is the difference between getDerivedStateFromError and componentDidCatch?",
+      answer:
+        "getDerivedStateFromError runs during the render phase when a child throws — its only job is to return a state update that triggers a fallback UI render. It must be pure with no side effects. componentDidCatch runs after the commit phase once the fallback is visible — it is the correct place to log errors to an external service like Sentry, because side effects are safe there.",
+    },
+  ],
+
+  "react-virtual-dom-interview-questions": [
+    {
+      question: "What is the Virtual DOM in React?",
+      answer:
+        "The Virtual DOM is a lightweight JavaScript object tree that mirrors the structure of the real DOM and lives entirely in memory. React creates a new Virtual DOM tree after every render and compares it against the previous snapshot. Only the differences found during this comparison are written to the real DOM, which avoids expensive full-page repaints.",
+    },
+    {
+      question: "How does React's diffing algorithm achieve O(n) complexity?",
+      answer:
+        "React reduces the theoretical O(n³) tree comparison to O(n) using two heuristics: when two elements have different types React destroys the old subtree and rebuilds it from scratch rather than comparing children; and for lists, React uses keys to match items by identity across renders instead of comparing every item at every position.",
+    },
+    {
+      question:
+        "What happens when you change the element type of a wrapper component?",
+      answer:
+        "React's diffing algorithm treats different element types as completely different trees. Changing a wrapper from div to section causes React to unmount the entire old subtree — destroying all state inside every child — and mount a brand new subtree. This is a common cause of unexpected state resets.",
+    },
+    {
+      question: "Why is using array index as a key dangerous?",
+      answer:
+        "When items are filtered, sorted, or inserted, array indices shift. React uses the key to match a DOM node to a list item across renders. With index as key, index 0 after a filter maps to a different item than before, so React reuses the DOM node (and its state) from the old item in the new item's position — causing incorrect state preservation and missed updates.",
+    },
+    {
+      question: "What is the difference between the render phase and commit phase?",
+      answer:
+        "The render phase runs component functions and diffs the new Virtual DOM against the previous one to produce a list of changes — it is pure computation with no DOM writes, and in concurrent mode it can be paused or restarted. The commit phase applies that change list to the real DOM synchronously in one uninterruptible pass, then fires layout effects and paint effects.",
+    },
+    {
+      question: "Is the Virtual DOM always faster than direct DOM manipulation?",
+      answer:
+        "No. For a single isolated update, directly writing to the DOM is faster because the Virtual DOM adds diffing overhead. React's performance advantage comes from batching many state changes into a single reconciliation pass on complex UIs — the diffing cost is smaller than the cost of individual DOM operations that would otherwise fire separately.",
+    },
+  ],
+
+  "react-controlled-uncontrolled-components-interview-questions": [
+    {
+      question: "What is a controlled component in React?",
+      answer:
+        "A controlled component is a form element whose value is driven entirely by React state. Every change the user makes fires an onChange handler that updates state, which triggers a re-render that sets the input's value. React state is the single source of truth — the DOM never independently holds the current value.",
+    },
+    {
+      question: "What is an uncontrolled component in React?",
+      answer:
+        "An uncontrolled component manages its own value inside the DOM. You set the initial value with defaultValue (not value) and read the current value via a ref only when you need it — typically on form submit. React is unaware of the value between reads, which means no re-renders occur on each keystroke.",
+    },
+    {
+      question:
+        "What bug occurs when you pass undefined as a controlled input's value?",
+      answer:
+        "React determines whether an input is controlled or uncontrolled on the first render based on whether a value prop is present. Passing value={user?.name} when user is null initially means no value prop (uncontrolled), then a string value later (controlled). React warns about this switch and the input behaves unpredictably. Always provide a fallback: value={user?.name ?? ''}.",
+    },
+    {
+      question: "Why are file inputs always uncontrolled in React?",
+      answer:
+        "File inputs are always uncontrolled because the browser enforces a security restriction that prevents JavaScript from programmatically setting a file input's value — a page cannot silently pre-select files. You must always read the selected file via a ref (fileRef.current.files[0]) or the event object.",
+    },
+    {
+      question:
+        "Why does React Hook Form outperform Formik on large forms?",
+      answer:
+        "React Hook Form uses uncontrolled inputs by default — inputs register with the form via refs, and values are read only on submit. Zero re-renders occur per keystroke. Formik uses controlled inputs where every field value lives in state, triggering a re-render of all subscribed components on every keystroke. The difference is negligible on small forms but significant on forms with 50+ fields.",
+    },
+  ],
+
+  "react-error-boundaries-interview-questions": [
+    {
+      question: "What is a React Error Boundary?",
+      answer:
+        "An Error Boundary is a class component that catches JavaScript errors thrown during the rendering of its child component tree, shows a fallback UI instead of a blank screen, and keeps the rest of the application running. Without Error Boundaries, any unhandled render error propagates to the root and unmounts the entire app.",
+    },
+    {
+      question:
+        "What is the difference between getDerivedStateFromError and componentDidCatch?",
+      answer:
+        "getDerivedStateFromError fires during the render phase and must be a pure function — its only job is to return a state object that triggers the fallback render. componentDidCatch fires in the commit phase after the fallback is already visible — it is the right place to log errors to monitoring services because side effects are safe there.",
+    },
+    {
+      question: "What types of errors do Error Boundaries not catch?",
+      answer:
+        "Error Boundaries only catch errors thrown during rendering, in lifecycle methods, and in constructors of children. They do not catch: errors inside event handlers (use try/catch there), errors in async code like setTimeout or fetch callbacks, errors in the Error Boundary component itself, or errors during server-side rendering.",
+    },
+    {
+      question: "Why must Error Boundaries be class components?",
+      answer:
+        "Error Boundaries require getDerivedStateFromError and componentDidCatch — two lifecycle methods with no hooks equivalents. React has not shipped a useErrorBoundary hook. The react-error-boundary library provides a ready-made class component so you don't have to write one from scratch, and it also exposes a useErrorBoundary hook for triggering boundaries from functional components.",
+    },
+    {
+      question: "How should Error Boundaries be placed for maximum resilience?",
+      answer:
+        "Place Error Boundaries at two granularities: route level so each page is isolated (a crash in /settings doesn't break /dashboard), and widget level around risky features like charts, maps, and third-party embeds. One root-level boundary is a last-resort safety net — not a strategy — because it makes the entire visible UI show the fallback on any error.",
+    },
+  ],
+
+  "react-context-api-interview-questions": [
+    {
+      question: "What problem does the React Context API solve?",
+      answer:
+        "Context solves prop drilling — the pattern of passing data through intermediate components that don't use it just to reach a deeply nested component that does. With Context, a Provider broadcasts a value at any level and any descendant component can read it directly with useContext, without any intermediate component being aware of the data.",
+    },
+    {
+      question: "How does changing a Context value trigger re-renders?",
+      answer:
+        "Every component that calls useContext(MyContext) re-renders whenever the Provider's value changes — React uses Object.is to compare the previous and new value. If the value is an object created inline in the Provider, it is a new reference on every parent render, causing all consumers to re-render even if the underlying data is identical. Fix this with useMemo on the value object.",
+    },
+    {
+      question: "What is the createContext default value used for?",
+      answer:
+        "The default value passed to createContext(defaultValue) is used only when a component calls useContext but has no matching Provider above it in the tree. It is not the initial value of the Provider — the Provider's value prop controls what consumers receive. The default value primarily serves as a fallback for isolated testing and as a TypeScript type anchor.",
+    },
+    {
+      question: "When should you use Context instead of Redux or Zustand?",
+      answer:
+        "Use Context for stable, infrequently changing ambient data that many components need to read: current user, theme, locale, and feature flags. Context has no selector system — every consumer re-renders on any value change — so it is a poor fit for frequently updating state. Redux and Zustand provide selective subscriptions, meaning a component watching cart.total doesn't re-render when user.name changes.",
+    },
+    {
+      question: "How do you prevent unnecessary re-renders caused by Context?",
+      answer:
+        "Split one large context into multiple smaller contexts by update frequency. A ThemeContext and a UserContext are better than one AppContext — a button reading theme doesn't re-render when the user logs out. Additionally, separate state from dispatch: useReducer's dispatch is always a stable reference, so components that only dispatch can consume a dispatch-only context and never re-render when state changes.",
+    },
+  ],
+
+  "react-higher-order-components-interview-questions": [
+    {
+      question: "What is a Higher Order Component (HOC) in React?",
+      answer:
+        "A Higher Order Component is a function that takes a component as an argument and returns a new, enhanced component. It adds cross-cutting behaviour — authentication checks, loading states, analytics tracking, error logging — without modifying the original component. The naming convention is to prefix with 'with': withAuth(Dashboard) returns a new component that checks auth before rendering Dashboard.",
+    },
+    {
+      question: "What are the three conventions every HOC must follow?",
+      answer:
+        "First, always spread props through: return <WrappedComponent {...props} /> — never swallow props or the wrapped component won't receive what its parent passed. Second, set displayName so React DevTools shows withAuth(Dashboard) instead of a generic function name. Third, use React.forwardRef if the HOC might receive a ref — HOCs break ref forwarding by default because the ref attaches to the wrapper, not the underlying component.",
+    },
+    {
+      question: "Why do HOCs break ref forwarding?",
+      answer:
+        "HOCs return a new component that wraps the original. When a parent attaches a ref to the HOC-wrapped component, the ref points to the HOC's function component — not to the underlying DOM node or class instance. The fix is to wrap the HOC's inner component with React.forwardRef and pass the forwarded ref through as the ref prop to WrappedComponent.",
+    },
+    {
+      question: "When should you prefer a custom hook over a HOC?",
+      answer:
+        "Prefer a custom hook whenever the shared logic does not need to render any JSX around the component. Custom hooks add no component tree depth, can't collide on prop names with the wrapped component's own props, don't require forwardRef, and are visible in the component's own code. HOCs are still the right choice for class components (which can't use hooks) and for React.memo.",
+    },
+    {
+      question: "What is the danger of defining a HOC inside another component's render?",
+      answer:
+        "Defining a HOC inside render creates a new component type on every render. React identifies components by referential identity — seeing a new type at the same position in the tree makes it unmount the old component and mount a fresh one, resetting all state. HOCs must always be defined at module scope, outside of any component function.",
+    },
+  ],
+
+  "react-portals-interview-questions": [
+    {
+      question: "What is a React Portal and what problem does it solve?",
+      answer:
+        "A React Portal renders a component's DOM output into a different DOM node than its parent — typically document.body — while keeping it inside the React component tree. It solves the CSS stacking context problem: a modal rendered inside a component with overflow:hidden or a low z-index will be clipped or hidden. Portalling the modal to document.body places it outside any constraining ancestor.",
+    },
+    {
+      question: "How do you create a Portal in React?",
+      answer:
+        "Use ReactDOM.createPortal(children, domNode). The first argument is the React children to render — any valid JSX. The second is the target DOM node to render into, such as document.body or document.getElementById('modal-root'). The component renders into the target DOM node while remaining a child of the component that called createPortal in the React tree.",
+    },
+    {
+      question: "Do events inside a Portal bubble through the React tree or the DOM tree?",
+      answer:
+        "Events bubble through the React component tree, not the DOM tree. Even though a portal's DOM nodes are in document.body, a click inside the portal bubbles up through the React ancestors of the component that rendered the portal — not through body's DOM ancestors. This means React parent handlers will fire for events inside the portal, which can cause unexpected double-handling if not handled with stopPropagation.",
+    },
+    {
+      question: "What accessibility requirements come with using Portals for modals?",
+      answer:
+        "Portalling a modal into body does not automatically make it accessible. You must: move keyboard focus into the modal when it opens and restore focus to the trigger element when it closes; trap focus so keyboard users cannot tab into background content (use focus-trap-react); add role='dialog' and aria-modal='true' to the modal container; and provide an accessible title with aria-labelledby.",
+    },
+    {
+      question: "When should you NOT use a Portal?",
+      answer:
+        "Avoid portals when the parent component has no overflow:hidden, no CSS transform, and a sufficient z-index. In that case, a simple position:fixed with a high z-index works just as well without the added complexity of managing a separate DOM container, event propagation nuances, and accessibility plumbing. Only reach for portals when you're actually fighting a CSS stacking context.",
+    },
+  ],
+
+  "react-code-splitting-interview-questions": [
+    {
+      question: "What is code splitting and why does it matter?",
+      answer:
+        "Code splitting breaks the JavaScript bundle into smaller chunks that load on demand instead of all at once. Without it, every user downloads the entire application — including code for pages they may never visit — on first load. Splitting at route boundaries means a user visiting /home never downloads /admin code, reducing initial load time and improving Time to Interactive.",
+    },
+    {
+      question: "How does React.lazy work?",
+      answer:
+        "React.lazy accepts a function that calls dynamic import() and returns a Promise resolving to a module with a default export. React treats the wrapped component as lazily loaded — its JavaScript chunk is not fetched until the component is first rendered. While the chunk is downloading, the nearest Suspense ancestor shows its fallback UI.",
+    },
+    {
+      question: "What is the role of Suspense in lazy loading?",
+      answer:
+        "Suspense is the loading boundary that shows a fallback UI while a lazy component's chunk is downloading. It can wrap one or many lazy components — it shows its fallback if any child is still loading. Nested Suspense boundaries give different sections their own independent loading states and skeletons.",
+    },
+    {
+      question: "Why must React.lazy be paired with an Error Boundary?",
+      answer:
+        "Lazy loading can fail — the network may be unreliable, a deployment may have changed the chunk filename, or the user may be offline. Without an Error Boundary, a failed chunk load throws an unhandled error that crashes the entire app. An Error Boundary wrapping the Suspense catches the load failure and shows a retry UI instead.",
+    },
+    {
+      question: "Why does React.lazy only work with default exports?",
+      answer:
+        "React.lazy expects a Promise that resolves to a module object with a default property — it calls module.default to get the component. Named exports have no default. The workaround is either exporting the component as default in a dedicated file, or using the .then() pattern: React.lazy(() => import('./file').then(m => ({ default: m.NamedExport }))).",
+    },
+  ],
+
+  "react-server-components-interview-questions": [
+    {
+      question: "What are React Server Components?",
+      answer:
+        "React Server Components (RSC) are components that run exclusively on the server and never ship their JavaScript to the browser. They can fetch data directly, access secrets and databases, and import heavy server-only libraries — all with zero bundle size impact. They return a serialized React tree (not HTML) that the client uses to update the UI.",
+    },
+    {
+      question: "What is the difference between RSC and Server-Side Rendering?",
+      answer:
+        "SSR (Server-Side Rendering) runs React on the server, converts the component tree to HTML, sends it to the client, then ships the same JavaScript bundle so the client can hydrate and make the page interactive. RSC components run only on the server — their JavaScript is never sent to the client at all. You can combine both: use RSC for data fetching (zero bundle cost) and SSR to generate the initial HTML for fast first paint.",
+    },
+    {
+      question: "What does the 'use client' directive do?",
+      answer:
+        "'use client' at the top of a file marks it — and everything imported by it — as a Client Component. In the Next.js App Router, every component is a Server Component by default. 'use client' creates a boundary: code above it stays on the server; code below runs on the client. It does not mean the component only renders on the client — Client Components are still server-rendered to HTML on first load in Next.js.",
+    },
+    {
+      question: "What can you NOT do in a React Server Component?",
+      answer:
+        "Server Components cannot use useState, useReducer, useEffect, or any other hook that requires the React runtime on the client. They cannot attach event handlers (onClick, onChange), use browser APIs (window, document, localStorage), or consume Context with useContext. Any component that needs interactivity or browser access must be marked 'use client'.",
+    },
+    {
+      question: "How does data fetching work in Server Components?",
+      answer:
+        "Server Components are async functions — you can use async/await directly in the component body. No useEffect, no useState for loading/error, no API route needed. async function ProductList() { const products = await db.product.findMany(); return <ul>...</ul>; } — the data is fetched on the server before the component's output is sent to the client.",
+    },
+    {
+      question: "What are Server Actions in React?",
+      answer:
+        "Server Actions are async functions marked with 'use server' that run on the server but can be called from Client Components — like an RPC call without a manual API route. They are used for mutations: creating, updating, or deleting data. After a Server Action completes, you can call revalidatePath() or revalidateTag() to clear the cache and trigger a fresh server render of affected pages.",
+    },
+  ],
+
+  "react-props-interview-questions": [
+    {
+      question: "What are props in React?",
+      answer:
+        "Props are a component's function arguments — read-only data passed from a parent component to a child. A component must never modify the props it receives. If the displayed value needs to change, the parent must pass different props. Props can be any JavaScript value: strings, numbers, objects, arrays, functions, and JSX.",
+    },
+    {
+      question: "What is one-way data flow in React?",
+      answer:
+        "One-way data flow means data moves in one direction: from parent to child via props. A child component cannot directly change its parent's state. This makes data flow predictable — you always know where a value comes from and that only one thing controls it. To send changes back up, a parent passes a callback function as a prop and the child calls it.",
+    },
+    {
+      question: "How does a child component communicate changes to its parent?",
+      answer:
+        "The parent passes a callback function as a prop. The child calls this callback when something happens, passing the new value as an argument. The parent's callback updates state, which causes a re-render, passing the updated value back down as a prop. Data flows down; events flow up through function calls.",
+    },
+    {
+      question: "What is prop drilling and how do you solve it?",
+      answer:
+        "Prop drilling is when a value is passed through intermediate components that don't need it — just to reach a deeply nested component that does. The first solution to try is component composition: restructure so the component that needs the data is rendered higher up and passed as children. If many disconnected components across the tree need the same value, React Context is the right solution.",
+    },
+    {
+      question: "What is the children prop in React?",
+      answer:
+        "children is a regular prop whose value is whatever JSX you place between a component's opening and closing tags. function Card({ children }) { return <div className='card'>{children}</div>; } — anything inside <Card>...</Card> becomes the children prop. This enables composable layout components that don't need to know what they're rendering.",
+    },
+    {
+      question: "When should a value be a prop versus state?",
+      answer:
+        "If the data is passed in from outside the component, it is a prop. If the component creates and controls the data itself, it is state. If two sibling components need to share the same value, lift it to their closest common ancestor as state and distribute it as props. If many unrelated components across the tree need it, use Context or an external store.",
+    },
+  ],
+
+  "react-state-management-interview-questions": [
+    {
+      question: "What are the different layers of state management in React?",
+      answer:
+        "React state management exists on a spectrum: useState for local state owned by a single component, lifting state up for state shared between siblings, Context API for ambient data many components read infrequently, and external stores (Zustand, Redux) for frequently changing global state with selective subscriptions. Server state — data fetched from an API — is best managed by a dedicated library like React Query.",
+    },
+    {
+      question: "When should you use Context instead of Zustand or Redux?",
+      answer:
+        "Use Context for stable, infrequently changing global values: the current user, theme, locale, or feature flags. Context has no selector system — all consumers re-render when the value changes — making it a poor fit for frequently updating state. Zustand and Redux provide selective subscriptions so a component watching cart.total doesn't re-render when user.name changes.",
+    },
+    {
+      question: "What is server state and how is it different from UI state?",
+      answer:
+        "Server state is data that lives on a remote server and is fetched into the client — user profiles, product lists, orders. It has unique challenges: it can become stale, needs caching, deduplication, and background refresh. UI state is local and always current — form values, selected tabs, modal open/closed. React Query (TanStack Query) is purpose-built for server state; useState and useReducer handle UI state.",
+    },
+    {
+      question: "When should you choose useReducer over useState?",
+      answer:
+        "Switch to useReducer when multiple state fields must update together based on the same event, when state transitions are complex enough to deserve named actions, or when you want to test state logic independently. The clearest signal is calling three or more state setters inside a single event handler — those coordinated updates belong in a single reducer action that transitions the entire state atomically.",
+    },
+    {
+      question: "What is URL state and when should you use it?",
+      answer:
+        "URL state stores values in the URL's query parameters or path segments — search queries, active filters, pagination, and selected tabs. It persists across page refreshes, is shareable via link, and works with the browser back button. Use useSearchParams (React Router) or Next.js's router to read and write URL state instead of putting these values in component state where they'd be lost on refresh.",
+    },
+    {
+      question: "What is the core rule for deciding where state should live?",
+      answer:
+        "Keep state as local as possible and only promote it up the tree when you have a concrete reason. If one component needs it, use useState locally. If siblings need to share it, lift it to their nearest common ancestor. If many disconnected components need it and it changes rarely, use Context. If it changes frequently across many components, use an external store. Never add a state management library before identifying a concrete problem it solves.",
+    },
+  ],
 };
 
 /**
