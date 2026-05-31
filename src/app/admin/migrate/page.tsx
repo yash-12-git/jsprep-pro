@@ -18,7 +18,7 @@ import { seedBlogPostsFromArray } from "@/lib/blogPosts";
 
 // ── Import static data ────────────────────────────────────────────────────────
 import { TOPICS as STATIC_TOPICS } from "@/data/seo/topics";
-import { BLOG_POSTS as STATIC_POSTS } from "@/data/seo/blogPosts";
+import { BLOG_POSTS as STATIC_POSTS, REACT_BLOG_POSTS } from "@/data/seo/blogPosts";
 import { REACT_TOPICS } from "@/data/seo/reactTopics";
 import { revalidateTopics } from "@/lib/adminRevalidate";
 
@@ -226,6 +226,7 @@ interface DoneState {
   jsTopics?: boolean;
   blogs?: boolean;
   reactTopics?: boolean;
+  reactBlogs?: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -236,15 +237,20 @@ export default function MigratePage() {
   // Separate loading + log state for each section
   const [migratingJs, setMigratingJs] = useState(false);
   const [migratingReact, setMigratingReact] = useState(false);
+  const [migratingReactBlogs, setMigratingReactBlogs] = useState(false);
   const [done, setDone] = useState<DoneState>({});
   const [jsLog, setJsLog] = useState<LogEntry[]>([]);
   const [reactLog, setReactLog] = useState<LogEntry[]>([]);
+  const [reactBlogsLog, setReactBlogsLog] = useState<LogEntry[]>([]);
 
   function addJsLog(type: LogEntry["type"], text: string) {
     setJsLog((prev) => [...prev, { type, text }]);
   }
   function addReactLog(type: LogEntry["type"], text: string) {
     setReactLog((prev) => [...prev, { type, text }]);
+  }
+  function addReactBlogsLog(type: LogEntry["type"], text: string) {
+    setReactBlogsLog((prev) => [...prev, { type, text }]);
   }
 
   // ── Section A: JS topics + blog posts (legacy, run once) ─────────────────
@@ -318,6 +324,38 @@ export default function MigratePage() {
       addReactLog("error", `❌ ${e.message}`);
     } finally {
       setMigratingReact(false);
+    }
+  }
+
+  // ── Section C: React blog posts ───────────────────────────────────────────
+  async function handleMigrateReactBlogs() {
+    if (!user) return;
+    setMigratingReactBlogs(true);
+    setReactBlogsLog([]);
+
+    try {
+      addReactBlogsLog("info", `── Migrating ${REACT_BLOG_POSTS.length} React blog posts ──────────────`);
+      REACT_BLOG_POSTS.forEach((p) => addReactBlogsLog("info", `  · ${p.slug}`));
+
+      const postsToSeed = REACT_BLOG_POSTS.map((p) => ({
+        ...p,
+        status: "published" as const,
+        topicSlug: "",
+        relatedTopicSlugs: [] as string[],
+        questionCategories: [] as string[],
+      }));
+
+      const { created, errors } = await seedBlogPostsFromArray(postsToSeed, user.uid);
+      errors.forEach((e) => addReactBlogsLog("error", `  ✗ ${e}`));
+      addReactBlogsLog("success", `  ✓ ${created} React blog posts written to Firestore`);
+      setDone((prev) => ({ ...prev, reactBlogs: true }));
+      addReactBlogsLog("info", "─────────────────────────────────────────────────");
+      addReactBlogsLog("success", "🎉 Done! Verify at /blog/react");
+      addReactBlogsLog("warn", "Next: open /admin/blog and set topicSlug on each post.");
+    } catch (e: any) {
+      addReactBlogsLog("error", `❌ ${e.message}`);
+    } finally {
+      setMigratingReactBlogs(false);
     }
   }
 
@@ -474,6 +512,75 @@ export default function MigratePage() {
             <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
           ))}
           {migratingReact && (
+            <div css={S.logLine("info")}>
+              <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.25rem" }} />
+              running…
+            </div>
+          )}
+        </div>
+      )}
+
+      <hr css={S.divider} />
+
+      {/* ── SECTION C: React Blog Posts ─────────────────────────────────────── */}
+      <div css={S.sectionTitle}>Section C — React Blog Posts</div>
+      <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
+        10 React interview blog posts (track: react). Seeded to <code style={{ color: C.accent3 }}>blog_posts</code> collection.
+        After seeding, set <code style={{ color: C.accent3 }}>topicSlug</code> on each post via Admin → Blog.
+      </p>
+
+      <div css={S.grid}>
+        <div css={S.card(C.purple, !!done.reactBlogs)}>
+          <div css={S.cardIcon(C.purple)}>
+            <Newspaper size={16} color={C.purple} />
+          </div>
+          <div css={S.cardTitle}>React Blog Posts</div>
+          <div css={S.cardCount(C.purple)}>{REACT_BLOG_POSTS.length}</div>
+          <div css={S.cardMeta}>
+            {REACT_BLOG_POSTS.map((p) => p.slug).join(", ")}
+          </div>
+          {done.reactBlogs && (
+            <div css={S.doneBadge}>
+              <CheckCircle2 size={9} /> Migrated
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div css={S.warningBox}>
+        <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+        <span>
+          <strong>Run once only.</strong> Re-running creates duplicate blog post docs. Check{" "}
+          <code style={{ color: C.accent2 }}>blog_posts</code> in Firebase Console first.
+        </span>
+      </div>
+
+      {done.reactBlogs && (
+        <div css={S.successBox}>
+          <CheckCircle2 size={18} />
+          React blog posts seeded! Verify at{" "}
+          <a href="/blog/react" style={{ color: C.accent3 }}>/blog/react</a>
+        </div>
+      )}
+
+      <button
+        css={S.migrateBtn(migratingReactBlogs)}
+        onClick={handleMigrateReactBlogs}
+        disabled={migratingReactBlogs}
+      >
+        {migratingReactBlogs ? (
+          <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Seeding React Blogs…</>
+        ) : (
+          <><Database size={16} /> Seed {REACT_BLOG_POSTS.length} React Blog Posts</>
+        )}
+      </button>
+
+      {reactBlogsLog.length > 0 && (
+        <div css={S.log}>
+          {reactBlogsLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
+          ))}
+          {migratingReactBlogs && (
             <div css={S.logLine("info")}>
               <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.25rem" }} />
               running…

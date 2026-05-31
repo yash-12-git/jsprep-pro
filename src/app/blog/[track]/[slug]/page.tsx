@@ -12,7 +12,7 @@ import {
   breadcrumbSchema,
   faqSchema,
 } from "@/lib/seo/seo";
-import { BLOG_FAQS } from "@/data/seo/blogFaqs";
+import { BLOG_FAQS, REACT_BLOG_FAQS } from "@/data/seo/blogFaqs";
 import { C } from "@/styles/tokens";
 import { Track } from "@/lib/tracks";
 import { getServerTrack } from "@/lib/getServerTrack";
@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
 
-  const blogFaqItems = BLOG_FAQS[post.slug] ?? [];
+  const blogFaqItems = track === 'javascript' ? BLOG_FAQS[post.slug] : REACT_BLOG_FAQS[post.slug] ?? [];
   const blogFaq = blogFaqItems.length > 0 ? faqSchema(blogFaqItems) : null;
 
   return (
