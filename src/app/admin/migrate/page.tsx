@@ -22,6 +22,7 @@ import { BLOG_POSTS as STATIC_POSTS, REACT_BLOG_POSTS, TYPESCRIPT_BLOG_POSTS } f
 import { REACT_TOPICS } from "@/data/seo/reactTopics";
 import { TYPESCRIPT_TOPICS } from "@/data/seo/typescriptTopics";
 import { revalidateBlogPosts, revalidateTopics } from "@/lib/adminRevalidate";
+import { submitToIndexNow } from "@/lib/indexnow";
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -243,6 +244,8 @@ export default function MigratePage() {
   const [migratingReactBlogs, setMigratingReactBlogs] = useState(false);
   const [migratingTs, setMigratingTs] = useState(false);
   const [migratingTsBlogs, setMigratingTsBlogs] = useState(false);
+  const [submittingIndexNow, setSubmittingIndexNow] = useState(false);
+  const [indexNowLog, setIndexNowLog] = useState<LogEntry[]>([]);
   const [done, setDone] = useState<DoneState>({});
   const [jsLog, setJsLog] = useState<LogEntry[]>([]);
   const [reactLog, setReactLog] = useState<LogEntry[]>([]);
@@ -264,6 +267,40 @@ export default function MigratePage() {
   }
   function addTsBlogsLog(type: LogEntry["type"], text: string) {
     setTsBlogsLog((prev) => [...prev, { type, text }]);
+  }
+
+  // ── TEMP: Manual IndexNow submission for already-seeded content ─────────
+  async function handleSubmitIndexNow() {
+    setSubmittingIndexNow(true);
+    setIndexNowLog([]);
+    const add = (type: LogEntry["type"], text: string) =>
+      setIndexNowLog((prev) => [...prev, { type, text }]);
+
+    const urls = [
+      // React
+      "https://jsprep.pro/topics/react",
+      "https://jsprep.pro/react-interview-questions",
+      ...REACT_TOPICS.map((t) => `https://jsprep.pro/${t.slug}`),
+      "https://jsprep.pro/blog/react",
+      ...REACT_BLOG_POSTS.map((p) => `https://jsprep.pro/blog/react/${p.slug}`),
+      // TypeScript
+      "https://jsprep.pro/topics/typescript",
+      "https://jsprep.pro/typescript-interview-questions",
+      ...TYPESCRIPT_TOPICS.map((t) => `https://jsprep.pro/${t.slug}`),
+      "https://jsprep.pro/blog/typescript",
+      ...TYPESCRIPT_BLOG_POSTS.map((p) => `https://jsprep.pro/blog/typescript/${p.slug}`),
+    ];
+
+    try {
+      add("info", `Submitting ${urls.length} URLs to Bing IndexNow…`);
+      urls.forEach((u) => add("info", `  · ${u}`));
+      await submitToIndexNow(urls);
+      add("success", `✅ Done — ${urls.length} URLs submitted`);
+    } catch (e: any) {
+      add("error", `❌ ${e.message}`);
+    } finally {
+      setSubmittingIndexNow(false);
+    }
   }
 
   // ── Section A: JS topics + blog posts (legacy, run once) ─────────────────
@@ -330,6 +367,13 @@ export default function MigratePage() {
       addReactLog("success", `  ✓ ${created} React topics written to Firestore`);
       setDone((prev) => ({ ...prev, reactTopics: true }));
       await revalidateTopics();
+      const reactTopicUrls = [
+        "https://jsprep.pro/topics/react",
+        "https://jsprep.pro/react-interview-questions",
+        ...REACT_TOPICS.map((t) => `https://jsprep.pro/${t.slug}`),
+      ];
+      await submitToIndexNow(reactTopicUrls);
+      addReactLog("success", `📡 IndexNow: submitted ${reactTopicUrls.length} URLs to Bing`);
       addReactLog("info", "─────────────────────────────────────────────────");
       addReactLog("success", "🎉 Done! Verify at /topics/react");
       addReactLog("warn", "If a shell topic already existed for this slug, delete the old one in Firebase Console → Firestore → topics.");
@@ -353,6 +397,13 @@ export default function MigratePage() {
       addTsLog("success", `  ✓ ${created} TypeScript topics written to Firestore`);
       setDone((prev) => ({ ...prev, tsTopics: true }));
       await revalidateTopics();
+      const tsTopicUrls = [
+        "https://jsprep.pro/topics/typescript",
+        "https://jsprep.pro/typescript-interview-questions",
+        ...TYPESCRIPT_TOPICS.map((t) => `https://jsprep.pro/${t.slug}`),
+      ];
+      await submitToIndexNow(tsTopicUrls);
+      addTsLog("success", `📡 IndexNow: submitted ${tsTopicUrls.length} URLs to Bing`);
       addTsLog("info", "─────────────────────────────────────────────────");
       addTsLog("success", "🎉 Done! Verify at /topics/typescript");
       addTsLog("warn", "If a shell topic already existed for this slug, delete it in Firebase Console first.");
@@ -382,6 +433,12 @@ export default function MigratePage() {
       errors.forEach((e) => addTsBlogsLog("error", `  ✗ ${e}`));
       addTsBlogsLog("success", `  ✓ ${created} TypeScript blog posts written to Firestore`);
       setDone((prev) => ({ ...prev, tsBlogs: true }));
+      const tsBlogUrls = [
+        "https://jsprep.pro/blog/typescript",
+        ...TYPESCRIPT_BLOG_POSTS.map((p) => `https://jsprep.pro/blog/typescript/${p.slug}`),
+      ];
+      await submitToIndexNow(tsBlogUrls);
+      addTsBlogsLog("success", `📡 IndexNow: submitted ${tsBlogUrls.length} URLs to Bing`);
       addTsBlogsLog("info", "─────────────────────────────────────────────────");
       addTsBlogsLog("success", "🎉 Done! Verify at /blog/typescript");
       await revalidateBlogPosts();
@@ -415,6 +472,12 @@ export default function MigratePage() {
       errors.forEach((e) => addReactBlogsLog("error", `  ✗ ${e}`));
       addReactBlogsLog("success", `  ✓ ${created} React blog posts written to Firestore`);
       setDone((prev) => ({ ...prev, reactBlogs: true }));
+      const reactBlogUrls = [
+        "https://jsprep.pro/blog/react",
+        ...REACT_BLOG_POSTS.map((p) => `https://jsprep.pro/blog/react/${p.slug}`),
+      ];
+      await submitToIndexNow(reactBlogUrls);
+      addReactBlogsLog("success", `📡 IndexNow: submitted ${reactBlogUrls.length} URLs to Bing`);
       addReactBlogsLog("info", "─────────────────────────────────────────────────");
       addReactBlogsLog("success", "🎉 Done! Verify at /blog/react");
       await revalidateBlogPosts();
@@ -794,6 +857,33 @@ export default function MigratePage() {
               running…
             </div>
           )}
+        </div>
+      )}
+
+      <hr css={S.divider} />
+
+      {/* ── TEMP: Manual IndexNow ────────────────────────────────────────── */}
+      <hr css={S.divider} />
+      <div css={S.sectionTitle}>⚠ Temp — Submit IndexNow (remove after use)</div>
+      <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
+        Submits all React + TypeScript topic and blog URLs to Bing IndexNow. Use this when data is already seeded.
+      </p>
+      <button
+        css={S.migrateBtn(submittingIndexNow)}
+        onClick={handleSubmitIndexNow}
+        disabled={submittingIndexNow}
+      >
+        {submittingIndexNow ? (
+          <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Submitting…</>
+        ) : (
+          <>📡 Submit React + TypeScript URLs to IndexNow ({REACT_TOPICS.length + REACT_BLOG_POSTS.length + TYPESCRIPT_TOPICS.length + TYPESCRIPT_BLOG_POSTS.length + 6} URLs)</>
+        )}
+      </button>
+      {indexNowLog.length > 0 && (
+        <div css={S.log}>
+          {indexNowLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
+          ))}
         </div>
       )}
 
