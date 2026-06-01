@@ -12,7 +12,6 @@ import {
 import type { Question } from "@/types/question";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
 import { C, RADIUS } from "@/styles/tokens";
-import { getServerTrack } from "@/lib/getServerTrack";
 
 interface Props {
   params: { slug: string };
@@ -38,29 +37,28 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const track = await getServerTrack();
   const { questions: qs } = await getQuestions({
-    filters: { track, status: "published", type: "theory" },
+    filters: { status: "published", type: "theory" },
     pageSize: 300,
   }).catch(() => ({ questions: [] }));
   const cats = [...new Set(qs.map((q: any) => q.category))];
   const cat = cats.find((c: string) => catToSlug(c) === params.slug);
   if (!cat) return {};
+  const track = (qs.find((q: any) => q.category === cat)?.track as string) ?? "javascript";
   return pageMeta({
-    title: `${cat} ${track} Interview Questions (Questions With Answers)`,
-    description: `${cat} interview questions with detailed answers and code examples. Master ${cat} concepts for your ${track} frontend interview.`,
+    title: `${cat} Interview Questions (With Answers)`,
+    description: `${cat} interview questions with detailed answers and code examples. Master ${cat} concepts for your frontend interview.`,
     path: `/questions/${params.slug}`,
     keywords: [
-      `${cat.toLowerCase()} ${track} interview`,
       `${cat.toLowerCase()} interview questions`,
+      `${cat.toLowerCase()} ${track} interview`,
     ],
   });
 }
 
 export default async function CategoryQuestionsPage({ params }: Props) {
-  const track = await getServerTrack();
   const { questions: allTheory } = await getQuestions({
-    filters: { track, status: "published", type: "theory" },
+    filters: { status: "published", type: "theory" },
     pageSize: 300,
   }).catch(() => ({ questions: [] }));
 
@@ -69,6 +67,7 @@ export default async function CategoryQuestionsPage({ params }: Props) {
   if (!cat) notFound();
 
   const catQuestions = allTheory.filter((q: any) => q.category === cat);
+  const track = (catQuestions[0]?.track as string) ?? "javascript";
   const allCats = theoryCats.map((c: string) => ({
     cat: c,
     slug: catToSlug(c),

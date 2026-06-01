@@ -11,3 +11,11 @@ export async function getServerTrack(): Promise<Track> {
     | undefined;
   return value && AVAILABLE_TRACKS.includes(value) ? value : "javascript";
 }
+
+// Derives track from a URL slug without needing a cookie (safe for crawlers).
+// Topic slugs follow the pattern: {track}-{keyword}-interview-questions
+export function trackFromSlug(slug: string): Track {
+  if (slug.startsWith("react-")) return "react";
+  if (slug.startsWith("typescript-")) return "typescript";
+  return "javascript";
+}

@@ -15,7 +15,6 @@ import {
 import { BLOG_FAQS, REACT_BLOG_FAQS, TYPESCRIPT_BLOG_FAQS } from "@/data/seo/blogFaqs";
 import { C } from "@/styles/tokens";
 import { Track } from "@/lib/tracks";
-import { getServerTrack } from "@/lib/getServerTrack";
 
 export const revalidate = 3600;
 
@@ -84,7 +83,7 @@ function md(content: string): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: Props) {
   const post = await getBlogPostBySlug(params.slug);
-  const track = await getServerTrack();
+  const track = post?.track ?? params.track;
   if (!post) notFound();
 
   const [relatedTopics, allPosts] = await Promise.all([

@@ -13,7 +13,8 @@ import { pageMeta, faqSchema, breadcrumbSchema } from "@/lib/seo/seo";
 import { getTopicFaqs, TOPIC_FAQS } from "@/data/seo/topicFaqs";
 import TopicQuestionList from "./TopicQuestionList";
 import { C, TOPIC_DIFF_BG, TOPIC_DIFF_COLOR } from "@/styles/tokens";
-import { getServerTrack } from "@/lib/getServerTrack";
+import { trackFromSlug } from "@/lib/getServerTrack";
+import type { Track } from "@/lib/tracks";
 
 export const revalidate = 3600;
 
@@ -100,7 +101,7 @@ function SectionHeading({
 export default async function TopicPage({ params }: Props) {
   const topic = await getTopicBySlug(params.topic);
   if (!topic) notFound();
-  const track = await getServerTrack();
+  const track: Track = (topic.track as Track | undefined) ?? trackFromSlug(params.topic);
   const { questions } = await getQuestions({
     filters: { track, status: "published", topicSlug: topic.slug },
     pageSize: 50,

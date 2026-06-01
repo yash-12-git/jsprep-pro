@@ -12,11 +12,9 @@ import {
   faqSchema,
   breadcrumbSchema,
   catToSlug,
-  SITE,
 } from "@/lib/seo/seo";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
 import { C } from "@/styles/tokens";
-import { getServerTrack } from "@/lib/getServerTrack";
 
 interface Props {
   params: { slug: string };
@@ -31,8 +29,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const q = await getQuestionBySlug(params.slug);
-  const track = await getServerTrack();
   if (!q) return {};
+  const track = q.track;
   const diff = DIFF_LABEL[q.difficulty] ?? "Core";
   const typeLabel =
     q.type === "output"
@@ -71,8 +69,8 @@ function markdownToHtml(text: string): string {
 
 export default async function QuestionPage({ params }: Props) {
   const question = await getQuestionBySlug(params.slug);
-  const track = await getServerTrack();
   if (!question) notFound();
+  const track = question.track;
   const dm = DIFF_STYLE[question.difficulty] ?? DIFF_STYLE.core;
   const catSlug = catToSlug(question.category);
   const isOutput = question.type === "output";
