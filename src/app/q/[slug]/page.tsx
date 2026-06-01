@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         : "Interview Question";
   return pageMeta({
     title: `${q.title} — ${track} ${typeLabel}`,
-    description: `${diff} ${track} ${typeLabel.toLowerCase()}: ${q.title} — Detailed answer with code examples and interview tips. Part of the ${q.category} category.`,
+    description: `${diff} ${track} ${typeLabel.toLowerCase()}: ${q.title.slice(0, 70)} — answer with code examples.`,
     path: `/q/${params.slug}`,
     keywords: [
       q.title.toLowerCase(),

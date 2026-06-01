@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { pageMeta } from "@/lib/seo/seo";
 import QuestionList from "./QuestionList";
 import { C } from "@/styles/tokens";
-import { getServerTrack } from "@/lib/getServerTrack";
 
 // ─── Static metadata ──────────────────────────────────────────────────────────
 
@@ -117,8 +116,6 @@ const PREP_TIPS = [
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function JSInterviewQuestionsPage() {
-
-  const track = await getServerTrack();
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -268,7 +265,7 @@ export default async function JSInterviewQuestionsPage() {
               </Link>
             ))}
             <Link
-              href={`/topics/${track}`}
+              href='/topics/javascript'
               style={{
                 ...topicCard,
                 gridColumn: "span 1",

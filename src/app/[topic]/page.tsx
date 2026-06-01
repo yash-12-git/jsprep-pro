@@ -37,8 +37,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMeta({
     title: `${topic.title}`,
     description: hasConceptHub
-      ? `${(topic.mentalModel ?? topic.description).slice(0, 120)} — with code examples, common mistakes, and ${topic.questionCount} practice interview questions.`
-      : `${topic.description} Covers ${topic.cheatSheet.slice(0, 2).join(". ")}. Practice with AI feedback.`,
+      ? `${(topic.mentalModel ?? topic.description).slice(0, 85)} — code examples, common mistakes, and ${topic.questionCount} interview Q&As.`
+      : `${topic.description.slice(0, 110)} Practice with AI feedback on ${topic.questionCount} questions.`,
     path: `/${topic.slug}`,
     keywords: [
       `${topic.keyword} interview questions`,

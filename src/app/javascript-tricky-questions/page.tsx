@@ -11,7 +11,6 @@ import { getQuestions } from "@/lib/cachedQueries";
 import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
 import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
 import { C } from "@/styles/tokens";
-import { getServerTrack } from "@/lib/getServerTrack";
 import { headers } from "next/headers";
 import { getPricingForCountry } from "@/lib/pricing";
 
@@ -96,11 +95,10 @@ function EmptyState() {
 }
 
 export default async function JavaScriptTrickyQuestionsPage() {
-  const track = await getServerTrack();
   const country = (await headers()).get("x-vercel-ip-country");
   const pricing = getPricingForCountry(country);
   const { questions } = await getQuestions({
-    filters: { track, isTricky: true, status: "published" },
+    filters: { track: "javascript", isTricky: true, status: "published" },
     pageSize: 300,
   });
 

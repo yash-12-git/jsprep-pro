@@ -11,7 +11,6 @@ import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
 import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
 import { C } from "@/styles/tokens";
 import { getQuestions } from "@/lib/cachedQueries";
-import { getServerTrack } from "@/lib/getServerTrack";
 import { headers } from "next/headers";
 import { getPricingForCountry } from "@/lib/pricing";
 
@@ -40,6 +39,10 @@ const CATEGORIES = [
   "'this' Binding",
   "Hoisting",
   "Type Coercion",
+  "Array Methods",
+  "Modern JS",
+  "Generators & Iterators",
+  "Prototypes & Inheritance"
 ] as const;
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -48,6 +51,10 @@ const CATEGORY_EMOJI: Record<string, string> = {
   "'this' Binding": "👉",
   Hoisting: "🚀",
   "Type Coercion": "🔀",
+  "Array Methods": "🔢",
+  "Modern JS": "✨",
+  "Generators & Iterators": "🔄",
+  "Prototypes & Inheritance": "🧬",
 };
 
 function slugify(s: string) {
@@ -76,11 +83,10 @@ const faqItems = [
 ];
 
 export default async function JavaScriptOutputQuestionsPage() {
-  const track = await getServerTrack();
   const country = (await headers()).get("x-vercel-ip-country");
   const pricing = getPricingForCountry(country);
   const outputQuestions = await getQuestions({
-    filters: { track, status: "published", type: "output" },
+    filters: { "track": "javascript", status: "published", type: "output" },
     pageSize: 300,
   }).catch(() => ({ questions: [] }));
 

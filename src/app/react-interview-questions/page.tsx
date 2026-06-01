@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { pageMeta } from "@/lib/seo/seo";
 import { C } from "@/styles/tokens";
-import { getServerTrack } from "@/lib/getServerTrack";
 import InterviewQuestionList from "../javascript-interview-questions/QuestionList";
 
 // ─── Static metadata ──────────────────────────────────────────────────────────
@@ -121,7 +120,6 @@ const PREP_TIPS = [
 
 export default async function ReactInterviewQuestionsPage() {
 
-  const track = await getServerTrack();
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -245,7 +243,7 @@ export default async function ReactInterviewQuestionsPage() {
 
         {/* ── Static topic overview (always visible, good for SEO + fallback) ── */}
         <div style={{ marginBottom: "3rem", marginTop: "1rem" }}>
-          <h2 style={h2}>Core {track.charAt(0).toUpperCase() + track.slice(1)} Topics</h2>
+          <h2 style={h2}>Core React Topics</h2>
           <div
             style={{
               display: "grid",
@@ -268,7 +266,7 @@ export default async function ReactInterviewQuestionsPage() {
               </Link>
             ))}
             <Link
-              href={`/topics/${track}`}
+              href={`/topics/react`}
               style={{
                 ...topicCard,
                 gridColumn: "span 1",
@@ -458,7 +456,7 @@ export default async function ReactInterviewQuestionsPage() {
             }}
           >
             Interactive questions with instant feedback. Predict outputs, find
-            bugs, and master {track.charAt(0).toUpperCase() + track.slice(1)}.
+            bugs, and master React.
           </p>
           <div
             style={{

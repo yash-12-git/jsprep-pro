@@ -1,26 +1,19 @@
 export async function submitToIndexNow(urls: string[]) {
   try {
-    const res = await fetch("https://api.indexnow.org/IndexNow", {
+    // Proxy through /api/indexnow — IndexNow API blocks direct browser fetches (CORS)
+    const res = await fetch("/api/indexnow", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        host: "jsprep.pro",
-        key: "67b1fa86f6684ea89e4adc9e8a75645e",
-        keyLocation:
-          "https://jsprep.pro/67b1fa86f6684ea89e4adc9e8a75645e.txt",
-        urlList: urls,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ urls }),
     });
 
-    const text = await res.text();
+    const data = await res.json();
 
-    console.log("IndexNow status:", res.status);
-    console.log("IndexNow response:", text);
+    console.log("IndexNow status:", data.status);
+    console.log("IndexNow response:", data.body);
 
     if (!res.ok) {
-      console.error("❌ IndexNow failed");
+      console.error("❌ IndexNow failed", data);
     } else {
       console.log("✅ IndexNow success");
     }

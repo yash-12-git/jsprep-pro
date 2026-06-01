@@ -449,7 +449,7 @@ The site has 40 topic pages and ~10 blog posts. For a site targeting 50+ high-vo
 | 2 | react interview questions | 60,000 | Hard | Already have page; fix track bug | /react-interview-questions |
 | 3 | javascript closures interview questions | 8,000 | Medium | Create page; linked from main page (404 now) | /javascript-closures-interview-questions |
 | 4 | javascript event loop interview questions | 6,500 | Medium | Create page; linked from main page (404 now) | /javascript-event-loop-interview-questions |
-| 5 | javascript promises interview questions | 5,500 | Medium | Create page | /javascript-promises-interview-questions |
+| 5 | javascript promises interview questions | 5,500 | Medium | Create page | /javascript-promise-interview-questions |
 | 6 | javascript output questions | 5,000 | Low | Fix sitemap, improve page | /javascript-output-questions |
 | 7 | javascript interview questions for 2 years experience | 4,800 | Medium | Create dedicated page | /javascript-interview-questions-2-years-experience |
 | 8 | react hooks interview questions | 4,500 | Medium | Create page; linked (404 now) | /react-hooks-interview-questions |

@@ -8,21 +8,12 @@ import {
 
 import { catToSlug, SITE } from "@/lib/seo/seo";
 
-function toSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/, "")
-    .slice(0, 80);
-}
-
 // Approximate dates pages were last significantly updated.
 // Better than `now` (which makes Google think everything changed on every deploy).
 const DATES = {
   home: new Date("2026-05-01").toISOString(),
   questionsPages: new Date("2026-05-01").toISOString(),
   cheatsheets: new Date("2026-03-01").toISOString(),
-  tools: new Date("2026-04-01").toISOString(),
   topics: new Date("2026-04-01").toISOString(),
   blog: new Date("2026-04-01").toISOString(),
 };
@@ -45,6 +36,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...new Set((theoryResult.questions as any[]).map((q) => q.category)),
   ] as string[];
 
+  // Content-only pages — no interactive tools (sprint, output-quiz, debug-lab,
+  // polyfill-lab, theory) because they are client-rendered shells with no
+  // static content for crawlers.
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: SITE.domain,
@@ -71,10 +65,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.95,
     },
     {
-      url: `${SITE.domain}/javascript-output-questions`,
+      url: `${SITE.domain}/typescript-interview-questions`,
       lastModified: DATES.questionsPages,
       changeFrequency: "weekly",
       priority: 0.95,
+    },
+    {
+      url: `${SITE.domain}/javascript-output-questions`,
+      lastModified: DATES.questionsPages,
+      changeFrequency: "weekly",
+      priority: 0.9,
     },
     {
       url: `${SITE.domain}/javascript-tricky-questions`,
@@ -107,6 +107,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${SITE.domain}/topics/typescript`,
+      lastModified: DATES.topics,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${SITE.domain}/blog/javascript`,
       lastModified: DATES.blog,
       changeFrequency: "weekly",
@@ -119,41 +125,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     {
-      url: `${SITE.domain}/topics/typescript`,
-      lastModified: DATES.topics,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
       url: `${SITE.domain}/blog/typescript`,
       lastModified: DATES.blog,
       changeFrequency: "weekly",
       priority: 0.85,
     },
-    {
-      url: `${SITE.domain}/typescript-interview-questions`,
-      lastModified: DATES.questionsPages,
-      changeFrequency: "weekly",
-      priority: 0.95,
-    },
-    {
-      url: `${SITE.domain}/output-quiz`,
-      lastModified: DATES.tools,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE.domain}/sprint`,
-      lastModified: DATES.tools,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE.domain}/debug-lab`,
-      lastModified: DATES.tools,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
+    // Removed (client-rendered tool pages — no crawlable static content):
+    // /sprint, /output-quiz, /debug-lab, /polyfill-lab, /theory
   ];
 
   const topicPages: MetadataRoute.Sitemap = topicSlugs.map((slug) => ({
@@ -170,12 +148,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }));
 
-  const questionPages: MetadataRoute.Sitemap = questionSlugs.map((slug) => ({
-    url: `${SITE.domain}/q/${slug}`,
-    lastModified: DATES.questionsPages,
-    changeFrequency: "monthly" as const,
-    priority: 0.75,
-  }));
+  // Only theory question pages — output/debug are thin single-question pages
+  // that Bing/Google flag for content quality issues.
+  const theoryQuestionPages: MetadataRoute.Sitemap = questionSlugs
+    .filter(
+      (slug) =>
+        !slug.startsWith("output-") &&
+        !slug.startsWith("ts-output-") &&
+        !slug.startsWith("debug-") &&
+        !slug.startsWith("ts-debug-"),
+    )
+    .map((slug) => ({
+      url: `${SITE.domain}/q/${slug}`,
+      lastModified: DATES.questionsPages,
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
+    }));
 
   const javascriptBlogPages: MetadataRoute.Sitemap = blogPosts
     .filter((post) => post.track === "javascript")
@@ -214,7 +202,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...topicPages,
     ...categoryPages,
-    ...questionPages,
+    ...theoryQuestionPages,
     ...javascriptBlogPages,
     ...reactBlogPages,
     ...typescriptBlogPages,
