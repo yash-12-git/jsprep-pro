@@ -36,9 +36,9 @@ export const TRACKS: TrackConfig[] = [
     label: "TypeScript",
     emoji: "🔷",
     color: "#3178c6",
-    tagline: "Coming soon · Types, generics, utility types",
-    badge: "SOON",
-    available: false,
+    tagline: "100+ questions · Types, generics, utility types",
+    badge: "NEW",
+    available: true,
     questionsPage: "/typescript-interview-questions",
   },
   {

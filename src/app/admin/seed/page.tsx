@@ -33,6 +33,9 @@ import { questions as theoryRaw } from "@/data/questions";
 import { outputQuestions } from "@/data/outputQuestions";
 import { debugQuestions } from "@/data/debugQuestions";
 import { polyfillQuestions } from "@/data/polyfillQuestions";
+import { typescriptQuestions } from "@/data/typescriptQuestions";
+import { typescriptOutputQuestions } from "@/data/typescriptOutputQuestions";
+import { typescriptDebugQuestions } from "@/data/typescriptDebugQuestions";
 import type { QuestionInput } from "@/types/question";
 
 // ─── Difficulty map ────────────────────────────────────────────────────────────
@@ -170,6 +173,93 @@ function buildPolyfillQuestions(): QuestionInput[] {
     stubCode: q.stubCode,
     testCode: q.testCode,
     solutionCode: q.solutionCode,
+  }));
+}
+
+function buildTypescriptTheoryQuestions(): QuestionInput[] {
+  return typescriptQuestions.map((q, i) => ({
+    slug: `ts-${q.id}-${q.q
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 60)}`,
+    type: "theory" as const,
+    track: "typescript" as const,
+    title: q.q,
+    question: q.q,
+    answer: q.answer,
+    hint: q.hint ?? "",
+    explanation: "",
+    keyInsight: "",
+    code: "",
+    category: q.cat,
+    tags: q.tags as string[],
+    difficulty: tagToDifficulty(q.tags),
+    status: "published" as const,
+    isPro: i >= 5,
+    order: i,
+    expectedOutput: "",
+    brokenCode: "",
+    fixedCode: "",
+    bugDescription: "",
+  }));
+}
+
+function buildTypescriptOutputQuestions(): QuestionInput[] {
+  return typescriptOutputQuestions.map((q, i) => ({
+    slug: `ts-output-${q.id}-${q.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .slice(0, 40)}`,
+    type: "output" as const,
+    track: "typescript" as const,
+    title: q.title,
+    question: q.title,
+    answer: `**Explanation:** ${q.explanation}\n\n**Key Insight:** ${q.keyInsight}`,
+    hint: q.keyInsight,
+    explanation: q.explanation,
+    keyInsight: q.keyInsight,
+    code: q.code,
+    category: q.cat,
+    tags: q.tags,
+    difficulty: diffMap(q.difficulty),
+    status: "published" as const,
+    isPro: i >= 5,
+    order: i,
+    expectedOutput: q.answer,
+    brokenCode: "",
+    fixedCode: "",
+    bugDescription: "",
+    companies: q.companies ?? [],
+  }));
+}
+
+function buildTypescriptDebugQuestions(): QuestionInput[] {
+  return typescriptDebugQuestions.map((q, i) => ({
+    slug: `ts-debug-${q.id}-${q.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .slice(0, 40)}`,
+    type: "debug" as const,
+    track: "typescript" as const,
+    title: q.title,
+    question: q.description,
+    answer: `**Bug:** ${q.bugDescription}\n\n**Explanation:** ${q.explanation}\n\n**Key Insight:** ${q.keyInsight}`,
+    hint: q.keyInsight,
+    explanation: q.explanation,
+    keyInsight: q.keyInsight,
+    code: q.brokenCode,
+    category: q.cat,
+    tags: q.tags,
+    difficulty: diffMap(q.difficulty),
+    status: "published" as const,
+    isPro: i >= 5,
+    order: i,
+    expectedOutput: q.expectedOutput,
+    brokenCode: q.brokenCode,
+    fixedCode: q.fixedCode,
+    bugDescription: q.bugDescription,
+    companies: q.companies ?? [],
   }));
 }
 
@@ -390,7 +480,11 @@ export default function SeedPage() {
   const outputQs = buildOutputQuestions();
   const debugQs = buildDebugQuestions();
   const polyfillQs = buildPolyfillQuestions();
+  const tsTheoryQs = buildTypescriptTheoryQuestions();
+  const tsOutputQs = buildTypescriptOutputQuestions();
+  const tsDebugQs = buildTypescriptDebugQuestions();
   const totalQs = debugQs.length + outputQs.length + theoryQs.length + polyfillQs.length;
+  const totalTsQs = tsTheoryQs.length + tsOutputQs.length + tsDebugQs.length;
 
   function addLog(type: LogEntry["type"], text: string) {
     setLog((prev) => [...prev, { type, text }]);
@@ -544,6 +638,37 @@ export default function SeedPage() {
     } finally {
       setSeeding(false);
       setEmbedding(false);
+    }
+  }
+
+  // ── TypeScript seed (separate from React seed to avoid duplicates) ─────────
+
+  const [seedingTs, setSeedingTs] = useState(false);
+  const [tsLog, setTsLog] = useState<LogEntry[]>([]);
+  const [doneTs, setDoneTs] = useState<Record<string, number>>({});
+
+  function addTsLog(type: LogEntry["type"], text: string) {
+    setTsLog((prev) => [...prev, { type, text }]);
+  }
+
+  async function handleSeedTypescript() {
+    if (!user) return;
+    setSeedingTs(true);
+    setTsLog([]);
+    setDoneTs({});
+    try {
+      addTsLog("info", `Starting TypeScript seed as ${user.email}`);
+      addTsLog("info", `Total: ${totalTsQs} TypeScript questions`);
+      addTsLog("info", "─────────────────────────────");
+      await seedBatch(tsTheoryQs, "TS-Theory", "#3178c6");
+      await seedBatch(tsOutputQs, "TS-Output", "#3178c6");
+      await seedBatch(tsDebugQs, "TS-Debug", "#3178c6");
+      addTsLog("info", "─────────────────────────────");
+      addTsLog("success", `TypeScript seed complete! ${totalTsQs} questions in Firestore.`);
+    } catch (e: any) {
+      addTsLog("error", `Error: ${e.message}`);
+    } finally {
+      setSeedingTs(false);
     }
   }
 
@@ -859,6 +984,64 @@ Index 4:  status ASC + category ASC + order ASC`}
           feature requires embeddings on all output + debug questions.
         </li>
       </ol>
+
+      <hr css={S.divider} />
+
+      {/* ── TypeScript Questions Section ──────────────────────────────────── */}
+      <div css={S.sectionTitle}>TypeScript Questions (separate seed)</div>
+      <p style={{ fontSize: "0.875rem", color: C.muted, marginBottom: "1.25rem", lineHeight: 1.7 }}>
+        Seed TypeScript-track questions independently. These are separate from the React questions above.
+        Run once — use Clear All first if re-seeding.
+      </p>
+
+      <div css={S.grid}>
+        {[
+          { label: "TS Theory", count: tsTheoryQs.length, icon: BookOpen, color: "#3178c6", desc: "Type system, generics, utility types", key: "TS-Theory" },
+          { label: "TS Output", count: tsOutputQs.length, icon: Code2, color: "#3178c6", desc: "Type inference & resolution questions", key: "TS-Output" },
+          { label: "TS Debug", count: tsDebugQs.length, icon: Bug, color: "#3178c6", desc: "Find & fix TypeScript type errors", key: "TS-Debug" },
+        ].map(({ label, count, icon: Icon, color, desc, key }) => (
+          <div key={key} css={S.dataCard(color, !!doneTs[key])}>
+            <div css={S.dataIcon(color)}>
+              <Icon size={16} color={color} />
+            </div>
+            <div css={S.dataTitle}>{label}</div>
+            <div css={S.dataCount(color)}>{count}</div>
+            <div css={S.dataMeta}>{desc}</div>
+            {doneTs[key] && (
+              <div css={S.doneBadge(color)}>
+                <CheckCircle2 size={9} /> Imported
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <button
+        css={S.seedBtn(seedingTs)}
+        onClick={handleSeedTypescript}
+        disabled={seedingTs || seeding || clearing}
+        style={{ background: seedingTs ? "#3178c680" : "#3178c6" }}
+      >
+        {seedingTs ? (
+          <><Loader2 size={16} css={{ animation: "spin 1s linear infinite" }} /> Seeding TypeScript…</>
+        ) : (
+          <><Database size={16} /> Seed {totalTsQs} TypeScript Questions</>
+        )}
+      </button>
+
+      {tsLog.length > 0 && (
+        <div css={S.log}>
+          {tsLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
+          ))}
+          {seedingTs && (
+            <div css={S.logLine("info")}>
+              <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.375rem" }} />
+              running…
+            </div>
+          )}
+        </div>
+      )}
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>

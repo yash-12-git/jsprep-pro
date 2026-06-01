@@ -119,6 +119,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     {
+      url: `${SITE.domain}/topics/typescript`,
+      lastModified: DATES.topics,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE.domain}/blog/typescript`,
+      lastModified: DATES.blog,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${SITE.domain}/typescript-interview-questions`,
+      lastModified: DATES.questionsPages,
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
+    {
       url: `${SITE.domain}/output-quiz`,
       lastModified: DATES.tools,
       changeFrequency: "monthly",
@@ -181,6 +199,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
+  const typescriptBlogPages: MetadataRoute.Sitemap = blogPosts
+    .filter((post) => post.track === "typescript")
+    .map((post) => ({
+      url: `${SITE.domain}/blog/typescript/${post.slug}`,
+      lastModified: new Date(
+        post.modifiedAt ?? post.publishedAt ?? now,
+      ).toISOString(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
+
   return [
     ...staticPages,
     ...topicPages,
@@ -188,5 +217,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...questionPages,
     ...javascriptBlogPages,
     ...reactBlogPages,
+    ...typescriptBlogPages,
   ];
 }

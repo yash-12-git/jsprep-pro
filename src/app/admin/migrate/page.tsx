@@ -18,9 +18,10 @@ import { seedBlogPostsFromArray } from "@/lib/blogPosts";
 
 // ── Import static data ────────────────────────────────────────────────────────
 import { TOPICS as STATIC_TOPICS } from "@/data/seo/topics";
-import { BLOG_POSTS as STATIC_POSTS, REACT_BLOG_POSTS } from "@/data/seo/blogPosts";
+import { BLOG_POSTS as STATIC_POSTS, REACT_BLOG_POSTS, TYPESCRIPT_BLOG_POSTS } from "@/data/seo/blogPosts";
 import { REACT_TOPICS } from "@/data/seo/reactTopics";
-import { revalidateTopics } from "@/lib/adminRevalidate";
+import { TYPESCRIPT_TOPICS } from "@/data/seo/typescriptTopics";
+import { revalidateBlogPosts, revalidateTopics } from "@/lib/adminRevalidate";
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -227,6 +228,8 @@ interface DoneState {
   blogs?: boolean;
   reactTopics?: boolean;
   reactBlogs?: boolean;
+  tsTopics?: boolean;
+  tsBlogs?: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -238,10 +241,14 @@ export default function MigratePage() {
   const [migratingJs, setMigratingJs] = useState(false);
   const [migratingReact, setMigratingReact] = useState(false);
   const [migratingReactBlogs, setMigratingReactBlogs] = useState(false);
+  const [migratingTs, setMigratingTs] = useState(false);
+  const [migratingTsBlogs, setMigratingTsBlogs] = useState(false);
   const [done, setDone] = useState<DoneState>({});
   const [jsLog, setJsLog] = useState<LogEntry[]>([]);
   const [reactLog, setReactLog] = useState<LogEntry[]>([]);
   const [reactBlogsLog, setReactBlogsLog] = useState<LogEntry[]>([]);
+  const [tsLog, setTsLog] = useState<LogEntry[]>([]);
+  const [tsBlogsLog, setTsBlogsLog] = useState<LogEntry[]>([]);
 
   function addJsLog(type: LogEntry["type"], text: string) {
     setJsLog((prev) => [...prev, { type, text }]);
@@ -251,6 +258,12 @@ export default function MigratePage() {
   }
   function addReactBlogsLog(type: LogEntry["type"], text: string) {
     setReactBlogsLog((prev) => [...prev, { type, text }]);
+  }
+  function addTsLog(type: LogEntry["type"], text: string) {
+    setTsLog((prev) => [...prev, { type, text }]);
+  }
+  function addTsBlogsLog(type: LogEntry["type"], text: string) {
+    setTsBlogsLog((prev) => [...prev, { type, text }]);
   }
 
   // ── Section A: JS topics + blog posts (legacy, run once) ─────────────────
@@ -291,7 +304,7 @@ export default function MigratePage() {
       postErrors.forEach((e) => addJsLog("error", `  ✗ ${e}`));
       addJsLog("success", `  ✓ ${postsCreated} blog posts written to Firestore`);
       setDone((prev) => ({ ...prev, blogs: true }));
-
+      await revalidateTopics();
       addJsLog("info", "─────────────────────────────────────────────────");
       addJsLog("success", `🎉 Done! ${topicsCreated} topics + ${postsCreated} posts in Firestore.`);
       addJsLog("warn", "Next: open /admin/blog and set topicSlug on each post.");
@@ -316,7 +329,7 @@ export default function MigratePage() {
       errors.forEach((e) => addReactLog("error", `  ✗ ${e}`));
       addReactLog("success", `  ✓ ${created} React topics written to Firestore`);
       setDone((prev) => ({ ...prev, reactTopics: true }));
-      await revalidateTopics()
+      await revalidateTopics();
       addReactLog("info", "─────────────────────────────────────────────────");
       addReactLog("success", "🎉 Done! Verify at /topics/react");
       addReactLog("warn", "If a shell topic already existed for this slug, delete the old one in Firebase Console → Firestore → topics.");
@@ -324,6 +337,59 @@ export default function MigratePage() {
       addReactLog("error", `❌ ${e.message}`);
     } finally {
       setMigratingReact(false);
+    }
+  }
+
+  // ── Section D: TypeScript topics ─────────────────────────────────────────
+  async function handleMigrateTs() {
+    if (!user) return;
+    setMigratingTs(true);
+    setTsLog([]);
+    try {
+      addTsLog("info", `── Migrating ${TYPESCRIPT_TOPICS.length} TypeScript topics ──────────────`);
+      TYPESCRIPT_TOPICS.forEach((t) => addTsLog("info", `  · ${t.slug}`));
+      const { created, errors } = await seedTopicsFromArray(TYPESCRIPT_TOPICS, user.uid);
+      errors.forEach((e) => addTsLog("error", `  ✗ ${e}`));
+      addTsLog("success", `  ✓ ${created} TypeScript topics written to Firestore`);
+      setDone((prev) => ({ ...prev, tsTopics: true }));
+      await revalidateTopics();
+      addTsLog("info", "─────────────────────────────────────────────────");
+      addTsLog("success", "🎉 Done! Verify at /topics/typescript");
+      addTsLog("warn", "If a shell topic already existed for this slug, delete it in Firebase Console first.");
+    } catch (e: any) {
+      addTsLog("error", `❌ ${e.message}`);
+    } finally {
+      setMigratingTs(false);
+    }
+  }
+
+  // ── Section E: TypeScript blog posts ─────────────────────────────────────
+  async function handleMigrateTsBlogs() {
+    if (!user) return;
+    setMigratingTsBlogs(true);
+    setTsBlogsLog([]);
+    try {
+      addTsBlogsLog("info", `── Migrating ${TYPESCRIPT_BLOG_POSTS.length} TypeScript blog posts ──────────`);
+      TYPESCRIPT_BLOG_POSTS.forEach((p) => addTsBlogsLog("info", `  · ${p.slug}`));
+      const postsToSeed = TYPESCRIPT_BLOG_POSTS.map((p) => ({
+        ...p,
+        status: "published" as const,
+        topicSlug: "",
+        relatedTopicSlugs: [] as string[],
+        questionCategories: [] as string[],
+      }));
+      const { created, errors } = await seedBlogPostsFromArray(postsToSeed, user.uid);
+      errors.forEach((e) => addTsBlogsLog("error", `  ✗ ${e}`));
+      addTsBlogsLog("success", `  ✓ ${created} TypeScript blog posts written to Firestore`);
+      setDone((prev) => ({ ...prev, tsBlogs: true }));
+      addTsBlogsLog("info", "─────────────────────────────────────────────────");
+      addTsBlogsLog("success", "🎉 Done! Verify at /blog/typescript");
+      await revalidateBlogPosts();
+      addTsBlogsLog("warn", "Next: open /admin/blog and set topicSlug on each post.");
+    } catch (e: any) {
+      addTsBlogsLog("error", `❌ ${e.message}`);
+    } finally {
+      setMigratingTsBlogs(false);
     }
   }
 
@@ -351,6 +417,7 @@ export default function MigratePage() {
       setDone((prev) => ({ ...prev, reactBlogs: true }));
       addReactBlogsLog("info", "─────────────────────────────────────────────────");
       addReactBlogsLog("success", "🎉 Done! Verify at /blog/react");
+      await revalidateBlogPosts();
       addReactBlogsLog("warn", "Next: open /admin/blog and set topicSlug on each post.");
     } catch (e: any) {
       addReactBlogsLog("error", `❌ ${e.message}`);
@@ -581,6 +648,147 @@ export default function MigratePage() {
             <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
           ))}
           {migratingReactBlogs && (
+            <div css={S.logLine("info")}>
+              <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.25rem" }} />
+              running…
+            </div>
+          )}
+        </div>
+      )}
+
+      <hr css={S.divider} />
+
+      <hr css={S.divider} />
+
+      {/* ── SECTION D: TypeScript Topics ───────────────────────────────────── */}
+      <div css={S.sectionTitle}>Section D — TypeScript Topics (Full Concept Hub)</div>
+      <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
+        TypeScript topics with Mental Model, Deep Explanation, Cheat Sheet, and Interview Tips.
+        Add topics to <code style={{ color: C.accent3 }}>src/data/seo/typescriptTopics.ts</code>,
+        then run this to seed them.
+      </p>
+
+      <div css={S.grid}>
+        <div css={S.card("#3178c6", !!done.tsTopics)}>
+          <div css={S.cardIcon("#3178c6")}>
+            <Layers size={16} color="#3178c6" />
+          </div>
+          <div css={S.cardTitle}>TypeScript Topics</div>
+          <div css={S.cardCount("#3178c6")}>{TYPESCRIPT_TOPICS.length}</div>
+          <div css={S.cardMeta}>
+            {TYPESCRIPT_TOPICS.map((t) => t.keyword).join(", ")}
+          </div>
+          {done.tsTopics && (
+            <div css={S.doneBadge}>
+              <CheckCircle2 size={9} /> Migrated
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div css={S.warningBox}>
+        <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+        <span>
+          <strong>Check for existing shells first.</strong> Delete any existing Firestore docs
+          with the same slugs before running to avoid duplicates.
+        </span>
+      </div>
+
+      {done.tsTopics && (
+        <div css={S.successBox}>
+          <CheckCircle2 size={18} />
+          TypeScript topics seeded! Verify at{" "}
+          <a href="/topics/typescript" style={{ color: C.accent3 }}>/topics/typescript</a>
+        </div>
+      )}
+
+      <button
+        css={S.migrateBtn(migratingTs)}
+        onClick={handleMigrateTs}
+        disabled={migratingTs}
+      >
+        {migratingTs ? (
+          <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Seeding TypeScript Topics…</>
+        ) : (
+          <><Database size={16} /> Seed {TYPESCRIPT_TOPICS.length} TypeScript Topics</>
+        )}
+      </button>
+
+      {tsLog.length > 0 && (
+        <div css={S.log}>
+          {tsLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
+          ))}
+          {migratingTs && (
+            <div css={S.logLine("info")}>
+              <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.25rem" }} />
+              running…
+            </div>
+          )}
+        </div>
+      )}
+
+      <hr css={S.divider} />
+
+      {/* ── SECTION E: TypeScript Blog Posts ───────────────────────────────── */}
+      <div css={S.sectionTitle}>Section E — TypeScript Blog Posts</div>
+      <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
+        10 TypeScript interview blog posts (track: typescript). After seeding, set{" "}
+        <code style={{ color: C.accent3 }}>topicSlug</code> on each post via Admin → Blog.
+      </p>
+
+      <div css={S.grid}>
+        <div css={S.card("#3178c6", !!done.tsBlogs)}>
+          <div css={S.cardIcon("#3178c6")}>
+            <Newspaper size={16} color="#3178c6" />
+          </div>
+          <div css={S.cardTitle}>TypeScript Blog Posts</div>
+          <div css={S.cardCount("#3178c6")}>{TYPESCRIPT_BLOG_POSTS.length}</div>
+          <div css={S.cardMeta}>
+            {TYPESCRIPT_BLOG_POSTS.map((p) => p.slug).join(", ")}
+          </div>
+          {done.tsBlogs && (
+            <div css={S.doneBadge}>
+              <CheckCircle2 size={9} /> Migrated
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div css={S.warningBox}>
+        <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+        <span>
+          <strong>Run once only.</strong> Check{" "}
+          <code style={{ color: C.accent2 }}>blog_posts</code> in Firebase Console first.
+        </span>
+      </div>
+
+      {done.tsBlogs && (
+        <div css={S.successBox}>
+          <CheckCircle2 size={18} />
+          TypeScript blog posts seeded! Verify at{" "}
+          <a href="/blog/typescript" style={{ color: C.accent3 }}>/blog/typescript</a>
+        </div>
+      )}
+
+      <button
+        css={S.migrateBtn(migratingTsBlogs)}
+        onClick={handleMigrateTsBlogs}
+        disabled={migratingTsBlogs}
+      >
+        {migratingTsBlogs ? (
+          <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Seeding TypeScript Blogs…</>
+        ) : (
+          <><Database size={16} /> Seed {TYPESCRIPT_BLOG_POSTS.length} TypeScript Blog Posts</>
+        )}
+      </button>
+
+      {tsBlogsLog.length > 0 && (
+        <div css={S.log}>
+          {tsBlogsLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
+          ))}
+          {migratingTsBlogs && (
             <div css={S.logLine("info")}>
               <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.25rem" }} />
               running…

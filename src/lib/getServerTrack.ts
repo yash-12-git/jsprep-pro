@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import type { Track } from "@/contexts/TrackContext";
 
-const AVAILABLE_TRACKS: Track[] = ["javascript", "react"];
+const AVAILABLE_TRACKS: Track[] = ["javascript", "react", "typescript", "system-design"];
 
 export async function getServerTrack(): Promise<Track> {
   const cookieStore = await cookies();

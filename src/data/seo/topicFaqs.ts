@@ -1639,6 +1639,306 @@ export const REACT_TOPIC_FAQS: Record<string, FAQItem[]> = {
         "Keep state as local as possible and only promote it up the tree when you have a concrete reason. If one component needs it, use useState locally. If siblings need to share it, lift it to their nearest common ancestor. If many disconnected components need it and it changes rarely, use Context. If it changes frequently across many components, use an external store. Never add a state management library before identifying a concrete problem it solves.",
     },
   ],
+
+  "typescript-types-vs-interfaces-interview-questions": [
+    {
+      question: "What is the difference between type and interface in TypeScript?",
+      answer:
+        "Both describe object shapes and are mostly interchangeable for that purpose. Interfaces support declaration merging — declaring the same interface name twice merges both definitions. Type aliases support unions, intersections, conditional types, mapped types, and template literal types. The TypeScript team recommends interface for object/class contracts and type for complex compositions involving union or transformation.",
+    },
+    {
+      question: "Can an interface extend a type alias in TypeScript?",
+      answer:
+        "Yes, an interface can extend a type alias using the extends keyword, as long as the type alias resolves to an object type. Conversely, a type alias can include an interface via intersection: type Admin = User & { role: string }. Both approaches produce structurally equivalent results, though interface extension provides better error messages for property conflicts.",
+    },
+    {
+      question: "What is declaration merging and why does it matter?",
+      answer:
+        "Declaration merging allows you to declare the same interface name multiple times and TypeScript merges all declarations into a single type. This is the mechanism behind module augmentation — extending third-party library types by declaring the module and adding properties to existing interfaces. Type aliases cannot be merged; attempting to declare the same type name twice is an error.",
+    },
+    {
+      question: "When does TypeScript infer a type as an interface vs a type alias?",
+      answer:
+        "TypeScript does not distinguish between the two at the structural level — a value satisfying one can be used where the other is expected. The distinction matters only for declaration merging (interface only), mapped and conditional transformations (type only), and error message quality. In hover tooltips and error messages, interfaces often show the name while complex type aliases expand to their full definition.",
+    },
+    {
+      question: "Is there a performance difference between type and interface in TypeScript?",
+      answer:
+        "For simple object shapes, interfaces are slightly more efficient because they are cached by name in the type checker, while complex type aliases may be re-evaluated. For most real-world code the difference is negligible. The TypeScript team's advice is to prefer interface for objects used across large type hierarchies, but this is a micro-optimization that should not drive everyday decisions.",
+    },
+    {
+      question: "Which should you default to: type or interface?",
+      answer:
+        "Default to interface for object types, classes, and public API contracts — it reads naturally as a contract and supports merging. Default to type for unions, intersections, utility type derivations, function signatures, and tuple types — things interface cannot express. If you start with interface and hit a limitation, switching to type is always an option.",
+    },
+  ],
+
+  "typescript-generics-interview-questions": [
+    {
+      question: "What are TypeScript generics and why are they useful?",
+      answer:
+        "Generics are type parameters that make components work over many types while preserving type safety. Without generics you must choose between too-restrictive (works only for number[]) or too-permissive (accepts any[] and loses type information). A generic like first<T>(arr: T[]): T works for any array and the compiler tracks exactly which type flows through — giving full autocomplete and error detection.",
+    },
+    {
+      question: "How do you constrain a generic type parameter in TypeScript?",
+      answer:
+        "Use the extends keyword: function getLength<T extends { length: number }>(x: T). This means T must structurally satisfy the constraint — it must have a length property of type number. TypeScript will reject any type argument that does not satisfy the constraint. Multiple constraints can be combined with intersection: T extends Serializable & Validatable.",
+    },
+    {
+      question: "What is the difference between a generic constraint and a generic default?",
+      answer:
+        "A constraint (T extends U) limits what types can be used as T — all callers must provide a type that satisfies the constraint. A default (T = U) provides a fallback type when the caller does not explicitly provide one — TypeScript infers or uses the default. Both can be combined: T extends string = string means T must be a string type, defaulting to the base string if not specified.",
+    },
+    {
+      question: "What is the infer keyword in TypeScript generics?",
+      answer:
+        "infer is used inside conditional types to capture a type extracted from another type. type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never — infer R captures the return type of T if T is a function. Without infer, you could not write utility types that extract inner types. infer is the mechanism behind ReturnType, Parameters, InstanceType, and Awaited.",
+    },
+    {
+      question: "How does TypeScript infer generic type parameters?",
+      answer:
+        "TypeScript infers type parameters from function arguments at the call site. When you call identity(42), TypeScript infers T = number from the argument. When inference is ambiguous or insufficient, you can provide explicit type arguments: identity<number>(42). TypeScript also infers from return type context and assignment targets in some cases.",
+    },
+    {
+      question: "What is a higher-kinded type and does TypeScript support it?",
+      answer:
+        "Higher-kinded types (HKTs) are type constructors that abstract over other type constructors — essentially generics over generics. TypeScript does not natively support HKTs. Common workarounds include encoding them through interface merging (as in fp-ts), using conditional types to simulate them, or restructuring the problem to avoid needing them. Libraries like Effect and fp-ts use advanced encoding patterns to approximate HKTs.",
+    },
+  ],
+
+  "typescript-utility-types-interview-questions": [
+    {
+      question: "What are TypeScript utility types?",
+      answer:
+        "Utility types are built-in generic types that transform other types. They are implemented using mapped types, conditional types, and keyof internally — you could write them yourself, but TypeScript ships them in the standard library. The most commonly used are Partial<T>, Required<T>, Readonly<T>, Pick<T,K>, Omit<T,K>, Record<K,V>, Exclude<T,U>, Extract<T,U>, NonNullable<T>, ReturnType<T>, and Parameters<T>.",
+    },
+    {
+      question: "What is the difference between Partial and Required?",
+      answer:
+        "Partial<T> makes every property in T optional by adding ? to each key. Required<T> does the opposite — it removes the optional marker from every property, making all of them required. Both are shallow — they only affect the top level of the type. For deep optionality or deep required, you need a recursive custom utility type like DeepPartial<T>.",
+    },
+    {
+      question: "When would you use Record over an index signature?",
+      answer:
+        "Record<K, V> is preferred when the set of keys is a known union of literals — Record<'active'|'inactive', number> ensures all specified keys are present and have the right type. An index signature { [key: string]: V } allows any string key and makes no guarantee about presence. Record produces a more precise type when you know the exact keys upfront.",
+    },
+    {
+      question: "How do you combine multiple utility types?",
+      answer:
+        "Utility types compose naturally since they all produce types. type Patch = Required<Pick<User, 'id'>> & Partial<Omit<User, 'id'>> creates a patch type where id is required and all other fields are optional. Combining Awaited with ReturnType extracts the resolved value type of async functions. Complex transformations can be broken into named intermediate types for readability.",
+    },
+    {
+      question: "What does NonNullable<T> do and when do you need it?",
+      answer:
+        "NonNullable<T> removes null and undefined from T, producing the non-nullable version. NonNullable<string | null | undefined> is string. It is useful when you receive a potentially null value (from an optional prop, a database query, or a Map lookup) and need to pass it to a function that expects a definite value. With strictNullChecks enabled, TypeScript enforces these distinctions.",
+    },
+  ],
+
+  "typescript-type-guards-narrowing-interview-questions": [
+    {
+      question: "What is type narrowing in TypeScript?",
+      answer:
+        "Type narrowing is the process by which TypeScript refines the type of a variable within a conditional block based on runtime checks. After if (typeof x === 'string'), TypeScript knows x is string inside the block. Narrowing techniques include typeof, instanceof, the in operator, equality checks against literal values, discriminated union switches, and custom type predicates.",
+    },
+    {
+      question: "What is the difference between a type guard and a type assertion?",
+      answer:
+        "A type guard is a runtime check that TypeScript recognizes and uses to narrow the type — typeof, instanceof, and type predicate functions. A type assertion (as Type) is a compile-time instruction that overrides TypeScript's type checking without any runtime validation. Type guards are safe; assertions can lie to the compiler and cause runtime errors if the actual value does not match.",
+    },
+    {
+      question: "How do you write a custom type predicate function in TypeScript?",
+      answer:
+        "Annotate the return type as parameterName is Type: function isUser(val: unknown): val is User { return typeof val === 'object' && val !== null && 'id' in val && 'name' in val }. When this function returns true, TypeScript narrows the parameter to User in the calling scope. The runtime checks inside the function are your responsibility — TypeScript trusts the predicate annotation.",
+    },
+    {
+      question: "What is a discriminated union and how does it help with narrowing?",
+      answer:
+        "A discriminated union has a shared literal property (the discriminant) across all union members. TypeScript uses this property to narrow the type in switch or if statements. type Result = { status: 'ok'; data: User } | { status: 'error'; message: string } — checking result.status === 'ok' narrows result to the first member, giving type-safe access to data.",
+    },
+    {
+      question: "What does the never type tell you about exhaustiveness?",
+      answer:
+        "After narrowing through all members of a discriminated union, the remaining type is never. Assigning to a variable typed as never in the default case acts as an exhaustiveness check — if you add a new union member without handling it, TypeScript cannot assign the new member to never and reports an error. This pattern ensures switch statements are always kept up to date with the union definition.",
+    },
+    {
+      question: "What is an assertion function in TypeScript?",
+      answer:
+        "An assertion function has the return type annotation asserts condition or asserts parameterName is Type. It throws if the condition is false and TypeScript narrows the type for all code after the call. function assertDefined<T>(val: T | null): asserts val is T — after calling assertDefined(user), TypeScript knows user is T for the rest of the scope, without needing an explicit if block.",
+    },
+  ],
+
+  "typescript-union-intersection-types-interview-questions": [
+    {
+      question: "What is a union type in TypeScript?",
+      answer:
+        "A union type (A | B) means a value can be one of the listed types. TypeScript only allows operations that are valid for every member of the union — accessing a property only on one member requires narrowing first. Unions are the foundation of discriminated unions, optional function parameters, and function overloads that return different types based on input.",
+    },
+    {
+      question: "What is an intersection type in TypeScript?",
+      answer:
+        "An intersection type (A & B) combines multiple types into one that must satisfy all of them simultaneously. type Admin = User & { permissions: string[] } creates a type with all User properties plus the permissions array. Intersection is used to mix in behaviors, merge configurations, and create composite types without inheritance.",
+    },
+    {
+      question: "What happens when you intersect two types that have conflicting properties?",
+      answer:
+        "If two intersected types have the same property name but different types, the intersection of that property becomes the intersection of both types. For primitive types like string and number, the result is never — no value can be both. For object types, the properties merge. This is why type intersection sometimes silently creates never properties that cause confusing errors downstream.",
+    },
+    {
+      question: "What is the difference between union narrowing and intersection?",
+      answer:
+        "A union expands the set of possible types — a variable can be any one of the listed options. Narrowing reduces that set at a point in code based on a runtime check. An intersection contracts the required type — the value must satisfy all constraints simultaneously. Union is about OR; intersection is about AND; narrowing is about progressively proving which branch of a union you are in.",
+    },
+    {
+      question: "How do you discriminate a union in TypeScript?",
+      answer:
+        "Add a shared literal property with a unique value to each union member. TypeScript uses this discriminant property to narrow the union in conditional blocks. The discriminant must be a literal type (a specific string, number, or boolean value), not just any string. Using a switch statement on the discriminant is the idiomatic TypeScript pattern for processing discriminated unions.",
+    },
+  ],
+
+  "typescript-classes-access-modifiers-interview-questions": [
+    {
+      question: "What are the access modifiers in TypeScript?",
+      answer:
+        "TypeScript has four access modifiers: public (accessible everywhere, the default), private (accessible only within the class body), protected (accessible within the class and all subclasses), and readonly (prevents reassignment after initialization, can be combined with any access modifier). TypeScript's private is erased at compile time. The ECMAScript # private fields syntax provides genuine runtime privacy.",
+    },
+    {
+      question: "What is the difference between TypeScript private and JavaScript # private?",
+      answer:
+        "TypeScript's private keyword is a compile-time check only — at runtime the property is fully accessible via JavaScript. The # prefix (ES private fields) is enforced by the JavaScript engine: accessing a # field outside the class body throws a TypeError at runtime. Use # when genuine runtime privacy is required, such as in libraries where consumers may bypass TypeScript.",
+    },
+    {
+      question: "What is an abstract class in TypeScript?",
+      answer:
+        "An abstract class cannot be instantiated directly — it serves as a base class that subclasses must extend. Abstract methods declared inside it (with the abstract keyword and no body) must be implemented by all concrete subclasses. Abstract classes can contain both abstract methods and concrete implementations with shared logic, which is not possible with interfaces.",
+    },
+    {
+      question: "What is the parameter property shorthand in TypeScript?",
+      answer:
+        "Parameter properties let you declare and initialize class fields directly in the constructor signature: constructor(private name: string, readonly id: number) declares both fields and assigns them from the arguments in one line. Without this shorthand, you would need to declare the field, add the constructor parameter, and write the assignment separately — three steps reduced to one.",
+    },
+    {
+      question: "What does the override keyword do in TypeScript?",
+      answer:
+        "The override keyword, introduced in TypeScript 4.3, marks a method as intentionally overriding a parent class method. TypeScript errors if the parent class does not have a method with that name or if the signature is incompatible. This prevents silent bugs when a parent method is renamed — without override, the child method becomes an unrelated new method rather than an override.",
+    },
+    {
+      question: "What is the difference between an abstract class and an interface?",
+      answer:
+        "An abstract class can contain implemented methods, constructors, instance fields, and access modifiers — it is a partial implementation. An interface is purely structural and contains no implementation. A class can implement multiple interfaces but extend only one abstract class. Use an interface when defining a contract; use an abstract class when sharing implementation across subclasses.",
+    },
+  ],
+
+  "typescript-enums-interview-questions": [
+    {
+      question: "What is a TypeScript enum?",
+      answer:
+        "An enum is a named set of related constants that can be numeric or string-based. Numeric enums auto-increment from 0 by default and support reverse mapping (looking up the name by value). String enums require an explicit value for each member and do not have reverse mapping. Enums compile to JavaScript objects that exist at runtime, unlike most TypeScript constructs.",
+    },
+    {
+      question: "What is the problem with numeric enums in TypeScript?",
+      answer:
+        "Numeric enums are not type-safe: TypeScript accepts any number where a numeric enum is expected, not just the declared members. Direction.Up is 0, but TypeScript also accepts 99 as a Direction. This is a known design decision but surprises developers expecting strict enum safety. String enums do not have this problem — only declared string members are accepted.",
+    },
+    {
+      question: "What is a const enum and when should you avoid it?",
+      answer:
+        "A const enum is fully erased at compile time — every usage is replaced with the literal value and no JavaScript object is emitted. This reduces bundle size but prevents any runtime access to the enum. Const enums should be avoided in library code published to consumers, because isolatedModules compilation (used by Babel, esbuild, and Vite) cannot inline const enums from external declaration files.",
+    },
+    {
+      question: "What is the recommended alternative to TypeScript enums?",
+      answer:
+        "The most versatile alternative is a const object with as const combined with a derived union type: const Status = { Active: 'ACTIVE', Inactive: 'INACTIVE' } as const; type Status = typeof Status[keyof typeof Status]. This provides dot-notation access, string literal union type safety, no runtime overhead beyond the object, no reverse mapping surprises, and compatibility with string literals directly.",
+    },
+    {
+      question: "Can you add methods to a TypeScript enum?",
+      answer:
+        "Standard TypeScript enums cannot have methods. If you need behavior associated with enumerated values, use a class with static readonly members, a const object combined with helper functions, or a discriminated union. For rich enum-like patterns with methods, some developers use a class with a private constructor and static instances — the Value Object pattern.",
+    },
+  ],
+
+  "typescript-mapped-types-interview-questions": [
+    {
+      question: "What is a mapped type in TypeScript?",
+      answer:
+        "A mapped type creates a new type by iterating over the keys of an existing type: { [K in keyof T]: NewType }. K takes on each key of T in turn and the expression defines the type for that key in the output. Mapped types are the foundation of Partial, Required, Readonly, and Record — all four are implemented as mapped types in TypeScript's standard library.",
+    },
+    {
+      question: "How do you add or remove the optional modifier in a mapped type?",
+      answer:
+        "Use +? to add optionality and -? to remove it. The + is implicit by default. type Required<T> = { [K in keyof T]-?: T[K] } removes the optional flag from every property. type Partial<T> = { [K in keyof T]?: T[K] } adds it. Similarly, +readonly and -readonly control the readonly modifier.",
+    },
+    {
+      question: "What is key remapping in TypeScript mapped types?",
+      answer:
+        "Key remapping uses the as clause to transform key names: { [K in keyof T as NewKeyType]: T[K] }. Combined with template literal types, it can generate getter/setter names from property names. Using never as the remapped key filters that key from the output entirely — enabling a PickByValue pattern that keeps only keys whose values match a condition.",
+    },
+    {
+      question: "How do mapped types enable homomorphic transformations?",
+      answer:
+        "A mapped type is homomorphic when it maps over keyof T — it preserves the optionality and readonly modifiers of the original type's properties unless explicitly overridden. Partial<T>, Readonly<T>, and Required<T> are all homomorphic. A mapped type that maps over a hard-coded union like { [K in 'a'|'b']: number } is not homomorphic and always produces required, mutable properties.",
+    },
+    {
+      question: "What is the difference between a mapped type and an index signature?",
+      answer:
+        "An index signature { [key: string]: V } allows any string key and makes no guarantees about which specific keys exist. A mapped type { [K in keyof T]: NewType } iterates over exactly the known keys of T, preserving their names and modifiers. Mapped types are precise and closed; index signatures are open and dynamic. TypeScript treats them differently in narrowing, compatibility checking, and error messages.",
+    },
+  ],
+
+  "typescript-conditional-types-interview-questions": [
+    {
+      question: "What are conditional types in TypeScript?",
+      answer:
+        "Conditional types use the form T extends U ? X : Y — if type T is assignable to U, the result is X, otherwise Y. They enable type-level computation and are the mechanism behind utility types like NonNullable<T>, ReturnType<T>, Awaited<T>, and Exclude<T,U>. Conditional types are lazily resolved — TypeScript defers evaluation when the type argument is not yet fully known.",
+    },
+    {
+      question: "What is distributive behavior in conditional types?",
+      answer:
+        "When a conditional type has a naked type parameter (T, not [T]), TypeScript distributes the condition over each member of a union. type ToArray<T> = T extends any ? T[] : never — applying this to string | number produces string[] | number[]. To prevent distribution and treat the union as a whole, wrap both sides in brackets: [T] extends [any] ? T[] : never.",
+    },
+    {
+      question: "How does infer work in conditional types?",
+      answer:
+        "infer declares a new type variable inside the extends clause of a conditional type and captures the type at that position. type FirstArg<T> = T extends (first: infer A, ...args: any[]) => any ? A : never captures the first parameter's type. infer can appear multiple times in a single conditional to extract multiple types simultaneously.",
+    },
+    {
+      question: "How do you use conditional types to filter a union?",
+      answer:
+        "Define a conditional type that returns never for members you want to remove and the member itself for those you want to keep. type OnlyStrings<T> = T extends string ? T : never — apply to a union to keep only string members. Since never is dropped from unions, the result contains only the members that satisfied the condition. This is exactly how Exclude and Extract are implemented.",
+    },
+    {
+      question: "What does deferred conditional type resolution mean?",
+      answer:
+        "When a conditional type depends on a generic type parameter that is not yet resolved, TypeScript defers the evaluation rather than immediately computing it. Inside a generic function body, T extends string ? A : B remains unevaluated. TypeScript only resolves it when the function is called with a concrete type. This can cause unexpected behavior when you try to assign a deferred conditional type to a specific type.",
+    },
+  ],
+
+  "typescript-decorators-interview-questions": [
+    {
+      question: "What are decorators in TypeScript?",
+      answer:
+        "Decorators are functions prefixed with @ that can be applied to classes, methods, properties, accessors, and parameters to add metadata or modify behavior at runtime. They are heavily used in Angular and NestJS for dependency injection, routing, and validation. TypeScript's experimental decorators (--experimentalDecorators) follow a legacy proposal; the finalized ECMAScript Stage 3 decorator proposal is also supported in newer TypeScript versions.",
+    },
+    {
+      question: "What is the difference between experimental decorators and Stage 3 decorators?",
+      answer:
+        "Experimental decorators (enabled by --experimentalDecorators) implement an older TC39 proposal that was never standardized. They work differently — particularly around class fields — and emit reflect-metadata calls. Stage 3 decorators (the standardized proposal, supported in TypeScript 5.0+) have a different execution model and API. The two systems are not compatible, and existing frameworks like Angular and NestJS still use the experimental decorator API.",
+    },
+    {
+      question: "How does a class decorator work in TypeScript?",
+      answer:
+        "A class decorator is a function called with the constructor as its argument. It can return a new constructor to replace the original class, add properties to the prototype, or register the class in a registry. function Singleton<T extends new (...args: any[]) => object>(Base: T) { /* ... */ } — applied with @Singleton, this modifies the class at decoration time, before any instances are created.",
+    },
+    {
+      question: "What is reflect-metadata and why is it used with decorators?",
+      answer:
+        "reflect-metadata is a polyfill for the Reflect.metadata API that lets decorators attach and read metadata on class constructors, methods, and properties. It is required by Angular and NestJS for dependency injection — decorators use it to record the constructor parameter types so the DI container can resolve them automatically. Without reflect-metadata, the type information emitted by TypeScript's emitDecoratorMetadata compiler option has no API to read it.",
+    },
+    {
+      question: "Are TypeScript decorators ready for production use in 2025?",
+      answer:
+        "Experimental decorators are production-ready in the context of Angular and NestJS, which have used them stably for years with well-established conventions. For greenfield code, the Stage 3 decorator standard is the future-proof choice and is supported in TypeScript 5.0+. Libraries are gradually migrating. Avoid experimental decorators outside established frameworks unless you accept the migration cost when the ecosystem finalizes on Stage 3.",
+    },
+  ],
 };
 
 /**

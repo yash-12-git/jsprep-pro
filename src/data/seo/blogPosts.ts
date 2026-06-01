@@ -9,7 +9,7 @@ export interface BlogPost {
   modifiedAt: string
   keywords: string[]
   content: string
-  track: 'javascript' | 'react'
+  track: 'javascript' | 'react' | 'typescript'
 }
 
 export const BLOG_POSTS: BlogPost[] = [
@@ -3014,6 +3014,1647 @@ function App() {
 \`data\` in the closure is captured at the time \`fetchData\` was created — when \`data = null\`. \`setData(result)\` schedules a state update (re-render), but the closure's \`data\` variable is not updated. The new value is only available in the *next* render's closure.
 
 Practice React behavior questions at [JSPrep Pro](/auth).
+    `,
+  },
+]
+
+export const TYPESCRIPT_BLOG_POSTS: BlogPost[] = [
+  {
+    slug: 'top-50-typescript-interview-questions',
+    track: 'typescript',
+    title: 'Top 50 TypeScript Interview Questions (2025)',
+    excerpt: 'The definitive list of the 50 most common TypeScript interview questions for frontend developers, with concise answers covering types, generics, utility types, and advanced patterns.',
+    category: 'Interview Prep',
+    accentColor: '#3178c6',
+    readTime: '15 min read',
+    publishedAt: '2025-05-01',
+    modifiedAt: '2025-06-01',
+    keywords: ['typescript interview questions 2025', 'top typescript interview questions', 'typescript interview prep', 'typescript types generics interview'],
+    content: `
+# Top 50 TypeScript Interview Questions (2025)
+
+## TypeScript Fundamentals (1–15)
+
+**1. What is TypeScript and why use it?**
+TypeScript is a statically typed superset of JavaScript that compiles to plain JavaScript. It catches type errors at compile time instead of runtime, improves IDE tooling (autocomplete, refactoring), and makes large codebases easier to maintain and reason about.
+
+**2. What is the difference between type and interface?**
+Both describe object shapes. interface supports declaration merging and is better for object/class contracts. type supports unions, intersections, mapped types, and conditional types — making it more versatile. Prefer interface for public API shapes; type for complex compositions.
+
+**3. What is type inference in TypeScript?**
+TypeScript automatically deduces the type of a value from its initializer, return expression, or context. const x = 5 infers number. Inference reduces annotation noise while retaining full type safety.
+
+**4. What is the any type and why is it dangerous?**
+any opts a variable out of type checking completely. It disables autocomplete, silences errors, and removes all benefits of TypeScript. Use unknown instead — it forces you to narrow the type before using the value.
+
+**5. What is the difference between any and unknown?**
+unknown is the type-safe alternative to any. You can assign anything to unknown, but you cannot use it without first narrowing it (typeof, instanceof, a type guard). any bypasses all checks entirely.
+
+**6. What is a union type?**
+A union type (A | B) means a value can be one of the listed types. TypeScript narrows unions through type guards, discriminated unions, or control flow analysis.
+
+**7. What is an intersection type?**
+An intersection type (A & B) combines multiple types into one — the result must satisfy all of them. Commonly used to merge interfaces or mix in behaviours.
+
+**8. What are generics in TypeScript?**
+Generics are type parameters that make components reusable over many types while preserving type safety. function identity<T>(x: T): T returns the same type it receives — the caller specifies T.
+
+**9. What are TypeScript utility types?**
+Built-in generic types that transform other types. Partial<T>, Required<T>, Readonly<T>, Record<K,V>, Pick<T,K>, Omit<T,K>, Exclude<T,U>, Extract<T,U>, NonNullable<T>, ReturnType<T> are the most common.
+
+**10. What is a type guard?**
+A runtime check that narrows a union type. typeof x === 'string', instanceof MyClass, or a custom x is MyType predicate function are all type guards.
+
+**11. What is a discriminated union?**
+A union where each member has a common literal property (the discriminant). switch/if on the discriminant narrows to the exact member: type Result = { ok: true; value: T } | { ok: false; error: string }.
+
+**12. What is the never type?**
+never represents values that can never exist. Exhaustive switch statements use never as a default — if TypeScript allows assigning to never, you've handled all cases. Functions that always throw or loop forever have return type never.
+
+**13. What is readonly in TypeScript?**
+readonly prevents a property from being reassigned after initialization. Readonly<T> makes all properties readonly. This is shallower than Object.freeze — nested objects can still be mutated.
+
+**14. What is a tuple type?**
+A fixed-length array where each position has a specific type: [string, number] is a two-element array of a string then a number. Useful for function return types and structured data pairs.
+
+**15. What is the satisfies operator (TypeScript 4.9)?**
+satisfies validates that an expression matches a type without widening its inferred type. const palette = { red: [255,0,0], blue: '#0000ff' } satisfies Record<string, string | number[]> — palette.blue retains string type rather than string | number[].
+
+## Generics (16–25)
+
+**16. How do you constrain a generic?**
+Use extends: function getLength<T extends { length: number }>(x: T): number. T must have a length property; you get no access to anything else on T.
+
+**17. What is a conditional type?**
+T extends U ? X : Y — if T is assignable to U, the type is X, else Y. Used in utility types: NonNullable<T> = T extends null | undefined ? never : T.
+
+**18. What are mapped types?**
+Transform every property of an existing type: { [K in keyof T]: NewType }. Built-in examples are Readonly<T>, Partial<T>, and Record<K,V>.
+
+**19. What is keyof?**
+keyof T produces a union of all property names of T as string | number | symbol literal types. function get<T, K extends keyof T>(obj: T, key: K): T[K] is a fully type-safe property accessor.
+
+**20. What is typeof in type position?**
+At the type level, typeof variable extracts the type of a value. type Config = typeof defaultConfig. Useful when you have a const object and want to derive its type without manually writing it.
+
+**21. What is a template literal type?**
+Constructs new string literal types via template syntax: type EventName = \`on\${Capitalize<string>}\` matches 'onClick', 'onChange', etc.
+
+**22. What is infer in conditional types?**
+infer introduces a type variable inside a conditional type: type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never extracts the return type of any function.
+
+**23. What is a recursive type?**
+A type that references itself. type NestedArray<T> = T | NestedArray<T>[] or type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] }.
+
+**24. What is function overloading in TypeScript?**
+Multiple function signatures followed by one implementation signature. TypeScript shows callers only the overload signatures — the implementation signature is internal. Useful for functions with multiple call patterns returning different types.
+
+**25. What is a generic default?**
+Type parameters can have defaults: function makeState<T = string>() — callers can omit T and get string. Similar to default function parameters.
+
+## Classes and Access Modifiers (26–35)
+
+**26. What are access modifiers in TypeScript?**
+public (default), protected (class + subclasses), private (class only), and readonly. TypeScript's private is erased at runtime — use # (ES private fields) for runtime enforcement.
+
+**27. What is the difference between abstract class and interface?**
+Abstract classes can have implementation (method bodies, constructors, instance fields) and use access modifiers. interfaces are purely structural. A class can implement many interfaces but extend only one abstract class.
+
+**28. What is parameter property shorthand?**
+constructor(private name: string) simultaneously declares and assigns the name field, removing boilerplate. Equivalent to declaring the field and assigning in the constructor body.
+
+**29. What are decorators in TypeScript?**
+Annotations (@) applied to classes, methods, properties, or parameters that can add metadata or modify behaviour. Used extensively in Angular and NestJS. The official decorators proposal (Stage 3) is enabled with --experimentalDecorators.
+
+**30. What is the override keyword?**
+Added in TypeScript 4.3. Marking a method override ensures it actually overrides a parent method — TypeScript errors if the parent method doesn't exist or has a different signature. Prevents silent drift when parent methods are renamed.
+
+## Types vs Interfaces Advanced (31–40)
+
+**31. What is declaration merging with interface?**
+Declaring the same interface name twice merges their members. Used to extend third-party types: declare module 'express' { interface Request { user?: User } }. type does not support merging.
+
+**32. What are index signatures?**
+{ [key: string]: number } allows any string key with number values. Useful for dynamic objects. Use Record<string, number> as a cleaner equivalent.
+
+**33. What is Exclude and Extract?**
+Exclude<T, U> removes types from T that are assignable to U. Extract<T, U> keeps only types assignable to U. Exclude<'a'|'b'|'c', 'a'> = 'b'|'c'.
+
+**34. What is ReturnType<T>?**
+Extracts the return type of a function type using infer. type R = ReturnType<typeof myFn> gives the return type without manually writing it.
+
+**35. What is Parameters<T>?**
+Extracts function parameter types as a tuple. type P = Parameters<typeof fn>. Used to forward arguments or validate them.
+
+## Advanced TypeScript Patterns (36–50)
+
+**36. What is a branded type?**
+A nominal type created by intersecting a base type with a unique marker: type UserId = string & { __brand: 'UserId' }. Prevents accidentally mixing IDs of different kinds even though both are strings.
+
+**37. What is the Builder pattern with TypeScript?**
+Chaining methods that each return this (or a narrowed subtype) to build an object incrementally with full type safety at each step.
+
+**38. What is variance in TypeScript generics?**
+Covariance means you can use a subtype where a supertype is expected. Contravariance means the reverse. TypeScript uses structural typing so variance is inferred — function parameters are contravariant, return types are covariant.
+
+**39. What are assertion functions?**
+function assertIsString(val: unknown): asserts val is string — TypeScript narrows val to string for the rest of the scope after calling this function, similar to type guards but for void functions that throw on failure.
+
+**40. What is declaration files (.d.ts)?**
+Type-only files that describe the shape of JavaScript modules without implementation. Published as part of a library (or via @types/... on DefinitelyTyped) so TypeScript knows a module's API even if the source is plain JS.
+
+**41. What is strict mode in TypeScript?**
+The --strict flag enables: noImplicitAny, strictNullChecks, strictFunctionTypes, strictPropertyInitialization, noImplicitThis, and alwaysStrict. strictNullChecks is the most impactful — null and undefined are not assignable to other types, eliminating null reference errors.
+
+**42. What is strictNullChecks?**
+With strictNullChecks, null and undefined are their own types and not assignable to anything else. The non-null assertion operator (!) overrides the check: value! tells TypeScript you're sure it's not null.
+
+**43. What is the as keyword?**
+Type assertion: tells TypeScript to treat a value as a specific type, overriding inference. Use sparingly — as unknown as T is a double assertion that bypasses all safety. Prefer type narrowing when possible.
+
+**44. What is module augmentation?**
+Extending types of external modules without modifying their source: declare module 'lodash' { interface LoDashStatic { myFn(): void } }. Merged into the original module's types.
+
+**45. What is the difference between type widening and narrowing?**
+Widening is TypeScript broadening an inferred type (let x = 'hello' → string). Narrowing is TypeScript restricting a type based on runtime checks (typeof, instanceof). as const prevents widening.
+
+**46. What is const assertion?**
+as const makes all inferred types as narrow as possible: const dirs = ['north','south'] as const — type is readonly ['north', 'south'] not string[]. Essential for discriminated unions with literal types.
+
+**47. What is a type predicate?**
+function isString(x: unknown): x is string — the x is string part tells TypeScript to narrow x to string in the true branch when this function is used as a condition.
+
+**48. What is the TypeScript project references feature?**
+Splits a large project into independently compiled sub-projects. Each subproject has its own tsconfig with references to its dependencies. Enables incremental compilation — only changed subprojects recompile.
+
+**49. What is the difference between interface extending and type intersecting an interface?**
+interface B extends A copies A's shape into B's scope with inheritance semantics (conflict detection, proper error messages). type B = A & { extra: string } is purely structural and can combine types in more flexible ways without inheritance.
+
+**50. What is the TypeScript compiler API?**
+A programmatic API to parse, type-check, and transform TypeScript code. Used by build tools, linters, code generators, and codemods. ts.createProgram() creates a program; diagnostics give compiler errors; the type checker resolves types.
+
+---
+
+Practice all 50 with AI feedback at [JSPrep Pro](/auth).
+    `,
+  },
+  {
+    slug: 'typescript-types-vs-interfaces',
+    track: 'typescript',
+    title: 'TypeScript Types vs Interfaces: The Definitive Guide',
+    excerpt: 'A clear, complete comparison of type aliases and interfaces in TypeScript — when to use each, the key differences, and the scenarios where only one works.',
+    category: 'Core Concepts',
+    accentColor: '#a78bfa',
+    readTime: '9 min read',
+    publishedAt: '2025-05-03',
+    modifiedAt: '2025-06-01',
+    keywords: ['typescript type vs interface', 'interface vs type alias typescript', 'when to use type or interface', 'typescript interface declaration merging'],
+    content: `
+# TypeScript Types vs Interfaces: The Definitive Guide
+
+The single most common TypeScript interview question. Here's everything you need to know.
+
+## What They Have In Common
+
+Both describe the shape of objects and are structurally equivalent for most everyday use:
+
+\`\`\`typescript
+// These are identical in usage:
+type UserType = { id: number; name: string }
+interface UserInterface { id: number; name: string }
+
+function greet(user: UserType) { /* works */ }
+function greet(user: UserInterface) { /* also works */ }
+\`\`\`
+
+Both can be extended, both appear in IDE tooltips, both enforce structural compatibility.
+
+## Key Differences
+
+### 1. Declaration Merging — Interface Only
+
+\`\`\`typescript
+interface Window {
+  myCustomProperty: string
+}
+interface Window {
+  anotherProperty: number
+}
+// Window now has both properties — merged!
+
+type Config = { debug: boolean }
+type Config = { verbose: boolean } // ❌ Error: duplicate identifier
+\`\`\`
+
+This is the killer feature for extending third-party types:
+\`\`\`typescript
+// In your express app:
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: AuthenticatedUser
+  }
+}
+// Now req.user is typed everywhere
+\`\`\`
+
+### 2. Union and Intersection — Type Only
+
+\`\`\`typescript
+type StringOrNumber = string | number           // union
+type AdminUser = User & { permissions: string[] } // intersection
+type Callback = (err: Error | null) => void    // function type
+type Pair<T> = [T, T]                          // tuple
+\`\`\`
+
+Interfaces cannot express any of these directly.
+
+### 3. Computed / Mapped Types — Type Only
+
+\`\`\`typescript
+type Keys = keyof User              // 'id' | 'name' | 'email'
+type Optional = Partial<User>       // all fields optional
+type OnlyIds = Record<string, number>
+
+// Interface cannot do this:
+type EventHandlers = {
+  [K in keyof Events as \`on\${Capitalize<K>}\`]: (e: Events[K]) => void
+}
+\`\`\`
+
+### 4. Extends vs Intersection
+
+Both can compose types, but differently:
+
+\`\`\`typescript
+// Interface extends — property conflicts are caught as errors
+interface Animal { name: string }
+interface Dog extends Animal { breed: string }
+
+// Type intersection — conflicting properties become never
+type Animal = { name: string; sound: string }
+type Cat = Animal & { sound: 'meow' }
+// Cat.sound is 'meow' (intersection narrows it)
+\`\`\`
+
+## Practical Decision Guide
+
+**Use interface when:**
+- Defining the shape of an object or class contract
+- You need declaration merging (extending third-party modules)
+- Writing a library where consumers may extend types
+- Defining class implements signatures
+
+**Use type when:**
+- Working with unions or intersections
+- Using mapped types, conditional types, or template literals
+- Defining function signatures (type Fn = (x: string) => void)
+- Creating tuple types
+- Aliasing primitives or utility type results
+
+## The Recommended Default
+
+Most style guides say: **prefer interface for object shapes, use type for everything else.**
+
+The TypeScript team's own guidance: use interface when possible; use type when you need features only type provides.
+
+\`\`\`typescript
+// Good: interface for object/class shapes
+interface Repository<T> {
+  findById(id: string): Promise<T>
+  save(entity: T): Promise<T>
+  delete(id: string): Promise<void>
+}
+
+// Good: type for union and complex compositions
+type Result<T, E extends Error = Error> =
+  | { success: true; data: T }
+  | { success: false; error: E }
+\`\`\`
+
+## One Practical Tip
+
+When in doubt about which to use, start with interface. If TypeScript complains about something interface can't do (unions, mapped types), switch to type. This matches how most TypeScript teams operate in practice.
+
+Practice TypeScript questions at [JSPrep Pro](/auth).
+    `,
+  },
+  {
+    slug: 'typescript-generics-complete-guide',
+    track: 'typescript',
+    title: 'TypeScript Generics: Complete Guide with Examples',
+    excerpt: 'Master TypeScript generics from basic type parameters to constraints, conditional types, and infer. Includes real-world patterns used in libraries and production code.',
+    category: 'Deep Dive',
+    accentColor: '#6af7c0',
+    readTime: '10 min read',
+    publishedAt: '2025-05-06',
+    modifiedAt: '2025-06-01',
+    keywords: ['typescript generics explained', 'typescript generic constraints', 'typescript infer type', 'generic types typescript examples'],
+    content: `
+# TypeScript Generics: Complete Guide with Examples
+
+Generics are TypeScript's most powerful feature and the topic most developers find difficult. This guide builds your understanding from first principles.
+
+## Why Generics Exist
+
+Without generics, you must choose between safety and reusability:
+
+\`\`\`typescript
+// Too restrictive — only works for number[]
+function first(arr: number[]): number { return arr[0] }
+
+// Too permissive — loses type information
+function first(arr: any[]): any { return arr[0] }
+
+// Just right — generic
+function first<T>(arr: T[]): T { return arr[0] }
+const n = first([1, 2, 3])  // n: number ✓
+const s = first(['a', 'b']) // s: string ✓
+\`\`\`
+
+The type parameter T is inferred from the argument — no manual annotation needed.
+
+## Generic Constraints (extends)
+
+Without constraints, generic T is too wide — you can only use it as unknown.
+
+\`\`\`typescript
+// ❌ TypeScript can't assume T has .length
+function logLength<T>(x: T) {
+  console.log(x.length) // Error: Property 'length' does not exist on type 'T'
+}
+
+// ✅ Constrain T to objects with a length property
+function logLength<T extends { length: number }>(x: T) {
+  console.log(x.length) // works: string, array, typed arrays, NodeList...
+}
+
+// Real example: type-safe property getter
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key]
+}
+
+const user = { id: 1, name: 'Alice', email: 'a@b.com' }
+const name = getProperty(user, 'name')  // string ✓
+const id   = getProperty(user, 'id')    // number ✓
+getProperty(user, 'missing')            // ❌ Error: not a key of user
+\`\`\`
+
+## Generic Interfaces and Classes
+
+\`\`\`typescript
+interface Repository<T> {
+  findById(id: string): Promise<T | null>
+  findAll(): Promise<T[]>
+  save(entity: Omit<T, 'id'>): Promise<T>
+  delete(id: string): Promise<void>
+}
+
+class UserRepository implements Repository<User> {
+  async findById(id: string) { /* ... */ }
+  // TypeScript enforces all four methods match the interface
+}
+
+// Generic class — type parameter used throughout
+class Stack<T> {
+  private items: T[] = []
+  push(item: T): void { this.items.push(item) }
+  pop(): T | undefined { return this.items.pop() }
+  peek(): T | undefined { return this.items[this.items.length - 1] }
+  get size(): number { return this.items.length }
+}
+
+const numStack = new Stack<number>()
+numStack.push(1)
+numStack.push('a') // ❌ Error: Argument of type 'string' is not assignable to 'number'
+\`\`\`
+
+## Multiple Type Parameters
+
+\`\`\`typescript
+function zip<A, B>(a: A[], b: B[]): [A, B][] {
+  return a.map((item, i) => [item, b[i]])
+}
+
+const pairs = zip([1,2,3], ['a','b','c'])
+// type: [number, string][]
+
+// Generic with default type
+function useState<T = string>(initial: T): [T, (val: T) => void] {
+  let value = initial
+  return [value, (val) => { value = val }]
+}
+const [name, setName] = useState() // T defaults to string
+\`\`\`
+
+## The infer Keyword
+
+\`infer\` introduces a type variable inside a conditional type to extract a type from another:
+
+\`\`\`typescript
+// Extract the return type of any function
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never
+
+type A = ReturnType<() => string>     // string
+type B = ReturnType<(x: number) => boolean> // boolean
+
+// Extract the type inside a Promise
+type Awaited<T> = T extends Promise<infer V> ? V : T
+type C = Awaited<Promise<User>>  // User
+type D = Awaited<string>         // string
+
+// Extract element type from array
+type ArrayItem<T> = T extends (infer Item)[] ? Item : never
+type E = ArrayItem<User[]>  // User
+\`\`\`
+
+## Mapped Types with Generics
+
+\`\`\`typescript
+// Make all properties optional
+type Partial<T> = { [K in keyof T]?: T[K] }
+
+// Make all properties required
+type Required<T> = { [K in keyof T]-?: T[K] }
+
+// Pick a subset of keys
+type Pick<T, K extends keyof T> = { [P in K]: T[P] }
+
+// Real-world example: form state derived from model
+type FormValues<T> = {
+  [K in keyof T]: T[K] extends object ? string : T[K]
+}
+\`\`\`
+
+## Common Generic Patterns in Practice
+
+\`\`\`typescript
+// Type-safe event emitter
+class TypedEventEmitter<Events extends Record<string, unknown>> {
+  on<K extends keyof Events>(event: K, handler: (data: Events[K]) => void): void { /* ... */ }
+  emit<K extends keyof Events>(event: K, data: Events[K]): void { /* ... */ }
+}
+
+type AppEvents = {
+  login: { userId: string }
+  logout: { userId: string }
+  error: Error
+}
+
+const emitter = new TypedEventEmitter<AppEvents>()
+emitter.on('login', ({ userId }) => console.log(userId)) // userId: string ✓
+emitter.emit('error', new Error('oops'))                  // correct type ✓
+emitter.emit('login', 'wrong')                            // ❌ Type error
+\`\`\`
+
+Practice TypeScript questions at [JSPrep Pro](/auth).
+    `,
+  },
+  {
+    slug: 'typescript-utility-types-cheatsheet',
+    track: 'typescript',
+    title: 'TypeScript Utility Types: The Complete Cheatsheet',
+    excerpt: 'A complete reference for all TypeScript built-in utility types — Partial, Required, Readonly, Pick, Omit, Record, Exclude, Extract, NonNullable, and more — with real examples.',
+    category: 'Reference',
+    accentColor: '#fb923c',
+    readTime: '8 min read',
+    publishedAt: '2025-05-09',
+    modifiedAt: '2025-06-01',
+    keywords: ['typescript utility types', 'partial required readonly typescript', 'pick omit typescript', 'typescript record exclude extract'],
+    content: `
+# TypeScript Utility Types: The Complete Cheatsheet
+
+TypeScript ships with powerful generic utilities that transform types. Knowing them saves hundreds of lines of manual type definitions.
+
+## Object Modification Utilities
+
+### Partial<T> — Make All Properties Optional
+\`\`\`typescript
+interface User { id: number; name: string; email: string }
+
+type UserUpdate = Partial<User>
+// { id?: number; name?: string; email?: string }
+
+function updateUser(id: number, changes: Partial<User>) {
+  // changes can contain any subset of User fields
+}
+updateUser(1, { name: 'Alice' })  // valid — only name
+updateUser(1, { email: 'a@b.com', name: 'Alice' }) // also valid
+\`\`\`
+
+### Required<T> — Make All Properties Required
+\`\`\`typescript
+interface Config {
+  debug?: boolean
+  timeout?: number
+  retries?: number
+}
+
+type FinalConfig = Required<Config>
+// { debug: boolean; timeout: number; retries: number }
+\`\`\`
+
+### Readonly<T> — Prevent Mutation
+\`\`\`typescript
+type ReadonlyUser = Readonly<User>
+// { readonly id: number; readonly name: string; readonly email: string }
+
+const user: ReadonlyUser = { id: 1, name: 'Alice', email: 'a@b.com' }
+user.name = 'Bob' // ❌ Error: Cannot assign to 'name' because it is read-only
+\`\`\`
+
+### Record<K, V> — Map Keys to Values
+\`\`\`typescript
+type StatusMap = Record<'active' | 'inactive' | 'banned', { count: number }>
+// { active: { count: number }; inactive: { count: number }; banned: { count: number } }
+
+const statusCounts: Record<string, number> = {}
+statusCounts['active'] = 42 // safe
+\`\`\`
+
+## Key Selection Utilities
+
+### Pick<T, K> — Select Specific Properties
+\`\`\`typescript
+interface User { id: number; name: string; email: string; password: string }
+
+type PublicUser = Pick<User, 'id' | 'name' | 'email'>
+// { id: number; name: string; email: string }
+// password is excluded — safe to send to client
+\`\`\`
+
+### Omit<T, K> — Exclude Specific Properties
+\`\`\`typescript
+type UserWithoutPassword = Omit<User, 'password'>
+// { id: number; name: string; email: string }
+
+// Common pattern: omit id when creating new entities
+type CreateUserInput = Omit<User, 'id'>
+\`\`\`
+
+### Pick vs Omit — When to Use Which
+- Use Pick when you know the small set of properties you WANT
+- Use Omit when you know the small set of properties you DON'T WANT
+- If the type has 20 fields and you want 18, Omit is cleaner than Pick
+
+## Union Type Utilities
+
+### Exclude<T, U> — Remove Types from Union
+\`\`\`typescript
+type Status = 'active' | 'inactive' | 'banned' | 'pending'
+type LiveStatus = Exclude<Status, 'banned' | 'pending'>
+// 'active' | 'inactive'
+
+type NonNullableId = Exclude<string | null | undefined, null | undefined>
+// string
+\`\`\`
+
+### Extract<T, U> — Keep Only Matching Types
+\`\`\`typescript
+type StringOrNum = string | number | boolean
+type OnlyStrings = Extract<StringOrNum, string>
+// string
+
+// Useful for narrowing unions:
+type StringEvents = Extract<DOMEvent, MouseEvent | KeyboardEvent>
+\`\`\`
+
+### NonNullable<T> — Remove null and undefined
+\`\`\`typescript
+type MaybeUser = User | null | undefined
+type DefiniteUser = NonNullable<MaybeUser>
+// User
+
+function processUser(user: NonNullable<typeof maybeUser>) {
+  // TypeScript knows user is defined here
+}
+\`\`\`
+
+## Function Type Utilities
+
+### ReturnType<T> — Extract Function Return Type
+\`\`\`typescript
+function createUser(name: string, email: string) {
+  return { id: Math.random(), name, email, createdAt: new Date() }
+}
+
+type User = ReturnType<typeof createUser>
+// { id: number; name: string; email: string; createdAt: Date }
+// No need to manually define User!
+\`\`\`
+
+### Parameters<T> — Extract Function Parameter Types
+\`\`\`typescript
+function fetchData(url: string, options: RequestInit, timeout: number) { /* */ }
+
+type FetchParams = Parameters<typeof fetchData>
+// [url: string, options: RequestInit, timeout: number]
+
+// Forward exact same parameters to a wrapper
+function cachedFetch(...args: Parameters<typeof fetchData>) {
+  return fetchData(...args)
+}
+\`\`\`
+
+### Awaited<T> — Unwrap Promise Type
+\`\`\`typescript
+async function getUser(): Promise<User> { /* */ }
+
+type UserResult = Awaited<ReturnType<typeof getUser>>
+// User (Promise is unwrapped)
+\`\`\`
+
+## Combining Utilities
+
+The real power comes from composing utilities:
+
+\`\`\`typescript
+// Patch endpoint: all fields optional except id (which is required)
+type UserPatch = Required<Pick<User, 'id'>> & Partial<Omit<User, 'id'>>
+
+// Read-only computed state
+type AppState = Readonly<{
+  user: NonNullable<User>
+  settings: Required<Settings>
+  cache: Record<string, unknown>
+}>
+\`\`\`
+
+Practice TypeScript utility type questions at [JSPrep Pro](/auth).
+    `,
+  },
+  {
+    slug: 'typescript-type-guards-narrowing',
+    track: 'typescript',
+    title: 'TypeScript Type Guards & Narrowing Explained',
+    excerpt: 'Learn every TypeScript narrowing technique: typeof, instanceof, in, discriminated unions, assertion functions, and custom type predicates — with practical examples.',
+    category: 'Core Concepts',
+    accentColor: '#34d399',
+    readTime: '7 min read',
+    publishedAt: '2025-05-12',
+    modifiedAt: '2025-06-01',
+    keywords: ['typescript type guards', 'typescript narrowing', 'type predicate typescript', 'discriminated union typescript'],
+    content: `
+# TypeScript Type Guards & Narrowing Explained
+
+Narrowing is TypeScript's ability to refine a broader type to a more specific one based on runtime checks. It's what makes union types practical.
+
+## typeof Narrowing
+
+\`\`\`typescript
+function format(value: string | number | boolean): string {
+  if (typeof value === 'string') {
+    return value.toUpperCase()  // value: string ✓
+  }
+  if (typeof value === 'number') {
+    return value.toFixed(2)     // value: number ✓
+  }
+  return String(value)          // value: boolean ✓
+}
+\`\`\`
+
+typeof works for: 'string', 'number', 'boolean', 'bigint', 'symbol', 'undefined', 'function', 'object'.
+
+## instanceof Narrowing
+
+\`\`\`typescript
+function handleEvent(event: MouseEvent | KeyboardEvent) {
+  if (event instanceof MouseEvent) {
+    console.log(event.clientX, event.clientY) // MouseEvent properties ✓
+  } else {
+    console.log(event.key) // KeyboardEvent properties ✓
+  }
+}
+
+// Works with custom classes too:
+class ApiError extends Error { constructor(public statusCode: number, message: string) { super(message) } }
+class NetworkError extends Error { constructor(public retryable: boolean, message: string) { super(message) } }
+
+function handleError(err: ApiError | NetworkError) {
+  if (err instanceof ApiError) {
+    console.log(err.statusCode) // ✓
+  } else {
+    console.log(err.retryable)  // ✓
+  }
+}
+\`\`\`
+
+## in Operator Narrowing
+
+\`\`\`typescript
+type Cat = { meow(): void; purr(): void }
+type Dog = { bark(): void; fetch(): void }
+
+function speak(animal: Cat | Dog) {
+  if ('meow' in animal) {
+    animal.meow()  // animal: Cat ✓
+  } else {
+    animal.bark()  // animal: Dog ✓
+  }
+}
+\`\`\`
+
+## Discriminated Unions (Best Practice)
+
+The most robust narrowing pattern — add a literal discriminant field:
+
+\`\`\`typescript
+type Success<T> = { status: 'success'; data: T }
+type Failure = { status: 'failure'; error: string }
+type Loading = { status: 'loading' }
+
+type AsyncResult<T> = Success<T> | Failure | Loading
+
+function render<T>(result: AsyncResult<T>) {
+  switch (result.status) {
+    case 'loading':  return <Spinner />              // result: Loading ✓
+    case 'success':  return <Data value={result.data} />  // result: Success<T> ✓
+    case 'failure':  return <Error msg={result.error} />  // result: Failure ✓
+  }
+}
+\`\`\`
+
+The discriminant (status) must be a literal type, not just string.
+
+## Custom Type Predicates
+
+\`\`\`typescript
+// Standard approach — TypeScript doesn't learn the type after this:
+function isUser(value: unknown) {
+  return typeof value === 'object' && value !== null && 'id' in value
+}
+
+// Type predicate — TypeScript narrows in the true branch:
+function isUser(value: unknown): value is User {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'id' in value &&
+    typeof (value as any).id === 'number'
+  )
+}
+
+const data: unknown = fetchFromAPI()
+if (isUser(data)) {
+  console.log(data.id)    // data: User ✓
+  console.log(data.name)  // ✓
+}
+\`\`\`
+
+## Assertion Functions (Throw or Narrow)
+
+\`\`\`typescript
+function assertDefined<T>(val: T | null | undefined, msg: string): asserts val is T {
+  if (val == null) throw new Error(msg)
+}
+
+const user = getUser(id)  // User | null
+assertDefined(user, 'User must exist')
+console.log(user.name) // user: User ✓ (TypeScript knows it's non-null after assertion)
+\`\`\`
+
+## Truthiness Narrowing
+
+\`\`\`typescript
+function process(input: string | null | undefined | 0 | false) {
+  if (input) {
+    // input: string (all falsy values are excluded)
+    console.log(input.toUpperCase())
+  }
+}
+// Careful: '' (empty string) is also falsy — may not be what you want
+// Use input != null for null/undefined only
+\`\`\`
+
+## Exhaustiveness Checking with never
+
+\`\`\`typescript
+type Shape = { kind: 'circle'; radius: number } | { kind: 'square'; side: number }
+
+function area(shape: Shape): number {
+  switch (shape.kind) {
+    case 'circle': return Math.PI * shape.radius ** 2
+    case 'square': return shape.side ** 2
+    default:
+      const _exhaustive: never = shape  // ❌ Error if a new Shape is added without handling it
+      throw new Error('Unhandled shape: ' + _exhaustive)
+  }
+}
+\`\`\`
+
+Practice TypeScript narrowing questions at [JSPrep Pro](/auth).
+    `,
+  },
+  {
+    slug: 'typescript-with-react-best-practices',
+    track: 'typescript',
+    title: 'TypeScript with React: Best Practices for 2025',
+    excerpt: 'How to use TypeScript effectively in React projects — typing props, hooks, events, context, and refs correctly, with common mistakes and how to avoid them.',
+    category: 'Best Practices',
+    accentColor: '#f59e0b',
+    readTime: '9 min read',
+    publishedAt: '2025-05-15',
+    modifiedAt: '2025-06-01',
+    keywords: ['typescript react best practices', 'typing react components typescript', 'react typescript hooks', 'typescript react events'],
+    content: `
+# TypeScript with React: Best Practices for 2025
+
+## Typing Component Props
+
+\`\`\`typescript
+// Interface for object shapes (recommended)
+interface ButtonProps {
+  label: string
+  variant?: 'primary' | 'secondary' | 'danger'
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void
+  disabled?: boolean
+  children?: React.ReactNode
+}
+
+// FC type — use sparingly; it always includes children
+const Button: React.FC<ButtonProps> = ({ label, onClick, variant = 'primary' }) => (
+  <button className={variant} onClick={onClick}>{label}</button>
+)
+
+// Preferred: plain function (better for generics, no implicit children)
+function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
+  return <button className={variant} onClick={onClick}>{label}</button>
+}
+\`\`\`
+
+## Typing useState
+
+\`\`\`typescript
+// TypeScript infers from initial value
+const [count, setCount] = useState(0)        // number
+const [name, setName] = useState('')          // string
+
+// Explicit generic when initial value doesn't reflect full type
+const [user, setUser] = useState<User | null>(null)  // User | null, not just null
+
+// For complex state, define the type explicitly
+interface FormState {
+  email: string
+  password: string
+  errors: Record<string, string>
+}
+const [form, setForm] = useState<FormState>({ email: '', password: '', errors: {} })
+\`\`\`
+
+## Typing useRef
+
+\`\`\`typescript
+// DOM ref — starts null, TypeScript knows it after mount
+const inputRef = useRef<HTMLInputElement>(null)
+
+function focusInput() {
+  inputRef.current?.focus()  // optional chain handles null safely
+  // or: inputRef.current!.focus() if you're certain it's mounted
+}
+
+// Mutable value ref — no null, no DOM
+const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+timerRef.current = setTimeout(() => {}, 1000)
+\`\`\`
+
+## Typing useReducer
+
+\`\`\`typescript
+type CartItem = { id: string; name: string; quantity: number }
+
+interface CartState {
+  items: CartItem[]
+  total: number
+}
+
+type CartAction =
+  | { type: 'ADD'; item: CartItem }
+  | { type: 'REMOVE'; id: string }
+  | { type: 'CLEAR' }
+
+function cartReducer(state: CartState, action: CartAction): CartState {
+  switch (action.type) {
+    case 'ADD':    return { ...state, items: [...state.items, action.item] }
+    case 'REMOVE': return { ...state, items: state.items.filter(i => i.id !== action.id) }
+    case 'CLEAR':  return { items: [], total: 0 }
+  }
+}
+
+const [cart, dispatch] = useReducer(cartReducer, { items: [], total: 0 })
+dispatch({ type: 'ADD', item: { id: '1', name: 'Hat', quantity: 1 } }) // ✓
+dispatch({ type: 'REMOVE', id: '1' })  // ✓
+dispatch({ type: 'REMOVE' })           // ❌ Error: missing 'id'
+\`\`\`
+
+## Typing Context
+
+\`\`\`typescript
+interface AuthContextType {
+  user: User | null
+  login: (credentials: Credentials) => Promise<void>
+  logout: () => void
+  isLoading: boolean
+}
+
+// Don't use undefined as default — makes every consumer check for it
+const AuthContext = React.createContext<AuthContextType | null>(null)
+
+export function useAuth(): AuthContextType {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider')
+  return ctx  // return type is AuthContextType, not null — no more ! assertions
+}
+\`\`\`
+
+## Typing Event Handlers
+
+\`\`\`typescript
+// Input events
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setEmail(e.target.value)
+}
+
+// Form submit
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault()
+  // process form
+}
+
+// Generic event (when you don't need event details)
+const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+  e.stopPropagation()
+}
+
+// Keyboard event
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (e.key === 'Enter') submitForm()
+}
+\`\`\`
+
+## Typing Children Patterns
+
+\`\`\`typescript
+// Most flexible — accepts anything React can render
+interface Props {
+  children: React.ReactNode
+}
+
+// Enforce a single React element
+interface Props {
+  children: React.ReactElement
+}
+
+// Render prop pattern
+interface DataTableProps<T> {
+  data: T[]
+  renderRow: (item: T, index: number) => React.ReactNode
+}
+
+function DataTable<T>({ data, renderRow }: DataTableProps<T>) {
+  return <table>{data.map(renderRow)}</table>
+}
+\`\`\`
+
+## Common Mistakes to Avoid
+
+\`\`\`typescript
+// ❌ Don't use React.FC — it implicitly adds children and breaks with generics
+const MyList: React.FC = () => <ul />
+
+// ✅ Plain function
+function MyList() { return <ul /> }
+
+// ❌ Don't use any for event handlers
+const handle = (e: any) => e.target.value
+
+// ✅ Use specific event type
+const handle = (e: React.ChangeEvent<HTMLInputElement>) => e.target.value
+
+// ❌ Don't assert ! when useRef might be null
+const el = ref.current!.getBoundingClientRect()
+
+// ✅ Check in useEffect after mount
+useEffect(() => {
+  if (ref.current) {
+    const rect = ref.current.getBoundingClientRect()
+  }
+}, [])
+\`\`\`
+
+Practice TypeScript + React questions at [JSPrep Pro](/auth).
+    `,
+  },
+  {
+    slug: 'typescript-advanced-patterns',
+    track: 'typescript',
+    title: 'Advanced TypeScript Patterns Every Senior Dev Should Know',
+    excerpt: 'Deep dive into advanced TypeScript: branded types, template literal types, recursive types, builder pattern, variance, and type-level programming techniques used in real libraries.',
+    category: 'Deep Dive',
+    accentColor: '#7c6af7',
+    readTime: '11 min read',
+    publishedAt: '2025-05-18',
+    modifiedAt: '2025-06-01',
+    keywords: ['advanced typescript patterns', 'typescript branded types', 'typescript template literal types', 'typescript conditional types advanced'],
+    content: `
+# Advanced TypeScript Patterns Every Senior Dev Should Know
+
+## 1. Branded Types (Nominal Typing)
+
+TypeScript uses structural typing — two types with the same shape are interchangeable. Branded types add nominal safety:
+
+\`\`\`typescript
+type UserId   = string & { readonly __brand: 'UserId' }
+type ProductId = string & { readonly __brand: 'ProductId' }
+
+function createUserId(id: string): UserId { return id as UserId }
+function createProductId(id: string): ProductId { return id as ProductId }
+
+function getUser(id: UserId): User { /* ... */ }
+
+const userId = createUserId('user-123')
+const productId = createProductId('prod-456')
+
+getUser(userId)    // ✓
+getUser(productId) // ❌ Error: ProductId is not assignable to UserId
+getUser('user-123') // ❌ Error: string is not branded UserId
+\`\`\`
+
+Useful for IDs, validated strings, monetary values, and CSS pixel values.
+
+## 2. Template Literal Types
+
+\`\`\`typescript
+type Alignment = 'left' | 'center' | 'right'
+type Direction = 'horizontal' | 'vertical'
+
+type ClassName = \`align-\${Alignment}\` // 'align-left' | 'align-center' | 'align-right'
+
+// Build event handler types
+type EventName<T extends string> = \`on\${Capitalize<T>}\`
+type ClickHandler = EventName<'click'> // 'onClick'
+
+// CSS property builder
+type CSSProperty = 'margin' | 'padding'
+type CSSEdge = 'Top' | 'Bottom' | 'Left' | 'Right'
+type CSSEdgeProperty = \`\${CSSProperty}\${CSSEdge}\`
+// 'marginTop' | 'marginBottom' | ... | 'paddingRight' (8 combinations)
+\`\`\`
+
+## 3. Recursive Types
+
+\`\`\`typescript
+// JSON value — any valid JSON
+type JSONValue =
+  | string | number | boolean | null
+  | JSONValue[]
+  | { [key: string]: JSONValue }
+
+// Deep partial — every nested object's properties are optional
+type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K]
+}
+
+// Deep readonly
+type DeepReadonly<T> = {
+  readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K]
+}
+
+// File system tree
+type FileTree = {
+  name: string
+  children?: FileTree[]  // recursive reference
+}
+\`\`\`
+
+## 4. Distributive Conditional Types
+
+\`\`\`typescript
+// When T is a union, conditional types are distributed over each member
+type IsString<T> = T extends string ? true : false
+type A = IsString<string | number>  // boolean (true | false) — distributed!
+
+// Prevent distribution with brackets
+type IsStringExact<T> = [T] extends [string] ? true : false
+type B = IsStringExact<string | number>  // false — not distributed
+
+// Use distribution to filter unions:
+type FilterStrings<T> = T extends string ? T : never
+type OnlyStrings = FilterStrings<string | number | boolean>  // string
+\`\`\`
+
+## 5. Variadic Tuple Types
+
+\`\`\`typescript
+// Spread in tuple positions
+type Concat<A extends unknown[], B extends unknown[]> = [...A, ...B]
+type C = Concat<[1,2], [3,4]>  // [1, 2, 3, 4]
+
+// Type-safe curry
+type Curry<F extends (...args: any) => any> =
+  F extends (first: infer A, ...rest: infer R) => infer T
+    ? (first: A) => R extends [] ? T : Curry<(...args: R) => T>
+    : never
+\`\`\`
+
+## 6. Assertion Functions
+
+\`\`\`typescript
+// Narrows type for rest of scope when the function doesn't throw
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) throw new Error(message)
+}
+
+function assertIsUser(val: unknown): asserts val is User {
+  if (!val || typeof val !== 'object' || !('id' in val)) {
+    throw new Error('Not a user')
+  }
+}
+
+const data: unknown = parseJSON(response)
+assertIsUser(data)
+console.log(data.id)  // data: User ✓ — TypeScript narrows after the assertion
+\`\`\`
+
+## 7. Const Type Parameters (TypeScript 5.0+)
+
+\`\`\`typescript
+// Without const — TypeScript widens the type
+function makeArray<T>(items: T[]) { return items }
+const arr = makeArray(['a', 'b', 'c'])  // string[]
+
+// With const — infers literal types
+function makeArray<const T>(items: T[]) { return items }
+const arr2 = makeArray(['a', 'b', 'c'])  // readonly ['a', 'b', 'c']
+\`\`\`
+
+## 8. Satisfies Operator (TypeScript 4.9+)
+
+\`\`\`typescript
+const palette = {
+  red:  [255, 0, 0],
+  green: '#00ff00',
+  blue: [0, 0, 255],
+} satisfies Record<string, string | number[]>
+
+// Without satisfies — TypeScript widens to Record<string, string | number[]>
+// palette.red would be string | number[], losing the specific type
+
+// With satisfies — validates shape AND preserves narrower inferred types
+palette.red.map(c => c * 2)  // number[] ✓ — preserved as number[]
+palette.green.toUpperCase()  // string ✓ — preserved as string
+\`\`\`
+
+Practice advanced TypeScript at [JSPrep Pro](/auth).
+    `,
+  },
+  {
+    slug: 'typescript-enums-explained',
+    track: 'typescript',
+    title: 'TypeScript Enums Explained: Numeric, String & Const Enums',
+    excerpt: 'A complete guide to TypeScript enums — numeric enums, string enums, const enums, and why many TypeScript experts recommend union types instead.',
+    category: 'Core Concepts',
+    accentColor: '#60a5fa',
+    readTime: '7 min read',
+    publishedAt: '2025-05-21',
+    modifiedAt: '2025-06-01',
+    keywords: ['typescript enums', 'typescript string enum', 'const enum typescript', 'typescript enum vs union type'],
+    content: `
+# TypeScript Enums Explained
+
+## Numeric Enums
+
+\`\`\`typescript
+enum Direction {
+  Up,     // 0
+  Down,   // 1
+  Left,   // 2
+  Right,  // 3
+}
+
+console.log(Direction.Up)    // 0
+console.log(Direction[0])    // 'Up' — reverse mapping exists!
+
+enum Status {
+  Draft = 1,    // manual start value
+  Published,    // 2
+  Archived,     // 3
+}
+\`\`\`
+
+Numeric enums generate both forward (Name → value) and reverse (value → Name) mappings in the compiled output.
+
+## String Enums
+
+\`\`\`typescript
+enum Color {
+  Red   = 'RED',
+  Green = 'GREEN',
+  Blue  = 'BLUE',
+}
+
+console.log(Color.Red)   // 'RED'
+console.log(Color['RED']) // ❌ No reverse mapping — string enums don't have it
+\`\`\`
+
+String enums are more debuggable (readable values in logs) and don't have the reverse mapping issue of numeric enums. They are more widely recommended.
+
+## Const Enums
+
+\`\`\`typescript
+const enum Weekday {
+  Mon = 1, Tue, Wed, Thu, Fri, Sat, Sun
+}
+
+const today = Weekday.Mon
+// Compiles to: const today = 1  — enum is fully inlined, no object emitted
+\`\`\`
+
+Const enums are erased entirely at compile time — values are inlined wherever they're used. This reduces bundle size but means the enum doesn't exist at runtime. Avoid them in library code where consumers may use the enum by name.
+
+## Heterogeneous Enums (Avoid)
+
+\`\`\`typescript
+// ❌ Don't do this — mixing types is confusing
+enum Mixed {
+  No = 0,
+  Yes = 'YES',
+}
+\`\`\`
+
+## The Case Against Enums
+
+Many TypeScript experts recommend using union types instead:
+
+\`\`\`typescript
+// ❌ Enum approach
+enum Direction { Up = 'UP', Down = 'DOWN', Left = 'LEFT', Right = 'RIGHT' }
+function move(dir: Direction) { /* */ }
+move(Direction.Up)
+
+// ✅ Union type — simpler, no runtime artifact, more flexible
+type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
+function move(dir: Direction) { /* */ }
+move('UP')  // direct string — no enum import needed
+
+// ✅ Object with as const — best of both worlds
+const Direction = {
+  Up: 'UP',
+  Down: 'DOWN',
+  Left: 'LEFT',
+  Right: 'RIGHT',
+} as const
+
+type Direction = typeof Direction[keyof typeof Direction]  // 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
+move(Direction.Up)  // 'UP' — dot notation like enum
+move('UP')          // also valid — string literals work too
+\`\`\`
+
+## When to Use Each
+
+| Approach | Use When |
+|---|---|
+| Numeric enum | Interop with C# or legacy code, database flags |
+| String enum | Debuggable runtime values needed, team is familiar with enums |
+| Const enum | Bundle size critical, no library consumers, no reverse mapping needed |
+| Union type | New TypeScript code, no runtime artifact needed, simple cases |
+| const object + typeof | Need dot notation AND string literals to work, maximum flexibility |
+
+The TypeScript team itself uses const objects with as const extensively in their own codebase.
+
+Practice TypeScript questions at [JSPrep Pro](/auth).
+    `,
+  },
+  {
+    slug: 'typescript-mapped-conditional-types',
+    track: 'typescript',
+    title: 'TypeScript Mapped & Conditional Types: Deep Dive',
+    excerpt: 'Master TypeScript mapped types and conditional types — the building blocks of all utility types. Understand keyof, in, infer, and how to write your own type transformations.',
+    category: 'Deep Dive',
+    accentColor: '#f76a6a',
+    readTime: '10 min read',
+    publishedAt: '2025-05-24',
+    modifiedAt: '2025-06-01',
+    keywords: ['typescript mapped types', 'typescript conditional types', 'typescript keyof in', 'typescript infer keyword'],
+    content: `
+# TypeScript Mapped & Conditional Types: Deep Dive
+
+These are the building blocks that all built-in utility types are constructed from.
+
+## Mapped Types Fundamentals
+
+A mapped type iterates over the keys of another type:
+
+\`\`\`typescript
+type User = { id: number; name: string; email: string }
+
+// The shape of Partial<T>
+type MyPartial<T> = {
+  [K in keyof T]?: T[K]
+}
+type PartialUser = MyPartial<User>
+// { id?: number; name?: string; email?: string }
+
+// Readonly<T>
+type MyReadonly<T> = {
+  readonly [K in keyof T]: T[K]
+}
+
+// Map over a union of string literals
+type Flags = 'debug' | 'verbose' | 'strict'
+type FlagConfig = { [K in Flags]: boolean }
+// { debug: boolean; verbose: boolean; strict: boolean }
+\`\`\`
+
+## Modifier Tokens (+ and -)
+
+Add or remove the optional (?) and readonly modifiers:
+
+\`\`\`typescript
+// -? removes optionality (Required<T>)
+type Required<T> = { [K in keyof T]-?: T[K] }
+
+// -readonly removes readonly
+type Mutable<T> = { -readonly [K in keyof T]: T[K] }
+
+type ReadonlyUser = Readonly<User>
+type MutableUser = Mutable<ReadonlyUser>  // all readonly removed
+\`\`\`
+
+## Key Remapping with as (TypeScript 4.1+)
+
+Rename keys in a mapped type using template literals:
+
+\`\`\`typescript
+type Getters<T> = {
+  [K in keyof T as \`get\${Capitalize<string & K>}\`]: () => T[K]
+}
+
+type UserGetters = Getters<User>
+// { getId: () => number; getName: () => string; getEmail: () => string }
+
+// Filter keys using never:
+type OnlyStrings<T> = {
+  [K in keyof T as T[K] extends string ? K : never]: T[K]
+}
+type StringFields = OnlyStrings<{ id: number; name: string; active: boolean }>
+// { name: string }
+\`\`\`
+
+## Conditional Types
+
+\`\`\`typescript
+// Basic form: T extends U ? X : Y
+type IsArray<T> = T extends any[] ? true : false
+type A = IsArray<number[]>  // true
+type B = IsArray<string>    // false
+
+// NonNullable<T>
+type NonNullable<T> = T extends null | undefined ? never : T
+type C = NonNullable<string | null | undefined>  // string
+
+// Extract element type
+type ElementType<T> = T extends (infer E)[] ? E : T
+type D = ElementType<User[]>  // User
+type E = ElementType<string>  // string (no array — falls through)
+\`\`\`
+
+## Distributive Conditional Types
+
+When T is a union, conditional types are distributed over each member:
+
+\`\`\`typescript
+type ToArray<T> = T extends any ? T[] : never
+
+type Result = ToArray<string | number>
+// string[] | number[]  — distributed!
+// Not (string | number)[] — that would be non-distributive
+
+// Prevent distribution with tuple wrapping:
+type ToArrayND<T> = [T] extends [any] ? T[] : never
+type Result2 = ToArrayND<string | number>
+// (string | number)[]  — non-distributive
+\`\`\`
+
+## The infer Keyword
+
+\`infer\` captures a type from within a conditional type:
+
+\`\`\`typescript
+// Extract the return type of a function
+type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never
+
+type R1 = MyReturnType<() => string>          // string
+type R2 = MyReturnType<(x: number) => User>   // User
+type R3 = MyReturnType<string>                // never (not a function)
+
+// Extract first argument type
+type FirstArg<T> = T extends (first: infer A, ...rest: any[]) => any ? A : never
+type F = FirstArg<(x: string, y: number) => void>  // string
+
+// Unwrap a Promise
+type UnPromise<T> = T extends Promise<infer V> ? V : T
+type U = UnPromise<Promise<User[]>>  // User[]
+
+// Extract object value types
+type ValueOf<T> = T extends Record<string, infer V> ? V : never
+type V = ValueOf<{ a: number; b: string; c: boolean }>  // number | string | boolean
+\`\`\`
+
+## Building Custom Utility Types
+
+\`\`\`typescript
+// DeepPartial — every nested object's properties are optional
+type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T
+
+// PickByValue — pick keys whose values match a type
+type PickByValue<T, V> = {
+  [K in keyof T as T[K] extends V ? K : never]: T[K]
+}
+type StringFields = PickByValue<User & { active: boolean }, string>
+// { name: string; email: string }
+
+// Merge two types (second overrides first)
+type Merge<A, B> = Omit<A, keyof B> & B
+\`\`\`
+
+Practice TypeScript questions at [JSPrep Pro](/auth).
+    `,
+  },
+  {
+    slug: 'typescript-common-mistakes',
+    track: 'typescript',
+    title: '10 Common TypeScript Mistakes (And How to Fix Them)',
+    excerpt: 'The TypeScript mistakes that trip up even experienced developers — overusing any, incorrect type assertions, structural typing pitfalls, and broken generic inference.',
+    category: 'Best Practices',
+    accentColor: '#f472b6',
+    readTime: '9 min read',
+    publishedAt: '2025-05-27',
+    modifiedAt: '2025-06-01',
+    keywords: ['typescript common mistakes', 'typescript anti-patterns', 'typescript any mistakes', 'typescript type assertion mistakes'],
+    content: `
+# 10 Common TypeScript Mistakes (And How to Fix Them)
+
+## 1. Using any Instead of unknown
+
+\`\`\`typescript
+// ❌ any disables all type checking — defeats the purpose
+function parse(data: any) {
+  return data.name.toUpperCase()  // no error, but crashes if name is missing
+}
+
+// ✅ unknown forces you to check before using
+function parse(data: unknown) {
+  if (typeof data === 'object' && data !== null && 'name' in data) {
+    return (data as { name: string }).name.toUpperCase()  // safe
+  }
+  throw new Error('Invalid data shape')
+}
+\`\`\`
+
+## 2. Incorrect Type Assertions
+
+\`\`\`typescript
+// ❌ Lying to TypeScript — runtime crash if response doesn't match User
+const user = response as User
+
+// ❌ Double assertion bypasses all safety
+const user = response as unknown as User
+
+// ✅ Use a type guard to validate the shape
+function isUser(val: unknown): val is User {
+  return typeof val === 'object' && val !== null && 'id' in val && 'name' in val
+}
+if (isUser(response)) {
+  user.name  // ✓ actually safe
+}
+\`\`\`
+
+## 3. Not Enabling strictNullChecks
+
+Without strictNullChecks, null and undefined are assignable to everything — eliminating half the value of TypeScript. Always add "strict": true to tsconfig.json.
+
+\`\`\`typescript
+// Without strictNullChecks — no error:
+const user: User = null  // TypeScript allows this
+user.name                 // runtime crash
+
+// With strictNullChecks — correctly catches it:
+const user: User | null = null
+user.name                 // ❌ Error: user is possibly null
+user?.name                // ✅ safe
+\`\`\`
+
+## 4. Object Literal Excess Property Checking Confusion
+
+\`\`\`typescript
+interface Point { x: number; y: number }
+
+// ❌ TypeScript catches excess properties on direct assignment
+const p: Point = { x: 1, y: 2, z: 3 }  // Error: z doesn't exist on Point
+
+// But NOT through a variable (structural compatibility, not exact match):
+const obj = { x: 1, y: 2, z: 3 }
+const p2: Point = obj  // ✓ No error — obj is structurally compatible
+\`\`\`
+
+This is by design — structural typing means extra properties are fine as long as required ones are present.
+
+## 5. Missing Generic Constraints
+
+\`\`\`typescript
+// ❌ T is unknown — you can only use T as unknown inside
+function getValue<T>(obj: T, key: string) {
+  return obj[key]  // Error: Element implicitly has 'any' type
+}
+
+// ✅ Constrain properly
+function getValue<T extends Record<string, unknown>, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key]
+}
+\`\`\`
+
+## 6. Misusing Non-Null Assertion (!)
+
+\`\`\`typescript
+// ❌ Using ! everywhere is "runtime TypeScript" — you lose all protection
+const el = document.getElementById('root')!
+const user = getUser(id)!
+const value = map.get(key)!
+
+// ✅ Actually check for null
+const el = document.getElementById('root')
+if (!el) throw new Error('#root element not found')
+el.innerHTML = app  // TypeScript knows el is non-null here
+\`\`\`
+
+## 7. Ignoring TypeScript Errors with @ts-ignore
+
+\`\`\`typescript
+// ❌ Silences the error without fixing it
+// @ts-ignore
+user.nonExistentMethod()
+
+// ✅ Use @ts-expect-error — fails if the error goes away (ensuring the comment stays intentional)
+// @ts-expect-error — legacy API, types not yet updated
+legacyLib.oldMethod()
+
+// ✅ Or fix the root cause
+\`\`\`
+
+## 8. Using Object as a Type
+
+\`\`\`typescript
+// ❌ Object and object are nearly useless
+let data: Object = 5  // allows primitives!
+let obj: object = { a: 1 }  // can't access any properties
+
+// ✅ Use Record, specific interface, or unknown
+let config: Record<string, unknown> = {}
+let user: User = { id: 1, name: 'Alice' }
+\`\`\`
+
+## 9. Mutating Readonly Properties
+
+\`\`\`typescript
+interface Config { readonly apiKey: string }
+const config: Config = { apiKey: 'secret' }
+
+config.apiKey = 'other'  // ❌ TypeScript error — readonly
+
+// But: Readonly is SHALLOW
+interface State { readonly user: { name: string } }
+const state: State = { user: { name: 'Alice' } }
+state.user = { name: 'Bob' }  // ❌ Error — user is readonly
+state.user.name = 'Bob'       // ✓ No error — nested object is mutable
+// Use DeepReadonly<T> for deep immutability
+\`\`\`
+
+## 10. Not Using Discriminated Unions
+
+\`\`\`typescript
+// ❌ All optional — TypeScript can't help narrow
+interface ApiResponse {
+  data?: User
+  error?: string
+  loading?: boolean
+}
+
+// ✅ Discriminated union — exactly one state is possible at a time
+type ApiState<T> =
+  | { status: 'loading' }
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: string }
+
+function render(state: ApiState<User>) {
+  if (state.status === 'success') {
+    state.data.name  // ✓ TypeScript knows data exists here
+  }
+  if (state.status === 'error') {
+    state.error.toUpperCase()  // ✓ TypeScript knows error exists here
+  }
+}
+\`\`\`
+
+Practice TypeScript at [JSPrep Pro](/auth).
     `,
   },
 ]

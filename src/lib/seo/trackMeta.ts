@@ -58,13 +58,26 @@ export const TRACK_META: Record<
   },
   typescript: {
     label: "TypeScript",
-    topicsTitle: "TypeScript Interview Topics",
+    topicsTitle: "TypeScript Interview Topics — Practice by Concept",
     topicsDescription:
-      "TypeScript interview topics — generics, utility types, and more.",
-    topicsKeywords: ["typescript interview topics"],
-    blogTitle: "TypeScript Interview Blog",
-    blogDescription: "Guides on TypeScript interview concepts.",
-    blogKeywords: ["typescript interview blog", "typescript tutorials"],
+      "Browse all TypeScript interview topics organised by concept. Generics, utility types, type guards, mapped types, decorators, and 10+ more — each with cheat sheets and practice questions.",
+    topicsKeywords: [
+      "typescript interview topics",
+      "typescript interview questions",
+      "typescript concepts interview",
+      "typescript interview preparation",
+      "typescript generics interview",
+      "typescript utility types interview",
+    ],
+    blogTitle: "TypeScript Interview Blog — Tips, Guides & Deep Dives",
+    blogDescription:
+      "In-depth guides on TypeScript interview topics. Generics, utility types, type guards, mapped types and more with real code examples.",
+    blogKeywords: [
+      "typescript interview blog",
+      "typescript interview tips",
+      "typescript tutorials",
+      "typescript guides",
+    ],
     heroTagline: "Types, generics, utility types and more",
   },
   "system-design": {
