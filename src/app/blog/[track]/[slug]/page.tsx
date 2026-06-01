@@ -101,7 +101,7 @@ export default async function BlogPostPage({ params }: Props) {
       ? TYPESCRIPT_BLOG_FAQS[post.slug]
       : REACT_BLOG_FAQS[post.slug]
     ?? [];
-  const blogFaq = blogFaqItems.length > 0 ? faqSchema(blogFaqItems) : null;
+  const blogFaq = blogFaqItems?.length > 0 ? faqSchema(blogFaqItems) : null;
 
   return (
     <div
