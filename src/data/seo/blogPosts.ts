@@ -9,7 +9,7 @@ export interface BlogPost {
   modifiedAt: string
   keywords: string[]
   content: string
-  track: 'javascript' | 'react' | 'typescript'
+  track: 'javascript' | 'react' | 'typescript' | 'system-design'
 }
 
 export const BLOG_POSTS: BlogPost[] = [

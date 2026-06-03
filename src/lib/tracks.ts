@@ -47,8 +47,8 @@ export const TRACKS: TrackConfig[] = [
     emoji: "🏗️",
     color: "#f7c76a",
     tagline: "Coming soon · Frontend architecture at scale",
-    badge: "SOON",
-    available: false,
+    badge: "NEW",
+    available: true,
     questionsPage: "/system-design-interview-questions",
   },
 ];

@@ -1640,6 +1640,9 @@ export const REACT_TOPIC_FAQS: Record<string, FAQItem[]> = {
     },
   ],
 
+};
+
+export const TYPESCRIPT_TOPIC_FAQS: Record<string, FAQItem[]> = {
   "typescript-types-vs-interfaces-interview-questions": [
     {
       question: "What is the difference between type and interface in TypeScript?",
@@ -1941,6 +1944,288 @@ export const REACT_TOPIC_FAQS: Record<string, FAQItem[]> = {
   ],
 };
 
+export const SYSTEM_DESIGN_TOPIC_FAQS: Record<string, FAQItem[]> = {
+  "system-design-rendering-strategies-interview-questions": [
+    {
+      question: "What is the difference between SSR, CSR, SSG, and ISR?",
+      answer:
+        "CSR (Client-Side Rendering) renders in the browser after downloading a JS bundle — great for dashboards, bad for SEO. SSR (Server-Side Rendering) generates HTML per request on the server — great for SEO and personalized content, costs TTFB. SSG (Static Site Generation) pre-builds HTML at deploy time and serves from a CDN — fastest for static content, requires rebuild for data changes. ISR (Incremental Static Regeneration) is SSG with background revalidation — stale-while-revalidate for pages.",
+    },
+    {
+      question: "When would you use SSR over SSG in a Next.js application?",
+      answer:
+        "Use SSR when the page content depends on request-time data that cannot be known at build time — authenticated user data, real-time stock prices, personalized feeds, or pages that need request cookies or headers. Use SSG for content that changes infrequently and is the same for all users — documentation, marketing pages, blog posts. Use ISR as a middle ground when data changes but not so often that every request needs a fresh render.",
+    },
+    {
+      question: "What is Streaming SSR and how does it improve performance?",
+      answer:
+        "Streaming SSR (React 18 via renderToPipeableStream and Next.js App Router) sends HTML to the browser in chunks as components finish rendering, instead of waiting for the entire tree. The browser starts parsing and rendering immediately, improving TTFB and FCP. Suspense boundaries define which parts stream progressively — a slow database query does not block the rest of the page from loading.",
+    },
+    {
+      question: "How does rendering strategy affect Core Web Vitals?",
+      answer:
+        "SSG and ISR produce the best LCP because HTML is served instantly from a CDN with no server computation. SSR improves LCP compared to CSR but adds TTFB latency. CSR has the worst LCP and FCP because the page is blank until JavaScript downloads and runs. CLS is most affected by images without dimensions and dynamic content insertion — independent of rendering strategy.",
+    },
+    {
+      question: "What is the difference between hydration and server-side rendering?",
+      answer:
+        "Server-side rendering generates the initial HTML so users see content immediately. Hydration is the subsequent step where React runs on the client, attaches event listeners to the existing HTML, and makes the page interactive without re-rendering. If hydration mismatches the server HTML, React must re-render from scratch causing a flash. React 18's selective hydration defers hydrating off-screen components.",
+    },
+  ],
+
+  "system-design-microfrontends-interview-questions": [
+    {
+      question: "What are microfrontends and when should you use them?",
+      answer:
+        "Microfrontends split a large frontend application into independently deployable pieces, each owned by a separate team. Use them when multiple teams work on different domains (checkout, catalog, search) that need to deploy independently, or when different parts of the app have different release cadences. Avoid for small teams — the operational overhead (shared dependencies, cross-app routing, auth) outweighs the benefits.",
+    },
+    {
+      question: "What is Webpack Module Federation and how does it enable microfrontends?",
+      answer:
+        "Module Federation is a Webpack 5 plugin that lets one application expose modules that other applications consume at runtime without a build-time dependency. A host app dynamically loads remotes deployed independently. Shared dependencies (React, ReactDOM) are declared with singleton:true so only one instance loads across all apps. Each remote is a fully independent deployment — updating it does not require rebuilding or redeploying the host.",
+    },
+    {
+      question: "What is the difference between Single-SPA and Module Federation?",
+      answer:
+        "Single-SPA is a framework-agnostic orchestrator that manages the lifecycle (mount, unmount, update) of multiple microfrontend applications on a single page, handling routing and lazy loading of apps. Module Federation is a bundler-level mechanism for sharing code between applications at runtime. They solve different problems: Single-SPA orchestrates independent apps; Module Federation shares dependencies and modules. They are commonly used together.",
+    },
+    {
+      question: "How do microfrontends share state and communicate?",
+      answer:
+        "Microfrontends should be loosely coupled. Best communication patterns: URL/query parameters for shared navigation state, custom DOM events for parent-to-child signals, a shared event bus (pub/sub) for cross-app messaging, and Module Federation for tightly coupled shared stores. Avoid direct imports between microfrontends — they create build-time coupling. Authentication state is typically shared via cookies or a global auth token that all apps read.",
+    },
+    {
+      question: "What are the main challenges of microfrontend architecture?",
+      answer:
+        "The main challenges are: shared dependency management (ensuring React is not loaded twice), consistent styling (each app brings its own CSS, risking conflicts — CSS-in-JS or Shadow DOM help), authentication across apps, cross-app navigation and routing complexity, performance (more network requests, more JavaScript to coordinate), and team coordination overhead for shared design systems and APIs.",
+    },
+  ],
+
+  "system-design-monorepo-interview-questions": [
+    {
+      question: "What is a monorepo and why do teams use it?",
+      answer:
+        "A monorepo stores multiple projects — apps, libraries, packages — in a single git repository. Teams use it to share code easily without publishing to npm, enable atomic cross-project changes in one commit, enforce consistent tooling and linting across all projects, and make cross-package refactoring straightforward. The cost is repository size and tooling complexity that scales with the number of packages.",
+    },
+    {
+      question: "What is the difference between Turborepo and Nx?",
+      answer:
+        "Turborepo focuses on build pipeline caching — it hashes task inputs and skips tasks whose inputs have not changed. Configuration is minimal (turbo.json). Nx provides a full developer platform with a project graph, affected commands that run tasks only for changed projects, code generators, module boundary enforcement, and first-class plugins for React, Next.js, Node. Turborepo is simpler to adopt; Nx provides more structure for large teams.",
+    },
+    {
+      question: "What is the pnpm workspace:* protocol?",
+      answer:
+        "In a pnpm monorepo, workspace:* in a package.json dependency means 'use the local version of this package from the monorepo workspace rather than downloading from npm.' During development, changes in a shared library are immediately reflected in consuming apps without publishing. On publish, pnpm replaces workspace:* with the resolved version number.",
+    },
+    {
+      question: "What is Turborepo's remote cache?",
+      answer:
+        "Turborepo's remote cache stores task outputs (build artifacts, test results) in shared storage. When any developer or CI machine runs a task, Turborepo checks if a matching cache entry exists for that exact input hash. If yes, it restores the output without running the task. On a team of 10, if one person already built a package, everyone else gets the result instantly from cache.",
+    },
+    {
+      question: "What is the difference between monorepo and polyrepo?",
+      answer:
+        "A polyrepo stores each project in its own git repository, published to npm independently. It provides clear team ownership and isolated CI pipelines. A monorepo stores everything together, enabling easier code sharing and atomic refactors but requiring more sophisticated tooling. Most large-scale frontend organizations (Google, Meta, Vercel) prefer monorepos for core products; smaller teams with independent services often prefer polyrepos.",
+    },
+  ],
+
+  "system-design-bundle-optimization-interview-questions": [
+    {
+      question: "What is tree shaking and what is required for it to work?",
+      answer:
+        "Tree shaking removes unused exports from the final JavaScript bundle. It requires ES module syntax (import/export) because ESM is statically analyzable — bundlers can determine at build time which exports are used. CommonJS (require) cannot be tree shaken because requires are dynamic. Packages must also set sideEffects: false in package.json to tell bundlers it is safe to skip files that are imported but whose exports are unused.",
+    },
+    {
+      question: "What is code splitting and how is it implemented in React?",
+      answer:
+        "Code splitting divides the bundle into smaller chunks loaded on demand. React.lazy(() => import('./Page')) with Suspense creates a separate chunk for each lazy component, loaded only when that route is visited. Next.js does route-based splitting automatically. Component-level splitting — lazy-loading heavy modals, charts, or maps — further reduces the initial bundle. The goal is to serve only the code needed for the current route.",
+    },
+    {
+      question: "What are vendor chunks and why do they improve caching?",
+      answer:
+        "A vendor chunk separates third-party library code (React, lodash) from application code. Since libraries change far less frequently, the vendor chunk gets a stable content hash and browsers cache it across deployments. Without this separation, every code change invalidates the combined hash and forces users to re-download all dependencies on every deploy.",
+    },
+    {
+      question: "How do you analyze and reduce bundle size in a React application?",
+      answer:
+        "Use webpack-bundle-analyzer or Vite's rollup-plugin-visualizer to generate a visual treemap of the bundle. Common findings: lodash imported as a whole (use lodash-es with tree shaking), moment.js (replace with date-fns), icon libraries imported entirely (import only used icons), duplicate packages (two versions of the same library), and polyfills for modern environments.",
+    },
+    {
+      question: "What is dynamic import() and when should you use it?",
+      answer:
+        "Dynamic import() returns a Promise that resolves to a module, loaded asynchronously at runtime. Use it to delay loading heavy chart libraries until visible, admin-only components until needed, or modals until opened. In Next.js, next/dynamic wraps dynamic import with SSR options and loading states. Dynamic imports are the mechanism behind all code splitting.",
+    },
+  ],
+
+  "system-design-caching-strategies-interview-questions": [
+    {
+      question: "What is the difference between Cache-Control no-cache and no-store?",
+      answer:
+        "no-store means never store the response anywhere — always make a fresh request. Use for sensitive data like banking pages. no-cache means store the response but always revalidate with the server before using it — the browser sends a conditional request and the server returns 304 Not Modified if unchanged, saving bandwidth. no-cache is often misunderstood as 'don't cache' but it actually caches with mandatory revalidation.",
+    },
+    {
+      question: "What is stale-while-revalidate and why is it powerful?",
+      answer:
+        "stale-while-revalidate is a Cache-Control extension: serve the cached response immediately (even if stale), then fetch a fresh version in the background for next time. Cache-Control: max-age=60, stale-while-revalidate=600 means serve from cache for 60 seconds, then serve stale for up to 10 minutes while silently refreshing. This gives instant response times with fresh data on next visit.",
+    },
+    {
+      question: "What is content hashing and why is it important for caching?",
+      answer:
+        "Content hashing adds a fingerprint of file contents to the filename (main.a3f8c2.js). When the file changes, the hash changes and busts the cache automatically. Files with content hashes can be served with long max-age (Cache-Control: max-age=31536000, immutable) because the URL uniquely represents one specific version. Without content hashing, you must use short cache times or risk users getting stale files after deployment.",
+    },
+    {
+      question: "What is a service worker and how does it enable offline caching?",
+      answer:
+        "A service worker runs in a background thread and intercepts all network requests from the page. It can respond from its own cache when offline, serve stale content while fetching fresh, and precache critical assets on install. The Cache API provides explicit control over what is cached. Workbox provides pre-built caching strategies: CacheFirst for assets, NetworkFirst for API responses, and StaleWhileRevalidate for frequently updated content.",
+    },
+    {
+      question: "What is the difference between HTTP caching and application-level caching?",
+      answer:
+        "HTTP caching is controlled via response headers (Cache-Control, ETag) and handled by browsers and CDNs transparently. Application-level caching stores computed data in memory (React Query's cache or Redis on the server) to avoid redundant computations or API calls. Use HTTP caching for static assets and cacheable API responses. Use application-level caching for expensive computations, database query results, and deduplicating in-flight requests.",
+    },
+  ],
+
+  "system-design-authentication-interview-questions": [
+    {
+      question: "What is the safest way to store authentication tokens in a browser?",
+      answer:
+        "Store tokens in HttpOnly cookies, not localStorage. HttpOnly cookies are inaccessible to JavaScript — XSS attacks that inject malicious scripts cannot read them. localStorage is accessible to any script on the page and is a common target for token theft. Add SameSite=Strict or Lax to prevent CSRF, and Secure to ensure HTTPS-only transmission. The tradeoff is that cookies require CSRF protection for state-changing requests.",
+    },
+    {
+      question: "What is refresh token rotation and why is it needed?",
+      answer:
+        "Access tokens should be short-lived (15 minutes) to limit theft damage. Refresh tokens are long-lived and stored in HttpOnly cookies to obtain new access tokens without re-login. Rotation means each use produces a new refresh token and invalidates the old one. If a stolen refresh token is detected (same token used twice), the server revokes the entire session. Without rotation, a stolen refresh token grants indefinite access.",
+    },
+    {
+      question: "What is the difference between session-based and JWT-based authentication?",
+      answer:
+        "Session-based auth stores session data on the server and sends a session ID in a cookie. Each request requires a database lookup. This enables immediate revocation but requires server state. JWT-based auth encodes claims in a signed token validated cryptographically without a database lookup — stateless and horizontally scalable. JWTs cannot be revoked without a blocklist. Most modern apps use short-lived JWTs in HttpOnly cookies with refresh token rotation.",
+    },
+    {
+      question: "What is OAuth PKCE and when should you use it?",
+      answer:
+        "PKCE (Proof Key for Code Exchange) prevents authorization code interception attacks in OAuth 2.0. The client generates a code verifier, hashes it to a challenge, and sends the challenge with the authorization request. On token exchange, the server verifies the hash matches. Use PKCE for public clients (SPAs, mobile apps) that cannot store a client secret — without PKCE, an intercepted authorization code could be exchanged by an attacker.",
+    },
+    {
+      question: "What is SSO and how is it implemented on the frontend?",
+      answer:
+        "Single Sign-On allows users to authenticate once and access multiple applications. Implementations include SAML (enterprise IdPs like Okta), OAuth/OpenID Connect (Google, GitHub), and shared session cookies on a parent domain. On the frontend, SSO redirects to a central identity provider, receives a token or session, then redirects back. Libraries like Auth0 SDK and NextAuth.js handle this flow.",
+    },
+  ],
+
+  "system-design-frontend-security-interview-questions": [
+    {
+      question: "What is XSS and how do you prevent it in a web application?",
+      answer:
+        "Cross-Site Scripting (XSS) injects malicious scripts into web pages viewed by other users. Prevention: use textContent instead of innerHTML for dynamic content, sanitize HTML with DOMPurify when you must render HTML, implement a Content Security Policy that blocks inline scripts and unauthorized sources, store tokens in HttpOnly cookies, and use React (which escapes JSX values by default).",
+    },
+    {
+      question: "What is CSRF and how does the SameSite cookie attribute prevent it?",
+      answer:
+        "CSRF tricks a logged-in user's browser into making unauthorized requests to a target site by exploiting automatic cookie inclusion. SameSite=Strict prevents the cookie from being sent on any cross-origin request. SameSite=Lax allows cookies on top-level navigations but blocks cross-origin form submissions and AJAX. CSRF tokens provide an additional layer by requiring a secret in the request body that attackers cannot read.",
+    },
+    {
+      question: "What is Content Security Policy and how do you configure it?",
+      answer:
+        "CSP is an HTTP header that tells browsers which sources of scripts, styles, and other resources are trusted. script-src 'self' 'nonce-{random}' prevents inline scripts and only allows scripts from your origin or with a matching nonce. This blocks most XSS attacks even if injection occurs — injected scripts have no valid nonce. Use report-only mode first to identify violations without breaking functionality.",
+    },
+    {
+      question: "What is clickjacking and how do you prevent it?",
+      answer:
+        "Clickjacking embeds your site in a transparent iframe on a malicious page, tricking users into clicking your UI while thinking they're clicking elsewhere. Prevention: add X-Frame-Options: DENY or SAMEORIGIN, or use the CSP frame-ancestors directive (frame-ancestors 'self') which supersedes X-Frame-Options in modern browsers and provides finer control.",
+    },
+    {
+      question: "What is the difference between authentication and authorization in frontend security?",
+      answer:
+        "Authentication verifies who the user is — login, JWT validation, session checks. Authorization verifies what the user is allowed to do — role checks, permission flags. Frontend authorization (hiding UI elements) is a UX concern only — it is always bypassable. Real authorization must happen on the server, rejecting unauthorized API requests regardless of what the frontend shows.",
+    },
+  ],
+
+  "system-design-state-management-interview-questions": [
+    {
+      question: "What is the difference between server state and client state?",
+      answer:
+        "Server state is data that lives on a remote server — user profiles, product lists, orders. It must be fetched, cached, synchronized, and can become stale. React Query and SWR are purpose-built for server state. Client state is local, ephemeral UI state — modal open/closed, selected tab, form values. Managing server state in Redux/Zustand with manual loading/error/caching is the most common architecture mistake in React applications.",
+    },
+    {
+      question: "When should you use Zustand instead of React Context?",
+      answer:
+        "Use Zustand when state changes frequently and many components depend on it. Context re-renders all consumers when the value changes — there is no selector system. Zustand supports subscriptions: a component using useStore(s => s.count) only re-renders when count changes, not when other store fields change. Use Context for stable global values (current user, theme) that change rarely.",
+    },
+    {
+      question: "What is React Query and what problem does it solve?",
+      answer:
+        "React Query provides automatic caching, deduplication, background refetching, loading/error state, and stale-time configuration for API calls. It replaces useState + useEffect + manual loading/error handling with useQuery. Multiple components calling useQuery with the same key share one request and one cached result. The cache is invalidated on window focus, network reconnect, or manual invalidation.",
+    },
+    {
+      question: "What is URL state and when should you use it?",
+      answer:
+        "URL state stores values in query parameters or path segments — search queries, filter selections, pagination, active tabs. URL state persists across refreshes, is shareable, and works with browser back/forward. Use useSearchParams (React Router) or Next.js router for URL state. Any state that a user might want to bookmark, share, or return to after navigating belongs in the URL, not in component state.",
+    },
+    {
+      question: "What is the atomic state model used by Jotai and Recoil?",
+      answer:
+        "Atomic state decomposes global state into tiny independent atoms. Components subscribe to individual atoms and only re-render when their specific atom changes, solving the Context re-render problem at fine granularity. Derived atoms (selectors) compute from other atoms and are memoized. The model works well for loosely related independent values that happen to be global — like multiple filter values on a search page.",
+    },
+  ],
+
+  "system-design-network-optimization-interview-questions": [
+    {
+      question: "What is the difference between prefetch, preload, and preconnect?",
+      answer:
+        "preload (<link rel='preload'>) fetches a resource needed for the current page at high priority — use for critical fonts, LCP images, and above-the-fold CSS. prefetch (<link rel='prefetch'>) fetches a resource likely needed for the next navigation at low priority during idle time. preconnect (<link rel='preconnect'>) establishes a connection (DNS + TCP + TLS) to an origin without fetching content — use for third-party CDNs to eliminate connection latency.",
+    },
+    {
+      question: "How do you optimize images for web performance?",
+      answer:
+        "Use modern formats: WebP reduces file size 25-35% vs JPEG; AVIF reduces it 50%+ but has less browser support. Serve responsive images with srcset and sizes. Lazy load below-the-fold images with loading='lazy'. Use a CDN with image optimization (Cloudinary, Imgix, Next.js Image) that resizes, converts, and compresses on demand. Always specify width and height to prevent CLS.",
+    },
+    {
+      question: "What is HTTP/2 multiplexing and how does it change frontend optimization?",
+      answer:
+        "HTTP/2 multiplexes multiple requests over a single TCP connection simultaneously, eliminating HTTP/1.1's 6-connection-per-domain limit. This makes domain sharding (splitting assets across subdomains) counterproductive. Inlining small files is less necessary since each request has minimal overhead. HTTP/2 also enables server push for preemptive asset delivery.",
+    },
+    {
+      question: "What is lazy loading and what are its SEO implications?",
+      answer:
+        "Lazy loading defers loading off-screen resources until needed. Use native loading='lazy' for images and dynamic import() for JavaScript. The SEO implication: Googlebot may not scroll far enough to trigger lazy loading of below-the-fold images, potentially missing indexable content. For SEO-critical images, ensure they are not lazy loaded or use IntersectionObserver to reliably trigger loading.",
+    },
+    {
+      question: "What is a CDN and how does it improve performance?",
+      answer:
+        "A CDN distributes static assets across servers in multiple geographic regions. Requests are routed to the closest server, reducing latency from hundreds to tens of milliseconds. CDNs cache content at edge nodes, reducing origin server load. For SSG pages, CDNs serve the entire HTML response from cache. Edge computing (Vercel Edge, Cloudflare Workers) moves dynamic computation to the CDN edge.",
+    },
+  ],
+
+  "system-design-core-web-vitals-interview-questions": [
+    {
+      question: "What are the Core Web Vitals and their passing thresholds?",
+      answer:
+        "Core Web Vitals are Google's UX quality signals used in search ranking. LCP (Largest Contentful Paint) measures loading speed — good is under 2.5s. INP (Interaction to Next Paint) measures responsiveness — good is under 200ms. CLS (Cumulative Layout Shift) measures visual stability — good is under 0.1. All three are measured at the 75th percentile of real user sessions from the Chrome UX Report.",
+    },
+    {
+      question: "How do you improve LCP (Largest Contentful Paint)?",
+      answer:
+        "LCP is typically a hero image or large text block. To improve it: preload the LCP image with <link rel='preload'>, serve it from a CDN, use WebP/AVIF format, ensure it is not lazy loaded, eliminate render-blocking resources, reduce TTFB (use SSG or ISR instead of SSR), and set explicit dimensions to prevent layout recalculation. For text-based LCP, reduce web font blocking with font-display: swap.",
+    },
+    {
+      question: "How do you improve INP (Interaction to Next Paint)?",
+      answer:
+        "INP measures the time from user interaction to the next frame painted. To improve it: break long tasks (>50ms) into chunks with scheduler.yield() or setTimeout(fn, 0), defer non-critical JavaScript with async/defer, use web workers for heavy computation, avoid synchronous layout in event handlers, use React's startTransition for non-urgent state updates, and profile with Chrome DevTools Performance tab.",
+    },
+    {
+      question: "What causes CLS (Cumulative Layout Shift) and how do you fix it?",
+      answer:
+        "CLS is caused by elements moving after the page loads. Main causes: images and videos without explicit width/height (browser can't reserve space), ads and embeds with unknown dimensions, web fonts causing FOUT (use font-display: optional), and dynamically injected content above existing content. Fix by always setting size attributes on media, reserving space for dynamic content, and using transform/opacity for animations instead of layout-affecting properties.",
+    },
+    {
+      question: "How do you measure Core Web Vitals in production?",
+      answer:
+        "Use the web-vitals JavaScript library (from Google) to capture real user measurements: import { onLCP, onINP, onCLS } from 'web-vitals'. These use PerformanceObserver to collect values from real users. Send them to your analytics backend — Google Analytics 4 captures them automatically. Google Search Console shows field data aggregated over 28 days. Use Lighthouse for lab data (synthetic measurements) to find issues before production.",
+    },
+  ],
+};
+
 /**
  * Get FAQs for a topic slug.
  * Falls back to an empty array if the topic has no dedicated FAQs.
@@ -1951,6 +2236,10 @@ export function getTopicFaqs(slug: string, track = "javascript"): FAQItem[] {
       return TOPIC_FAQS[slug] ?? [];
     case "react":
       return REACT_TOPIC_FAQS[slug] ?? [];
+    case "typescript":
+      return TYPESCRIPT_TOPIC_FAQS[slug] ?? [];
+    case "system-design":
+      return SYSTEM_DESIGN_TOPIC_FAQS[slug] ?? [];
     default:
       return [];
   }

@@ -21,6 +21,8 @@ import { TOPICS as STATIC_TOPICS } from "@/data/seo/topics";
 import { BLOG_POSTS as STATIC_POSTS, REACT_BLOG_POSTS, TYPESCRIPT_BLOG_POSTS } from "@/data/seo/blogPosts";
 import { REACT_TOPICS } from "@/data/seo/reactTopics";
 import { TYPESCRIPT_TOPICS } from "@/data/seo/typescriptTopics";
+import { SYSTEM_DESIGN_TOPICS } from "@/data/seo/systemDesignTopics";
+import { SYSTEM_DESIGN_BLOG_POSTS } from "@/data/seo/systemDesignBlogPosts";
 import { revalidateBlogPosts, revalidateTopics } from "@/lib/adminRevalidate";
 import { submitToIndexNow } from "@/lib/indexnow";
 
@@ -231,6 +233,8 @@ interface DoneState {
   reactBlogs?: boolean;
   tsTopics?: boolean;
   tsBlogs?: boolean;
+  sdTopics?: boolean;
+  sdBlogs?: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -244,6 +248,8 @@ export default function MigratePage() {
   const [migratingReactBlogs, setMigratingReactBlogs] = useState(false);
   const [migratingTs, setMigratingTs] = useState(false);
   const [migratingTsBlogs, setMigratingTsBlogs] = useState(false);
+  const [migratingSd, setMigratingSd] = useState(false);
+  const [migratingSdBlogs, setMigratingSdBlogs] = useState(false);
   const [submittingIndexNow, setSubmittingIndexNow] = useState(false);
   const [indexNowLog, setIndexNowLog] = useState<LogEntry[]>([]);
   const [done, setDone] = useState<DoneState>({});
@@ -252,6 +258,8 @@ export default function MigratePage() {
   const [reactBlogsLog, setReactBlogsLog] = useState<LogEntry[]>([]);
   const [tsLog, setTsLog] = useState<LogEntry[]>([]);
   const [tsBlogsLog, setTsBlogsLog] = useState<LogEntry[]>([]);
+  const [sdLog, setSdLog] = useState<LogEntry[]>([]);
+  const [sdBlogsLog, setSdBlogsLog] = useState<LogEntry[]>([]);
 
   function addJsLog(type: LogEntry["type"], text: string) {
     setJsLog((prev) => [...prev, { type, text }]);
@@ -267,6 +275,12 @@ export default function MigratePage() {
   }
   function addTsBlogsLog(type: LogEntry["type"], text: string) {
     setTsBlogsLog((prev) => [...prev, { type, text }]);
+  }
+  function addSdLog(type: LogEntry["type"], text: string) {
+    setSdLog((prev) => [...prev, { type, text }]);
+  }
+  function addSdBlogsLog(type: LogEntry["type"], text: string) {
+    setSdBlogsLog((prev) => [...prev, { type, text }]);
   }
 
   // ── TEMP: Manual IndexNow submission for already-seeded content ─────────
@@ -289,6 +303,12 @@ export default function MigratePage() {
       ...TYPESCRIPT_TOPICS.map((t) => `https://jsprep.pro/${t.slug}`),
       "https://jsprep.pro/blog/typescript",
       ...TYPESCRIPT_BLOG_POSTS.map((p) => `https://jsprep.pro/blog/typescript/${p.slug}`),
+      // System Design
+      "https://jsprep.pro/topics/system-design",
+      "https://jsprep.pro/system-design-interview-questions",
+      ...SYSTEM_DESIGN_TOPICS.map((t) => `https://jsprep.pro/${t.slug}`),
+      "https://jsprep.pro/blog/system-design",
+      ...SYSTEM_DESIGN_BLOG_POSTS.map((p) => `https://jsprep.pro/blog/system-design/${p.slug}`),
     ];
 
     try {
@@ -447,6 +467,70 @@ export default function MigratePage() {
       addTsBlogsLog("error", `❌ ${e.message}`);
     } finally {
       setMigratingTsBlogs(false);
+    }
+  }
+
+  // ── Section F: System Design topics ──────────────────────────────────────
+  async function handleMigrateSd() {
+    if (!user) return;
+    setMigratingSd(true);
+    setSdLog([]);
+    try {
+      addSdLog("info", `── Migrating ${SYSTEM_DESIGN_TOPICS.length} System Design topics ──────────`);
+      SYSTEM_DESIGN_TOPICS.forEach((t) => addSdLog("info", `  · ${t.slug}`));
+      const { created, errors } = await seedTopicsFromArray(SYSTEM_DESIGN_TOPICS, user.uid);
+      errors.forEach((e) => addSdLog("error", `  ✗ ${e}`));
+      addSdLog("success", `  ✓ ${created} System Design topics written to Firestore`);
+      setDone((prev) => ({ ...prev, sdTopics: true }));
+      await revalidateTopics();
+      const sdTopicUrls = [
+        "https://jsprep.pro/topics/system-design",
+        "https://jsprep.pro/system-design-interview-questions",
+        ...SYSTEM_DESIGN_TOPICS.map((t) => `https://jsprep.pro/${t.slug}`),
+      ];
+      await submitToIndexNow(sdTopicUrls);
+      addSdLog("success", `📡 IndexNow: submitted ${sdTopicUrls.length} URLs to Bing`);
+      addSdLog("info", "─────────────────────────────────────────────────");
+      addSdLog("success", "🎉 Done! Verify at /topics/system-design");
+    } catch (e: any) {
+      addSdLog("error", `❌ ${e.message}`);
+    } finally {
+      setMigratingSd(false);
+    }
+  }
+
+  // ── Section G: System Design blog posts ──────────────────────────────────
+  async function handleMigrateSdBlogs() {
+    if (!user) return;
+    setMigratingSdBlogs(true);
+    setSdBlogsLog([]);
+    try {
+      addSdBlogsLog("info", `── Migrating ${SYSTEM_DESIGN_BLOG_POSTS.length} System Design blog posts ──`);
+      SYSTEM_DESIGN_BLOG_POSTS.forEach((p) => addSdBlogsLog("info", `  · ${p.slug}`));
+      const postsToSeed = SYSTEM_DESIGN_BLOG_POSTS.map((p) => ({
+        ...p,
+        status: "published" as const,
+        topicSlug: "",
+        relatedTopicSlugs: [] as string[],
+        questionCategories: [] as string[],
+      }));
+      const { created, errors } = await seedBlogPostsFromArray(postsToSeed, user.uid);
+      errors.forEach((e) => addSdBlogsLog("error", `  ✗ ${e}`));
+      addSdBlogsLog("success", `  ✓ ${created} System Design blog posts written to Firestore`);
+      setDone((prev) => ({ ...prev, sdBlogs: true }));
+      const sdBlogUrls = [
+        "https://jsprep.pro/blog/system-design",
+        ...SYSTEM_DESIGN_BLOG_POSTS.map((p) => `https://jsprep.pro/blog/system-design/${p.slug}`),
+      ];
+      await submitToIndexNow(sdBlogUrls);
+      addSdBlogsLog("success", `📡 IndexNow: submitted ${sdBlogUrls.length} URLs to Bing`);
+      addSdBlogsLog("info", "─────────────────────────────────────────────────");
+      addSdBlogsLog("success", "🎉 Done! Verify at /blog/system-design");
+      await revalidateBlogPosts();
+    } catch (e: any) {
+      addSdBlogsLog("error", `❌ ${e.message}`);
+    } finally {
+      setMigratingSdBlogs(false);
     }
   }
 
@@ -862,11 +946,113 @@ export default function MigratePage() {
 
       <hr css={S.divider} />
 
+      {/* ── Section F: System Design Topics ─────────────────────────────── */}
+      <div css={S.sectionTitle}>Section F — System Design Topics (Full Concept Hub)</div>
+      <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
+        Seeds {SYSTEM_DESIGN_TOPICS.length} system design topics — Rendering Strategies, Microfrontends, Monorepo, Bundle Optimization, Caching, Auth, Security, State Management, Network Optimization, Core Web Vitals.
+      </p>
+      <div css={S.grid}>
+        <div css={S.card("#7c3aed", !!done.sdTopics)}>
+          <div css={S.cardIcon("#7c3aed")}>
+            <Layers size={16} color="#7c3aed" />
+          </div>
+          <div css={S.cardTitle}>System Design Topics</div>
+          <div css={S.cardCount("#7c3aed")}>{SYSTEM_DESIGN_TOPICS.length}</div>
+          <div css={S.cardMeta}>
+            {SYSTEM_DESIGN_TOPICS.map((t) => t.keyword).join(", ")}
+          </div>
+          {done.sdTopics && (
+            <div css={S.doneBadge}>
+              <CheckCircle2 size={9} /> Migrated
+            </div>
+          )}
+        </div>
+      </div>
+
+      <button
+        css={S.migrateBtn(migratingSd)}
+        onClick={handleMigrateSd}
+        disabled={migratingSd}
+      >
+        {migratingSd ? (
+          <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Seeding System Design Topics…</>
+        ) : (
+          <><Database size={16} /> Seed {SYSTEM_DESIGN_TOPICS.length} System Design Topics</>
+        )}
+      </button>
+
+      {sdLog.length > 0 && (
+        <div css={S.log}>
+          {sdLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
+          ))}
+          {migratingSd && (
+            <div css={S.logLine("info")}>
+              <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.25rem" }} />
+              running…
+            </div>
+          )}
+        </div>
+      )}
+
+      <hr css={S.divider} />
+
+      {/* ── Section G: System Design Blog Posts ─────────────────────────── */}
+      <div css={S.sectionTitle}>Section G — System Design Blog Posts</div>
+      <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
+        Seeds {SYSTEM_DESIGN_BLOG_POSTS.length} blog posts covering rendering strategies, microfrontends, JWT auth, frontend security, and monorepo architecture.
+      </p>
+      <div css={S.grid}>
+        <div css={S.card("#7c3aed", !!done.sdBlogs)}>
+          <div css={S.cardIcon("#7c3aed")}>
+            <Newspaper size={16} color="#7c3aed" />
+          </div>
+          <div css={S.cardTitle}>System Design Blog Posts</div>
+          <div css={S.cardCount("#7c3aed")}>{SYSTEM_DESIGN_BLOG_POSTS.length}</div>
+          <div css={S.cardMeta}>
+            {SYSTEM_DESIGN_BLOG_POSTS.map((p) => p.slug).join(", ")}
+          </div>
+          {done.sdBlogs && (
+            <div css={S.doneBadge}>
+              <CheckCircle2 size={9} /> Migrated
+            </div>
+          )}
+        </div>
+      </div>
+
+      <button
+        css={S.migrateBtn(migratingSdBlogs)}
+        onClick={handleMigrateSdBlogs}
+        disabled={migratingSdBlogs}
+      >
+        {migratingSdBlogs ? (
+          <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Seeding System Design Blogs…</>
+        ) : (
+          <><Database size={16} /> Seed {SYSTEM_DESIGN_BLOG_POSTS.length} System Design Blog Posts</>
+        )}
+      </button>
+
+      {sdBlogsLog.length > 0 && (
+        <div css={S.log}>
+          {sdBlogsLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
+          ))}
+          {migratingSdBlogs && (
+            <div css={S.logLine("info")}>
+              <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.25rem" }} />
+              running…
+            </div>
+          )}
+        </div>
+      )}
+
+      <hr css={S.divider} />
+
       {/* ── TEMP: Manual IndexNow ────────────────────────────────────────── */}
       <hr css={S.divider} />
       <div css={S.sectionTitle}>⚠ Temp — Submit IndexNow (remove after use)</div>
       <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
-        Submits all React + TypeScript topic and blog URLs to Bing IndexNow. Use this when data is already seeded.
+        Submits all React, TypeScript, and System Design topic and blog URLs to Bing IndexNow. Use this when data is already seeded.
       </p>
       <button
         css={S.migrateBtn(submittingIndexNow)}

@@ -1,6 +1,6 @@
 # JSPrep Pro
 
-> JSPrep Pro is a frontend interview preparation platform for JavaScript and React developers. It offers 400+ practice questions across four modes (theory, output prediction, debug lab, polyfill lab), 50+ concept deep-dives with mental models, an AI answer evaluator, AI mock interviewer, timed Interview Sprint, and daily streak tracking. Designed for developers at any level preparing for frontend engineering interviews.
+> JSPrep Pro is a frontend interview preparation platform for JavaScript, React, TypeScript, and Frontend System Design. It offers 400+ practice questions across four modes (theory, output prediction, debug lab, polyfill lab), 60+ concept deep-dives with mental models, an AI answer evaluator, AI mock interviewer, timed Interview Sprint, and daily streak tracking. The system design track covers rendering strategies, microfrontends, bundle optimization, caching, authentication architecture, frontend security, state management, network optimization, and Core Web Vitals. Designed for developers at any level preparing for junior-to-senior frontend engineering interviews.
 
 Platform URL: https://jsprep.pro
 Target audience: Frontend and full-stack developers preparing for junior-to-senior engineering interviews.
@@ -24,6 +24,8 @@ AI features: Answer Evaluator, AI Tutor, Code Checker, Mock Interviewer, Study P
 - [Polyfill Lab](https://jsprep.pro/polyfill-lab): 25 questions — implement Array methods, Promise utilities, and Function methods from scratch
 - [Topic Guides — JavaScript](https://jsprep.pro/topics/javascript): Index of all JavaScript concept hubs
 - [Topic Guides — React](https://jsprep.pro/topics/react): Index of all React concept hubs
+- [Topic Guides — TypeScript](https://jsprep.pro/topics/typescript): Index of all TypeScript concept hubs
+- [Topic Guides — System Design](https://jsprep.pro/topics/system-design): Index of all Frontend System Design concept hubs
 - [Pricing](https://jsprep.pro/#pricing): Free tier (93 questions forever) and Pro tier with all AI features
 
 ## JavaScript Concept Hubs
@@ -80,11 +82,29 @@ Each hub contains: a mental model analogy, deep code walkthrough, common misconc
 - [React useContext](https://jsprep.pro/react-usecontext-interview-questions): Context API, provider pattern, performance gotchas, when to avoid
 - [React Custom Hooks](https://jsprep.pro/react-custom-hook-interview-questions): Composition patterns, rules of hooks, real-world examples
 
+## System Design Concept Hubs
+
+Each hub contains: mental model analogy, deep code walkthrough, common misconceptions, real-world examples, interview tips, and a cheat sheet.
+
+- [Rendering Strategies (SSR, CSR, SSG, ISR)](https://jsprep.pro/system-design-rendering-strategies-interview-questions): CSR vs SSR vs SSG vs ISR vs Streaming SSR — when to use each, trade-offs for SEO and performance
+- [Microfrontends](https://jsprep.pro/system-design-microfrontends-interview-questions): Module Federation, Single-SPA, when to split, team topology, deployment independence
+- [Monorepo (Nx & Turborepo)](https://jsprep.pro/system-design-monorepo-interview-questions): pnpm workspaces, Turborepo pipeline caching, Nx affected commands, module boundaries
+- [Bundle Optimization](https://jsprep.pro/system-design-bundle-optimization-interview-questions): Tree shaking, code splitting, dynamic imports, vendor chunks, bundle analysis
+- [Caching Strategies](https://jsprep.pro/system-design-caching-strategies-interview-questions): Cache-Control headers, stale-while-revalidate, service workers, content hashing, CDN
+- [Authentication Architecture](https://jsprep.pro/system-design-authentication-interview-questions): JWT vs cookies, HttpOnly, refresh token rotation, OAuth PKCE, SSO, session management
+- [Frontend Security](https://jsprep.pro/system-design-frontend-security-interview-questions): XSS, CSRF (SameSite, CSRF tokens), CSP (nonces, strict-dynamic), clickjacking
+- [State Management](https://jsprep.pro/system-design-state-management-interview-questions): Server state (React Query) vs client state (Zustand), when to use each
+- [Network Optimization](https://jsprep.pro/system-design-network-optimization-interview-questions): Prefetch, preload, preconnect, image optimization, HTTP/2, resource hints
+- [Core Web Vitals](https://jsprep.pro/system-design-core-web-vitals-interview-questions): LCP, INP, CLS, TTFB — measurement, targets, optimization techniques
+
 ## SEO Question Sets (Static Pages)
 
 - [JavaScript Tricky Questions](https://jsprep.pro/javascript-tricky-questions): Coercion, equality quirks, typeof null, NaN !== NaN — the "wat?" moments
 - [JavaScript Output Questions](https://jsprep.pro/javascript-output-questions): Predict console.log output — hoisting, closures, async ordering
 - [JavaScript Interview Questions](https://jsprep.pro/javascript-interview-questions): 150+ theory questions with answers
+- [React Interview Questions](https://jsprep.pro/react-interview-questions): 200+ React interview questions with answers
+- [TypeScript Interview Questions](https://jsprep.pro/typescript-interview-questions): 100+ TypeScript questions with answers
+- [System Design Interview Questions](https://jsprep.pro/system-design-interview-questions): 50+ frontend system design questions with answers
 
 ## Blog
 
@@ -100,6 +120,14 @@ Each hub contains: a mental model analogy, deep code walkthrough, common misconc
 - [JavaScript Performance Optimisation](https://jsprep.pro/blog/javascript/javascript-performance-optimization): Practical techniques for faster JavaScript
 - [JavaScript Prototypes Explained](https://jsprep.pro/blog/javascript/javascript-prototypes-explained): The object model and prototype chain
 - [JavaScript this Keyword](https://jsprep.pro/blog/javascript/javascript-this-keyword-explained): Five binding rules with real examples
+
+### System Design Blog Posts
+
+- [Rendering Strategies Explained: SSR vs CSR vs SSG vs ISR](https://jsprep.pro/blog/system-design/rendering-strategies-ssr-csr-ssg-isr): Clear breakdown of all rendering strategies, when to use each, and interview questions
+- [Microfrontends vs Monolith: When to Split Your Frontend](https://jsprep.pro/blog/system-design/microfrontends-vs-monolith): Module Federation, Single-SPA, real migration patterns, and the trade-offs by team size
+- [JWT vs Cookie Authentication: What Senior Engineers Know](https://jsprep.pro/blog/system-design/jwt-vs-cookie-authentication): HttpOnly cookies, refresh token rotation, PKCE, SSO — complete auth architecture guide
+- [Frontend Security: XSS, CSRF, and CSP Explained](https://jsprep.pro/blog/system-design/frontend-security-xss-csrf-csp): Attack vectors, defenses, and the exact questions interviewers ask about frontend security
+- [Monorepo Tools: Turborepo vs Nx](https://jsprep.pro/blog/system-design/monorepo-turborepo-vs-nx): Pipeline caching, affected commands, module boundaries — when to use each
 
 ## Optional
 

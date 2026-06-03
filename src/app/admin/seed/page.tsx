@@ -36,6 +36,7 @@ import { polyfillQuestions } from "@/data/polyfillQuestions";
 import { typescriptQuestions } from "@/data/typescriptQuestions";
 import { typescriptOutputQuestions } from "@/data/typescriptOutputQuestions";
 import { typescriptDebugQuestions } from "@/data/typescriptDebugQuestions";
+import { systemDesignQuestions } from "@/data/systemDesignQuestions";
 import type { QuestionInput } from "@/types/question";
 
 // ─── Difficulty map ────────────────────────────────────────────────────────────
@@ -263,6 +264,35 @@ function buildTypescriptDebugQuestions(): QuestionInput[] {
   }));
 }
 
+function buildSystemDesignTheoryQuestions(): QuestionInput[] {
+  return systemDesignQuestions.map((q, i) => ({
+    slug: `sd-${q.id}-${q.q
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 60)}`,
+    type: "theory" as const,
+    track: "system-design" as const,
+    title: q.q,
+    question: q.q,
+    answer: q.answer,
+    hint: q.hint ?? "",
+    explanation: "",
+    keyInsight: "",
+    code: "",
+    category: q.cat,
+    tags: q.tags as string[],
+    difficulty: tagToDifficulty(q.tags),
+    status: "published" as const,
+    isPro: i >= 5,
+    order: i,
+    expectedOutput: "",
+    brokenCode: "",
+    fixedCode: "",
+    bugDescription: "",
+  }));
+}
+
 // ─── Styles ────────────────────────────────────────────────────────────────────
 
 const S = {
@@ -483,8 +513,10 @@ export default function SeedPage() {
   const tsTheoryQs = buildTypescriptTheoryQuestions();
   const tsOutputQs = buildTypescriptOutputQuestions();
   const tsDebugQs = buildTypescriptDebugQuestions();
+  const sdTheoryQs = buildSystemDesignTheoryQuestions();
   const totalQs = debugQs.length + outputQs.length + theoryQs.length + polyfillQs.length;
   const totalTsQs = tsTheoryQs.length + tsOutputQs.length + tsDebugQs.length;
+  const totalSdQs = sdTheoryQs.length;
 
   function addLog(type: LogEntry["type"], text: string) {
     setLog((prev) => [...prev, { type, text }]);
@@ -669,6 +701,56 @@ export default function SeedPage() {
       addTsLog("error", `Error: ${e.message}`);
     } finally {
       setSeedingTs(false);
+    }
+  }
+
+  // ── System Design seed ────────────────────────────────────────────────────
+
+  const [seedingSd, setSeedingSd] = useState(false);
+  const [sdLog, setSdLog] = useState<LogEntry[]>([]);
+  const [doneSd, setDoneSd] = useState<Record<string, number>>({});
+
+  function addSdLog(type: LogEntry["type"], text: string) {
+    setSdLog((prev) => [...prev, { type, text }]);
+  }
+
+  async function handleSeedSystemDesign() {
+    if (!user) return;
+    setSeedingSd(true);
+    setSdLog([]);
+    setDoneSd({});
+    try {
+      addSdLog("info", `Starting System Design seed as ${user.email}`);
+      addSdLog("info", `Total: ${totalSdQs} System Design questions`);
+      addSdLog("info", "─────────────────────────────");
+
+      let count = 0;
+      const BATCH_SIZE = 400;
+      for (let i = 0; i < sdTheoryQs.length; i += BATCH_SIZE) {
+        const b = writeBatch(db);
+        const chunk = sdTheoryQs.slice(i, i + BATCH_SIZE);
+        for (const q of chunk) {
+          const ref = doc(collection(db, "questions"));
+          b.set(ref, {
+            ...q,
+            createdBy: user!.uid,
+            viewCount: 0,
+            solveCount: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+          count++;
+        }
+        await b.commit();
+        addSdLog("success", `  Committed ${Math.min(i + BATCH_SIZE, sdTheoryQs.length)}/${sdTheoryQs.length}`);
+      }
+
+      addSdLog("success", `System Design seed complete! ${count} questions added.`);
+      setDoneSd({ "SD-Theory": count });
+    } catch (e: any) {
+      addSdLog("error", `Error: ${e.message}`);
+    } finally {
+      setSeedingSd(false);
     }
   }
 
@@ -1035,6 +1117,58 @@ Index 4:  status ASC + category ASC + order ASC`}
             <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
           ))}
           {seedingTs && (
+            <div css={S.logLine("info")}>
+              <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.375rem" }} />
+              running…
+            </div>
+          )}
+        </div>
+      )}
+
+      <hr css={S.divider} />
+
+      {/* ── System Design Questions Section ──────────────────────────────────── */}
+      <div css={S.sectionTitle}>System Design Questions (separate seed)</div>
+      <p style={{ fontSize: "0.875rem", color: C.muted, marginBottom: "1.25rem", lineHeight: 1.7 }}>
+        Seed System Design–track theory questions independently. {totalSdQs} questions across 10 categories.
+        Run once — use Clear All first if re-seeding.
+      </p>
+
+      <div css={S.grid}>
+        <div css={S.dataCard("#7c3aed", !!doneSd["SD-Theory"])}>
+          <div css={S.dataIcon("#7c3aed")}>
+            <BookOpen size={16} color="#7c3aed" />
+          </div>
+          <div css={S.dataTitle}>SD Theory</div>
+          <div css={S.dataCount("#7c3aed")}>{sdTheoryQs.length}</div>
+          <div css={S.dataMeta}>Rendering, MFEs, Auth, Security, CWV…</div>
+          {doneSd["SD-Theory"] && (
+            <div css={S.doneBadge("#7c3aed")}>
+              <CheckCircle2 size={9} /> Imported
+            </div>
+          )}
+        </div>
+      </div>
+
+      <button
+        css={S.seedBtn(seedingSd)}
+        onClick={handleSeedSystemDesign}
+        disabled={seedingSd || seeding || seedingTs || clearing}
+        style={{ background: seedingSd ? "#7c3aed80" : "#7c3aed" }}
+      >
+        {seedingSd ? (
+          <><Loader2 size={16} css={{ animation: "spin 1s linear infinite" }} /> Seeding System Design…</>
+        ) : (
+          <><Database size={16} /> Seed {totalSdQs} System Design Questions</>
+        )}
+      </button>
+
+      {sdLog.length > 0 && (
+        <div css={S.log}>
+          {sdLog.map((entry, i) => (
+            <div key={i} css={S.logLine(entry.type)}>{entry.text}</div>
+          ))}
+          {seedingSd && (
             <div css={S.logLine("info")}>
               <Loader2 size={11} style={{ display: "inline", animation: "spin 1s linear infinite", marginRight: "0.375rem" }} />
               running…

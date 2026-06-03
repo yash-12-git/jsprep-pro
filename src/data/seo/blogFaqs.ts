@@ -652,5 +652,102 @@ export const TYPESCRIPT_BLOG_FAQS: Record<string, FAQItem[]> = {
       answer: 'The uppercase Object type includes nearly everything in JavaScript (it accepts primitives like 5 and \'hello\'), making it almost as useless as any for type safety. The lowercase object type prevents primitives but prevents accessing any properties. Use specific interfaces, Record<string, unknown> for generic objects, or the actual type you expect. For truly unknown data, use unknown.',
     },
   ],
+}
 
+export const SYSTEM_DESIGN_BLOG_FAQS: Record<string, FAQItem[]> = {
+
+  'rendering-strategies-ssr-csr-ssg-isr': [
+    {
+      question: 'What is the difference between SSR, CSR, SSG, and ISR?',
+      answer: 'CSR renders in the browser — blank HTML until JavaScript runs. SSR renders on the server per request — full HTML immediately, but adds server latency. SSG pre-builds HTML at deploy time — fastest, served from CDN, requires rebuild for data changes. ISR is SSG with background revalidation — pages are served stale while a fresh version builds silently. Choose based on data freshness, SEO needs, and personalization requirements.',
+    },
+    {
+      question: 'Which rendering strategy is best for SEO?',
+      answer: 'SSG and ISR are best for SEO — they deliver fully rendered HTML from a CDN with minimal TTFB, and Googlebot sees complete content instantly. SSR also delivers full HTML but with higher TTFB from server processing. CSR is worst for SEO because Googlebot must execute JavaScript to see content, which delays indexing and may result in incomplete crawls for complex pages.',
+    },
+    {
+      question: 'What is Streaming SSR in React 18?',
+      answer: 'Streaming SSR uses React 18 renderToPipeableStream to send HTML to the browser progressively as components finish rendering, instead of waiting for the entire tree. Suspense boundaries define what streams last. The browser starts parsing and displaying content immediately — a product page can stream the header and shell while the price and reviews are still being fetched from the database.',
+    },
+    {
+      question: 'When should I use getServerSideProps vs getStaticProps in Next.js?',
+      answer: 'Use getStaticProps (SSG) for pages where content is the same for all users and changes infrequently — marketing pages, documentation, blog posts. Use getServerSideProps (SSR) for pages that need request-time data — authenticated user data, real-time prices, personalized content, or pages that need request cookies/headers. Use getStaticProps with revalidate (ISR) when data changes but not on every request.',
+    },
+  ],
+
+  'microfrontends-vs-monolith': [
+    {
+      question: 'What is the main advantage of microfrontends over a monolithic frontend?',
+      answer: 'Microfrontends allow independent deployment — different teams can release their domain (checkout, catalog, search) without coordinating with others. This reduces deployment risk and enables different tech stacks per domain. However, this benefit only materializes at scale (10+ frontend engineers) — below that, the operational overhead of Module Federation, shared dependencies, cross-app auth, and design system coordination costs more than it saves.',
+    },
+    {
+      question: 'What is Module Federation in Webpack 5?',
+      answer: 'Module Federation is a Webpack 5 plugin that allows JavaScript applications to share code at runtime. A host application dynamically loads exposed modules from remote applications deployed separately. Shared dependencies like React are configured with singleton:true to prevent loading two instances. Each remote is a fully independent deployment — updating it does not require rebuilding or redeploying the host.',
+    },
+    {
+      question: 'What is Single-SPA and how does it relate to microfrontends?',
+      answer: 'Single-SPA is a JavaScript framework that orchestrates multiple microfrontend applications on a single page. It manages the lifecycle (bootstrap, mount, unmount) of each app and handles routing — showing apps based on the URL. It is framework-agnostic: a Single-SPA root config can host a React app, an Angular app, and a Vue app simultaneously. Module Federation can be used alongside Single-SPA to optimize shared dependency loading.',
+    },
+    {
+      question: 'How do microfrontends share a design system?',
+      answer: 'The most scalable approach is a shared component library published to npm or a monorepo workspace, consumed by all microfrontends. Module Federation can expose the design system as a remote module, ensuring all apps use one instance at runtime. CSS custom properties applied to the document root provide design tokens that all apps inherit without JavaScript coupling.',
+    },
+  ],
+
+  'jwt-vs-cookie-authentication': [
+    {
+      question: 'What is the safest way to store a JWT in a browser?',
+      answer: 'Store JWTs in HttpOnly cookies, not localStorage or sessionStorage. HttpOnly cookies are inaccessible to JavaScript — XSS attacks cannot read them. localStorage is exposed to any script on the page and is the primary target of token theft attacks. Add Secure (HTTPS only) and SameSite=Lax or Strict. The tradeoff: cookie-based JWTs require CSRF protection for state-changing mutations.',
+    },
+    {
+      question: 'Why should JWTs be short-lived?',
+      answer: 'JWTs are stateless — the server validates them cryptographically without a database lookup, meaning there is no built-in revocation. If a JWT is stolen, it remains valid until expiry. Short expiry (5-15 minutes) limits the window of exploitation. Pair short-lived access JWTs with a refresh token rotation system stored in an HttpOnly cookie to maintain sessions without requiring frequent re-login.',
+    },
+    {
+      question: 'What is refresh token rotation and how does it prevent token theft?',
+      answer: 'Refresh token rotation generates a new refresh token on every use and invalidates the old one. If a stolen refresh token is presented (the same token used twice), the server detects reuse and revokes the entire session — logging out the attacker and the legitimate user. Without rotation, a single stolen refresh token provides indefinite access until the user changes their password.',
+    },
+    {
+      question: 'What is the difference between OAuth 2.0 and OpenID Connect?',
+      answer: 'OAuth 2.0 is an authorization framework — it issues access tokens that grant permission to access resources on behalf of a user, but says nothing about who the user is. OpenID Connect (OIDC) is an authentication layer built on OAuth 2.0 — it adds an ID token (a JWT with user identity claims) and a UserInfo endpoint. Use OAuth 2.0 for delegated API access. Use OIDC when you need to authenticate the user and know their identity.',
+    },
+  ],
+
+  'frontend-security-xss-csrf-csp': [
+    {
+      question: 'What is the difference between XSS and CSRF attacks?',
+      answer: 'XSS (Cross-Site Scripting) injects malicious scripts into your site that run in other users\' browsers — stealing tokens, hijacking sessions, or exfiltrating data. CSRF (Cross-Site Request Forgery) tricks a logged-in user into unknowingly submitting a request to your site from a malicious third-party page, exploiting automatic cookie inclusion. XSS exploits trust in your site; CSRF exploits trust in the user\'s browser.',
+    },
+    {
+      question: 'What is Content Security Policy and how does it block XSS?',
+      answer: 'CSP is an HTTP response header that declares which sources of content are trusted. script-src \'self\' \'nonce-abc123\' blocks all inline scripts and external scripts not on your allowlist — even if an attacker injects a script tag, it has no valid nonce and is blocked by the browser. Use Content-Security-Policy-Report-Only first to log violations without blocking, fix issues, then switch to enforcement mode.',
+    },
+    {
+      question: 'How does the SameSite cookie attribute prevent CSRF?',
+      answer: 'SameSite=Strict prevents cookies from being sent on any cross-origin request — even clicking a link from an external site, blocking all CSRF. SameSite=Lax blocks cross-origin form submissions and AJAX but allows cookies on top-level navigations. Lax is the recommended default for session cookies — it blocks most CSRF scenarios while preserving OAuth redirect flows and link sharing.',
+    },
+    {
+      question: 'What makes innerHTML dangerous and what should you use instead?',
+      answer: 'innerHTML directly parses and inserts HTML, including script tags and event handlers. Any user-supplied content set via innerHTML becomes executable code — this is reflected XSS. Use textContent for plain text (escapes HTML automatically). If you must render HTML from user input, sanitize with DOMPurify first. React\'s JSX escapes all values by default — dangerouslySetInnerHTML is the explicit escape hatch requiring manual sanitization.',
+    },
+  ],
+
+  'monorepo-turborepo-vs-nx': [
+    {
+      question: 'What is a monorepo and what problems does it solve?',
+      answer: 'A monorepo stores multiple related projects in a single repository. It solves: code sharing without npm publishing (internal packages imported directly), atomic cross-project refactors in one commit, consistent tooling and CI across all packages, and easy discovery of inter-package dependencies. The cost is repository size and the need for build orchestration tools like Turborepo or Nx.',
+    },
+    {
+      question: 'How does Turborepo speed up builds?',
+      answer: 'Turborepo hashes task inputs (source files, package.json, environment variables) and caches task outputs (build artifacts, test results). If the input hash matches a previous run, Turborepo restores the output from cache without executing the task. With remote cache enabled, cache hits are shared across all developers and CI machines — a build that took 10 minutes runs in seconds if nothing in that package changed.',
+    },
+    {
+      question: 'What is Nx\'s "affected" command and why is it useful in CI?',
+      answer: 'nx affected runs tasks only for projects that changed or depend on changed projects, based on the project dependency graph. Instead of running tests for all 50 packages, Nx runs tests only for the changed packages and their dependents. This scales CI time sub-linearly — adding more packages does not proportionally increase CI time if most are unaffected by any given change.',
+    },
+    {
+      question: 'What is the pnpm workspace protocol in a monorepo?',
+      answer: 'workspace:* in package.json tells pnpm to use the local package from the monorepo workspace instead of downloading from npm. During development, changes in a shared library are immediately reflected in consuming apps without publishing. On publish, pnpm replaces workspace:* with the resolved version number, producing correct published artifacts.',
+    },
+  ],
 }
