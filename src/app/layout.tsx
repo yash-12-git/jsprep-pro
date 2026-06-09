@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
-import { SITE, softwareSchema, websiteSchema, KEYWORDS } from "@/lib/seo/seo";
+import { SITE, softwareSchema, websiteSchema, organizationSchema, KEYWORDS } from "@/lib/seo/seo";
 import Navbar from "@/components/layout/Navbar";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TrackProvider } from "@/contexts/TrackContext";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "en_IN",
+    locale: "en_US",
     url: SITE.domain,
     siteName: SITE.name,
     title: "Frontend Interview Questions & Practice — JSPrep Pro",
@@ -76,12 +76,15 @@ export default function RootLayout({
           key="website-schema"
           dangerouslySetInnerHTML={{ __html: websiteSchema() }}
         />
+        <script
+          type="application/ld+json"
+          key="org-schema"
+          dangerouslySetInnerHTML={{ __html: organizationSchema() }}
+        />
         <meta name="application-name" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-title" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#ffffff" />
-        <meta name="geo.region" content="IN" />
-        <meta name="geo.placename" content="India" />
       </head>
       <body className="antialiased">
         <Script id="microsoft-clarity" strategy="afterInteractive">

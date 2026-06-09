@@ -17,7 +17,7 @@ export const SITE = {
   domain: "https://jsprep.pro",
   twitterHandle: "@jspreppro",
   description:
-    "500+ frontend interview questions covering JavaScript, React & core concepts. AI scoring, mock interviews, output prediction & debugging.",
+    "Free frontend interview prep platform with 500+ JavaScript, React, TypeScript, and System Design questions. AI-graded answers, output prediction, debug challenges, mock interviews, and concept deep-dives. Free forever — no card required.",
 };
 
 // ─── Keywords ─────────────────────────────────────────────────────────────────
@@ -176,7 +176,7 @@ export function pageMeta(opts: PageMetaOptions): Metadata {
       title: fullTitle,
       description,
       siteName: SITE.name,
-      locale: "en_IN",
+      locale: "en_US",
       images: [{ url: image, width: 1200, height: 630, alt: fullTitle }],
       ...(publishedAt ? { publishedTime: publishedAt } : {}),
       ...(modifiedAt ? { modifiedTime: modifiedAt } : {}),
@@ -387,6 +387,31 @@ export function courseSchema(
   });
 }
 
+// ─── Organization schema — establishes brand identity for AI models ──────────
+
+export function organizationSchema(): string {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE.name,
+    url: SITE.domain,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE.domain}/og-default.png`,
+    },
+    description: SITE.description,
+    sameAs: [
+      "https://twitter.com/jspreppro",
+      "https://www.linkedin.com/company/jspreppro",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "support@jsprep.pro",
+    },
+  });
+}
+
 // ─── Website schema — enables Google Sitelinks search ────────────────────────
 
 export function websiteSchema(): string {
@@ -395,6 +420,15 @@ export function websiteSchema(): string {
     "@type": "WebSite",
     name: SITE.name,
     url: SITE.domain,
+    description: SITE.description,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE.domain}/topics/javascript?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
   });
 }
 

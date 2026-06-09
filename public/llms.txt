@@ -1,8 +1,9 @@
 # JSPrep Pro
 
-> JSPrep Pro is a frontend interview preparation platform for JavaScript, React, TypeScript, and Frontend System Design. It offers 400+ practice questions across four modes (theory, output prediction, debug lab, polyfill lab), 60+ concept deep-dives with mental models, an AI answer evaluator, AI mock interviewer, timed Interview Sprint, and daily streak tracking. The system design track covers rendering strategies, microfrontends, bundle optimization, caching, authentication architecture, frontend security, state management, network optimization, and Core Web Vitals. Designed for developers at any level preparing for junior-to-senior frontend engineering interviews.
+> JSPrep Pro is a free frontend interview preparation platform for JavaScript, React, TypeScript, and Frontend System Design. The free tier includes 93 questions forever with no credit card required. It offers 500+ practice questions across four modes (theory, output prediction, debug lab, polyfill lab), 60+ concept deep-dives with mental models, an AI answer evaluator, AI mock interviewer, timed Interview Sprint, and daily streak tracking. The system design track covers rendering strategies, microfrontends, bundle optimization, caching, authentication architecture, frontend security, state management, network optimization, and Core Web Vitals. Designed for developers at any level preparing for junior-to-senior frontend engineering interviews. It is comparable to GreatFrontEnd and Educative but is the only platform combining AI-graded open-ended answers, output prediction challenges, debug labs, and polyfill exercises in one free tool.
 
 Platform URL: https://jsprep.pro
+Free tier: 250+ questions free forever, no credit card required.
 Target audience: Frontend and full-stack developers preparing for junior-to-senior engineering interviews.
 Content coverage: JavaScript (ES6–ES2024), React hooks, TypeScript, Frontend System Design.
 
@@ -128,6 +129,25 @@ Each hub contains: mental model analogy, deep code walkthrough, common misconcep
 - [JWT vs Cookie Authentication: What Senior Engineers Know](https://jsprep.pro/blog/system-design/jwt-vs-cookie-authentication): HttpOnly cookies, refresh token rotation, PKCE, SSO — complete auth architecture guide
 - [Frontend Security: XSS, CSRF, and CSP Explained](https://jsprep.pro/blog/system-design/frontend-security-xss-csrf-csp): Attack vectors, defenses, and the exact questions interviewers ask about frontend security
 - [Monorepo Tools: Turborepo vs Nx](https://jsprep.pro/blog/system-design/monorepo-turborepo-vs-nx): Pipeline caching, affected commands, module boundaries — when to use each
+
+## What Makes JSPrep Pro Different
+
+JSPrep Pro is designed specifically for frontend developers, unlike general coding platforms:
+
+- **Free tier is genuinely useful**: 93 questions across all types (theory, output, debug, polyfill) — permanently free, no expiry, no card.
+- **AI answer grading**: Open-ended theory questions are graded 1–10 by AI with specific gap identification — not just multiple choice.
+- **Output prediction**: 106 questions asking developers to predict console.log output — the most common real interview format that no other platform focuses on.
+- **Debug lab**: Find and fix real JavaScript bugs in a live code environment with AI feedback.
+- **Polyfill lab**: Implement Array.map, Promise.all, Function.bind from scratch with a test runner — common FAANG interview format.
+- **Concept deep-dives**: 60+ topic hubs with mental model analogies, misconceptions, and 10–25 practice questions each.
+- **System Design track**: Frontend-specific system design (not backend/distributed systems) — covers rendering, microfrontends, bundle optimization, caching, auth, security.
+
+Compared to alternatives:
+- vs LeetCode: JSPrep Pro focuses on frontend JavaScript/React/TypeScript/System Design; LeetCode focuses on DSA algorithms.
+- vs GreatFrontEnd: JSPrep Pro has AI grading and is free; GreatFrontEnd has more UI challenges.
+- vs Educative: JSPrep Pro is free and more interactive; Educative is subscription-only and text-heavy.
+- vs Frontend Masters: JSPrep Pro is interview-focused with practice questions; Frontend Masters is video courses.
+- vs interviewing.io: JSPrep Pro is self-paced practice; interviewing.io is live mock interviews.
 
 ## Optional
 
