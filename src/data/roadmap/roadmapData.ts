@@ -14,6 +14,8 @@ export const ROADMAP: RoadmapMonth[] = [
     month: 1,
     title: "JS + Browser Mastery",
     accent: "green",
+    description: "Lock in the 'why' behind things you already use. Product companies probe JS internals hard — execution context, closures, event loop, prototypes. Every topic links to JSPrep articles + all questions.",
+    timeCommitment: "1h read · 1h questions · 1h implementation",
     weeks: [
       {
         week: 1,
@@ -57,17 +59,21 @@ export const ROADMAP: RoadmapMonth[] = [
           },
           {
             day: 3,
+            tags: ["JS", "critical"],
             tasks: [
               {
                 text: "Closures — CRITICAL for interviews",
                 topicSlug: "javascript-closure-interview-questions",
+                type: "read",
               },
               {
                 text: "Real use cases: memoization, private variables, factory functions",
                 topicSlug: "javascript-memoization-interview-questions",
+                type: "read",
               },
               {
                 text: "Practice: Build a counter, memoize, and private module using closures",
+                type: "build",
               },
             ],
           },
@@ -94,31 +100,37 @@ export const ROADMAP: RoadmapMonth[] = [
                 text: "bind / call / apply — differences & use cases",
               },
               { text: "Implement polyfill for bind from scratch" },
-              { text: "polyfill-lab" },
+              { text: "polyfill-lab", topicSlug: "polyfill-lab" },
             ],
           },
           {
             day: 6,
+            tags: ["JS", "senior"],
             tasks: [
               {
                 text: "Event loop — microtask vs macrotask queue (deep)",
                 topicSlug: "javascript-event-loop-interview-questions",
+                type: "read",
               },
               {
                 text: "Promise chaining & execution order",
                 topicSlug: "javascript-promise-interview-questions",
+                type: "read",
               },
               {
                 text: "Practice: 20 event loop output prediction questions",
+                type: "build",
               },
             ],
           },
           {
             day: 7,
+            tags: ["build", "review"],
+            mockFocus: "Core JavaScript",
             tasks: [
-              { text: "Build: Custom setTimeout using Date.now loop" },
-              { text: "Build: Basic Promise polyfill" },
-              { text: "Revise Week 1 notes — flashcard all concepts" },
+              { text: "Build: Custom setTimeout using Date.now loop", type: "build" },
+              { text: "Build: Basic Promise polyfill", type: "build" },
+              { text: "Mock: Revise Week 1 — predict output for 10 JS questions", type: "mock" },
             ],
           },
         ],
@@ -208,31 +220,39 @@ export const ROADMAP: RoadmapMonth[] = [
           },
           {
             day: 13,
+            tags: ["build", "machine coding"],
             tasks: [
               {
                 text: "Implement debounce from scratch (with leading/trailing options)",
                 topicSlug: "polyfill-lab",
+                type: "build",
               },
               {
                 text: "Implement throttle from scratch",
                 topicSlug: "polyfill-lab",
+                type: "build",
               },
-              { text: "Practice: Build debounced search input" },
+              { text: "Practice: Build debounced search input", type: "build" },
             ],
           },
           {
             day: 14,
+            tags: ["build", "polyfills"],
+            mockFocus: "Async & Promises",
             tasks: [
               {
                 text: "Polyfills: Array.map, Array.reduce, Array.filter, Array.flat",
                 topicSlug: "polyfill-lab",
+                type: "build",
               },
               {
                 text: "Polyfills: Promise.all, Promise.race, Promise.allSettled",
                 topicSlug: "polyfill-lab",
+                type: "build",
               },
               {
-                text: "Revise Week 2 — write all polyfills from memory",
+                text: "Mock: Write all polyfills from memory, explain each",
+                type: "mock",
               },
             ],
           },
@@ -417,6 +437,8 @@ export const ROADMAP: RoadmapMonth[] = [
     month: 2,
     title: "React Deep Dive",
     accent: "blue",
+    description: "You use React daily — now you need to explain it. Fiber, reconciliation, hook internals, render optimisation. Your real-world experience is an unfair advantage if you articulate it right.",
+    timeCommitment: "React source reading · JSPrep React section · 1h coding daily",
     weeks: [
       {
         week: 5,
@@ -509,15 +531,20 @@ export const ROADMAP: RoadmapMonth[] = [
           },
           {
             day: 35,
+            tags: ["React", "mock"],
+            mockFocus: "React & State Management",
             tasks: [
               {
                 text: "Weekend: Review React core — write 10 interview Q&A from memory",
+                type: "read",
               },
               {
-                text: "Mock Q: Explain reconciliation in 2 mins",
+                text: "Mock: Explain reconciliation in 2 mins",
+                type: "mock",
               },
               {
-                text: "Mock Q: What happens when a component's key changes?",
+                text: "Mock: What happens when a component's key changes?",
+                type: "mock",
               },
             ],
           },
@@ -611,17 +638,26 @@ export const ROADMAP: RoadmapMonth[] = [
           },
           {
             day: 42,
+            tags: ["React", "hooks", "mock"],
+            mockFocus: "React & State Management",
             tasks: [
               {
                 text: "Weekend: useContext deep dive — Context API pitfalls",
                 topicSlug: "react-usecontext-interview-questions",
+                type: "read",
               },
               {
                 text: "useReducer — when to prefer over useState",
                 topicSlug: "react-usereducer-interview-questions",
+                type: "read",
               },
               {
                 text: "Build: Theme switcher using Context + useReducer",
+                type: "build",
+              },
+              {
+                text: "Mock: Explain useState vs useReducer — when would you pick each?",
+                type: "mock",
               },
             ],
           },
@@ -711,14 +747,21 @@ export const ROADMAP: RoadmapMonth[] = [
           },
           {
             day: 49,
+            tags: ["React", "patterns", "mock"],
+            mockFocus: "React & State Management",
             tasks: [
               {
                 text: "Weekend: HOC pattern, Render Props — when each fits",
+                type: "read",
               },
               {
                 text: "Compound components pattern — real example (Tabs UI)",
+                type: "build",
               },
-              { text: "Revise Weeks 5–7 concepts" },
+              {
+                text: "Mock: Explain render optimisation strategy for a large React app",
+                type: "mock",
+              },
             ],
           },
         ],
@@ -820,6 +863,8 @@ export const ROADMAP: RoadmapMonth[] = [
     month: 3,
     title: "Machine Coding + Projects",
     accent: "amber",
+    description: "This is the biggest differentiator at 25 LPA+. Build 15+ UI components under time pressure. Zepto gives you 1h to build a working UI — these weeks give you the reps to build anything confidently.",
+    timeCommitment: "1 component/day · timed builds · 45-min sessions",
     weeks: [
       {
         week: 9,
@@ -827,6 +872,7 @@ export const ROADMAP: RoadmapMonth[] = [
         days: [
           {
             day: 57,
+            tags: ["machine coding", "timed"],
             tasks: [
               {
                 text: "Machine code: Todo app — add, complete, delete, filter (all/active/completed)",
@@ -1148,6 +1194,8 @@ export const ROADMAP: RoadmapMonth[] = [
     month: 4,
     title: "Interview Mode",
     accent: "coral",
+    description: "Company-specific calibration. Mock interviews, STAR behavioral stories, system design rounds, and salary negotiation. The 'why do you want to join' answer at 25 LPA companies matters more than you think.",
+    timeCommitment: "2 full mock rounds/week · company research · offer prep",
     weeks: [
       {
         week: 13,
@@ -1181,41 +1229,55 @@ export const ROADMAP: RoadmapMonth[] = [
           },
           {
             day: 87,
+            tags: ["JS", "mock", "pressure"],
+            mockFocus: "Core JavaScript",
             tasks: [
               {
                 text: "JS interview deep session: 30 questions in 60 min",
+                type: "mock",
               },
               {
                 text: "Focus: closures, event loop, prototype, this, async",
+                type: "read",
               },
               {
                 text: "Target: answer each under 90 seconds",
+                type: "mock",
               },
             ],
           },
           {
             day: 88,
+            tags: ["React", "mock", "pressure"],
+            mockFocus: "React & State Management",
             tasks: [
               {
                 text: "React interview deep session: 20 questions in 60 min",
+                type: "mock",
               },
               {
                 text: "Focus: hooks, rendering, reconciliation, performance",
+                type: "read",
               },
               {
                 text: "Include architectural questions (when to split components)",
+                type: "mock",
               },
             ],
           },
           {
             day: 89,
+            tags: ["machine coding", "timed", "mock"],
+            mockFocus: "Mixed (all topics)",
             tasks: [
               {
                 text: "Machine coding mock: Build autocomplete in 45 min solo",
+                type: "mock",
               },
-              { text: "No help — timer running" },
+              { text: "No help — timer running", type: "build" },
               {
                 text: "Review: completeness, edge cases, code clarity",
+                type: "read",
               },
             ],
           },
@@ -1235,12 +1297,15 @@ export const ROADMAP: RoadmapMonth[] = [
           },
           {
             day: 91,
+            tags: ["full mock", "JS", "React"],
+            mockFocus: "Mixed (all topics)",
             tasks: [
               {
                 text: "Weekend: Full mock interview (self-record)",
+                type: "mock",
               },
-              { text: "Round 1: JS + React Q&A (30 min)" },
-              { text: "Round 2: Machine coding — Data table (45 min)" },
+              { text: "Round 1: JS + React Q&A (30 min)", type: "mock" },
+              { text: "Round 2: Machine coding — Data table (45 min)", type: "build" },
             ],
           },
         ],
@@ -1321,14 +1386,18 @@ export const ROADMAP: RoadmapMonth[] = [
           },
           {
             day: 98,
+            tags: ["full mock", "system design"],
+            mockFocus: "Mixed (all topics)",
             tasks: [
               {
                 text: "Weekend: Full-length mock interview simulation",
+                type: "mock",
               },
               {
                 text: "Include: intro (2 min), JS (20 min), React (20 min), machine coding (45 min), Q&A",
+                type: "mock",
               },
-              { text: "Score yourself 1–10 on each section" },
+              { text: "Score yourself 1–10 on each section", type: "read" },
             ],
           },
         ],

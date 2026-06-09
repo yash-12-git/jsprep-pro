@@ -5,7 +5,7 @@ import { styles } from "./styles";
 
 interface StatsGridProps {
   global: GlobalStats;
-  monthStats: MonthStats;
+  monthStats?: MonthStats;
   mounted: boolean;
 }
 
@@ -42,7 +42,7 @@ export function StatsGrid({ global: g, monthStats: m, mounted }: StatsGridProps)
   const pct = mounted ? g.pct : 0;
   const totalDone = mounted ? g.totalDone : 0;
   const weeksComplete = mounted ? g.weeksComplete : 0;
-  const monthPct = mounted ? m.pct : 0;
+  const monthPct = mounted && m ? m.pct : 0;
   const streak = mounted ? g.streak : 0;
 
   return (
