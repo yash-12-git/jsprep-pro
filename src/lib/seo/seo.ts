@@ -152,7 +152,9 @@ export function pageMeta(opts: PageMetaOptions): Metadata {
   const trackKw = track ? TRACK_KEYWORDS[track] : [];
 
   return {
-    title: fullTitle,
+    // `absolute` bypasses the root layout's "%s — JSPrep Pro" template so the
+    // brand suffix isn't appended twice (fullTitle already includes it).
+    title: { absolute: fullTitle },
     description,
     keywords: [...KEYWORDS.primary, ...trackKw, ...keywords].join(", "),
     authors: [{ name: "JSPrep Pro Team" }],

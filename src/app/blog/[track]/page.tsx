@@ -1,5 +1,5 @@
 // app/blog/[track]/page.tsx
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { TRACKS, TRACK_MAP } from "@/lib/tracks";
@@ -37,7 +37,15 @@ export default async function BlogIndexPage({
   params: Promise<{ track: Track }>;
 }) {
   const { track } = await params;
-  if (!TRACK_MAP[track]?.available) notFound();
+  if (!TRACK_MAP[track]?.available) {
+    // Legacy flat blog URLs (/blog/<slug>) were once indexed without the track
+    // segment and now 404. If this param is actually a known post slug, 301 it
+    // to its canonical /blog/<track>/<slug> path instead of 404-ing.
+    const allPosts = await getPublishedBlogPosts();
+    const match = allPosts.find((p) => p.slug === (track as string));
+    if (match) permanentRedirect(`/blog/${match.track}/${match.slug}`);
+    notFound();
+  }
 
   const meta = TRACK_META[track];
   const posts = await getPublishedBlogPosts({ track });
