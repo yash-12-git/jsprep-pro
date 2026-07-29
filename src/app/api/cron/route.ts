@@ -32,6 +32,7 @@ import {
   findDuplicate,
 } from "@/lib/embeddings";
 import type { Question } from "@/types/question";
+import { getAdminDb } from "@/lib/firebaseAdmin";
 
 const QUESTIONS_COL = "questions";
 const PENDING_COL = "questions_pending";
@@ -213,18 +214,23 @@ async function generateAndSavePending(
       };
     }
 
-    // Save to pending collection for admin review
-    await addDoc(collection(db, PENDING_COL), {
-      ...candidate.question,
-      embedding: candidate.embedding,
-      topSimilar: candidate.topSimilar,
-      similarityScore: candidate.similarityScore,
-      generatedAt: Timestamp.now(),
-      generatedTopic: topic,
-      status: "pending", // pending | approved | rejected
-      reviewedAt: null,
-      reviewedBy: null,
-    });
+    // Save to pending collection for admin review.
+    // Admin SDK, not the client SDK: this runs unauthenticated on a cron, so
+    // a client-SDK write would be denied by the admin-only Firestore rule on
+    // questions_pending (and allowing it would open the collection to anyone).
+    await getAdminDb()
+      .collection(PENDING_COL)
+      .add({
+        ...candidate.question,
+        embedding: candidate.embedding,
+        topSimilar: candidate.topSimilar,
+        similarityScore: candidate.similarityScore,
+        generatedAt: new Date().toISOString(),
+        generatedTopic: topic,
+        status: "pending", // pending | approved | rejected
+        reviewedAt: null,
+        reviewedBy: null,
+      });
 
     return {
       saved: true,

@@ -29,6 +29,7 @@ import {
   buildRAGContext,
 } from '@/lib/embeddings'
 import type { Question } from '@/types/question'
+import { verifyAdmin } from '@/lib/firebaseAdmin'
 
 const QUESTIONS_COL = 'questions'
 const DUPLICATE_THRESHOLD = 0.85
@@ -78,11 +79,15 @@ async function callGenerateAI(params: {
 
 export async function POST(req: NextRequest) {
   try {
-    // Auth check — only admin
-    // Auth: accept cron secret (for weekly job) OR no secret (admin UI — already
-    // protected by Firebase auth on the page level, not exposed publicly)
+    // Auth: the cron secret (weekly job) OR an admin's Firebase ID token.
+    // Previously a *missing* header passed the check, leaving this route open
+    // to anyone and burning Groq credits.
     const authHeader = req.headers.get('authorization')
-    if (authHeader && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const isCron =
+      !!process.env.CRON_SECRET &&
+      authHeader === `Bearer ${process.env.CRON_SECRET}`
+
+    if (!isCron && !(await verifyAdmin(authHeader))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

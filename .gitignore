@@ -1,3 +1,9 @@
 node_modules
+.next
 .env.local
 scripts/serviceAccountKey.json
+
+# Yarn 4 (PnP)
+.yarn/*
+!.yarn/patches
+.pnp.*

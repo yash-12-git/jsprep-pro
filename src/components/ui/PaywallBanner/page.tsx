@@ -1,89 +1,21 @@
 /** @jsxImportSource @emotion/react */
 "use client";
-import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { usePricing } from "@/hooks/usePricing";
-import { activatePro } from "@/lib/userProgress";
+import { useUpgrade } from "@/hooks/useUpgrade";
 import { Zap, X, CheckCircle } from "lucide-react";
 import * as S from "./styles";
 import { C } from "@/styles/tokens";
 import { proFeatures } from "@/data/homepageStaticData";
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
-
 interface Props {
   onClose?: () => void;
   reason?: string;
 }
+
 export default function PaywallBanner({ onClose, reason }: Props) {
-  const { user, refreshProgress } = useAuth();
   const pricing = usePricing();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleUpgrade() {
-    if (!user) {
-      window.location.href = "/auth";
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Load SDK and create a fresh order in parallel
-      const [, order] = await Promise.all([
-        loadRazorpay(),
-        fetch("/api/create-order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user.uid }),
-        }).then(async (r) => {
-          if (!r.ok) throw new Error(`order ${r.status}`);
-          return r.json();
-        }),
-      ]);
-
-      const rzp = new window.Razorpay({
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        order_id: order.orderId,
-        amount: order.amount,
-        currency: order.currency,
-        name: "JSPrep Pro",
-        description: "Monthly Pro Subscription",
-        prefill: { email: user.email ?? "", name: user.displayName ?? "" },
-        theme: { color: C.accent },
-        modal: { ondismiss: () => setLoading(false) },
-        handler: async (response: { razorpay_payment_id: string }) => {
-          try {
-            await activatePro(user.uid, response.razorpay_payment_id);
-            await refreshProgress();
-            onClose?.();
-          } catch {
-            setError(
-              "Payment received but activation failed — contact support.",
-            );
-          } finally {
-            setLoading(false);
-          }
-        },
-      });
-
-      rzp.on("payment.failed", (res: { error: { description: string } }) => {
-        setError(res.error?.description ?? "Payment failed. Please try again.");
-        setLoading(false);
-      });
-
-      rzp.open();
-    } catch {
-      setError("Could not start payment. Check your connection and try again.");
-      setLoading(false);
-    }
-  }
+  // Checkout lives entirely in useUpgrade — this component only renders it.
+  const { handleUpgrade, loading, error } = useUpgrade({ onSuccess: onClose });
 
   return (
     <div css={S.overlay}>

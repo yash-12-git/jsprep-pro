@@ -599,6 +599,7 @@ export default function AdminGeneratePage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${await user!.getIdToken()}`,
         },
         body: JSON.stringify({ type, category, difficulty, topic, count }),
       });

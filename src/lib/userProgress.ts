@@ -17,7 +17,12 @@ export interface UserProgress {
   uid: string;
   isPro: boolean;
   isAdmin?: boolean; // for future admin-only features
-  subscriptionId?: string; // Stripe subscription or payment ID
+  /** @deprecated legacy field from the client-side activation flow */
+  subscriptionId?: string;
+  razorpayPaymentId?: string;
+  razorpayOrderId?: string;
+  razorpaySubscriptionId?: string;
+  cancelledAt?: string;
   masteredIds: number[];
   bookmarkedIds: number[];
   streakDays: number;
@@ -113,14 +118,10 @@ export async function saveQuizScore(uid: string, score: number, total: number) {
   });
 }
 
-export async function activatePro(uid: string, subscriptionId: string) {
-  const ref = doc(db, "users", uid);
-  await updateDoc(ref, {
-    isPro: true,
-    subscriptionId,
-    proActivatedAt: new Date().toISOString(),
-  });
-}
+// NOTE: there is deliberately no activatePro() here.
+// isPro is a privileged field written only by the server, via
+// /api/verify-payment or the Razorpay webhook. A client-side write would let
+// any signed-in user grant themselves Pro from the browser console.
 
 // ─── XP System ────────────────────────────────────────────────────────────────
 

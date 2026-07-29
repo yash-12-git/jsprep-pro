@@ -25,6 +25,7 @@ import { ArrowRight, Zap, BarChart2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
 import { C, RADIUS } from "@/styles/tokens";
+import ManageSubscription from "@/components/ui/ManageSubscription";
 import Link from "next/link";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -383,6 +384,9 @@ export default function HomeClient({
           </div>
         )}
       </div>
+
+      {/* ── Subscription management (renders only for Pro subscribers) ── */}
+      <ManageSubscription />
 
       {/* ── Mode progress cards ── */}
       <div css={modesSection}>

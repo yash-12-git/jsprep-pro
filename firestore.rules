@@ -1,0 +1,121 @@
+rules_version = '2';
+
+// JSPrep Pro — Firestore security rules
+//
+// Principle: anything that represents money or privilege is server-written.
+// The client may only touch its own learning progress.
+//
+// The Admin SDK (used by /api/verify-payment, /api/cancel-subscription,
+// /api/razorpay/webhook and /api/cron) bypasses these rules entirely, so
+// locking a field here does not stop the server from writing it.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helpers ────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Admin identity comes from a custom claim, NOT from users/{uid}.isAdmin.
+    // Custom claims are settable only via the Admin SDK
+    // (scripts/set-admin-claim.js), so they cannot be self-granted.
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.isAdmin == true;
+    }
+
+    // Fields on a user doc that the client must never write.
+    // Subscription state decides who gets paid features; isAdmin decides who
+    // can edit content. Both are server-only.
+    function lockedUserFields() {
+      return [
+        'isPro',
+        'isAdmin',
+        'proActivatedAt',
+        'proExpiresAt',
+        'subscriptionStatus',
+        'cancelledAt',
+        'lastRenewedAt',
+        'razorpayPaymentId',
+        'razorpayOrderId',
+        'razorpaySubscriptionId',
+        'subscriptionId'
+      ];
+    }
+
+    // ─── users/{uid} ────────────────────────────────────────────────────────
+    // Readable by any signed-in user because the weekly leaderboard lists the
+    // top users by weeklyXp. Keep it that way only while user docs hold no
+    // private data — display name, photo and XP are already public in the UI.
+    // Do not start storing emails, addresses or payment details on this doc.
+
+    match /users/{uid} {
+      allow read: if isSignedIn();
+
+      // A fresh doc must start unprivileged: free tier, not an admin,
+      // no subscription fields smuggled in at creation time.
+      allow create: if isOwner(uid)
+                    && request.resource.data.isPro == false
+                    && !request.resource.data.keys().hasAny(lockedUserFields().removeAll(['isPro']));
+
+      // Progress, XP and streak updates are fine; privileged fields are not.
+      // affectedKeys() covers adding, changing AND deleting a locked field.
+      allow update: if isOwner(uid)
+                    && !request.resource.data.diff(resource.data)
+                         .affectedKeys().hasAny(lockedUserFields());
+
+      allow delete: if false;
+
+      // Per-question progress, saved mock interviews and sprint results are
+      // private to their owner.
+      match /progress/{questionId} {
+        allow read, write: if isOwner(uid);
+      }
+      match /interviews/{interviewId} {
+        allow read, write: if isOwner(uid);
+      }
+      match /sprints/{sprintId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ─── Public content ─────────────────────────────────────────────────────
+    // Read by server components and unauthenticated visitors (SEO pages), so
+    // reads are open. Writes come from the admin panel.
+
+    match /questions/{questionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /topics/{topicId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /blog_posts/{postId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Admin-only ─────────────────────────────────────────────────────────
+    // AI-generated candidates awaiting review. The weekly cron writes here via
+    // the Admin SDK, so it is unaffected by this rule.
+
+    match /questions_pending/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ─── Default deny ───────────────────────────────────────────────────────
+    // Any collection added later is closed until a rule is written for it.
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
