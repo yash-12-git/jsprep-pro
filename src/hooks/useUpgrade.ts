@@ -130,8 +130,11 @@ export function useUpgrade({
       rzp.open();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
+      const isOrderError =
+        message.startsWith("Order creation failed") ||
+        message.startsWith("Failed to create order");
       setError(
-        message.startsWith("Order creation failed")
+        isOrderError
           ? "Could not initiate payment — please try again."
           : "Could not load payment. Check your connection and try again.",
       );
