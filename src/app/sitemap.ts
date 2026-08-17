@@ -1,7 +1,6 @@
 import { MetadataRoute } from "next";
 import {
   getPublishedBlogPosts,
-  getPublishedQuestionSlugs,
   getTopicSlugs,
   getQuestions,
 } from "@/lib/cachedQueries";
@@ -21,16 +20,14 @@ const DATES = {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date().toISOString();
 
-  const [topicSlugs, blogPosts, questionSlugs, theoryResult] =
-    await Promise.all([
-      getTopicSlugs().catch(() => [] as string[]),
-      getPublishedBlogPosts().catch(() => []),
-      getPublishedQuestionSlugs().catch(() => [] as string[]),
-      getQuestions({
-        filters: { status: "published", type: "theory" },
-        pageSize: 300,
-      }).catch(() => ({ questions: [] })),
-    ]);
+  const [topicSlugs, blogPosts, theoryResult] = await Promise.all([
+    getTopicSlugs().catch(() => [] as string[]),
+    getPublishedBlogPosts().catch(() => []),
+    getQuestions({
+      filters: { status: "published", type: "theory" },
+      pageSize: 300,
+    }).catch(() => ({ questions: [] })),
+  ]);
 
   const categories = [
     ...new Set((theoryResult.questions as any[]).map((q) => q.category)),
@@ -166,22 +163,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }));
 
-  // Only theory question pages — output/debug are thin single-question pages
-  // that Bing/Google flag for content quality issues.
-  const theoryQuestionPages: MetadataRoute.Sitemap = questionSlugs
-    .filter(
-      (slug) =>
-        !slug.startsWith("output-") &&
-        !slug.startsWith("ts-output-") &&
-        !slug.startsWith("debug-") &&
-        !slug.startsWith("ts-debug-"),
-    )
-    .map((slug) => ({
-      url: `${SITE.domain}/q/${slug}`,
-      lastModified: DATES.questionsPages,
-      changeFrequency: "monthly" as const,
-      priority: 0.75,
-    }));
+  // /q/<slug> pages are deliberately NOT submitted. Every answer they render is
+  // reproduced verbatim on its category page (/questions/<category>, ~3,500
+  // words) and on the relevant topic hub, so as standalone URLs they are thin
+  // duplicates — the exact profile Google files under "Crawled - currently not
+  // indexed". Measured over all 291 of them: median answer 966 chars, longest
+  // 1,758, and 50 polyfill pages under 110. They stay live and internally
+  // linked (and carry `noindex, follow` — see app/q/[slug]/page.tsx) so link
+  // equity still flows into the pages that can actually rank.
 
   const javascriptBlogPages: MetadataRoute.Sitemap = blogPosts
     .filter((post) => post.track === "javascript")
@@ -231,7 +220,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...topicPages,
     ...categoryPages,
-    ...theoryQuestionPages,
     ...javascriptBlogPages,
     ...reactBlogPages,
     ...typescriptBlogPages,

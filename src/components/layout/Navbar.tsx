@@ -346,7 +346,7 @@ export default function Navbar() {
                 { href: "/#practice", label: "Practice" },
                 { href: "/topics", label: "Topics" },
                 {href: "/#roadmap", label: "Roadmap" },
-                { href: "/blog", label: "Blog" },
+                { href: `/blog/${track}`, label: "Blog" },
                 { href: "/#pricing", label: "Pricing" },
               ].map(({ href, label }) => (
                 <Link key={href} href={href} css={S.marketingLink}>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import {
   getBlogPostBySlug,
   getPublishedBlogPosts,
@@ -83,8 +83,14 @@ function md(content: string): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: Props) {
   const post = await getBlogPostBySlug(params.slug);
-  const track = post?.track ?? params.track;
   if (!post) notFound();
+
+  // The post is looked up by slug alone, so every post used to resolve at all
+  // four track paths (/blog/javascript/x, /blog/react/x, …) with a 200 — four
+  // crawlable URLs for one article. Send the mismatched ones to the canonical
+  // path with a 308 instead of serving duplicate content.
+  const track = post.track ?? "javascript";
+  if (params.track !== track) permanentRedirect(`/blog/${track}/${post.slug}`);
 
   const [relatedTopics, allPosts] = await Promise.all([
     post.relatedTopicSlugs?.length
@@ -159,7 +165,7 @@ export default async function BlogPostPage({ params }: Props) {
           </Link>
           <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
           <Link
-            href="/blog"
+            href={`/blog/${track}`}
             style={{ color: C.accent, textDecoration: "none" }}
           >
             Blog
