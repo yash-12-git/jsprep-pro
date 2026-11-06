@@ -253,7 +253,7 @@ export default async function JavaScriptTrickyQuestionsPage() {
         {questions.length > FREE_PREVIEW && (
           <DocClose
             title={`${totalCount - FREE_PREVIEW} more tricky questions in the quiz`}
-            line="Free accounts get 5 questions. Pro unlocks everything: all output questions, debug lab, theory mastery, and the leaderboard."
+            line="Free accounts get interactive practice on 5 questions. Pro adds all output questions, debug lab, theory mastery, and the leaderboard."
             actions={
               <>
                 <Link href="/output-quiz" className="btn btn--primary">

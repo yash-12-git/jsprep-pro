@@ -28,7 +28,6 @@ export const metadata: Metadata = pageMeta({
 });
 import { getServerTrack } from "@/lib/getServerTrack";
 import {
-  getPublishedBlogPosts,
   getPublishedTopics,
   getQuestions,
 } from "@/lib/cachedQueries";
@@ -119,7 +118,7 @@ const SHARED_FAQ: FAQItem[] = [
   {
     question: "Is JSPrep Pro free to use?",
     answer:
-      `Yes. JSPrep Pro offers ${CONTENT_COUNTS.theory} theory questions free across JavaScript, React, TypeScript, and System Design, with no credit card required. The Pro plan unlocks all ${CONTENT_COUNTS.total} questions, unlimited Interview Sprints, AI tools, Study Plan, and more.`,
+      `Yes. JSPrep Pro offers ${CONTENT_COUNTS.theory} theory questions free across JavaScript, React, TypeScript, and System Design, with no credit card required. The Pro plan adds interactive practice on all ${CONTENT_COUNTS.total} questions, unlimited Interview Sprints, AI tools, Study Plan, and more.`,
   },
   {
     question: "What is the Interview Sprint?",
@@ -154,7 +153,7 @@ function buildFaq(): FAQItem[] {
 export default async function HomePage() {
   const track = await getServerTrack();
 
-  const [theory, output, debug, polyfill, topics, blogs] = await Promise.all([
+  const [theory, output, debug, polyfill, topics] = await Promise.all([
     getQuestions({
       filters: { track, status: "published", type: "theory" },
       pageSize: 300,
@@ -172,7 +171,6 @@ export default async function HomePage() {
       pageSize: 300,
     }).catch(() => ({ questions: [] })),
     getPublishedTopics({ track }),
-    getPublishedBlogPosts({ track }),
   ]);
 
   return (
@@ -192,8 +190,13 @@ export default async function HomePage() {
         debug={debug.questions?.length ?? 0}
         output={output.questions?.length ?? 0}
         polyfill={polyfill.questions?.length ?? 0}
-        topics={topics}
-        blogs={blogs}
+        // The full topic documents hold whole guides; this page lists six titles.
+        topics={topics.map(({ slug, title, difficulty, questionCount }) => ({
+          slug,
+          title,
+          difficulty,
+          questionCount,
+        }))}
       />
     </>
   );

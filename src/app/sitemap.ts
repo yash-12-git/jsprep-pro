@@ -21,13 +21,15 @@ const DATES = {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date().toISOString();
 
+  // No catch: this is generated at build time, so a failed read should fail the
+  // build rather than publish a sitemap with most of the site missing.
   const [topicSlugs, blogPosts, theoryResult] = await Promise.all([
-    getTopicSlugs().catch(() => [] as string[]),
-    getPublishedBlogPosts().catch(() => []),
+    getTopicSlugs(),
+    getPublishedBlogPosts(),
     getQuestions({
       filters: { status: "published", type: "theory" },
       pageSize: 300,
-    }).catch(() => ({ questions: [] })),
+    }),
   ]);
 
   const categories = [

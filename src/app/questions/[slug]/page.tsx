@@ -32,7 +32,7 @@ export async function generateStaticParams() {
   const { questions } = await getQuestions({
     filters: { status: "published", type: "theory" },
     pageSize: 300,
-  }).catch(() => ({ questions: [] }));
+  });
   const cats = [...new Set(questions.map((q: any) => q.category))];
   return cats.map((cat: string) => ({ slug: catToSlug(cat) }));
 }
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { questions: qs } = await getQuestions({
     filters: { status: "published", type: "theory" },
     pageSize: 300,
-  }).catch(() => ({ questions: [] }));
+  });
   const cats = [...new Set(qs.map((q: any) => q.category))];
   const cat = cats.find((c: string) => catToSlug(c) === params.slug);
   if (!cat) return {};
@@ -61,7 +61,7 @@ export default async function CategoryQuestionsPage({ params }: Props) {
   const { questions: allTheory } = await getQuestions({
     filters: { status: "published", type: "theory" },
     pageSize: 300,
-  }).catch(() => ({ questions: [] }));
+  });
 
   const theoryCats = [...new Set(allTheory.map((q: any) => q.category))];
   const cat = theoryCats.find((c: string) => catToSlug(c) === params.slug);

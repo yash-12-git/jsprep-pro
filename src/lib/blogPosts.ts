@@ -6,7 +6,7 @@
  */
 
 import {
-  collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc,
+  collection, doc, getDoc, getDocsFromServer, addDoc, updateDoc, deleteDoc,
   query, where, orderBy, writeBatch,
   type QueryConstraint,
 } from 'firebase/firestore'
@@ -26,7 +26,7 @@ export async function getBlogPost(id: string): Promise<BlogPost | null> {
 /** Fetch a post by its slug field (used by blog/[slug]/page.tsx) */
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   const q = query(collection(db, COL), where('slug', '==', slug), where('status', '==', 'published'))
-  const snap = await getDocs(q)
+  const snap = await getDocsFromServer(q)
   if (snap.empty) return null
   const d = snap.docs[0]
   return { id: d.id, ...d.data() } as BlogPost
@@ -42,7 +42,7 @@ export async function getBlogPosts(filters: BlogPostFilters = {}): Promise<BlogP
   if (filters.track)     constraints.push(where('track',     '==', filters.track))
 
   constraints.push(orderBy('publishedAt', 'desc'))
-  const snap = await getDocs(query(collection(db, COL), ...constraints))
+  const snap = await getDocsFromServer(query(collection(db, COL), ...constraints))
   return snap.docs.map(d => ({ id: d.id, ...d.data() }) as BlogPost)
 }
 
@@ -52,7 +52,7 @@ export async function getPublishedBlogPosts({track}: {track?: string} = {}): Pro
 
 /** Slugs only — for generateStaticParams */
 export async function getBlogPostSlugs(): Promise<string[]> {
-  const snap = await getDocs(
+  const snap = await getDocsFromServer(
     query(collection(db, COL), where('status', '==', 'published'), orderBy('publishedAt', 'desc'))
   )
   return snap.docs.map(d => (d.data() as BlogPost).slug)
@@ -60,7 +60,7 @@ export async function getBlogPostSlugs(): Promise<string[]> {
 
 /** Posts related to a given topic slug — for topic page sidebars */
 export async function getBlogPostsForTopic(topicSlug: string): Promise<BlogPost[]> {
-  const snap = await getDocs(
+  const snap = await getDocsFromServer(
     query(
       collection(db, COL),
       where('status',    '==', 'published'),
@@ -73,7 +73,7 @@ export async function getBlogPostsForTopic(topicSlug: string): Promise<BlogPost[
 
 /** Posts with a specific question category — for question page sidebars */
 export async function getBlogPostsForCategory(category: string): Promise<BlogPost[]> {
-  const snap = await getDocs(
+  const snap = await getDocsFromServer(
     query(
       collection(db, COL),
       where('status',              '==',               'published'),

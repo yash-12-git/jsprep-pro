@@ -14,6 +14,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  getDocsFromServer,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -58,7 +59,7 @@ export async function getQuestionBySlug(
     where("slug", "==", slug),
     where("status", "==", "published"),
   );
-  const snap = await getDocs(q);
+  const snap = await getDocsFromServer(q);
   if (snap.empty) return null;
   const d = snap.docs[0];
   return { id: d.id, ...d.data() } as Question;
@@ -66,7 +67,7 @@ export async function getQuestionBySlug(
 
 /** All published slugs — for generateStaticParams on /q/[slug] */
 export async function getPublishedQuestionSlugs(): Promise<string[]> {
-  const snap = await getDocs(
+  const snap = await getDocsFromServer(
     query(collection(db, QUESTIONS_COL), where("status", "==", "published")),
   );
   return snap.docs.map((d) => (d.data() as Question).slug).filter(Boolean);
@@ -76,7 +77,7 @@ export async function getPublishedQuestionSlugs(): Promise<string[]> {
 export async function getPublishedCategories({ track }: { track?: string } = {}): Promise<string[]> {
   const constraints: QueryConstraint[] = [where("status", "==", "published")];
   if (track) constraints.push(where("track", "==", track));
-  const snap = await getDocs(query(collection(db, QUESTIONS_COL), ...constraints));
+  const snap = await getDocsFromServer(query(collection(db, QUESTIONS_COL), ...constraints));
   const cats = new Set<string>();
   snap.docs.forEach((d) => {
     const cat = (d.data() as Question).category;
@@ -133,7 +134,7 @@ export async function getQuestions(
   if (afterDoc) constraints.push(startAfter(afterDoc));
 
   const q = query(collection(db, QUESTIONS_COL), ...constraints);
-  const snap = await getDocs(q);
+  const snap = await getDocsFromServer(q);
 
   const hasMore = snap.docs.length > pageSize;
   const docs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs;
@@ -160,7 +161,7 @@ export async function getQuestionList(
   ];
   if (type) constraints.push(where("type", "==", type));
   if (track) constraints.push(where("track", "==", track));
-  const snap = await getDocs(
+  const snap = await getDocsFromServer(
     query(collection(db, QUESTIONS_COL), ...constraints),
   );
   return snap.docs.map((d) => {

@@ -28,6 +28,22 @@ export const DAILY_AI_LIMITS: Record<AITier, number> = {
 const USAGE_COL = "aiUsage";
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+// Firestore retries quota errors with long backoffs, so without a limit an
+// exhausted quota leaves every AI request hanging until the platform kills it.
+const FIRESTORE_TIMEOUT_MS = 4_000;
+
+/** Rejects if a Firestore-backed check takes too long to answer. */
+export function withFirestoreTimeout<T>(work: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error("Firestore did not respond in time")),
+      FIRESTORE_TIMEOUT_MS,
+    );
+  });
+  return Promise.race([work, timeout]).finally(() => clearTimeout(timer));
+}
+
 function hasActivePro(user: FirebaseFirestore.DocumentData | undefined) {
   if (user?.isPro !== true) return false;
   return !user.proExpiresAt || new Date(user.proExpiresAt) > new Date();

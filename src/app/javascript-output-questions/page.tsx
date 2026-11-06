@@ -218,7 +218,7 @@ export default async function JavaScriptOutputQuestionsPage() {
 
         <DocClose
           title={`${totalCount - FREE_PREVIEW} more questions with progress tracking`}
-          line={`Free accounts get 5 tracked questions. Pro unlocks all ${totalCount}+ output questions, debug lab, theory mastery, and the leaderboard.`}
+          line={`Free accounts get 5 tracked questions. Pro adds interactive practice on all ${totalCount} output questions, debug lab, theory mastery, and the leaderboard.`}
           actions={
             <>
               <Link href="/output-quiz" className="btn btn--primary">

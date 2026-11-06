@@ -27,7 +27,7 @@ AI features: Answer Evaluator, AI Tutor, Code Checker, Mock Interviewer, Study P
 - [Topic Guides — React](https://jsprep.pro/topics/react): Index of all React concept hubs
 - [Topic Guides — TypeScript](https://jsprep.pro/topics/typescript): Index of all TypeScript concept hubs
 - [Topic Guides — System Design](https://jsprep.pro/topics/system-design): Index of all Frontend System Design concept hubs
-- [Pricing](https://jsprep.pro/#pricing): Free tier (200+ theory questions) and Pro tier with all AI features
+- [Pricing](https://jsprep.pro/#pricing): Free tier (200+ theory questions) and Pro tier with full interactive practice, progress tracking and all AI features
 
 ## JavaScript Concept Hubs
 

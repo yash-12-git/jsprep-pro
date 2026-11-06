@@ -41,6 +41,9 @@ export async function postAI(payload: unknown): Promise<{ text: string }> {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(payload),
+    // Longer than the server's own limit of 20s per model, so this only fires
+    // if the request is truly stuck.
+    signal: AbortSignal.timeout(60_000),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {

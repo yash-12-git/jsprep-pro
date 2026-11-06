@@ -9,7 +9,7 @@
  */
 
 import {
-  collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc,
+  collection, doc, getDoc, getDocsFromServer, addDoc, updateDoc, deleteDoc,
   query, where, orderBy, writeBatch,
   type QueryConstraint,
 } from 'firebase/firestore'
@@ -29,7 +29,7 @@ export async function getTopic(id: string): Promise<Topic | null> {
 /** Fetch a topic by its slug field (used by [topic]/page.tsx) */
 export async function getTopicBySlug(slug: string): Promise<Topic | null> {
   const q = query(collection(db, COL), where('slug', '==', slug), where('status', '==', 'published'))
-  const snap = await getDocs(q)
+  const snap = await getDocsFromServer(q)
   if (snap.empty) return null
   const d = snap.docs[0]
   return { id: d.id, ...d.data() } as Topic
@@ -46,7 +46,7 @@ export async function getTopics(filters: TopicFilters = {}): Promise<Topic[]> {
 
   constraints.push(orderBy('order', 'asc'))
 
-  const snap = await getDocs(query(collection(db, COL), ...constraints))
+  const snap = await getDocsFromServer(query(collection(db, COL), ...constraints))
   return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Topic)
 }
 
@@ -60,7 +60,7 @@ export async function getTopicSlugs({ track }: { track?: string } = {}): Promise
   const constraints: QueryConstraint[] = [where('status', '==', 'published'), orderBy('order', 'asc')]
   if (track) constraints.push(where('track', '==', track))
 
-  const snap = await getDocs(query(collection(db, COL), ...constraints))
+  const snap = await getDocsFromServer(query(collection(db, COL), ...constraints))
   return snap.docs.map(d => (d.data() as Topic).slug)
 }
 
@@ -69,7 +69,7 @@ export async function getRelatedTopics({slugs, track}: {slugs: string[], track?:
   if (!slugs.length) return []
   // Firestore `in` is limited to 10 items
   const batch = slugs.slice(0, 10)
-  const snap = await getDocs(
+  const snap = await getDocsFromServer(
     query(collection(db, COL), where('slug', 'in', batch), where('status', '==', 'published'), ...(track ? [where('track', '==', track)] : []))
   )
   return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Topic)

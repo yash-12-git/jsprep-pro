@@ -299,7 +299,7 @@ export default function OutputCard({
                       marginBottom: "0.25rem",
                     }}
                   >
-                    All output questions are on Pro
+                    Interactive practice on this question is on Pro
                   </p>
                   <p
                     css={{

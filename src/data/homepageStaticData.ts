@@ -295,7 +295,7 @@ export const AI_TOOLS = [
 export const proFeatures = [
   "Everything in Free",
   "Interview Sprint, unlimited",
-  "All output, debug, polyfill questions",
+  "Interactive practice on all output, debug and polyfill questions",
   "Unlimited mastery tracking",
   "Bookmarks + cloud sync",
   "Timed quiz / flashcard mode",
@@ -312,8 +312,8 @@ export const FREE_F = [
   "All theory questions",
   "Interview Sprint, 5-question warmup",
   "Daily Question of the Day + AI eval",
-  "First 5 output + 5 debug questions",
-  "First 5 polyfill challenges",
+  "Interactive practice on the first 5 output + 5 debug questions",
+  "Interactive practice on the first 5 polyfill challenges",
   "JavaScript and React cheat sheets",
   "Deep Dives (in-depth concept explanations)",
 ];

@@ -153,8 +153,7 @@ interface HomePageClientProps {
   debug: number;
   output: number;
   polyfill: number;
-  topics: Topic[];
-  blogs: unknown[];
+  topics: Pick<Topic, "slug" | "title" | "difficulty" | "questionCount">[];
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────

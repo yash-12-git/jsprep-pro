@@ -14,7 +14,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildRAGContext } from "@/lib/embeddings";
 import type { SimilarQuestion } from "@/lib/embeddings";
-import { consumeAIQuota, resolveAICaller } from "@/lib/aiAccess";
+import {
+  consumeAIQuota,
+  resolveAICaller,
+  withFirestoreTimeout,
+} from "@/lib/aiAccess";
 import { getPublishedTopics } from "@/lib/cachedQueries";
 import { verifyAdmin } from "@/lib/firebaseAdmin";
 import { getServerTrack } from "@/lib/getServerTrack";
@@ -81,18 +85,54 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
     } else {
-      const caller = await resolveAICaller(req);
-      if (!caller || (access === "pro" && caller.tier === "anon")) {
-        return NextResponse.json({ error: "Sign in required" }, { status: 401 });
-      }
-      if (access === "pro" && caller.tier !== "pro") {
-        return NextResponse.json({ error: "Pro required" }, { status: 403 });
-      }
-      if (!(await consumeAIQuota(caller))) {
+      // If Firestore can't answer, Pro can't be confirmed, so paid features
+      // stop. Free evaluation carries on unmetered: Groq's own rate limits still
+      // cap the cost, and a database problem shouldn't break the free sprint.
+      const firestoreDown = (err: unknown) => {
+        console.error("[ai] access check unavailable:", err);
+        return null;
+      };
+      let checksFailed = false;
+      const caller = await withFirestoreTimeout(resolveAICaller(req)).catch(
+        (err) => {
+          checksFailed = true;
+          return firestoreDown(err);
+        },
+      );
+      if (checksFailed && access === "pro") {
         return NextResponse.json(
-          { error: "Daily AI limit reached" },
-          { status: 429 },
+          { error: "AI is busy, try again shortly" },
+          { status: 503 },
         );
+      }
+      if (!checksFailed) {
+        if (!caller || (access === "pro" && caller.tier === "anon")) {
+          return NextResponse.json(
+            { error: "Sign in required" },
+            { status: 401 },
+          );
+        }
+        if (access === "pro" && caller.tier !== "pro") {
+          return NextResponse.json({ error: "Pro required" }, { status: 403 });
+        }
+        const allowed = await withFirestoreTimeout(consumeAIQuota(caller)).catch(
+          (err) => {
+            firestoreDown(err);
+            return access !== "pro" ? true : null;
+          },
+        );
+        if (allowed === null) {
+          return NextResponse.json(
+            { error: "AI is busy, try again shortly" },
+            { status: 503 },
+          );
+        }
+        if (!allowed) {
+          return NextResponse.json(
+            { error: "Daily AI limit reached" },
+            { status: 429 },
+          );
+        }
       }
     }
 
