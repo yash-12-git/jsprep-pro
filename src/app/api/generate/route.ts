@@ -54,10 +54,11 @@ async function callGenerateAI(params: {
   difficulty: string
   topic: string
   ragContext: string
+  authHeader: string
 }): Promise<string> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'}/api/ai`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: params.authHeader },
     body: JSON.stringify({
       type: 'generate',
       messages: [{ role: 'user', content: 'Generate the question now.' }],
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
       !!process.env.CRON_SECRET &&
       authHeader === `Bearer ${process.env.CRON_SECRET}`
 
-    if (!isCron && !(await verifyAdmin(authHeader))) {
+    if (!authHeader || (!isCron && !(await verifyAdmin(authHeader)))) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -119,7 +120,7 @@ export async function POST(req: NextRequest) {
     for (let i = 0; i < Math.min(count, 5); i++) {
       try {
         // 3. Generate question via Claude
-        const rawText = await callGenerateAI({ type, category, difficulty, topic, ragContext })
+        const rawText = await callGenerateAI({ type, category, difficulty, topic, ragContext, authHeader })
         const clean   = rawText.replace(/```json|```/g, '').trim()
         const parsed  = JSON.parse(clean)
 

@@ -61,7 +61,7 @@ export async function verifyIdToken(
   return (await decodeIdToken(authHeader))?.uid ?? null;
 }
 
-async function decodeIdToken(authHeader: string | null) {
+export async function decodeIdToken(authHeader: string | null) {
   const token = authHeader?.startsWith("Bearer ")
     ? authHeader.slice("Bearer ".length)
     : null;

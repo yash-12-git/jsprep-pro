@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
+import { AIRequestError, postAI } from "@/lib/aiClient";
 import { css, keyframes } from "@emotion/react";
 import { useState } from "react";
 import {
@@ -305,6 +306,17 @@ const skipBtn = css`
   }
 `;
 
+const evalError = css`
+  padding: 0.625rem 0.875rem;
+  margin-bottom: 0.75rem;
+  border-radius: ${RADIUS.md};
+  background: ${C.redSubtle};
+  border: 1px solid ${C.redBorder};
+  color: ${C.red};
+  font-size: 0.8125rem;
+  line-height: 1.5;
+`;
+
 const nextBtn = css`
   display: inline-flex;
   align-items: center;
@@ -373,10 +385,11 @@ const DIFF_META: Record<
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function TheorySprintCard({ q, onComplete }: Props) {
   const [phase, setPhase] = useState<
-    "read" | "answering" | "evaluating" | "done"
+    "read" | "answering" | "evaluating" | "failed" | "done"
   >("read");
   const [userAnswer, setUserAnswer] = useState("");
   const [result, setResult] = useState<EvalResult | null>(null);
+  const [limitReached, setLimitReached] = useState(false);
   const [showBetter, setShowBetter] = useState(false);
 
   const dm = DIFF_META[q.difficulty] ?? DIFF_META.core;
@@ -385,37 +398,29 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
     if (!userAnswer.trim()) return;
     setPhase("evaluating");
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "evaluate",
-          messages: [{ role: "user", content: userAnswer }],
-          context: {
-            question: q.title,
-            idealAnswer: (q.answer ?? "")
-              .replace(/<[^>]*>/g, "")
-              .replace(/\s+/g, " ")
-              .trim(),
-          },
-        }),
+      const data = await postAI({
+        type: "evaluate",
+        messages: [{ role: "user", content: userAnswer }],
+        context: {
+          question: q.title,
+          idealAnswer: (q.answer ?? "")
+            .replace(/<[^>]*>/g, "")
+            .replace(/\s+/g, " ")
+            .trim(),
+        },
       });
-      const data = await res.json();
       const parsed = JSON.parse(
         data.text.replace(/```json|```/g, "").trim(),
       ) as EvalResult;
+      if (typeof parsed.score !== "number") {
+        throw new Error("AI reply has no score");
+      }
       setResult(parsed);
       setPhase("done");
-    } catch {
-      setResult({
-        score: 3,
-        grade: "C",
-        verdict: "Could not evaluate, good effort!",
-        strengths: [],
-        missing: [],
-        betterAnswer: "",
-      });
-      setPhase("done");
+    } catch (err) {
+      console.error("[sprint] evaluation failed", err);
+      setLimitReached(err instanceof AIRequestError && err.status === 429);
+      setPhase("failed");
     }
   }
 
@@ -439,6 +444,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
 
       {(phase === "answering" ||
         phase === "evaluating" ||
+        phase === "failed" ||
         phase === "done") && (
         <div css={answerPhase}>
           <div css={answerLabel}>
@@ -447,6 +453,13 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
 
           {phase !== "done" ? (
             <>
+              {phase === "failed" && (
+                <div css={evalError} role="alert">
+                  {limitReached
+                    ? "You've used today's AI scoring limit, so this answer can't be scored. It won't count against your result."
+                    : "We couldn't score your answer. This is on our side, and your answer is still here. Try again, or continue and it won't count against your result."}
+                </div>
+              )}
               <textarea
                 css={textarea}
                 value={userAnswer}
@@ -458,34 +471,38 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                   if (e.key === "Enter" && e.metaKey) evaluate();
                 }}
               />
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.75rem",
-                }}
-              >
-                <button
-                  css={submitBtn(!!userAnswer.trim() && phase === "answering")}
-                  onClick={evaluate}
-                  disabled={!userAnswer.trim() || phase === "evaluating"}
+              {!(phase === "failed" && limitReached) && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                  }}
                 >
-                  {phase === "evaluating" ? (
-                    <>
-                      <Loader2
-                        size={13}
-                        style={{ animation: "spin 1s linear infinite" }}
-                      />{" "}
-                      Evaluating...
-                    </>
-                  ) : (
-                    <>Submit Answer</>
-                  )}
-                </button>
-                <span style={{ fontSize: "0.75rem", color: C.muted }}>
-                  ⌘ + Enter to submit
-                </span>
-              </div>
+                  <button
+                    css={submitBtn(!!userAnswer.trim() && phase !== "evaluating")}
+                    onClick={evaluate}
+                    disabled={!userAnswer.trim() || phase === "evaluating"}
+                  >
+                    {phase === "evaluating" ? (
+                      <>
+                        <Loader2
+                          size={13}
+                          style={{ animation: "spin 1s linear infinite" }}
+                        />{" "}
+                        Evaluating...
+                      </>
+                    ) : phase === "failed" ? (
+                      <>Try again</>
+                    ) : (
+                      <>Submit Answer</>
+                    )}
+                  </button>
+                  <span style={{ fontSize: "0.75rem", color: C.muted }}>
+                    ⌘ + Enter to submit
+                  </span>
+                </div>
+              )}
             </>
           ) : (
             result && (
@@ -591,6 +608,11 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
         {phase === "answering" && (
           <button css={skipBtn} onClick={() => onComplete("skipped")}>
             Skip question
+          </button>
+        )}
+        {phase === "failed" && (
+          <button css={skipBtn} onClick={() => onComplete("unscored")}>
+            Continue without a score
           </button>
         )}
         {phase === "done" && result && (

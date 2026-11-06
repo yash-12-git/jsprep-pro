@@ -105,6 +105,7 @@ function formatTime(secs: number) {
 function getCategoryStats(results: SprintSummary["results"]) {
   const map = new Map<string, { correct: number; total: number }>();
   for (const r of results) {
+    if (r.outcome === "unscored") continue;
     const e = map.get(r.category) ?? { correct: 0, total: 0 };
     e.total++;
     if (r.outcome === "correct") e.correct++;
@@ -210,7 +211,7 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
     { label: "Accuracy", val: `${accuracy}%` },
     {
       label: "Correct",
-      val: `${results.filter((r) => r.outcome === "correct").length}/${results.length}`,
+      val: `${results.filter((r) => r.outcome === "correct").length}/${results.filter((r) => r.outcome !== "unscored").length}`,
     },
     { label: "Time", val: formatTime(timeUsedSecs) },
     { label: "Questions", val: `${results.length}` },
@@ -372,10 +373,12 @@ export default function SprintResults({ summary, onRetry }: Props) {
   const g = getGrade(accuracy);
   const catStats = getCategoryStats(results);
   const correct = results.filter((r) => r.outcome === "correct").length;
+  const unscoredCount = results.filter((r) => r.outcome === "unscored").length;
+  const scoredCount = results.length - unscoredCount;
   const display = showAll ? results : results.slice(0, 7);
 
   const siteUrl = "https://jsprep.pro/sprint";
-  const shareText = `I scored ${score}/${maxScore} on the JSPrep JavaScript Interview Sprint 🏁\n${accuracy}% accuracy • ${correct}/${results.length} correct\n\n${g.shareMsg}. Can you beat my score?\n👉 ${siteUrl}`;
+  const shareText = `I scored ${score}/${maxScore} on the JSPrep JavaScript Interview Sprint 🏁\n${accuracy}% accuracy • ${correct}/${scoredCount} correct\n\n${g.shareMsg}. Can you beat my score?\n👉 ${siteUrl}`;
   const twitterText = `I scored ${score}/${maxScore} in the JSPrep JS Interview Sprint (${accuracy}% accuracy).\n\nGrade: ${g.grade} — ${g.label}. Can you beat me? 👇`;
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(siteUrl)}`;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(siteUrl)}`;
@@ -732,11 +735,45 @@ export default function SprintResults({ summary, onRetry }: Props) {
     `,
   };
 
+  // With no graded answers, a grade would just be a made-up result.
+  const nothingScored =
+    unscoredCount > 0 &&
+    !results.some((r) => r.outcome === "correct" || r.outcome === "attempted");
+
+  if (nothingScored) {
+    return (
+      <div css={S.page}>
+        <div css={S.wrap}>
+          <div css={S.hero}>
+            <div css={S.h1}>{"We couldn't score this sprint"}</div>
+            <div css={S.sub}>
+              {
+                "AI scoring wasn't available, so there's no result to show. It's not a reflection of your answers. Please try again in a little while."
+              }
+            </div>
+          </div>
+          <div css={S.ctaRow}>
+            <button css={S.retryBtn} onClick={onRetry}>
+              <RotateCcw size={14} /> New Sprint
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div css={S.page}>
       <div css={S.wrap}>
         {/* Hero */}
         <div css={S.hero}>
+          {unscoredCount > 0 && (
+            <div css={S.sub} role="status" style={{ marginBottom: "1rem" }}>
+              {unscoredCount === 1
+                ? "1 answer couldn't be scored, so it isn't counted in this result."
+                : `${unscoredCount} answers couldn't be scored, so they aren't counted in this result.`}
+            </div>
+          )}
           <div css={S.gradeRow}>
             <div css={S.gradeBadge}>{g.grade}</div>
             <div>
@@ -762,7 +799,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
           </div>
           <div css={S.statsGrid}>
             {[
-              { val: `${correct}/${results.length}`, lbl: "Correct" },
+              { val: `${correct}/${scoredCount}`, lbl: "Correct" },
               { val: String(results.length), lbl: "Questions" },
               { val: formatTime(timeUsedSecs), lbl: "Time used" },
             ].map((s) => (
@@ -888,7 +925,9 @@ export default function SprintResults({ summary, onRetry }: Props) {
               )}
               <span css={S.typeChip(r.type)}>{r.type}</span>
               <span css={S.bkTitle}>{r.category}</span>
-              <span css={S.bkPts(r.points)}>+{r.points}</span>
+              <span css={S.bkPts(r.points)}>
+                {r.outcome === "unscored" ? "Not scored" : `+${r.points}`}
+              </span>
             </div>
           ))}
           {results.length > 7 && (

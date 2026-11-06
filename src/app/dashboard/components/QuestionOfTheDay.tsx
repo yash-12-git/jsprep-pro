@@ -17,6 +17,7 @@
  * via a dynamic() import to keep it out of the server bundle.
  */
 
+import { postAI } from "@/lib/aiClient";
 import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 import {
@@ -489,22 +490,17 @@ export default function QOTDInteractive({
     setLoading(true);
     setResult(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "evaluate",
-          messages: [{ role: "user", content: userAnswer }],
-          context: {
-            question: q.title,
-            idealAnswer: (q.answer ?? "")
-              .replace(/<[^>]*>/g, "")
-              .replace(/\s+/g, " ")
-              .trim(),
-          },
-        }),
+      const data = await postAI({
+        type: "evaluate",
+        messages: [{ role: "user", content: userAnswer }],
+        context: {
+          question: q.title,
+          idealAnswer: (q.answer ?? "")
+            .replace(/<[^>]*>/g, "")
+            .replace(/\s+/g, " ")
+            .trim(),
+        },
       });
-      const data = await res.json();
       const parsed = JSON.parse(
         data.text.replace(/```json|```/g, "").trim(),
       ) as EvalResult;

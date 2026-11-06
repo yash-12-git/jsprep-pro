@@ -11,6 +11,7 @@
  * 3. Shows the correct AI score and verdict, never "0/10 Evaluation failed".
  */
 
+import { postAI } from "@/lib/aiClient";
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -165,31 +166,25 @@ export default function DebugCard({
 
     setUiPhase("checking");
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "debugcheck",
-          messages: [
-            {
-              role: "user",
-              content: `I fixed this buggy code:\n\n\`\`\`js\n${userCode}\n\`\`\``,
-            },
-          ],
-          context: {
-            questionTitle: q.title,
-            bugDescription: q.bugDescription ?? "",
-            brokenCode,
-            fixedCode: q.fixedCode ?? "",
-            userFix: userCode,
+      const data = await postAI({
+        type: "debugcheck",
+        messages: [
+          {
+            role: "user",
+            content: `I fixed this buggy code:\n\n\`\`\`js\n${userCode}\n\`\`\``,
           },
-        }),
+        ],
+        context: {
+          questionTitle: q.title,
+          bugDescription: q.bugDescription ?? "",
+          brokenCode,
+          fixedCode: q.fixedCode ?? "",
+          userFix: userCode,
+        },
       });
-      const data = await res.json();
 
-      // API returns { text: "```json\n{...}\n```" } or { result: {...} }
-      // Extract the string from whichever field it arrives in
-      let raw: any = data.result ?? data.text ?? data;
+      // API returns { text: "```json\n{...}\n```" }
+      let raw: any = data.text;
       if (typeof raw === "string") {
         // Strip markdown code fences if present
         const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);

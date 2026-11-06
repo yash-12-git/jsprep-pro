@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
+import { postAI } from "@/lib/aiClient";
 import { useState } from "react";
 import { Loader2, Target, X, ChevronDown, ChevronUp } from "lucide-react";
 import * as S from "./styles";
@@ -34,19 +35,14 @@ export default function AnswerEvaluator({
     setLoading(true);
     setResult(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "evaluate",
-          messages: [{ role: "user", content: answer }],
-          context: {
-            question,
-            idealAnswer: idealAnswer.replace(/<[^>]*>/g, ""),
-          },
-        }),
+      const data = await postAI({
+        type: "evaluate",
+        messages: [{ role: "user", content: answer }],
+        context: {
+          question,
+          idealAnswer: idealAnswer.replace(/<[^>]*>/g, ""),
+        },
       });
-      const data = await res.json();
       setResult(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
     } catch {
       alert("Evaluation failed, try again");

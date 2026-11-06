@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
+import { postAI } from "@/lib/aiClient";
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User, Loader2, Sparkles, X } from "lucide-react";
 import * as S from "./styles";
@@ -45,16 +46,11 @@ export default function AIChat({ question, answer, onClose }: Props) {
     setInput("");
     setLoading(true);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "qa",
-          messages: newMessages,
-          context: { question, answer: answer.replace(/<[^>]*>/g, "") },
-        }),
+      const data = await postAI({
+        type: "qa",
+        messages: newMessages,
+        context: { question, answer: answer.replace(/<[^>]*>/g, "") },
       });
-      const data = await res.json();
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: data.text },

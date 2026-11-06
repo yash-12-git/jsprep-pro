@@ -1,4 +1,7 @@
-export type SprintOutcome = "correct" | "attempted" | "skipped";
+// "unscored": the user answered but the AI couldn't grade it. It earns nothing
+// and is left out of the maximum score and accuracy, so it doesn't count against
+// them.
+export type SprintOutcome = "correct" | "attempted" | "skipped" | "unscored";
 export type SprintPhase = "lobby" | "active" | "results";
 
 export interface QuestionResult {
@@ -20,6 +23,7 @@ export const SPRINT_POINTS: Record<SprintOutcome, number> = {
   correct: 10,
   attempted: 3,
   skipped: 0,
+  unscored: 0,
 };
 
 export const MAX_POINTS = 10; // per question

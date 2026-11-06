@@ -112,7 +112,7 @@ function buildMix(
 function computeInsights(results: QuestionResult[]) {
   const catMap = new Map<string, { correct: number; total: number }>();
   for (const r of results) {
-    if (r.outcome === "skipped") continue;
+    if (r.outcome === "skipped" || r.outcome === "unscored") continue;
     const entry = catMap.get(r.category) ?? { correct: 0, total: 0 };
     entry.total++;
     if (r.outcome === "correct") entry.correct++;
@@ -201,14 +201,18 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
       const timeUsedSecs = Math.round(
         (Date.now() - startTimeRef.current) / 1000,
       );
-      const attempted = finalResults.filter((r) => r.outcome !== "skipped");
+      const attempted = finalResults.filter(
+        (r) => r.outcome !== "skipped" && r.outcome !== "unscored",
+      );
       const correct = finalResults.filter((r) => r.outcome === "correct");
+      const unscored = finalResults.filter((r) => r.outcome === "unscored");
       const accuracy =
         attempted.length > 0
           ? Math.round((correct.length / attempted.length) * 100)
           : 0;
       const maxScore =
-        (config?.questionCount ?? finalResults.length) * MAX_POINTS;
+        ((config?.questionCount ?? finalResults.length) - unscored.length) *
+        MAX_POINTS;
       const { strengths, weakAreas } = computeInsights(finalResults);
 
       const s: SprintSummary = {

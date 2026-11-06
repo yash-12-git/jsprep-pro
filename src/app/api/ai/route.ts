@@ -2,7 +2,10 @@
  * src/app/api/ai/route.ts
  *
  * All AI features — Groq only (free, fast).
- * RAG context injected into qa + evaluate + generate prompts.
+ * RAG context injected into the generate prompt.
+ *
+ * Access is decided here, never by the client (see ACCESS below). System prompts
+ * are built on the server; the client only supplies values for them.
  *
  * Env vars needed:
  *   GROQ_API_KEY=gsk_...   (free at console.groq.com)
@@ -11,52 +14,93 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildRAGContext } from "@/lib/embeddings";
 import type { SimilarQuestion } from "@/lib/embeddings";
+import { consumeAIQuota, resolveAICaller } from "@/lib/aiAccess";
+import { getPublishedTopics } from "@/lib/cachedQueries";
+import { verifyAdmin } from "@/lib/firebaseAdmin";
+import { getServerTrack } from "@/lib/getServerTrack";
+import { callGroq, GroqError } from "@/lib/groq";
+import { parseSetupConfig } from "@/lib/mockInterviewOptions";
+import { buildPrompt } from "@/lib/mockInterviewPrompt";
 
-const GROQ_API = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+// evaluate stays open to everyone because the free sprint warmup and Question
+// of the Day use it without an account. Daily limits bound what that can cost.
+const ACCESS: Record<string, "any" | "pro" | "internal"> = {
+  evaluate: "any",
+  qa: "pro",
+  debugcheck: "pro",
+  studyplan: "pro",
+  mock: "pro",
+  generate: "internal",
+};
 
-async function callGroq(
-  systemPrompt: string,
-  messages: { role: string; content: string }[],
-  maxTokens = 1024,
-  temperature = 1,
-): Promise<string> {
-  const response = await fetch(GROQ_API, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: GROQ_MODEL,
-      max_tokens: maxTokens,
-      temperature: temperature,
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...messages.map((m) => ({ role: m.role, content: m.content })),
-      ],
-    }),
-  });
+const MAX_MESSAGES = 40;
+const MAX_MESSAGE_CHARS = 8_000;
+const MAX_CONTEXT_CHARS = 20_000;
 
-  if (!response.ok) {
-    const err = await response.text();
-    console.error("Groq error:", response.status, err);
-    throw new Error(`Groq error ${response.status}: ${err}`);
-  }
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content ?? "";
+function parseMessages(value: unknown) {
+  if (!Array.isArray(value) || value.length > MAX_MESSAGES) return null;
+  const valid = value.every(
+    (m) =>
+      (m?.role === "user" || m?.role === "assistant") &&
+      typeof m?.content === "string" &&
+      m.content.length <= MAX_MESSAGE_CHARS,
+  );
+  return valid
+    ? (value as { role: string; content: string }[]).map(({ role, content }) => ({
+        role,
+        content,
+      }))
+    : null;
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { type, messages, context, similarQuestions, system } = body;
+    const { type, similarQuestions } = body;
+    const context = body.context ?? {};
 
-    // RAG context — injected into relevant prompts when provided
-    const ragContext = similarQuestions?.length
-      ? buildRAGContext(similarQuestions as SimilarQuestion[])
-      : "";
+    const access = Object.prototype.hasOwnProperty.call(ACCESS, type)
+      ? ACCESS[type]
+      : null;
+    if (!access) {
+      return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+    }
+
+    const messages = parseMessages(body.messages);
+    if (!messages || JSON.stringify(context).length > MAX_CONTEXT_CHARS) {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+
+    if (access === "internal") {
+      // Question generation: the weekly cron or an admin, via /api/generate.
+      const authHeader = req.headers.get("authorization");
+      const isCron =
+        !!process.env.CRON_SECRET &&
+        authHeader === `Bearer ${process.env.CRON_SECRET}`;
+      if (!isCron && !(await verifyAdmin(authHeader))) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    } else {
+      const caller = await resolveAICaller(req);
+      if (!caller || (access === "pro" && caller.tier === "anon")) {
+        return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+      }
+      if (access === "pro" && caller.tier !== "pro") {
+        return NextResponse.json({ error: "Pro required" }, { status: 403 });
+      }
+      if (!(await consumeAIQuota(caller))) {
+        return NextResponse.json(
+          { error: "Daily AI limit reached" },
+          { status: 429 },
+        );
+      }
+    }
+
+    // RAG context — only the admin-only generate prompt uses it
+    const ragContext =
+      access === "internal" && similarQuestions?.length
+        ? buildRAGContext(similarQuestions as SimilarQuestion[])
+        : "";
 
     let systemPrompt = "";
     let mockMesssages: { role: string; content: string }[] = [];
@@ -164,17 +208,19 @@ Respond with ONLY a JSON object in this exact format:
 
       // ── Mock Interview ────────────────────────────────────────────────────
       case "mock":
-        systemPrompt =
-          body.system ??
-          `You are a senior JavaScript interviewer. Conduct a realistic technical interview.
-     Ask one question at a time. Never hint or teach. Be professional and challenging.`;
+        const ctx = parseSetupConfig(context);
+        if (!ctx) {
+          return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+        }
+        const track = await getServerTrack();
+        const topics = await getPublishedTopics({ track });
+        systemPrompt = buildPrompt(
+          ctx,
+          topics.map(({ title, slug }) => ({ title, slug })),
+        );
 
-        const ctx = body.context ?? {};
-        const isFinal = ctx.isFinal ?? false;
-        const clientMsgs = (body.messages ?? []) as {
-          role: string;
-          content: string;
-        }[];
+        const isFinal = context.isFinal === true;
+        const clientMsgs = messages;
 
         // Per-request entropy prevents model caching / identical responses
         const entropy = Math.random().toString(36).slice(2, 8);
@@ -197,14 +243,14 @@ Respond with ONLY a JSON object in this exact format:
                   `Start the interview NOW. Ask the FIRST question from your opening topics list.`,
                   ``,
                   `Candidate context for this specific session:`,
-                  `  Company:    ${ctx.company ?? "General"}`,
-                  `  Role:       ${ctx.role ?? "Frontend Developer"}`,
-                  `  Level:      ${ctx.experience ?? "mid"}`,
-                  `  Focus:      ${ctx.focus ?? "Mixed"}`,
+                  `  Company:    ${ctx.company}`,
+                  `  Role:       ${ctx.role}`,
+                  `  Level:      ${ctx.experience}`,
+                  `  Focus:      ${ctx.focus}`,
                   ``,
                   `CRITICAL: Do NOT ask "null vs undefined" or "var let const differences".`,
                   `Those are banned. Use the company-specific opening question from your system prompt.`,
-                  `Ask exactly ONE question. Make it feel like a real ${ctx.company ?? "tech company"} interview.`,
+                  `Ask exactly ONE question. Make it feel like a real ${ctx.company} interview.`,
                 ].join("\n"),
               },
             ]
@@ -294,18 +340,22 @@ For companies: pick 2-4 from Razorpay, Flipkart, Swiggy, CRED, PhonePe, Google, 
         return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
 
-    const text = await callGroq(
+    const text = await callGroq({
       systemPrompt,
-      type === "mock" ? (mockMesssages ?? messages) : messages,
-      type === "generate" || type === "mock" ? 2048 : 1024,
-      type === "mock" ? 0.7 : 1,
-    );
+      messages: type === "mock" ? mockMesssages : messages,
+      maxTokens: type === "qa" || type === "evaluate" || type === "debugcheck" ? 1024 : 2048,
+      temperature: type === "mock" ? 0.7 : 1,
+      json: type !== "qa" && type !== "mock",
+    });
     return NextResponse.json({ text });
   } catch (err) {
     console.error("AI route error:", err);
-    return NextResponse.json(
-      { error: "Internal error", detail: String(err) },
-      { status: 500 },
-    );
+    if (err instanceof GroqError && err.status === 429) {
+      return NextResponse.json(
+        { error: "AI is busy, try again shortly" },
+        { status: 503 },
+      );
+    }
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

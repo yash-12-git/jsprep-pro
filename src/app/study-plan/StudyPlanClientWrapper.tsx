@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
+import { postAI } from "@/lib/aiClient";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -74,24 +75,19 @@ export default function StudyPlanClientPage({
     setGenerating(true);
     setPlan(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "studyplan",
-          messages: [{ role: "user", content: "Generate my study plan." }],
-          context: {
-            masteredCount: masteredIds.length,
-            totalQuestions: questions.length,
-            weakCategories,
-            strongCategories,
-            catStats,
-            interviewDate: interviewDate || null,
-            streakDays: progress?.streakDays,
-          },
-        }),
+      const data = await postAI({
+        type: "studyplan",
+        messages: [{ role: "user", content: "Generate my study plan." }],
+        context: {
+          masteredCount: masteredIds.length,
+          totalQuestions: questions.length,
+          weakCategories,
+          strongCategories,
+          catStats,
+          interviewDate: interviewDate || null,
+          streakDays: progress?.streakDays,
+        },
       });
-      const data = await res.json();
       setPlan(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
     } catch {
       alert("Failed to generate plan. Try again.");

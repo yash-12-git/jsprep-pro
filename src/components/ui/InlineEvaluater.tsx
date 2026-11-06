@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
+import { postAI } from "@/lib/aiClient";
 import { css } from "@emotion/react";
 import { useState } from "react";
 import Link from "next/link";
@@ -331,16 +332,11 @@ export default function InlineEvaluator({
     setLoading(true);
     setResult(null);
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "evaluate",
-          messages: [{ role: "user", content: answer }],
-          context: { question, idealAnswer },
-        }),
+      const data = await postAI({
+        type: "evaluate",
+        messages: [{ role: "user", content: answer }],
+        context: { question, idealAnswer },
       });
-      const data = await res.json();
       setResult(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
     } catch {
       /* keep form open */

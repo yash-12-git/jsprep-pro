@@ -1,0 +1,21 @@
+# Fails, and so notifies the repo owner, when a Groq model stops working.
+# Needs a CRON_SECRET repository secret matching the one set in Vercel.
+name: AI health check
+
+on:
+  schedule:
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check /api/health/ai
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl --silent --show-error --fail-with-body --max-time 60 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            https://jsprep.pro/api/health/ai
