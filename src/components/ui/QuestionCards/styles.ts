@@ -71,7 +71,7 @@ export const bodyInner = css`
 // ─── Number badge ─────────────────────────────────────────────────────────────
 
 export const qNumber = (accentColor: string) => css`
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.75rem;
   color: ${accentColor};
   background: ${C.bgSubtle};
@@ -192,7 +192,7 @@ export const codeTextarea = (
     border: 1px solid ${border};
     border-radius: ${RADIUS.lg};
     padding: 0.75rem 1rem;
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--font-outlier);
     font-size: 0.75rem;
     color: ${C.text};
     outline: none;

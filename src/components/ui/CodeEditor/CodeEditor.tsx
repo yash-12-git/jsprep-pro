@@ -58,7 +58,7 @@ export default function CodeEditor({
           minimap: { enabled: false },
           scrollBeyondLastLine: false,
           fontSize: 13,
-          fontFamily: '"JetBrains Mono","Fira Code",monospace',
+          fontFamily: "var(--font-outlier)",
           fontLigatures: true,
           lineNumbers: showLineNums ? "on" : "off",
           lineDecorationsWidth: 10,
@@ -132,5 +132,5 @@ const placeholder = css`
 const placeholderText = css`
   font-size: 12px;
   color: ${C.muted};
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
 `;

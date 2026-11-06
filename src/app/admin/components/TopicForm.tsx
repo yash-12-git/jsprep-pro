@@ -82,7 +82,7 @@ const S = {
     border-radius: ${RADIUS.md};
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
-    color: white;
+    color: ${C.text};
     outline: none;
     transition: border-color 0.15s ease;
     &:focus {
@@ -100,7 +100,7 @@ const S = {
     border-radius: ${RADIUS.md};
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
-    color: white;
+    color: ${C.text};
     outline: none;
     cursor: pointer;
     appearance: none;
@@ -122,7 +122,7 @@ const S = {
     border-radius: ${RADIUS.md};
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
-    color: white;
+    color: ${C.text};
     outline: none;
     resize: vertical;
     &:focus {
@@ -174,7 +174,7 @@ const S = {
     border: none;
     outline: none;
     font-size: 0.8125rem;
-    color: white;
+    color: ${C.text};
     padding: 0.25rem 0;
     resize: none;
     line-height: 1.5;
@@ -251,7 +251,7 @@ const S = {
     background: ${loading ? C.accent + "80" : C.accent};
     border: none;
     border-radius: ${RADIUS.xl};
-    color: white;
+    color: ${C.text};
     font-weight: 800;
     font-size: 0.9375rem;
     cursor: ${loading ? "not-allowed" : "pointer"};

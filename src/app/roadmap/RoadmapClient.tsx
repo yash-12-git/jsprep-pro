@@ -15,44 +15,44 @@ const ACCENT = {
     text: "var(--color-green)",
     border: "var(--color-green-border)",
     bar: "var(--color-green)",
-    bannerBg: "#E1F5EE",
-    bannerBorder: "#9FE1CB",
-    bannerTitle: "#04342C",
-    bannerText: "#0F6E56",
-    bannerMeta: "#3B9B7A",
+    bannerBg: "var(--color-ok-soft)",
+    bannerBorder: "var(--color-green-border)",
+    bannerTitle: "var(--color-ink)",
+    bannerText: "var(--color-ok)",
+    bannerMeta: "var(--color-ok)",
   },
   blue: {
     tab: "color-mix(in srgb, var(--color-accent) 12%, transparent)",
     text: "var(--color-accent)",
     border: "color-mix(in srgb, var(--color-accent) 30%, transparent)",
     bar: "var(--color-accent)",
-    bannerBg: "#E6F1FB",
-    bannerBorder: "#B5D4F4",
-    bannerTitle: "#042C53",
-    bannerText: "#185FA5",
-    bannerMeta: "#378ADD",
+    bannerBg: "var(--color-cool-soft)",
+    bannerBorder: "var(--color-rule)",
+    bannerTitle: "var(--color-ink)",
+    bannerText: "var(--color-cool)",
+    bannerMeta: "var(--color-cool)",
   },
   amber: {
     tab: "color-mix(in srgb, var(--color-amber) 12%, transparent)",
     text: "var(--color-amber)",
     border: "var(--color-amber-border)",
     bar: "var(--color-amber)",
-    bannerBg: "#FAEEDA",
-    bannerBorder: "#FAC775",
-    bannerTitle: "#633806",
-    bannerText: "#854F0B",
-    bannerMeta: "#BA7517",
+    bannerBg: "var(--color-accent-soft)",
+    bannerBorder: "var(--color-amber-border)",
+    bannerTitle: "var(--color-ink)",
+    bannerText: "var(--color-accent)",
+    bannerMeta: "var(--color-accent)",
   },
   coral: {
-    tab: "color-mix(in srgb, #f97316 12%, transparent)",
-    text: "#f97316",
-    border: "color-mix(in srgb, #f97316 30%, transparent)",
-    bar: "#f97316",
-    bannerBg: "#FAECE7",
-    bannerBorder: "#F5C4B3",
-    bannerTitle: "#4A1B0C",
-    bannerText: "#993C1D",
-    bannerMeta: "#D85A30",
+    tab: "color-mix(in srgb, var(--color-accent) 12%, transparent)",
+    text: "var(--color-accent)",
+    border: "color-mix(in srgb, var(--color-accent) 30%, transparent)",
+    bar: "var(--color-accent)",
+    bannerBg: "var(--color-bad-soft)",
+    bannerBorder: "var(--color-red-border)",
+    bannerTitle: "var(--color-ink)",
+    bannerText: "var(--color-bad)",
+    bannerMeta: "var(--color-bad)",
   },
 } satisfies Record<RoadmapMonth["accent"], Record<string, string>>;
 
@@ -84,7 +84,7 @@ export function RoadmapClient() {
   function handleToggleDay(day: number) {
     const wasDone = isDayDone(day);
     toggleDay(day);
-    if (!wasDone) showToast(`Day ${day} complete! 🎉`);
+    if (!wasDone) showToast(`Day ${day} complete`);
   }
 
   function handleReset() {
@@ -133,7 +133,7 @@ export function RoadmapClient() {
                 borderRadius: "8px",
                 border: `1px solid ${isActive ? a.border : "var(--color-border)"}`,
                 fontSize: "12px",
-                fontFamily: "var(--font-mono, monospace)",
+                fontFamily: "var(--font-outlier)",
                 cursor: "pointer",
                 background: isActive ? a.tab : "var(--color-bg-subtle)",
                 color: isActive ? a.text : "var(--color-muted)",
@@ -152,19 +152,19 @@ export function RoadmapClient() {
           style={{
             padding: "7px 14px",
             borderRadius: "8px",
-            border: `1px solid ${isCompaniesTab ? "color-mix(in srgb, #f97316 30%, transparent)" : "var(--color-border)"}`,
+            border: `1px solid ${isCompaniesTab ? "color-mix(in srgb, var(--color-accent) 30%, transparent)" : "var(--color-border)"}`,
             fontSize: "12px",
-            fontFamily: "var(--font-mono, monospace)",
+            fontFamily: "var(--font-outlier)",
             cursor: "pointer",
             background: isCompaniesTab
-              ? "color-mix(in srgb, #f97316 12%, transparent)"
+              ? "color-mix(in srgb, var(--color-accent) 12%, transparent)"
               : "var(--color-bg-subtle)",
-            color: isCompaniesTab ? "#f97316" : "var(--color-muted)",
+            color: isCompaniesTab ? "var(--color-accent)" : "var(--color-muted)",
             transition: "all 0.15s",
             whiteSpace: "nowrap",
           }}
         >
-          🏢 Company guide
+          Company guide
         </button>
       </div>
 
@@ -193,7 +193,7 @@ export function RoadmapClient() {
                   marginBottom: "6px",
                 }}
               >
-                Month {activeMonth.month} — {activeMonth.title}
+                Month {activeMonth.month}: {activeMonth.title}
               </p>
               <p
                 style={{
@@ -212,10 +212,10 @@ export function RoadmapClient() {
                     color: accent.bannerMeta,
                     marginTop: "8px",
                     marginBottom: 0,
-                    fontFamily: "var(--font-mono, monospace)",
+                    fontFamily: "var(--font-outlier)",
                   }}
                 >
-                  ⏱ {activeMonth.timeCommitment}
+                  {activeMonth.timeCommitment}
                 </p>
               )}
             </div>
@@ -235,7 +235,7 @@ export function RoadmapClient() {
                 style={{
                   fontSize: "11px",
                   color: "var(--color-muted)",
-                  fontFamily: "var(--font-mono, monospace)",
+                  fontFamily: "var(--font-outlier)",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -263,7 +263,7 @@ export function RoadmapClient() {
               <span
                 style={{
                   fontSize: "11px",
-                  fontFamily: "var(--font-mono, monospace)",
+                  fontFamily: "var(--font-outlier)",
                   color: accent.text,
                   minWidth: "36px",
                   textAlign: "right",
@@ -302,10 +302,10 @@ export function RoadmapClient() {
           style={{
             fontSize: "12px",
             color: "var(--color-muted)",
-            fontFamily: "var(--font-mono, monospace)",
+            fontFamily: "var(--font-outlier)",
           }}
         >
-          Progress auto-saved to browser · Works offline
+          Progress auto-saved to browser, works offline
         </span>
         <button
           onClick={handleReset}
@@ -317,7 +317,7 @@ export function RoadmapClient() {
             background: "transparent",
             color: "var(--color-muted)",
             cursor: "pointer",
-            fontFamily: "var(--font-mono, monospace)",
+            fontFamily: "var(--font-outlier)",
             transition: "all 0.15s",
           }}
           onMouseEnter={(e) => {
@@ -343,13 +343,12 @@ export function RoadmapClient() {
             background: "var(--color-bg-subtle)",
             border: "1px solid var(--color-green-border)",
             color: "var(--color-green)",
-            fontFamily: "var(--font-mono, monospace)",
+            fontFamily: "var(--font-outlier)",
             fontSize: "12px",
             padding: "10px 16px",
             borderRadius: "8px",
             zIndex: 999,
             pointerEvents: "none",
-            boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
             animation: "fadeInUp 0.25s ease",
           }}
         >

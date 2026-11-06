@@ -328,7 +328,7 @@ const nextBtn = css`
   cursor: pointer;
   background: ${C.accent};
   border: none;
-  color: #ffffff;
+  color: ${C.accentInk};
   transition:
     opacity 0.12s ease,
     transform 0.12s ease;

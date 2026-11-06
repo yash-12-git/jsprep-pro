@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { BookOpen, Circle, Hammer, Mic } from "lucide-react";
 import Link from "next/link";
 import type { RoadmapDay, TaskType } from "@/data/roadmap/types";
 import { styles } from "./styles";
@@ -10,10 +12,10 @@ interface DayRowProps {
   onToggle: (day: number) => void;
 }
 
-const TASK_ICONS: Record<TaskType, string> = {
-  read: "📖",
-  build: "🛠️",
-  mock: "🎤",
+const TASK_ICONS: Record<TaskType, ReactNode> = {
+  read: <BookOpen size={16} aria-hidden="true" />,
+  build: <Hammer size={16} aria-hidden="true" />,
+  mock: <Mic size={16} aria-hidden="true" />,
 };
 
 // Detect mock task by explicit type or by text heuristic
@@ -24,22 +26,22 @@ function isMockTask(text: string, type?: TaskType): boolean {
 }
 
 const TAG_STYLES: Record<string, { bg: string; color: string; border: string }> = {
-  critical: { bg: "#FAECE7", color: "#993C1D", border: "#F5C4B3" },
-  "machine coding": { bg: "#FAEEDA", color: "#854F0B", border: "#FAC775" },
-  mock: { bg: "#EAF3DE", color: "#3B6D11", border: "#C0DD97" },
-  "full mock": { bg: "#EAF3DE", color: "#3B6D11", border: "#C0DD97" },
-  React: { bg: "#E6F1FB", color: "#185FA5", border: "#B5D4F4" },
-  JS: { bg: "#FAEEDA", color: "#854F0B", border: "#FAC775" },
-  DSA: { bg: "#FAECE7", color: "#993C1D", border: "#F5C4B3" },
-  hooks: { bg: "#E6F1FB", color: "#185FA5", border: "#B5D4F4" },
-  patterns: { bg: "#EEEDFE", color: "#3C3489", border: "#AFA9EC" },
-  senior: { bg: "#EEEDFE", color: "#3C3489", border: "#AFA9EC" },
-  build: { bg: "#E1F5EE", color: "#0F6E56", border: "#9FE1CB" },
+  critical: { bg: "var(--color-bad-soft)", color: "var(--color-bad)", border: "var(--color-red-border)" },
+  "machine coding": { bg: "var(--color-accent-soft)", color: "var(--color-accent)", border: "var(--color-amber-border)" },
+  mock: { bg: "var(--color-ok-soft)", color: "var(--color-ok)", border: "var(--color-green-border)" },
+  "full mock": { bg: "var(--color-ok-soft)", color: "var(--color-ok)", border: "var(--color-green-border)" },
+  React: { bg: "var(--color-cool-soft)", color: "var(--color-cool)", border: "var(--color-rule)" },
+  JS: { bg: "var(--color-accent-soft)", color: "var(--color-accent)", border: "var(--color-amber-border)" },
+  DSA: { bg: "var(--color-bad-soft)", color: "var(--color-bad)", border: "var(--color-red-border)" },
+  hooks: { bg: "var(--color-cool-soft)", color: "var(--color-cool)", border: "var(--color-rule)" },
+  patterns: { bg: "var(--color-cool-soft)", color: "var(--color-ink)", border: "var(--color-rule)" },
+  senior: { bg: "var(--color-cool-soft)", color: "var(--color-ink)", border: "var(--color-rule)" },
+  build: { bg: "var(--color-ok-soft)", color: "var(--color-ok)", border: "var(--color-green-border)" },
   review: { bg: "var(--color-bg-subtle)", color: "var(--color-muted)", border: "var(--color-border)" },
-  polyfills: { bg: "#E1F5EE", color: "#0F6E56", border: "#9FE1CB" },
-  timed: { bg: "#FAECE7", color: "#993C1D", border: "#F5C4B3" },
-  pressure: { bg: "#FAECE7", color: "#993C1D", border: "#F5C4B3" },
-  "system design": { bg: "#EEEDFE", color: "#3C3489", border: "#AFA9EC" },
+  polyfills: { bg: "var(--color-ok-soft)", color: "var(--color-ok)", border: "var(--color-green-border)" },
+  timed: { bg: "var(--color-bad-soft)", color: "var(--color-bad)", border: "var(--color-red-border)" },
+  pressure: { bg: "var(--color-bad-soft)", color: "var(--color-bad)", border: "var(--color-red-border)" },
+  "system design": { bg: "var(--color-cool-soft)", color: "var(--color-ink)", border: "var(--color-rule)" },
 };
 
 function getTagStyle(tag: string) {
@@ -107,7 +109,7 @@ export function DayRow({ day, isDone, onToggle }: DayRowProps) {
                   background: ts.bg,
                   color: ts.color,
                   border: `0.5px solid ${ts.border}`,
-                  fontFamily: "var(--font-mono, monospace)",
+                  fontFamily: "var(--font-outlier)",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -120,7 +122,7 @@ export function DayRow({ day, isDone, onToggle }: DayRowProps) {
         {/* Tasks */}
         <ul style={styles.taskList}>
           {day.tasks.map((task, i) => {
-            const icon = task.type ? TASK_ICONS[task.type] : "→";
+            const icon = task.type ? TASK_ICONS[task.type] : <Circle size={16} aria-hidden="true" />;
             const isMock = isMockTask(task.text, task.type);
             return (
               <li key={i} style={styles.taskItem}>
@@ -151,7 +153,7 @@ export function DayRow({ day, isDone, onToggle }: DayRowProps) {
                     style={{
                       ...styles.taskText,
                       ...(isDone ? styles.taskDone : {}),
-                      color: isDone ? undefined : "#3B6D11",
+                      color: isDone ? undefined : "var(--color-ok)",
                       fontStyle: "italic",
                     }}
                   >
@@ -183,17 +185,17 @@ export function DayRow({ day, isDone, onToggle }: DayRowProps) {
               marginTop: "8px",
               padding: "5px 10px",
               borderRadius: "6px",
-              border: "1px solid #C0DD97",
-              background: "#EAF3DE",
-              color: "#3B6D11",
+              border: "1px solid var(--color-green-border)",
+              background: "var(--color-ok-soft)",
+              color: "var(--color-ok)",
               fontSize: "11px",
               fontWeight: 500,
               textDecoration: "none",
-              fontFamily: "var(--font-mono, monospace)",
+              fontFamily: "var(--font-outlier)",
               transition: "opacity 0.15s",
             }}
           >
-            🎤 Start mock interview →
+            Start mock interview
           </Link>
         )}
       </div>

@@ -11,58 +11,6 @@ import { useState } from "react";
 import Link from "next/link";
 import type { Question } from "@/types/question";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function diffBg(d: string) {
-  return d === "beginner"
-    ? "#f0fff4"
-    : d === "core"
-      ? "#e8f4fd"
-      : d === "advanced"
-        ? "#fffbeb"
-        : "#fff5f5";
-}
-function diffColor(d: string) {
-  return d === "beginner"
-    ? "#2d7a4f"
-    : d === "core"
-      ? "#2383e2"
-      : d === "advanced"
-        ? "#d97706"
-        : "#c53030";
-}
-
-const rowStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "0.625rem",
-  padding: "0.625rem 0.875rem",
-  background: "var(--color-surface)",
-  border: "1px solid var(--color-border)",
-  borderRadius: "0.5rem",
-  textDecoration: "none",
-};
-
-function TypeBadge({ type }: { type: string }) {
-  const color = type === "output" ? "#2383e2" : "#e53e3e";
-  return (
-    <span
-      style={{
-        fontSize: "10px",
-        padding: "1px 6px",
-        borderRadius: "4px",
-        background: color + "14",
-        border: `1px solid ${color}33`,
-        color,
-        fontWeight: 600,
-        flexShrink: 0,
-      }}
-    >
-      {type}
-    </span>
-  );
-}
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function QuestionListClientWrapper({
@@ -101,14 +49,7 @@ export default function QuestionListClientWrapper({
   return (
     <>
       {/* Live stats */}
-      <div
-        style={{
-          display: "flex",
-          gap: "1.5rem",
-          flexWrap: "wrap",
-          marginBottom: "1.5rem",
-        }}
-      >
+      <div className="doc-figures">
         {[
           { label: "Questions", value: `${questions.length}+` },
           { label: "Categories", value: `${categories.length}` },
@@ -122,66 +63,18 @@ export default function QuestionListClientWrapper({
           },
         ].map((s) => (
           <div key={s.label}>
-            <div
-              style={{
-                fontSize: "1.375rem",
-                fontWeight: 900,
-                color: "var(--color-accent)",
-              }}
-            >
-              {s.value}
-            </div>
-            <div
-              style={{
-                fontSize: "0.75rem",
-                color: "var(--color-muted)",
-                fontWeight: 500,
-              }}
-            >
-              {s.label}
-            </div>
+            <b>{s.value}</b>
+            <span>{s.label}</span>
           </div>
         ))}
       </div>
 
       {/* Companies banner */}
       {topCompanies.length > 0 && (
-        <div
-          style={{
-            padding: "0.875rem 1.125rem",
-            background: "var(--color-surface)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "0.75rem",
-            marginBottom: "2rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-            flexWrap: "wrap",
-          }}
-        >
-          <span
-            style={{
-              fontSize: "0.75rem",
-              fontWeight: 600,
-              color: "var(--color-muted)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            🏢 Asked at:
-          </span>
+        <div className="doc-meta" style={{ marginBlock: "var(--space-lg)" }}>
+          <span>Asked at:</span>
           {topCompanies.map((c) => (
-            <span
-              key={c}
-              style={{
-                fontSize: "0.8125rem",
-                fontWeight: 600,
-                padding: "0.25rem 0.75rem",
-                background: "var(--color-bg-subtle)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "9999px",
-                color: "var(--color-text)",
-              }}
-            >
+            <span key={c} className="chip">
               {c}
             </span>
           ))}
@@ -189,143 +82,59 @@ export default function QuestionListClientWrapper({
       )}
 
       {/* Category sections */}
-      <h2
-        style={{
-          fontSize: "1.25rem",
-          fontWeight: 900,
-          color: "var(--color-text)",
-          marginBottom: "1.25rem",
-          paddingBottom: "0.625rem",
-          borderBottom: "1px solid var(--color-border)",
-        }}
-      >
-        All Questions by Category
-      </h2>
+      <section className="doc-section">
+        <div className="doc-head">
+          <h2 className="doc-h2">All Questions by Category</h2>
+        </div>
 
-      {categories.map((cat) => {
-        const qs = byCategory[cat];
-        const isExpanded = expanded === cat;
-        const visible = isExpanded ? qs : qs.slice(0, 6);
+        {categories.map((cat) => {
+          const qs = byCategory[cat];
+          const isExpanded = expanded === cat;
+          const visible = isExpanded ? qs : qs.slice(0, 6);
 
-        return (
-          <div key={cat} style={{ marginBottom: "2rem" }}>
-            <h3
-              style={{
-                fontSize: "1rem",
-                fontWeight: 800,
-                color: "var(--color-text)",
-                marginBottom: "0.75rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}
-            >
-              {cat}
-              <span
-                style={{
-                  fontSize: "0.6875rem",
-                  fontWeight: 600,
-                  background: "var(--color-bg-subtle)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "9999px",
-                  padding: "0.125rem 0.5rem",
-                  color: "var(--color-muted)",
-                }}
-              >
-                {qs.length}
-              </span>
-            </h3>
+          return (
+            <div key={cat} className="q-group">
+              <div className="q-group__head">
+                <h3 className="doc-h3">{cat}</h3>
+                <span className="measured">{qs.length}</span>
+              </div>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.375rem",
-              }}
-            >
-              {visible.map((q) => {
-                const companies = (q as any).companies as string[] | undefined;
-                return (
-                  <Link key={q.id} href={`/q/${q.slug}`} style={rowStyle}>
-                    <span
-                      style={{
-                        fontSize: "0.625rem",
-                        fontWeight: 600,
-                        padding: "0.125rem 0.4rem",
-                        borderRadius: "4px",
-                        background: diffBg(q.difficulty),
-                        color: diffColor(q.difficulty),
-                        flexShrink: 0,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.06em",
-                      }}
-                    >
-                      {q.difficulty}
-                    </span>
-                    <span
-                      style={{
-                        flex: 1,
-                        minWidth: 0,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        color: "var(--color-text)",
-                        fontSize: "0.875rem",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {q.title}
-                    </span>
-                    {companies && companies.length > 0 && (
-                      <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                        {companies.slice(0, 2).map((c) => (
-                          <span
-                            key={c}
-                            style={{
-                              fontSize: "10px",
-                              padding: "1px 6px",
-                              borderRadius: "4px",
-                              background: "var(--color-bg-subtle)",
-                              border: "1px solid var(--color-border)",
-                              color: "var(--color-muted)",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
+              <div className="q-list">
+                {visible.map((q) => {
+                  const companies = (q as any).companies as string[] | undefined;
+                  return (
+                    <Link key={q.id} href={`/q/${q.slug}`} className="q-row">
+                      <span className="chip">{q.difficulty}</span>
+                      <span className="q-row__title">{q.title}</span>
+                      {companies &&
+                        companies.slice(0, 2).map((c) => (
+                          <span key={c} className="chip">
                             {c}
                           </span>
                         ))}
-                      </div>
-                    )}
-                    {(q.type === "output" || q.type === "debug") && (
-                      <TypeBadge type={q.type} />
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
+                      {(q.type === "output" || q.type === "debug") && (
+                        <span className="chip chip--cool">{q.type}</span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
 
-            {qs.length > 6 && (
-              <button
-                onClick={() => setExpanded(isExpanded ? null : cat)}
-                style={{
-                  marginTop: "0.5rem",
-                  fontSize: "0.8125rem",
-                  color: "var(--color-accent)",
-                  fontWeight: 600,
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "0.375rem 0",
-                }}
-              >
-                {isExpanded
-                  ? "▲ Show less"
-                  : `+ ${qs.length - 6} more in ${cat}`}
-              </button>
-            )}
-          </div>
-        );
-      })}
+              {qs.length > 6 && (
+                <button
+                  type="button"
+                  className="q-more"
+                  onClick={() => setExpanded(isExpanded ? null : cat)}
+                >
+                  {isExpanded
+                    ? "Show less"
+                    : `${qs.length - 6} more in ${cat}`}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </section>
     </>
   );
 }

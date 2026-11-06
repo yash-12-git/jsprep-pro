@@ -79,11 +79,11 @@ const COMPANIES: Company[] = [
 ];
 
 const TAG_COLORS = [
-  { bg: "#FAEEDA", color: "#854F0B", border: "#FAC775" },
-  { bg: "#E6F1FB", color: "#185FA5", border: "#B5D4F4" },
-  { bg: "#EEEDFE", color: "#3C3489", border: "#AFA9EC" },
-  { bg: "#E1F5EE", color: "#0F6E56", border: "#9FE1CB" },
-  { bg: "#FAECE7", color: "#993C1D", border: "#F5C4B3" },
+  { bg: "var(--color-accent-soft)", color: "var(--color-accent)", border: "var(--color-amber-border)" },
+  { bg: "var(--color-cool-soft)", color: "var(--color-cool)", border: "var(--color-rule)" },
+  { bg: "var(--color-cool-soft)", color: "var(--color-ink)", border: "var(--color-rule)" },
+  { bg: "var(--color-ok-soft)", color: "var(--color-ok)", border: "var(--color-green-border)" },
+  { bg: "var(--color-bad-soft)", color: "var(--color-bad)", border: "var(--color-red-border)" },
 ];
 
 export function CompanyGuide() {
@@ -103,7 +103,7 @@ export function CompanyGuide() {
           Company-specific prep guide
         </p>
         <p style={{ fontSize: "12px", color: "var(--color-muted)", lineHeight: 1.6, margin: 0 }}>
-          Each company tests differently. Know their format before you apply — click "Start mock" to practice with company context pre-loaded.
+          Each company tests differently. Know their format before you apply: click “Start mock” to practice with company context pre-loaded.
         </p>
       </div>
 
@@ -138,12 +138,12 @@ export function CompanyGuide() {
                   fontSize: "11px",
                   padding: "2px 8px",
                   borderRadius: "99px",
-                  background: "#E1F5EE",
-                  color: "#0F6E56",
-                  border: "0.5px solid #9FE1CB",
+                  background: "var(--color-ok-soft)",
+                  color: "var(--color-ok)",
+                  border: "0.5px solid var(--color-green-border)",
                   fontWeight: 600,
                   whiteSpace: "nowrap",
-                  fontFamily: "var(--font-mono, monospace)",
+                  fontFamily: "var(--font-outlier)",
                 }}
               >
                 {co.lpa}
@@ -183,13 +183,13 @@ export function CompanyGuide() {
                 fontSize: "12px",
                 padding: "8px 10px",
                 borderRadius: "7px",
-                background: "#FAEEDA",
-                color: "#854F0B",
+                background: "var(--color-accent-soft)",
+                color: "var(--color-accent)",
                 lineHeight: 1.55,
-                border: "0.5px solid #FAC775",
+                border: "0.5px solid var(--color-amber-border)",
               }}
             >
-              💡 {co.tip}
+              {co.tip}
             </div>
 
             {/* Mock CTA */}
@@ -207,12 +207,12 @@ export function CompanyGuide() {
                 fontSize: "12px",
                 fontWeight: 500,
                 textDecoration: "none",
-                fontFamily: "var(--font-mono, monospace)",
+                fontFamily: "var(--font-outlier)",
                 transition: "background 0.15s",
                 alignSelf: "flex-start",
               }}
             >
-              🎤 Start {co.name} mock →
+              Start {co.name} mock
             </Link>
           </div>
         ))}

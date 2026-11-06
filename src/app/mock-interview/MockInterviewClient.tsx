@@ -328,7 +328,7 @@ const ava = (u: boolean) => css`
   letter-spacing: 0.04em;
   ${u
     ? `background:${C.bgSubtle};border:1px solid ${C.border};color:${C.muted};`
-    : `background:${C.accent};color:#fff;`}
+    : `background:${C.accent};color: ${C.accentInk};`}
 `;
 const bubble = (u: boolean) => css`
   max-width: 75%;

@@ -421,7 +421,7 @@ export default function PolyfillCard({
                           <span
                             css={{
                               fontSize: "12px",
-                              fontFamily: '"JetBrains Mono",monospace',
+                              fontFamily: "var(--font-outlier)",
                               flex: 1,
                             }}
                           >
@@ -432,7 +432,7 @@ export default function PolyfillCard({
                               css={{
                                 fontSize: "11px",
                                 color: C.red,
-                                fontFamily: '"JetBrains Mono",monospace',
+                                fontFamily: "var(--font-outlier)",
                                 opacity: 0.8,
                               }}
                             >
@@ -641,7 +641,7 @@ const cardHeader = css`
 const qNum = css`
   font-size: 0.6875rem;
   font-weight: 800;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   color: ${C.muted};
   flex-shrink: 0;
 `;

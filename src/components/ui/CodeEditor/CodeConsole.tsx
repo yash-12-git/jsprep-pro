@@ -72,12 +72,12 @@ const label = css`
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: ${C.muted};
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
 `;
 
 const body = css`
   padding: 10px 14px;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   font-size: 12.5px;
   line-height: 1.7;
   min-height: 40px;

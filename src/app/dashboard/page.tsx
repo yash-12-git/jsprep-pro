@@ -18,6 +18,7 @@
  * Individual sections degrade gracefully when user is null.
  */
 
+import { C } from "@/styles/tokens";
 import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -106,7 +107,7 @@ function SprintCTA() {
           padding:       "0.4375rem 1rem",
           borderRadius:  "0.5rem",
           background:    "var(--color-accent, #2383e2)",
-          color:         "#ffffff",
+          color: C.accentInk,
           fontSize:      "0.8125rem",
           fontWeight:    600,
           flexShrink:    0,

@@ -198,7 +198,7 @@ const startBtn = css`
   font-weight: 700;
   background: ${C.accent};
   border: none;
-  color: #ffffff;
+  color: ${C.accentInk};
   cursor: pointer;
   display: flex;
   align-items: center;

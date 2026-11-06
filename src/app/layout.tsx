@@ -64,8 +64,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("jsprep-theme");document.documentElement.setAttribute("data-theme",t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"))}catch(e){}`,
+          }}
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500&family=Atkinson+Hyperlegible+Mono:wght@400;500&display=swap"
+        />
         <script
           type="application/ld+json"
           key="software-schema"
@@ -84,7 +95,6 @@ export default function RootLayout({
         <meta name="application-name" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-title" content="JSPrep Pro" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#ffffff" />
       </head>
       <body className="antialiased">
         <Script id="microsoft-clarity" strategy="afterInteractive">

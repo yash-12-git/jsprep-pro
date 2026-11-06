@@ -64,7 +64,7 @@ const S = {
     border: 1px solid ${C.border};
     border-radius: ${RADIUS.lg};
     padding: 0.875rem 1rem;
-    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-family: var(--font-outlier);
     font-size: 0.8125rem;
     line-height: 1.75;
     color: ${C.text};

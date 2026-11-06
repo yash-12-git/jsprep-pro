@@ -44,7 +44,7 @@ const S = {
     background: ${C.accent};
     border: none;
     border-radius: ${RADIUS.xl};
-    color: white;
+    color: ${C.accentInk};
     font-weight: 800;
     font-size: 0.875rem;
     text-decoration: none;
@@ -72,7 +72,7 @@ const S = {
     border: none;
     outline: none;
     font-size: 0.875rem;
-    color: white;
+    color: ${C.text};
     &::placeholder {
       color: ${C.muted};
     }
@@ -281,7 +281,7 @@ export default function AdminTopicsPage() {
                   <div
                     style={{
                       fontWeight: 600,
-                      color: "white",
+                      color: C.text,
                       marginBottom: "0.1875rem",
                     }}
                   >

@@ -102,7 +102,7 @@ export const upgradeBtn = css`
   justify-content: center;
   gap: 0.5rem;
   background: ${C.accent};
-  color: #ffffff;
+  color: ${C.accentInk};
   font-weight: 600;
   font-size: 0.9375rem;
   padding: 0.875rem;

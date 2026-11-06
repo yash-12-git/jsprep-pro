@@ -110,7 +110,7 @@ const signInLink = css`
   gap: 0.375rem;
   padding: 0.4375rem 0.875rem;
   background: ${C.accent};
-  color: #ffffff;
+  color: ${C.accentInk};
   border-radius: ${RADIUS.md};
   font-size: 0.8rem;
   font-weight: 600;
@@ -141,7 +141,7 @@ const proUpgradeBtn = css`
   gap: 0.375rem;
   padding: 0.4375rem 0.875rem;
   background: ${C.accent};
-  color: #ffffff;
+  color: ${C.accentInk};
   border-radius: ${RADIUS.md};
   font-size: 0.8rem;
   font-weight: 600;

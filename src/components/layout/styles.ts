@@ -5,22 +5,19 @@ import { C, BP, RADIUS } from "@/styles/tokens";
 
 export const nav = css`
   position: sticky;
-  top: 0;
-  z-index: 50;
-  border-bottom: 1px solid ${C.border};
-  background: ${C.bg};
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow:
-    0 1px 0 0 ${C.border},
-    0 4px 16px rgba(0, 0, 0, 0.04);
+  top: var(--space-xs);
+  z-index: var(--z-sticky-nav);
+  padding: var(--space-xs) var(--gutter) 0;
 `;
 
 export const navInner = css`
-  max-width: 1200px;
+  max-width: calc(var(--container) - 2 * var(--gutter));
   margin: 0 auto;
-  padding: 0 1.25rem;
-  height: 3.25rem;
+  padding: 0 var(--space-xs) 0 var(--space-md);
+  height: 3.5rem;
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  border-radius: var(--radius-card);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -70,9 +67,8 @@ export const logoBadge = css`
   align-items: center;
   justify-content: center;
   font-size: 0.625rem;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  color: ${C.accentInk};
   flex-shrink: 0;
 `;
 
@@ -87,7 +83,7 @@ export const logoText = css`
 `;
 
 export const logoAccent = css`
-  color: ${C.accent};
+  color: ${C.text};
 `;
 
 // ─── Desktop Center Nav ────────────────────────────────────────────────────────
@@ -145,8 +141,8 @@ export const navLinkBtn = css`
 `;
 
 export const navLinkActive = css`
-  color: ${C.accent} !important;
-  background: ${C.accentSubtle} !important;
+  color: ${C.text} !important;
+  background: ${C.bgHover} !important;
 `;
 
 // Sprint link — amber highlight
@@ -186,17 +182,12 @@ export const dropdownMenu = css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   padding: 0.375rem;
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.04),
-    0 16px 40px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+  z-index: var(--z-dropdown);
 `;
 
 export const dropdownSectionLabel = css`
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: var(--text-xs);
+  font-weight: 500;
   color: ${C.muted};
   padding: 0.25rem 0.75rem 0.375rem;
   margin: 0;
@@ -225,8 +216,7 @@ export const dropdownIconBadge = (color: string) => css`
   width: 1.75rem;
   height: 1.75rem;
   border-radius: ${RADIUS.md};
-  background: ${color}14;
-  border: 1px solid ${color}28;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -270,14 +260,13 @@ export const aiCoachBtn = css`
     box-shadow 0.15s ease;
   &:hover {
     background: ${C.accentSubtle};
-    border-color: ${C.accent}55;
-    box-shadow: 0 0 0 3px ${C.accent}18;
+    border-color: ${C.borderStrong};
   }
 `;
 
 export const aiCoachBtnActive = css`
   background: ${C.accent};
-  color: #fff;
+  color: ${C.accentInk};
   border-color: ${C.accent};
   &:hover {
     background: ${C.accent};
@@ -295,11 +284,7 @@ export const aiDropdownMenu = css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   padding: 0.375rem;
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.04),
-    0 16px 40px rgba(0, 0, 0, 0.12),
-    0 0 0 1px ${C.accent}18;
-  z-index: 100;
+  z-index: var(--z-dropdown);
 `;
 
 // ─── Badges ───────────────────────────────────────────────────────────────────
@@ -307,7 +292,6 @@ export const aiDropdownMenu = css`
 export const proBadge = css`
   font-size: 0.5625rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
   background: ${C.amberSubtle};
   color: ${C.amber};
   border: 1px solid ${C.amberBorder};
@@ -321,9 +305,8 @@ export const proPill = css`
   gap: 3px;
   padding: 3px 8px;
   border-radius: 9999px;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: var(--text-xs);
+  font-weight: 500;
   color: ${C.accentText};
   background: ${C.accentSubtle};
   border: 1px solid ${C.border};
@@ -356,9 +339,9 @@ export const themeBtn = (isDark: boolean) => css`
   width: 1.75rem;
   height: 1.75rem;
   border-radius: ${RADIUS.md};
-  border: 1px solid ${isDark ? "rgba(255,255,255,0.1)" : C.border};
+  border: 1px solid ${C.border};
   background: transparent;
-  color: ${isDark ? "rgba(255,255,255,0.45)" : C.muted};
+  color: ${C.muted};
   cursor: pointer;
   flex-shrink: 0;
   transition:
@@ -366,9 +349,9 @@ export const themeBtn = (isDark: boolean) => css`
     border-color 0.12s,
     color 0.12s;
   &:hover {
-    background: ${isDark ? "rgba(255,255,255,0.08)" : C.bgHover};
-    border-color: ${isDark ? "rgba(255,255,255,0.2)" : C.borderStrong};
-    color: ${isDark ? "#fff" : C.text};
+    background: ${C.bgHover};
+    border-color: ${C.borderStrong};
+    color: ${C.text};
   }
 `;
 
@@ -436,9 +419,6 @@ export const accountPanel = css`
   background: ${C.bg};
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
-  box-shadow:
-    0 4px 6px rgba(0, 0, 0, 0.04),
-    0 16px 32px rgba(0, 0, 0, 0.1);
   z-index: 200;
   overflow: hidden;
 `;
@@ -534,7 +514,7 @@ export const signInBtn = css`
   border-radius: ${RADIUS.md};
   text-decoration: none;
   border: 1px solid ${C.border};
-  transition: all 0.12s;
+  transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
   &:hover {
     color: ${C.text};
     border-color: ${C.borderStrong};
@@ -547,7 +527,7 @@ export const getStartedBtn = css`
   align-items: center;
   gap: 0.375rem;
   background: ${C.accent};
-  color: #fff;
+  color: ${C.accentInk};
   font-size: 0.8125rem;
   font-weight: 600;
   padding: 0.375rem 0.875rem;
@@ -572,7 +552,6 @@ export const mobileSheet = css`
   background: ${C.bg};
   overflow-y: auto;
   /* Soft shadow below the nav */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   @media (min-width: ${BP.md}) {
     display: none;
   }
@@ -629,10 +608,8 @@ export const mobileUserBadges = css`
 `;
 
 export const mobileSectionLabel = css`
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: var(--text-xs);
+  font-weight: 500;
   color: ${C.muted};
   padding: 0.375rem 0.875rem 0.25rem;
   margin: 0;
@@ -695,8 +672,7 @@ export const mobileIconBadge = (color: string) => css`
   width: 1.875rem;
   height: 1.875rem;
   border-radius: ${RADIUS.md};
-  background: ${color}14;
-  border: 1px solid ${color}28;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -722,7 +698,6 @@ export const mobileProBadge = css`
   margin-left: auto;
   font-size: 0.5625rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
   background: ${C.amberSubtle};
   color: ${C.amber};
   border: 1px solid ${C.amberBorder};
@@ -762,16 +737,11 @@ export const mobileBottomNav = css`
   background: ${C.bg};
   border-top: 1px solid ${C.border};
   /* Subtle frosted blur */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   display: flex;
   align-items: stretch;
   z-index: 60;
   /* Safe area for iOS home bar */
   padding-bottom: env(safe-area-inset-bottom);
-  box-shadow:
-    0 -1px 0 ${C.border},
-    0 -4px 16px rgba(0, 0, 0, 0.04);
 
   @media (min-width: ${BP.md}) {
     display: none;
@@ -835,6 +805,5 @@ export const mobileTabAiActive = css`
 export const mobileTabLabel = css`
   font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
   line-height: 1;
 `;

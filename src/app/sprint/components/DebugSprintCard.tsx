@@ -69,7 +69,7 @@ const codeBlock = css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   padding: 1rem 1.125rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.8125rem;
   line-height: 1.7;
   color: ${C.codeText};
@@ -85,7 +85,7 @@ const textarea = (state: "idle" | "submitted") => css`
   border: 1px solid ${state === "submitted" ? C.border : C.accent};
   border-radius: ${RADIUS.lg};
   padding: 1rem 1.125rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.8125rem;
   line-height: 1.7;
   color: ${C.text};
@@ -124,7 +124,7 @@ const compPanel = (color: string, bg: string) => css`
 `;
 
 const compPre = css`
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.75rem;
   line-height: 1.7;
   color: ${C.codeText};
@@ -258,7 +258,7 @@ const nextBtn = css`
   cursor: pointer;
   background: ${C.accent};
   border: none;
-  color: #ffffff;
+  color: ${C.accentInk};
   transition:
     opacity 0.12s ease,
     transform 0.12s ease;

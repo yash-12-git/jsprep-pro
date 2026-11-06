@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  DocClose,
+  DocHero,
+  DocSection,
+  LinkGrid,
+  RelatedLinks,
+} from "@/components/seo/DocParts";
+import {
   pageMeta,
   faqSchema,
   breadcrumbSchema,
@@ -44,18 +51,6 @@ const CATEGORIES = [
   "Generators & Iterators",
   "Prototypes & Inheritance"
 ] as const;
-
-const CATEGORY_EMOJI: Record<string, string> = {
-  "Event Loop & Promises": "⚙️",
-  "Closures & Scope": "🔒",
-  "'this' Binding": "👉",
-  Hoisting: "🚀",
-  "Type Coercion": "🔀",
-  "Array Methods": "🔢",
-  "Modern JS": "✨",
-  "Generators & Iterators": "🔄",
-  "Prototypes & Inheritance": "🧬",
-};
 
 function slugify(s: string) {
   return s
@@ -118,276 +113,80 @@ export default async function JavaScriptOutputQuestionsPage() {
         }}
       />
 
-      <div
-        style={{
-          maxWidth: "56rem",
-          margin: "0 auto",
-          padding: "2.5rem 1.25rem",
-          color: C.text,
-          fontFamily: "system-ui, sans-serif",
-        }}
-      >
-        {/* Breadcrumb */}
-        <nav
-          style={{
-            fontSize: "0.8125rem",
-            color: C.muted,
-            marginBottom: "2rem",
-          }}
-        >
-          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
-            JSPrep Pro
-          </Link>
-          <span style={{ margin: "0 0.5rem", color: C.borderStrong }}>›</span>
-          <span style={{ color: C.muted }}>JavaScript Output Questions</span>
-        </nav>
-
-        {/* Hero */}
-        <header style={{ marginBottom: "2.5rem" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              fontSize: "0.8125rem",
-              fontWeight: 600,
-              color: C.amber,
-              background: C.amberSubtle,
-              border: `1px solid ${C.amberBorder}`,
-              padding: "0.25rem 0.75rem",
-              borderRadius: "9999px",
-              marginBottom: "1rem",
-            }}
-          >
-            ⚡ Predict the Output
-          </div>
-          <h1
-            style={{
-              fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
-              fontWeight: 700,
-              color: C.text,
-              lineHeight: 1.15,
-              marginBottom: "1rem",
-              letterSpacing: "-0.025em",
-            }}
-          >
-            JavaScript Output Questions
-            <br />
-            <span style={{ color: C.amber }}>What Does This Code Print?</span>
-          </h1>
-          <p
-            style={{
-              fontSize: "1.0625rem",
-              lineHeight: 1.75,
-              marginBottom: "1rem",
-              maxWidth: "44rem",
-              color: C.text,
-            }}
-          >
-            {totalCount}+ real{" "}
-            <strong>JavaScript output prediction questions</strong> from
-            frontend interviews. Read code → predict{" "}
-            <code
-              style={{
-                background: C.codeInlineBg,
-                border: `1px solid ${C.border}`,
-                padding: "0.1em 0.4em",
-                borderRadius: "0.25rem",
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: "0.9em",
-                color: C.codeText,
-              }}
-            >
-              console.log
-            </code>{" "}
-            → learn why.
-          </p>
-          <p
-            style={{
-              fontSize: "0.9375rem",
-              color: C.muted,
-              marginBottom: "1.5rem",
-            }}
-          >
-            ✅ {totalCount} questions &nbsp;·&nbsp; ✅ First {FREE_PREVIEW}{" "}
-            interactive free &nbsp;·&nbsp; ✅ Progress saved in quiz
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: "0.875rem",
-              flexWrap: "wrap",
-              alignItems: "center",
-            }}
-          >
-            <SEOHeroCTA />
-            <a
-              href="#questions"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "0.5625rem 1.25rem",
-                border: `1px solid ${C.border}`,
-                color: C.muted,
-                borderRadius: "0.625rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                fontSize: "0.9375rem",
-              }}
-            >
-              Browse Questions ↓
-            </a>
-          </div>
-        </header>
-
-        {/* How it works */}
-        <section
-          style={{
-            background: C.bgSubtle,
-            border: `1px solid ${C.border}`,
-            borderRadius: "0.875rem",
-            padding: "1.125rem 1.375rem",
-            marginBottom: "2.5rem",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "0.9375rem",
-              fontWeight: 600,
-              color: C.text,
-              marginBottom: "0.5rem",
-            }}
-          >
-            ⚡ How to use this page
-          </h2>
-          <p
-            style={{
-              fontSize: "0.9rem",
-              lineHeight: 1.75,
-              color: C.muted,
-              margin: 0,
-            }}
-          >
-            <strong style={{ color: C.text }}>
-              Try the first {FREE_PREVIEW} questions here
-            </strong>{" "}
-            — click a question, type your prediction, check it. No account
-            needed. The rest are in the{" "}
-            <Link href="/output-quiz" style={{ color: C.amber }}>
-              interactive quiz
-            </Link>{" "}
-            where progress is tracked. Reading answers ≠ predicting them.
-          </p>
-        </section>
-
-        {/* TOC */}
-        <nav
-          style={{
-            background: C.bgSubtle,
-            border: `1px solid ${C.border}`,
-            borderRadius: "0.875rem",
-            padding: "1.375rem",
-            marginBottom: "2.5rem",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "0.9375rem",
-              fontWeight: 600,
-              color: C.text,
-              marginBottom: "1rem",
-            }}
-          >
-            📋 Topics
-          </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "0.5rem",
-            }}
-          >
-            {byCategory.map(({ cat, questions }) => (
-              <a
-                key={cat}
-                href={`#${slugify(cat)}`}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.625rem",
-                  padding: "0.5625rem 0.875rem",
-                  background: C.bg,
-                  border: `1px solid ${C.border}`,
-                  borderRadius: "0.5rem",
-                  textDecoration: "none",
-                  color: C.text,
-                  fontSize: "0.875rem",
-                }}
-              >
-                <span>{CATEGORY_EMOJI[cat]}</span>
-                <span style={{ flex: 1 }}>{cat}</span>
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    color: C.muted,
-                    background: C.bgActive,
-                    padding: "0.1rem 0.5rem",
-                    borderRadius: "9999px",
-                  }}
-                >
-                  {questions.length}
-                </span>
+      <main className="doc">
+        <DocHero
+          crumbs={
+            <>
+              <Link href="/">JSPrep Pro</Link>
+              <span>/</span>
+              <span>JavaScript Output Questions</span>
+            </>
+          }
+          title={
+            <>
+              JavaScript Output Questions
+              <br />
+              What Does This Code Print?
+            </>
+          }
+          lede={
+            <>
+              {totalCount}+ real{" "}
+              <strong>JavaScript output prediction questions</strong> from
+              frontend interviews. Read code, predict <code>console.log</code>,
+              learn why.
+            </>
+          }
+          meta={
+            <>
+              <span>{totalCount} questions</span>
+              <span>First {FREE_PREVIEW} interactive free</span>
+              <span>Progress saved in quiz</span>
+            </>
+          }
+          actions={
+            <>
+              <SEOHeroCTA />
+              <a href="#questions" className="btn">
+                Browse Questions
               </a>
-            ))}
-          </div>
-        </nav>
+            </>
+          }
+        />
+
+        <DocSection
+          title="How to use this page"
+          line={
+            <>
+              <strong>Try the first {FREE_PREVIEW} questions here</strong>: click
+              a question, type your prediction, check it. No account needed. The
+              rest are in the{" "}
+              <Link href="/output-quiz" className="link">
+                interactive quiz
+              </Link>{" "}
+              where progress is tracked. Reading answers ≠ predicting them.
+            </>
+          }
+        >
+          <LinkGrid
+            items={byCategory.map(({ cat, questions }) => ({
+              href: `#${slugify(cat)}`,
+              title: cat,
+              note: `${questions.length} questions`,
+            }))}
+          />
+        </DocSection>
 
         {/* Questions */}
-        <div
-          id="questions"
-          style={{ display: "flex", flexDirection: "column", gap: "3rem" }}
-        >
+        <div id="questions">
           {byCategory.map(({ cat, questions }) => (
-            <section key={cat} id={slugify(cat)}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.75rem",
-                  marginBottom: "1.25rem",
-                  paddingBottom: "0.875rem",
-                  borderBottom: `1px solid ${C.border}`,
-                }}
-              >
-                <span style={{ fontSize: "1.5rem" }}>
-                  {CATEGORY_EMOJI[cat]}
-                </span>
-                <div>
-                  <h2
-                    style={{
-                      fontSize: "1.25rem",
-                      fontWeight: 700,
-                      color: C.text,
-                      margin: 0,
-                      letterSpacing: "-0.015em",
-                    }}
-                  >
-                    {cat}
-                  </h2>
-                  <p
-                    style={{ fontSize: "0.8125rem", color: C.muted, margin: 0 }}
-                  >
-                    {questions.length} questions
-                  </p>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.875rem",
-                }}
-              >
+            <DocSection
+              key={cat}
+              id={slugify(cat)}
+              title={cat}
+              line={`${questions.length} questions`}
+            >
+              <div className="doc-cards">
                 {questions.map((q) => {
                   const globalIndex = orderedAll.indexOf(q);
                   return (
@@ -407,161 +206,55 @@ export default async function JavaScriptOutputQuestionsPage() {
                       globalIndex={globalIndex}
                       freeLimit={FREE_PREVIEW}
                       quizHref="/output-quiz"
-                      accent={C.amber}
+                      accent={C.cool}
                       badgeLabel={`#${String(globalIndex + 1).padStart(2, "0")}`}
                     />
                   );
                 })}
               </div>
-            </section>
+            </DocSection>
           ))}
         </div>
 
-        {/* Upgrade CTA */}
-        <section
-          style={{
-            marginTop: "3rem",
-            padding: "2rem 2.5rem",
-            textAlign: "center",
-            background: C.amberSubtle,
-            border: `1px solid ${C.amberBorder}`,
-            borderRadius: "0.875rem",
-          }}
-        >
-          <div style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>🔒</div>
-          <h2
-            style={{
-              fontSize: "1.375rem",
-              fontWeight: 700,
-              color: C.text,
-              marginBottom: "0.5rem",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {totalCount - FREE_PREVIEW} more questions with progress tracking
-          </h2>
-          <p
-            style={{
-              color: C.muted,
-              marginBottom: "1.5rem",
-              maxWidth: "30rem",
-              marginInline: "auto",
-              fontSize: "0.9375rem",
-              lineHeight: 1.7,
-            }}
-          >
-            Free accounts get 5 tracked questions. Pro unlocks all {totalCount}+
-            output questions, debug lab, theory mastery, and the leaderboard.
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: "0.875rem",
-              justifyContent: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            <Link
-              href="/output-quiz"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.75rem 1.625rem",
-                background: C.amber,
-                color: C.text,
-                borderRadius: "0.625rem",
-                fontWeight: 600,
-                textDecoration: "none",
-                fontSize: "0.9375rem",
-              }}
-            >
-              ⚡ Start Free — 5 Questions
-            </Link>
-            <Link
-              href="/#pricing"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.75rem 1.625rem",
-                border: `1px solid ${C.border}`,
-                color: C.accent,
-                borderRadius: "0.625rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                fontSize: "0.9375rem",
-              }}
-            >
-              View Pro — {pricing.symbol}
-              {pricing.display}/mo →
-            </Link>
-          </div>
-        </section>
+        <DocClose
+          title={`${totalCount - FREE_PREVIEW} more questions with progress tracking`}
+          line={`Free accounts get 5 tracked questions. Pro unlocks all ${totalCount}+ output questions, debug lab, theory mastery, and the leaderboard.`}
+          actions={
+            <>
+              <Link href="/output-quiz" className="btn btn--primary">
+                Start free, 5 questions
+              </Link>
+              <Link href="/#pricing" className="btn">
+                View Pro, {pricing.symbol}
+                {pricing.display}/mo
+              </Link>
+            </>
+          }
+        />
 
-        {/* Related */}
-        <section style={{ marginTop: "2.5rem" }}>
-          <h2
-            style={{
-              fontSize: "1.0625rem",
-              fontWeight: 700,
-              color: C.text,
-              marginBottom: "1rem",
-              paddingBottom: "0.75rem",
-              borderBottom: `1px solid ${C.border}`,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            Related Resources
-          </h2>
-          <ul
-            style={{
-              paddingLeft: "1.25rem",
-              fontSize: "0.9375rem",
-              lineHeight: 2,
-            }}
-          >
-            <li style={{ color: C.muted }}>
-              <Link
-                href="/javascript-tricky-questions"
-                style={{ color: C.accent }}
-              >
-                JavaScript Tricky Questions — [] == false, null == undefined
-                explained
-              </Link>
-            </li>
-            <li style={{ color: C.muted }}>
-              <Link
-                href="/javascript-interview-questions"
-                style={{ color: C.accent }}
-              >
-                150+ JavaScript Interview Questions with Answers
-              </Link>
-            </li>
-            <li style={{ color: C.muted }}>
-              <Link
-                href="/javascript-interview-cheatsheet"
-                style={{ color: C.accent }}
-              >
-                JavaScript Interview Cheat Sheet (Printable)
-              </Link>
-            </li>
-          </ul>
-        </section>
+        <DocSection title="Related Resources">
+          <RelatedLinks
+            items={[
+              {
+                href: "/javascript-tricky-questions",
+                text: "JavaScript Tricky Questions: [] == false, null == undefined explained",
+              },
+              {
+                href: "/javascript-interview-questions",
+                text: "150+ JavaScript Interview Questions with Answers",
+              },
+              {
+                href: "/javascript-interview-cheatsheet",
+                text: "JavaScript Interview Cheat Sheet (Printable)",
+              },
+            ]}
+          />
+        </DocSection>
 
-        <footer
-          style={{
-            marginTop: "3rem",
-            paddingTop: "1.5rem",
-            borderTop: `1px solid ${C.border}`,
-            fontSize: "0.8125rem",
-            color: C.muted,
-            textAlign: "center",
-          }}
-        >
-          © 2026 {SITE.name} · {SITE.domain}
+        <footer className="doc-foot">
+          © 2026 {SITE.name}, {SITE.domain}
         </footer>
-      </div>
+      </main>
     </>
   );
 }

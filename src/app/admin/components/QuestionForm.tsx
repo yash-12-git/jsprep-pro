@@ -181,7 +181,7 @@ const S = {
     background: ${C.surface};
     color: ${C.text};
     font-size: 0.875rem;
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--font-outlier);
     resize: vertical;
     box-sizing: border-box;
     &:focus {
@@ -278,7 +278,7 @@ const S = {
     background: ${C.accent};
     border: none;
     border-radius: ${RADIUS.xl};
-    color: white;
+    color: ${C.accentInk};
     font-weight: 700;
     font-size: 0.9375rem;
     cursor: pointer;

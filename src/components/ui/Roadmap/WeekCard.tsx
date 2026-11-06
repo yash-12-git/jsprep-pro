@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import type { RoadmapWeek } from "@/data/roadmap/types";
 import { DayRow } from "./DayRow";
@@ -58,7 +59,7 @@ export function WeekCard({ week, isDayDone, onToggleDay, defaultOpen = false }: 
           }}
           aria-hidden
         >
-          ▶
+          <ChevronRight size={16} aria-hidden="true" />
         </span>
       </button>
 

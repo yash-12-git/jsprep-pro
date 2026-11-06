@@ -9,10 +9,10 @@
  */
 
 import { useState } from "react";
-import { C } from "@/styles/tokens";
 
 const DownloadIcon = () => (
   <svg
+    aria-hidden="true"
     width="14"
     height="14"
     viewBox="0 0 24 24"
@@ -40,47 +40,19 @@ export default function DownloadPDFButton() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "0.5rem",
-      }}
-    >
+    <div>
       <button
+        type="button"
         onClick={handleClick}
-        className="no-print"
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          padding: "0.625rem 1.375rem",
-          background: C.accent,
-          color: "#ffffff",
-          border: "none",
-          borderRadius: "0.625rem",
-          fontWeight: 600,
-          fontSize: "0.9375rem",
-          cursor: "pointer",
-          transition: "opacity 0.12s ease",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+        className="no-print btn btn--primary"
       >
         <DownloadIcon /> Download PDF
       </button>
       {state === "tip" && (
-        <p
-          style={{
-            fontSize: "0.75rem",
-            color: C.muted,
-            margin: 0,
-            textAlign: "center",
-          }}
-        >
-          In the print dialog → set Destination to{" "}
-          <strong style={{ color: C.text }}>Save as PDF</strong>
+        <p className="doc-meta">
+          <span>
+            In the print dialog, set Destination to <strong>Save as PDF</strong>
+          </span>
         </p>
       )}
     </div>

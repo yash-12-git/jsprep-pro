@@ -202,7 +202,7 @@ export const primaryBtn = (color: string = C.accent) => css`
   font-weight: 500;
   background: ${color};
   border: 1px solid ${color};
-  color: #ffffff;
+  color: ${C.accentInk};
   cursor: pointer;
   transition:
     opacity 0.12s ease,
@@ -243,7 +243,7 @@ export const textarea = (focusColor: string = C.accent) => css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   padding: 0.75rem 1rem;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.8125rem;
   color: ${C.text};
   outline: none;
@@ -272,7 +272,7 @@ export const codeBlock = (borderColor: string = C.border) => css`
   border: 1px solid ${borderColor};
   border-radius: ${RADIUS.lg};
   padding: 1rem;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.6875rem;
   color: ${C.codeText};
   overflow: auto;
@@ -370,7 +370,7 @@ export const proNudge = css`
 export const upgradeBtn = css`
   padding: 0.5rem 1.125rem;
   background: ${C.accent};
-  color: white;
+  color: ${C.accentInk};
   border: none;
   border-radius: 0.5rem;
   font-weight: 700;

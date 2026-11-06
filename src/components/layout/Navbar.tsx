@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { css } from "@emotion/react";
 import {
+  Flame,
   Zap,
   BookOpen,
   LogOut,
@@ -18,7 +19,6 @@ import {
   Bug,
   Newspaper,
   Layers,
-  ArrowRight,
   Sun,
   Moon,
   Code,
@@ -289,7 +289,7 @@ export default function Navbar() {
 
               <span css={S.sep} />
 
-              {/* ✨ AI Coach — highlighted CTA */}
+              {/* AI Coach */}
               <div css={S.dropdownWrapper} ref={aiRef}>
                 <button
                   css={[S.aiCoachBtn, isAiActive && S.aiCoachBtnActive]}
@@ -297,7 +297,7 @@ export default function Navbar() {
                 >
                   <Sparkles size={12} />
                   AI Coach
-                  {!progress?.isPro && <span css={S.proBadge}>PRO</span>}
+                  {!progress?.isPro && <span css={S.proBadge}>Pro</span>}
                   <ChevronDown size={10} css={S.chevron(open === "ai")} />
                 </button>
                 {open === "ai" && (
@@ -326,7 +326,7 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* ⚡ Sprint — end CTA */}
+              {/* Sprint */}
               <Link
                 href="/sprint"
                 css={[
@@ -356,11 +356,11 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* RIGHT: PRO · Theme · Hamburger / Avatar */}
+          {/* RIGHT: Pro, theme, hamburger or avatar */}
           <div css={S.rightSide}>
             {user && progress?.isPro && (
               <span css={S.proPill}>
-                <Zap size={9} /> PRO
+                <Zap size={12} aria-hidden="true" /> Pro
               </span>
             )}
 
@@ -426,7 +426,7 @@ export default function Navbar() {
                         )}
                         {(progress?.streakDays ?? 0) > 0 && (
                           <span css={S.streakChip}>
-                            🔥 {progress!.streakDays}d streak
+                            <Flame size={12} aria-hidden="true" /> {progress!.streakDays}d streak
                           </span>
                         )}
                       </div>
@@ -445,7 +445,7 @@ export default function Navbar() {
                         <BarChart2 size={14} color={C.muted} /> Analytics
                         {!progress?.isPro && (
                           <span css={S.proBadge} style={{ marginLeft: "auto" }}>
-                            PRO
+                            Pro
                           </span>
                         )}
                       </Link>
@@ -489,7 +489,7 @@ export default function Navbar() {
                   Log in
                 </Link>
                 <Link href="/auth" css={S.getStartedBtn}>
-                  Get started <ArrowRight size={13} />
+                  Start free
                 </Link>
               </div>
             )}
@@ -525,11 +525,11 @@ export default function Navbar() {
                 <div css={S.mobileUserBadges}>
                   {progress?.isPro && (
                     <span css={S.proPill}>
-                      <Zap size={9} /> PRO
+                      <Zap size={12} aria-hidden="true" /> Pro
                     </span>
                   )}
                   {(progress?.streakDays ?? 0) > 0 && (
-                    <span css={S.streakChip}>🔥 {progress!.streakDays}d</span>
+                    <span css={S.streakChip}><Flame size={12} aria-hidden="true" /> {progress!.streakDays}d</span>
                   )}
                 </div>
               </div>
@@ -615,7 +615,7 @@ export default function Navbar() {
                   <span>{label}</span>
                   <span css={S.mobileItemDesc}>{desc}</span>
                 </div>
-                {!progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
+                {!progress?.isPro && <span css={S.mobileProBadge}>Pro</span>}
               </Link>
             ))}
 
@@ -624,7 +624,7 @@ export default function Navbar() {
 
             <Link href="/analytics" css={S.mobileNavLink}>
               <BarChart2 size={16} color={C.muted} /> Analytics
-              {!progress?.isPro && <span css={S.mobileProBadge}>PRO</span>}
+              {!progress?.isPro && <span css={S.mobileProBadge}>Pro</span>}
             </Link>
 
             <button

@@ -628,7 +628,7 @@ const toolbarLabel = css`
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: ${C.muted};
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
 `;
 const editedDot = css`
   width: 6px;

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { C } from "@/styles/tokens";
+import { DocClose, DocHero, DocSection, RelatedLinks } from "@/components/seo/DocParts";
 import { pageMeta, breadcrumbSchema } from "@/lib/seo/seo";
 import DownloadPDFButton from "./DownloadPdfButton";
-import { C } from "@/styles/tokens";
 
 export const metadata: Metadata = pageMeta({
   title: "JavaScript Interview Cheat Sheet 2026 (Printable PDF)",
@@ -235,119 +236,40 @@ export default function CheatsheetPage() {
         }}
       />
 
-      <div
-        style={{
-          maxWidth: "64rem",
-          margin: "0 auto",
-          padding: "2.5rem 1.25rem",
-          color: C.text,
-        }}
-      >
-        {/* Breadcrumb */}
-        <nav
-          style={{
-            fontSize: "0.8125rem",
-            color: C.muted,
-            marginBottom: "2rem",
-          }}
-        >
-          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
-            JSPrep Pro
-          </Link>
-          <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
-          <span style={{ color: C.muted }}>
-            JavaScript Interview Cheat Sheet
-          </span>
-        </nav>
+      <div className="doc">
+        <DocHero
+          crumbs={
+            <>
+              <Link href="/">JSPrep Pro</Link>
+              <span>/</span>
+              <span>JavaScript Interview Cheat Sheet</span>
+            </>
+          }
+          title={
+            <>
+              JavaScript Interview
+              <br />
+              Cheat Sheet 2025
+            </>
+          }
+          lede="A complete quick-reference for every JavaScript concept you need to know before your frontend interview. Printable, bookmarkable, shareable."
+          actions={
+            <>
+              <DownloadPDFButton />
+              <Link href="/auth" className="btn">
+                Or practice these concepts interactively
+              </Link>
+            </>
+          }
+        />
 
-        {/* Hero */}
-        <header style={{ marginBottom: "2.5rem", textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: C.accentText,
-              marginBottom: "0.625rem",
-            }}
-          >
-            Free Resource
-          </div>
-          <h1
-            style={{
-              fontSize: "clamp(1.75rem, 5vw, 3rem)",
-              fontWeight: 700,
-              color: C.text,
-              lineHeight: 1.15,
-              marginBottom: "0.875rem",
-              letterSpacing: "-0.025em",
-            }}
-          >
-            JavaScript Interview
-            <br />
-            <span style={{ color: C.accent }}>Cheat Sheet 2025</span>
-          </h1>
-          <p
-            style={{
-              fontSize: "1rem",
-              maxWidth: "40rem",
-              margin: "0 auto 1.5rem",
-              lineHeight: 1.75,
-              color: C.muted,
-            }}
-          >
-            A complete quick-reference for every JavaScript concept you need to
-            know before your frontend interview. Printable, bookmarkable,
-            shareable.
-          </p>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "0.875rem",
-            }}
-          >
-            <DownloadPDFButton />
-            <Link
-              href="/auth"
-              style={{
-                fontSize: "0.875rem",
-                color: C.accentText,
-                textDecoration: "none",
-                fontWeight: 500,
-              }}
-            >
-              Or practice these concepts interactively →
-            </Link>
-          </div>
-        </header>
-
-        {/* Topic anchor chips */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "0.5rem",
-            justifyContent: "center",
-            marginBottom: "3rem",
-          }}
-        >
+        {/* Topic anchors */}
+        <div className="chip-links no-print">
           {SECTIONS.map((s) => (
             <a
               key={s.title}
               href={`#${s.title.toLowerCase().replace(/\s+/g, "-")}`}
-              style={{
-                fontSize: "0.75rem",
-                padding: "0.25rem 0.875rem",
-                borderRadius: "9999px",
-                border: `1px solid ${s.border}`,
-                background: s.bg,
-                color: s.color,
-                textDecoration: "none",
-                fontWeight: 600,
-              }}
+              className="chip"
             >
               {s.title}
             </a>
@@ -355,133 +277,41 @@ export default function CheatsheetPage() {
         </div>
 
         {/* Cheatsheet grid */}
-        <main
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fill, minmax(min(100%, 30rem), 1fr))",
-            gap: "1.25rem",
-            marginBottom: "3rem",
-          }}
-        >
+        <main className="sheet">
           {SECTIONS.map((section) => (
             <section
               key={section.title}
               id={section.title.toLowerCase().replace(/\s+/g, "-")}
-              style={{
-                background: C.bg,
-                border: `1px solid ${section.border}`,
-                borderTop: `3px solid ${section.color}`,
-                borderRadius: "0.75rem",
-                padding: "1.375rem",
-                pageBreakInside: "avoid",
-                breakInside: "avoid",
-              }}
+              className="doc-panel sheet__item"
             >
-              <h2
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 700,
-                  color: section.color,
-                  marginBottom: "1rem",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {section.title}
-              </h2>
-
-              <ul
-                style={{
-                  paddingLeft: "1.125rem",
-                  marginBottom: "1rem",
-                  fontSize: "0.8125rem",
-                  lineHeight: 1.75,
-                }}
-              >
+              <h2 className="doc-h3">{section.title}</h2>
+              <ul>
                 {section.points.map((point, i) => (
-                  <li
-                    key={i}
-                    style={{ marginBottom: "0.375rem", color: C.text }}
-                    dangerouslySetInnerHTML={{ __html: point }}
-                  />
+                  <li key={i} dangerouslySetInnerHTML={{ __html: point }} />
                 ))}
               </ul>
-
-              <pre
-                style={{
-                  background: C.codeBg,
-                  border: `1px solid ${C.border}`,
-                  borderLeft: `3px solid ${section.color}`,
-                  borderRadius: "0.5rem",
-                  padding: "0.875rem",
-                  overflowX: "auto",
-                  fontSize: "0.725rem",
-                  lineHeight: 1.7,
-                  color: C.codeText,
-                  fontFamily: "'JetBrains Mono', monospace",
-                  margin: 0,
-                }}
-              >
+              <pre>
                 <code>{section.code}</code>
               </pre>
             </section>
           ))}
         </main>
 
-        {/* What's not covered */}
-        <section
-          style={{
-            background: C.bgSubtle,
-            border: `1px solid ${C.border}`,
-            borderRadius: "0.875rem",
-            padding: "2rem",
-            marginBottom: "2.5rem",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "1.0625rem",
-              fontWeight: 700,
-              color: C.text,
-              marginBottom: "1rem",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            What's Not Covered Here
-          </h2>
-          <p
-            style={{
-              fontSize: "0.9375rem",
-              marginBottom: "1rem",
-              color: C.muted,
-              lineHeight: 1.75,
-            }}
-          >
-            This cheat sheet covers the concepts most frequently tested in
-            interviews. For deeper practice, check:
-          </p>
-          <ul
-            style={{
-              paddingLeft: "1.25rem",
-              fontSize: "0.9375rem",
-              lineHeight: 2,
-            }}
-          >
-            {[
+        <div className="no-print">
+          <DocSection title="What’s Not Covered Here" line="This cheat sheet covers the concepts most frequently tested in interviews. For deeper practice, check:">
+            <RelatedLinks
+              items={[
               {
                 href: "/javascript-interview-questions",
                 text: "200+ full JavaScript interview questions with answers",
               },
               {
                 href: "/output-quiz",
-                text: "Output prediction quiz ( tricky code snippets)",
+                text: "Output prediction quiz (tricky code snippets)",
               },
               {
                 href: "/debug-lab",
-                text: "Debug lab ( real bugs to fix with AI feedback)",
+                text: "Debug lab (real bugs to fix with AI feedback)",
               },
               {
                 href: "/questions/async-js",
@@ -491,76 +321,27 @@ export default function CheatsheetPage() {
                 href: "/questions/this-keyword",
                 text: 'All "this" keyword interview questions',
               },
-            ].map(({ href, text }) => (
-              <li key={href} style={{ color: C.muted }}>
-                <Link
-                  href={href}
-                  style={{ color: C.accent, textDecoration: "none" }}
-                >
-                  {text}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
+            ]}
+            />
+          </DocSection>
 
-        {/* Bottom CTA */}
-        <section
-          style={{
-            background: C.accentSubtle,
-            border: `1px solid ${C.border}`,
-            borderRadius: "1rem",
-            padding: "2.5rem",
-            textAlign: "center",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "1.5rem",
-              fontWeight: 700,
-              color: C.text,
-              marginBottom: "0.75rem",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Ready to Test Yourself?
-          </h2>
-          <p
-            style={{
-              color: C.muted,
-              maxWidth: "36rem",
-              margin: "0 auto 1.5rem",
-              fontSize: "0.9375rem",
-              lineHeight: 1.7,
-            }}
-          >
-            This cheat sheet gives you the concepts. JSPrep Pro makes you
-            practice them actively — with output prediction, AI-evaluated
-            answers, and mock interviews.
-          </p>
-          <Link
-            href="/auth"
-            style={{
-              display: "inline-flex",
-              padding: "0.75rem 1.875rem",
-              background: C.accent,
-              color: "#ffffff",
-              borderRadius: "0.625rem",
-              fontWeight: 600,
-              textDecoration: "none",
-              fontSize: "1rem",
-            }}
-          >
-            Start Practicing Free →
-          </Link>
-        </section>
+          <DocClose
+            title="Ready to Test Yourself?"
+            line="This cheat sheet gives you the concepts. JSPrep Pro makes you practice them actively: with output prediction, AI-evaluated answers, and mock interviews."
+            actions={
+              <Link href="/auth" className="btn btn--primary">
+                Start Practicing Free
+              </Link>
+            }
+          />
+        </div>
       </div>
 
       {/* ─── Print / PDF styles ────────────────────────────────────────────────── */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        code { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+        code { font-family: var(--font-outlier); }
 
         @media print {
           .no-print, nav, header, footer,
@@ -577,7 +358,7 @@ export default function CheatsheetPage() {
           }
 
           body > * > main,
-          div[style*="max-width"] {
+          .doc {
             display: block !important;
             max-width: 100% !important;
             padding: 0 !important;

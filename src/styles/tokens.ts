@@ -29,6 +29,14 @@ export const C = {
   accentText:   "var(--color-accent-text)",
   accentDim:    "var(--color-accent-subtle)",    // alias
   accentBorder: "var(--color-accent-subtle)",    // alias
+  accentInk:    "var(--color-accent-ink)",       // text on an accent fill
+
+  // ─── Console surfaces and the instrument colour ─────────────────────────────
+  paper3:   "var(--color-paper-3)",              // deepest step: code, logs, wells
+  ink2:     "var(--color-ink-2)",
+  rule2:    "var(--color-rule-2)",
+  cool:     "var(--color-cool)",                 // what an instrument measured
+  coolSoft: "var(--color-cool-soft)",
 
   // ─── Code ───────────────────────────────────────────────────────────────────
   codeBg:       "var(--color-code-bg)",
@@ -68,8 +76,9 @@ export const C = {
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
 export const FONT = {
-  sans: `"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`,
-  mono: `"JetBrains Mono", "Fira Code", monospace`,
+  sans: "var(--font-body)",
+  display: "var(--font-display)",
+  mono: "var(--font-outlier)",
 } as const;
 
 // ─── Breakpoints ──────────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getQuestions } from "@/lib/cachedQueries";
 import Link from "next/link";
+import { DocClose, DocHero, DocSection, LinkGrid } from "@/components/seo/DocParts";
 import {
   pageMeta,
   faqSchema,
@@ -126,251 +127,99 @@ export default async function CategoryQuestionsPage({ params }: Props) {
         }}
       />
 
-      <div
-        style={{
-          maxWidth: "56rem",
-          margin: "0 auto",
-          padding: "2.5rem 1.25rem",
-          color: C.text,
-        }}
-      >
-        {/* Breadcrumb */}
-        <nav
-          style={{
-            fontSize: "0.8125rem",
-            color: C.muted,
-            marginBottom: "2rem",
-          }}
-        >
-          <Link href="/" style={{ color: C.accent, textDecoration: "none" }}>
-            JSPrep Pro
-          </Link>
-          <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
-          <Link
-            href={`/${track}-interview-questions`}
-            style={{ color: C.accent, textDecoration: "none" }}
-          >
-            {track.charAt(0).toUpperCase() + track.slice(1)} Interview Questions
-          </Link>
-          <span style={{ margin: "0 0.375rem", color: C.borderStrong }}>›</span>
-          <span style={{ color: C.muted }}>{cat}</span>
-        </nav>
-
-        {/* Header */}
-        <header style={{ marginBottom: "2.5rem" }}>
-          <div
-            style={{
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: C.accentText,
-              marginBottom: "0.625rem",
-            }}
-          >
-            {track.charAt(0).toUpperCase() + track.slice(1)} · {cat}
-          </div>
-          <h1
-            style={{
-              fontSize: "clamp(1.625rem, 4vw, 2.5rem)",
-              fontWeight: 700,
-              color: C.text,
-              lineHeight: 1.2,
-              marginBottom: "0.875rem",
-              letterSpacing: "-0.025em",
-            }}
-          >
-            {cat} Interview Questions
-            <br />
-            <span style={{ color: C.accent }}>
+      <main className="doc">
+        <DocHero
+          crumbs={
+            <>
+              <Link href="/">JSPrep Pro</Link>
+              <span>/</span>
+              <Link href={`/${track}-interview-questions`}>
+                {track.charAt(0).toUpperCase() + track.slice(1)} Interview Questions
+              </Link>
+              <span>/</span>
+              <span>{cat}</span>
+            </>
+          }
+          title={
+            <>
+              {cat} Interview Questions
+              <br />
               With Answers & Code Examples
-            </span>
-          </h1>
-          <p
-            style={{
-              fontSize: "1rem",
-              lineHeight: 1.75,
-              maxWidth: "42rem",
-              color: C.muted,
-              marginBottom: "1.5rem",
-            }}
-          >
-            {catQuestions.length} carefully curated{" "}
-            <strong style={{ color: C.text }}>{cat} interview questions</strong>{" "}
-            with working code examples and real interview gotchas.
-          </p>
-          <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
-            <Link
-              href="/auth"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.5625rem 1.125rem",
-                background: C.accent,
-                color: "#ffffff",
-                borderRadius: "0.625rem",
-                fontWeight: 600,
-                textDecoration: "none",
-                fontSize: "0.9rem",
-              }}
-            >
-              Practice Interactively →
-            </Link>
-            <Link
-              href={`/${track}-interview-questions`}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.5625rem 1.125rem",
-                border: `1px solid ${C.border}`,
-                color: C.muted,
-                borderRadius: "0.625rem",
-                textDecoration: "none",
-                fontSize: "0.9rem",
-              }}
-            >
-              ← All Categories
-            </Link>
-          </div>
-        </header>
+            </>
+          }
+          lede={
+            <>
+              {catQuestions.length} carefully curated{" "}
+              <strong>{cat} interview questions</strong> with working code
+              examples and real interview gotchas.
+            </>
+          }
+          actions={
+            <>
+              <Link href="/auth" className="btn btn--primary">
+                Practice Interactively
+              </Link>
+              <Link href={`/${track}-interview-questions`} className="btn">
+                All Categories
+              </Link>
+            </>
+          }
+        />
 
         {/* Difficulty summary row */}
-        <div
-          style={{
-            display: "flex",
-            gap: "1.5rem",
-            flexWrap: "wrap",
-            padding: "0.875rem 1.125rem",
-            background: C.bgSubtle,
-            border: `1px solid ${C.border}`,
-            borderRadius: "0.75rem",
-            marginBottom: "2.5rem",
-            fontSize: "0.8125rem",
-          }}
-        >
-          <span>
-            <strong style={{ color: C.text }}>{catQuestions.length}</strong>{" "}
-            <span style={{ color: C.muted }}>questions</span>
-          </span>
-          <span>
-            <strong style={{ color: C.green }}>
-              {catQuestions.filter((q) => q.difficulty === "beginner").length}
-            </strong>{" "}
-            <span style={{ color: C.muted }}>beginner</span>
-          </span>
-          <span>
-            <strong style={{ color: C.accent }}>
-              {catQuestions.filter((q) => q.difficulty === "core").length}
-            </strong>{" "}
-            <span style={{ color: C.muted }}>core</span>
-          </span>
-          <span>
-            <strong style={{ color: C.amber }}>
-              {
-                catQuestions.filter(
-                  (q: Question) =>
-                    q.difficulty === "advanced" || q.difficulty === "expert",
-                ).length
-              }
-            </strong>{" "}
-            <span style={{ color: C.muted }}>advanced</span>
-          </span>
+        <div className="doc-figures">
+          {[
+            { n: catQuestions.length, label: "questions" },
+            {
+              n: catQuestions.filter((q) => q.difficulty === "beginner").length,
+              label: "beginner",
+            },
+            {
+              n: catQuestions.filter((q) => q.difficulty === "core").length,
+              label: "core",
+            },
+            {
+              n: catQuestions.filter(
+                (q: Question) =>
+                  q.difficulty === "advanced" || q.difficulty === "expert",
+              ).length,
+              label: "advanced",
+            },
+          ].map(({ n, label }) => (
+            <div key={label}>
+              <b>{n}</b>
+              <span>{label}</span>
+            </div>
+          ))}
         </div>
 
         {/* Questions */}
-        <main>
+        <div className="q-articles">
           {catQuestions.map((q: Question, i: number) => {
             const diff = diffBadge(q.difficulty);
             const plainAnswer = (q.answer ?? "")
               .replace(/<[^>]*>/g, "")
               .replace(/\s+/g, " ")
               .trim();
-
             return (
               <article
                 key={q.id}
+                className="q-article"
                 itemScope
                 itemType="https://schema.org/Question"
-                style={{
-                  marginBottom: "3rem",
-                  paddingBottom: "3rem",
-                  borderBottom:
-                    i < catQuestions.length - 1
-                      ? `1px solid ${C.border}`
-                      : "none",
-                }}
               >
-                {/* Badge row */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "0.5rem",
-                    marginBottom: "0.875rem",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "0.6875rem",
-                      fontWeight: 600,
-                      letterSpacing: "0.06em",
-                      background: C.accentSubtle,
-                      border: `1px solid ${C.border}`,
-                      color: C.accentText,
-                      padding: "0.125rem 0.5rem",
-                      borderRadius: "0.3125rem",
-                    }}
-                  >
-                    Q{i + 1}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "0.6875rem",
-                      fontWeight: 600,
-                      background: diff.bg,
-                      border: `1px solid ${diff.border}`,
-                      color: diff.color,
-                      padding: "0.125rem 0.5rem",
-                      borderRadius: "0.3125rem",
-                    }}
-                  >
-                    {diff.label}
-                  </span>
-                </div>
-
-                <h2
-                  itemProp="name"
-                  style={{
-                    fontSize: "1.125rem",
-                    fontWeight: 600,
-                    color: C.text,
-                    marginBottom: "1rem",
-                    lineHeight: 1.4,
-                    letterSpacing: "-0.01em",
-                  }}
-                >
+                <h2 className="q-article__title" itemProp="name">
                   {q.title}
                 </h2>
-
+                <div className="doc-meta" style={{ margin: "0 0 var(--space-md)" }}>
+                  <span className="measured">Question {i + 1}</span>
+                  <span className="chip">{diff.label}</span>
+                </div>
                 {q.hint && (
-                  <div
-                    style={{
-                      fontSize: "0.8125rem",
-                      color: C.green,
-                      background: C.greenSubtle,
-                      border: `1px solid ${C.greenBorder}`,
-                      borderRadius: "0.5rem",
-                      padding: "0.5rem 0.875rem",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    💡 <strong>Hint:</strong> {q.hint}
-                  </div>
+                  <p className="doc-line">
+                    <strong>Hint:</strong> {q.hint}
+                  </p>
                 )}
-
                 <div
                   itemProp="suggestedAnswer"
                   itemScope
@@ -382,34 +231,11 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                     dangerouslySetInnerHTML={{ __html: q.answer ?? "" }}
                   />
                 </div>
-
-                {/* Practice link */}
-                <div
-                  style={{
-                    marginTop: "1.25rem",
-                    display: "flex",
-                    gap: "0.75rem",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                  }}
-                >
-                  <Link
-                    href={`/q/${q.slug}`}
-                    style={{
-                      fontSize: "0.75rem",
-                      color: C.accent,
-                      border: `1px solid ${C.border}`,
-                      padding: "0.3125rem 0.875rem",
-                      borderRadius: "0.375rem",
-                      textDecoration: "none",
-                      fontWeight: 500,
-                      background: C.accentSubtle,
-                    }}
-                  >
-                    Practice this question →
+                <div className="doc-actions" style={{ marginTop: "var(--space-md)" }}>
+                  <Link href={`/q/${q.slug}`} className="btn btn--small">
+                    Practice this question
                   </Link>
                 </div>
-
                 <InlineEvaluator
                   question={q.title}
                   idealAnswer={plainAnswer}
@@ -418,158 +244,31 @@ export default async function CategoryQuestionsPage({ params }: Props) {
               </article>
             );
           })}
-        </main>
+        </div>
 
-        {/* Related topics */}
-        <section style={{ marginTop: "1rem", marginBottom: "3rem" }}>
-          <h2
-            style={{
-              fontSize: "1.0625rem",
-              fontWeight: 600,
-              color: C.text,
-              marginBottom: "1rem",
-              letterSpacing: "-0.01em",
-              paddingBottom: "0.75rem",
-              borderBottom: `1px solid ${C.border}`,
-            }}
-          >
-            Other {track.charAt(0).toUpperCase() + track.slice(1)} Interview Topics
-          </h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-            {allCats
-              .filter((c) => c.cat !== cat)
-              .map(({ cat: c, slug }) => (
-                <Link
-                  key={slug}
-                  href={`/questions/${slug}`}
-                  style={{
-                    fontSize: "0.8125rem",
-                    color: C.accent,
-                    border: `1px solid ${C.border}`,
-                    padding: "0.375rem 0.875rem",
-                    borderRadius: "0.5rem",
-                    textDecoration: "none",
-                    background: C.accentSubtle,
-                  }}
-                >
-                  {c} →
-                </Link>
-              ))}
-          </div>
-        </section>
-
-        {/* Bottom CTA */}
-        <section
-          style={{
-            background: C.accentSubtle,
-            border: `1px solid ${C.border}`,
-            borderRadius: "0.875rem",
-            padding: "2rem",
-            textAlign: "center",
-            marginBottom: "2rem",
-          }}
+        <DocSection
+          title={`Other ${track.charAt(0).toUpperCase() + track.slice(1)} Interview Topics`}
         >
-          <h2
-            style={{
-              fontSize: "1.375rem",
-              fontWeight: 700,
-              color: C.text,
-              marginBottom: "0.625rem",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Ready to practice {cat}?
-          </h2>
-          <p
-            style={{
-              color: C.muted,
-              marginBottom: "1.25rem",
-              fontSize: "0.9375rem",
-              lineHeight: 1.7,
-            }}
-          >
-            Get AI feedback on your answers, predict code output, and fix real
-            bugs.
-          </p>
-          <Link
-            href="/auth"
-            style={{
-              display: "inline-flex",
-              padding: "0.625rem 1.625rem",
-              background: C.accent,
-              color: "#ffffff",
-              borderRadius: "0.625rem",
-              fontWeight: 600,
-              textDecoration: "none",
-              fontSize: "0.9375rem",
-            }}
-          >
-            Start Free Practice →
-          </Link>
-        </section>
-      </div>
+          <LinkGrid
+            items={allCats
+              .filter((c) => c.cat !== cat)
+              .map(({ cat: c, slug }) => ({
+                href: `/questions/${slug}`,
+                title: c,
+              }))}
+          />
+        </DocSection>
 
-      {/* ─── Answer body prose — light theme ─────────────────────────────────── */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        .answer-body p {
-          margin: 0 0 0.75rem;
-          line-height: 1.8;
-          font-size: 0.9375rem;
-          color: ${C.text};
-        }
-        .answer-body pre {
-          background: ${C.codeBg};
-          border: 1px solid ${C.border};
-          border-left: 3px solid ${C.accent};
-          border-radius: 0.625rem;
-          padding: 0.875rem 1rem;
-          overflow-x: auto;
-          margin: 0.875rem 0;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.8125rem;
-          line-height: 1.7;
-          color: ${C.codeText};
-        }
-        .answer-body code {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.8125rem;
-        }
-        .answer-body p > code,
-        .answer-body li > code {
-          background: ${C.codeInlineBg};
-          border: 1px solid ${C.border};
-          padding: 0.125rem 0.35rem;
-          border-radius: 0.25rem;
-          color: ${C.codeText};
-          font-size: 0.8em;
-        }
-        .answer-body ul, .answer-body ol {
-          padding-left: 1.5rem;
-          margin: 0 0 0.875rem;
-        }
-        .answer-body li {
-          margin-bottom: 0.375rem;
-          line-height: 1.75;
-          color: ${C.text};
-        }
-        .answer-body strong {
-          color: ${C.text};
-          font-weight: 600;
-        }
-        .answer-body .tip {
-          background: ${C.accentSubtle};
-          border-left: 3px solid ${C.accent};
-          border-radius: 0 0.5rem 0.5rem 0;
-          padding: 0.5rem 0.875rem;
-          margin: 0.75rem 0;
-          font-size: 0.875rem;
-          color: ${C.accentText};
-        }
-      `,
-        }}
-      />
+        <DocClose
+          title={`Ready to practice ${cat}?`}
+          line="Get AI feedback on your answers, predict code output, and fix real bugs."
+          actions={
+            <Link href="/auth" className="btn btn--primary">
+              Start Free Practice
+            </Link>
+          }
+        />
+      </main>
     </>
   );
 }

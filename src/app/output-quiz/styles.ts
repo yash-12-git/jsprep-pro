@@ -107,7 +107,7 @@ export const cardHeader = css`
 `;
 
 export const qNumber = css`
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.75rem;
   color: ${C.amber};
   background: ${C.bgSubtle};
@@ -155,7 +155,7 @@ export const actionRow = css`
 `;
 
 export const correctOutput = css`
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.75rem;
   color: ${C.green};
 `;

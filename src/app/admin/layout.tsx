@@ -56,7 +56,7 @@ const S = {
   logoText: css`
     font-size: 0.875rem;
     font-weight: 900;
-    color: white;
+    color: ${C.text};
   `,
 
   adminBadge: css`
@@ -104,7 +104,7 @@ const S = {
     transition: all 0.15s ease;
     margin-bottom: 0.125rem;
     &:hover {
-      color: white;
+      color: ${C.text};
       background: rgba(255, 255, 255, 0.05);
     }
   `,

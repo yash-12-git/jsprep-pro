@@ -291,7 +291,7 @@ export const cardSummary = css`
 `;
 
 export const qNum = css`
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.625rem;
   color: ${C.accentText};
   background: ${C.accentSubtle};
@@ -415,13 +415,13 @@ export const answerArea = css`
     padding: 0.875rem 1rem;
     overflow-x: auto;
     margin: 0.75rem 0;
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--font-outlier);
     font-size: 0.75rem;
     line-height: 1.7;
     color: ${C.codeText};
   }
   code {
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--font-outlier);
     font-size: 0.75rem;
   }
   p > code,

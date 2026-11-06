@@ -24,17 +24,16 @@ export const styles = {
   statLabel: {
     fontSize: "10px",
     textTransform: "uppercase" as const,
-    letterSpacing: "0.07em",
     color: "var(--color-muted)",
     marginBottom: "8px",
-    fontFamily: "var(--font-mono, monospace)",
+    fontFamily: "var(--font-outlier)",
   } as CSSProperties,
 
   statValue: {
     fontSize: "26px",
     fontWeight: 600,
     color: "var(--color-text)",
-    fontFamily: "var(--font-mono, monospace)",
+    fontFamily: "var(--font-outlier)",
     lineHeight: 1,
   } as CSSProperties,
 
@@ -84,7 +83,7 @@ export const styles = {
 
   weekNum: {
     fontSize: "10px",
-    fontFamily: "var(--font-mono, monospace)",
+    fontFamily: "var(--font-outlier)",
     color: "var(--color-muted)",
     minWidth: "36px",
   } as CSSProperties,
@@ -110,12 +109,12 @@ export const styles = {
     background: "var(--color-green-subtle)",
     color: "var(--color-green)",
     border: "1px solid var(--color-green-border)",
-    fontFamily: "var(--font-mono, monospace)",
+    fontFamily: "var(--font-outlier)",
   } as CSSProperties,
 
   weekProgText: {
     fontSize: "11px",
-    fontFamily: "var(--font-mono, monospace)",
+    fontFamily: "var(--font-outlier)",
     color: "var(--color-muted)",
     minWidth: "32px",
     textAlign: "right" as const,
@@ -169,7 +168,7 @@ export const styles = {
 
   dayLabel: {
     fontSize: "10px",
-    fontFamily: "var(--font-mono, monospace)",
+    fontFamily: "var(--font-outlier)",
     color: "var(--color-muted)",
     marginBottom: "4px",
   } as CSSProperties,
@@ -189,7 +188,7 @@ export const styles = {
 
   taskArrow: {
     color: "var(--color-muted)",
-    fontFamily: "var(--font-mono, monospace)",
+    fontFamily: "var(--font-outlier)",
     fontSize: "11px",
     flexShrink: 0,
     marginTop: "2px",

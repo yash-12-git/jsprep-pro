@@ -738,7 +738,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
       font-weight: 600;
       background: ${C.accent};
       border: none;
-      color: #ffffff;
+      color: ${C.accentInk};
       cursor: pointer;
       display: flex;
       align-items: center;

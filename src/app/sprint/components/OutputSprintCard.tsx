@@ -60,7 +60,7 @@ const codeBlock = css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   padding: 1rem 1.125rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.8125rem;
   line-height: 1.7;
   color: ${C.codeText};
@@ -90,7 +90,7 @@ const input = css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.md};
   padding: 0.75rem;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.875rem;
   color: ${C.text};
   outline: none;
@@ -146,7 +146,7 @@ const expectedOutput = css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.md};
   padding: 0.625rem 0.875rem;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-outlier);
   font-size: 0.8125rem;
   color: ${C.codeText};
 `;
@@ -211,7 +211,7 @@ const nextBtn = css`
   cursor: pointer;
   background: ${C.accent};
   border: none;
-  color: #ffffff;
+  color: ${C.accentInk};
   transition:
     opacity 0.12s ease,
     transform 0.12s ease;

@@ -190,7 +190,7 @@ const ctaLink = css`
   display: inline-flex;
   padding: 0.4375rem 1.125rem;
   background: ${C.accent};
-  color: #ffffff;
+  color: ${C.accentInk};
   border-radius: ${RADIUS.md};
   font-weight: 600;
   font-size: 0.8125rem;

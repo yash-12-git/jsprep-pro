@@ -12,6 +12,7 @@
  * Also shows the `questions_pending` queue from cron jobs.
  */
 
+import { C } from "@/styles/tokens";
 import { useState, useEffect } from "react";
 import {
   collection,
@@ -298,7 +299,7 @@ function CandidateCard({
             style={{
               fontSize: "0.9rem",
               fontWeight: 700,
-              color: "white",
+              color: C.text,
               margin: 0,
               lineHeight: 1.4,
             }}
@@ -730,7 +731,7 @@ export default function AdminGeneratePage() {
           style={{
             fontSize: "1.5rem",
             fontWeight: 900,
-            color: "white",
+            color: C.text,
             marginBottom: "0.375rem",
             letterSpacing: "-0.02em",
           }}
@@ -1026,7 +1027,7 @@ export default function AdminGeneratePage() {
                       style={{
                         fontWeight: 700,
                         fontSize: "0.9rem",
-                        color: "white",
+                        color: C.text,
                         margin: "0 0 0.25rem",
                       }}
                     >
@@ -1105,7 +1106,7 @@ const selectStyle: React.CSSProperties = {
   background: "rgba(255,255,255,0.04)",
   border: "1px solid rgba(255,255,255,0.1)",
   borderRadius: "0.625rem",
-  color: "white",
+  color: C.text,
   fontSize: "0.875rem",
   outline: "none",
   cursor: "pointer",
@@ -1118,7 +1119,7 @@ const generateBtnStyle = (loading: boolean): React.CSSProperties => ({
   background: "linear-gradient(135deg, #7c6af7, #a78bfa)",
   border: "none",
   borderRadius: "0.75rem",
-  color: "white",
+  color: C.text,
   fontSize: "0.875rem",
   fontWeight: 800,
   cursor: loading ? "not-allowed" : "pointer",

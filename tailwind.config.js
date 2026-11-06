@@ -4,18 +4,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        // Syne removed — no longer used
-        sans: [
-          "Inter",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "sans-serif",
-        ],
-        mono: ["JetBrains Mono", "Fira Code", "monospace"],
+        sans: ["var(--font-body)"],
+        mono: ["var(--font-outlier)"],
       },
       colors: {
-        // Notion-style light palette — maps to CSS vars for theme switching
+        // Maps to CSS vars for theme switching
         bg: "var(--bg-base)",
         subtle: "var(--bg-subtle)",
         hover: "var(--bg-hover)",

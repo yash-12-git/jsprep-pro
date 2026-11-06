@@ -277,8 +277,6 @@ export default function SEOPredictionCard({
                   fontSize: "0.6875rem",
                   fontWeight: 700,
                   color: C.muted,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
                   margin: "0 0 0.5rem",
                 }}
               >
@@ -291,7 +289,7 @@ export default function SEOPredictionCard({
                   borderRadius: "0.625rem",
                   padding: "1rem",
                   fontSize: "0.8125rem",
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "var(--font-outlier)",
                   color: C.codeText,
                   overflow: "auto",
                   margin: 0,
@@ -358,7 +356,7 @@ export default function SEOPredictionCard({
                     flexShrink: 0,
                   }}
                 >
-                  Open Interactive Quiz →
+                  Open Interactive Quiz
                 </Link>
               </div>
             </div>
@@ -375,8 +373,6 @@ export default function SEOPredictionCard({
                   fontSize: "0.6875rem",
                   fontWeight: 700,
                   color: C.muted,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
                   margin: "0.875rem 0 0.5rem",
                 }}
               >
@@ -396,7 +392,7 @@ export default function SEOPredictionCard({
                 value={prediction}
                 onChange={(e) => setPrediction(e.target.value)}
                 disabled={state === "correct"}
-                placeholder={"Type the expected output...\nOne value per line"}
+                placeholder={"Type the expected output…\nOne value per line"}
                 rows={expectedRows}
                 style={
                   {
@@ -412,7 +408,7 @@ export default function SEOPredictionCard({
                     }`,
                     borderRadius: "0.625rem",
                     padding: "0.75rem 1rem",
-                    fontFamily: "'JetBrains Mono', monospace",
+                    fontFamily: "var(--font-outlier)",
                     fontSize: "0.8125rem",
                     color: C.text,
                     outline: "none",
@@ -455,7 +451,7 @@ export default function SEOPredictionCard({
                       gap: "0.375rem",
                       padding: "0.5rem 1.125rem",
                       background: prediction.trim() ? C.accent : C.bgSubtle,
-                      color: prediction.trim() ? "#ffffff" : C.muted,
+                      color: prediction.trim() ? C.accentInk : C.muted,
                       border: "none",
                       borderRadius: "0.5rem",
                       fontWeight: 600,
@@ -463,10 +459,10 @@ export default function SEOPredictionCard({
                       cursor: prediction.trim() ? "pointer" : "not-allowed",
                     }}
                   >
-                    ✓ Check Answer
+                    Check Answer
                   </button>
                   <button onClick={() => setState("revealed")} style={ghostBtn}>
-                    👁 Reveal
+                    Reveal
                   </button>
                 </div>
               )}
@@ -485,7 +481,7 @@ export default function SEOPredictionCard({
                       fontWeight: 600,
                     }}
                   >
-                    <XCircle size={14} /> Not quite — check your output
+                    <XCircle size={14} /> Not quite, check your output
                   </div>
                   <div
                     style={{
@@ -504,7 +500,7 @@ export default function SEOPredictionCard({
                         gap: "0.375rem",
                         padding: "0.5rem 1.125rem",
                         background: C.red,
-                        color: "#ffffff",
+                        color: C.accentInk,
                         border: "none",
                         borderRadius: "0.5rem",
                         fontWeight: 600,
@@ -582,18 +578,16 @@ export default function SEOPredictionCard({
                         fontSize: "0.6875rem",
                         fontWeight: 700,
                         color: state === "correct" ? C.green : C.muted,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.06em",
                         margin: "0 0 0.5rem",
                       }}
                     >
                       {state === "correct"
-                        ? "✓ Correct! 🎉"
+                        ? "Correct"
                         : "Expected Output"}
                     </p>
                     <pre
                       style={{
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "var(--font-outlier)",
                         fontSize: "0.875rem",
                         color: C.green,
                         margin: 0,
@@ -622,7 +616,7 @@ export default function SEOPredictionCard({
                           marginBottom: "0.375rem",
                         }}
                       >
-                        💡 Explanation
+                        Explanation
                       </p>
                       <p
                         style={{
@@ -650,7 +644,7 @@ export default function SEOPredictionCard({
                               marginBottom: "0.25rem",
                             }}
                           >
-                            ⚡ Key Insight
+                            Key Insight
                           </p>
                           <p
                             style={{

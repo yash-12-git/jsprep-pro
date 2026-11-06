@@ -16,7 +16,7 @@ import { useTrack } from '@/contexts/TrackContext'
 const S = {
   page: css`padding: 2rem; max-width: 1100px;`,
 
-  heading: css`font-size: 1.5rem; font-weight: 900; color: white; margin-bottom: 0.25rem;`,
+  heading: css`font-size: 1.5rem; font-weight: 900; color: ${C.text}; margin-bottom: 0.25rem;`,
   sub: css`color: ${C.muted}; font-size: 0.875rem; margin-bottom: 2rem;`,
 
   toolbar: css`
@@ -35,7 +35,7 @@ const S = {
   search: css`
     width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.25rem;
     background: ${C.card}; border: 1px solid ${C.border};
-    border-radius: ${RADIUS.lg}; color: white; font-size: 0.875rem;
+    border-radius: ${RADIUS.lg}; color: ${C.text}; font-size: 0.875rem;
     &:focus { outline: none; border-color: ${C.accent}; }
     &::placeholder { color: ${C.muted}; }
   `,
@@ -43,7 +43,7 @@ const S = {
   select: css`
     padding: 0.5rem 0.75rem;
     background: ${C.card}; border: 1px solid ${C.border};
-    border-radius: ${RADIUS.lg}; color: white; font-size: 0.875rem;
+    border-radius: ${RADIUS.lg}; color: ${C.text}; font-size: 0.875rem;
     cursor: pointer; min-width: 160px;
     &:focus { outline: none; border-color: ${C.accent}; }
   `,
@@ -81,7 +81,7 @@ const S = {
   td: css`padding: 0.75rem 1rem; vertical-align: middle;`,
 
   qTitle: css`
-    font-size: 0.875rem; color: white; font-weight: 500;
+    font-size: 0.875rem; color: ${C.text}; font-weight: 500;
     line-height: 1.4;
   `,
   qMeta: css`

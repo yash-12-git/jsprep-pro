@@ -52,7 +52,7 @@ const S = {
     background: ${C.accent};
     border: none;
     border-radius: ${RADIUS.xl};
-    color: white;
+    color: ${C.accentInk};
     font-weight: 800;
     font-size: 0.875rem;
     text-decoration: none;
@@ -80,7 +80,7 @@ const S = {
     border: none;
     outline: none;
     font-size: 0.875rem;
-    color: white;
+    color: ${C.text};
     &::placeholder {
       color: ${C.muted};
     }
@@ -135,7 +135,7 @@ const S = {
   title: css`
     flex: 1;
     font-size: 0.875rem;
-    color: white;
+    color: ${C.text};
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

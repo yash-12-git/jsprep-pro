@@ -9,11 +9,9 @@
 //   3. Logged out   → link to /auth
 
 import Link from "next/link";
-import { CheckCircle, Zap, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUpgrade } from "@/hooks/useUpgrade";
-import { proActiveBtn, proPayBtn, pBtnP } from "@/app/page.styles";
-import { C } from "@/styles/tokens";
+import { proActiveBtn, proPayBtn, pBtnP, pcNote, pcError } from "@/app/page.styles";
 
 export default function ProCTA() {
   const { user, progress } = useAuth();
@@ -24,20 +22,9 @@ export default function ProCTA() {
     return (
       <>
         <Link href="/dashboard" css={proActiveBtn}>
-          <CheckCircle size={15} /> You&apos;re Pro — Go to Dashboard
+          You&apos;re Pro. Go to Dashboard
         </Link>
-        <p
-          style={{
-            fontSize: "0.75rem",
-            color: C.muted,
-            textAlign: "center",
-            marginTop: "0.625rem",
-          }}
-        >
-          <Sparkles
-            size={10}
-            style={{ verticalAlign: "middle", marginRight: "3px" }}
-          />
+        <p css={pcNote}>
           Pro is active on your account
         </p>
       </>
@@ -49,23 +36,10 @@ export default function ProCTA() {
     return (
       <>
         <button css={proPayBtn} onClick={handleUpgrade} disabled={payLoading}>
-          {payLoading ? (
-            "Opening payment…"
-          ) : (
-            <>
-              <Zap size={16} /> Upgrade to Pro →
-            </>
-          )}
+          {payLoading ? "Opening payment…" : "Upgrade to Pro"}
         </button>
         {payError && (
-          <p
-            style={{
-              color: C.red,
-              fontSize: "0.75rem",
-              textAlign: "center",
-              marginTop: "0.5rem",
-            }}
-          >
+          <p css={pcError}>
             {payError}
           </p>
         )}
@@ -77,16 +51,9 @@ export default function ProCTA() {
   return (
     <>
       <Link href="/auth" css={pBtnP}>
-        Start with Pro →
+        Start with Pro
       </Link>
-      <p
-        style={{
-          fontSize: "0.75rem",
-          color: C.muted,
-          textAlign: "center",
-          marginTop: "0.625rem",
-        }}
-      >
+      <p css={pcNote}>
         You&apos;ll sign in or create an account during checkout
       </p>
     </>

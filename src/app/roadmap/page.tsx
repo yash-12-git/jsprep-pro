@@ -3,6 +3,7 @@
 // RoadmapClient handles all interactive progress tracking client-side.
 
 import type { Metadata } from "next";
+import { DocHero, DocSection, LinkGrid } from "@/components/seo/DocParts";
 import { RoadmapClient } from "./RoadmapClient";
 import { ROADMAP, TOTAL_DAYS, TOTAL_WEEKS } from "@/data/roadmap/roadmapData";
 
@@ -209,11 +210,11 @@ function RoadmapOutline() {
       }}
       aria-hidden="true"
     >
-      <h2>Frontend Developer Roadmap — All 16 Weeks</h2>
+      <h2>Frontend Developer Roadmap: All 16 Weeks</h2>
       {ROADMAP.map((month) => (
         <div key={month.month} id={`month-${month.month}`}>
           <h3>
-            Month {month.month}: {month.title} — Frontend Roadmap
+            Month {month.month}: {month.title}, Frontend Roadmap
           </h3>
           {month.weeks.map((week) => (
             <div key={week.week}>
@@ -253,7 +254,7 @@ function RoadmapFAQ() {
     },
     {
       q: "Should I learn JavaScript or React first?",
-      a: "JavaScript first — always. React is built on JavaScript, so closures, the event loop, and async/await must be solid before React makes sense. This roadmap spends the first 4 weeks on JavaScript mastery.",
+      a: "JavaScript first, always. React is built on JavaScript, so closures, the event loop, and async/await must be solid before React makes sense. This roadmap spends the first 4 weeks on JavaScript mastery.",
     },
     {
       q: "Do frontend developers need DSA?",
@@ -283,7 +284,7 @@ function RoadmapFAQ() {
       }}
       aria-hidden="true"
     >
-      <h2>Frontend Roadmap — Frequently Asked Questions</h2>
+      <h2>Frontend Roadmap: Frequently Asked Questions</h2>
       {faqs.map(({ q, a }) => (
         <div key={q}>
           <h3>{q}</h3>
@@ -320,120 +321,33 @@ export default function RoadmapPage() {
       <RoadmapOutline />
       <RoadmapFAQ />
 
-      <main
-        style={{
-          maxWidth: "800px",
-          margin: "0 auto",
-          padding: "2rem 1.25rem 4rem",
-        }}
-      >
-        {/* ── Semantic page header — H1 is critical for rankings ── */}
-        <header
-          style={{
-            marginBottom: "2rem",
-            paddingBottom: "1.5rem",
-            borderBottom: "1px solid var(--color-border)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              flexWrap: "wrap",
-              marginBottom: "6px",
-            }}
-          >
-            {/*
-              H1 targets the primary keyword cluster:
-              "frontend developer roadmap 2026"
-              Secondary: "javascript roadmap" + "react roadmap" appear in
-              the page body and schema descriptions.
-            */}
-            <h1
-              style={{
-                fontSize: "18px",
-                fontWeight: 600,
-                color: "var(--color-text)",
-                letterSpacing: "-0.02em",
-                margin: 0,
-              }}
-            >
-              Frontend Developer Roadmap 2026 — {TOTAL_WEEKS} Weeks,{" "}
-              {TOTAL_DAYS} Days
-            </h1>
-
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "5px",
-                fontSize: "12px",
-                padding: "3px 10px",
-                borderRadius: "20px",
-                background: "var(--color-amber-subtle)",
-                color: "var(--color-amber)",
-                border: "1px solid var(--color-amber-border)",
-                fontFamily: "var(--font-mono, monospace)",
-              }}
-            >
-              🔥 Roadmap
-            </span>
-          </div>
-
-          {/* Subtitle — naturally embeds secondary keywords */}
-          <p
-            style={{
-              fontSize: "13px",
-              color: "var(--color-muted)",
-              fontFamily: "var(--font-mono, monospace)",
-              margin: "0 0 4px",
-            }}
-          >
-            JavaScript → React → Machine Coding → DSA → System Design
-          </p>
-          <p
-            style={{
-              fontSize: "12px",
-              color: "var(--color-muted)",
-              fontFamily: "var(--font-mono, monospace)",
-              margin: 0,
-            }}
-          >
-            2–3 hrs weekdays · 5–6 hrs weekends · Progress auto-saved to browser
-          </p>
-        </header>
+      <main className="doc">
+        <DocHero
+          title={`Frontend Developer Roadmap 2026: ${TOTAL_WEEKS} Weeks, ${TOTAL_DAYS} Days`}
+          lede="JavaScript, React, Machine Coding, DSA, System Design"
+          meta={
+            <>
+              <span>2 to 3 hrs weekdays</span>
+              <span>5 to 6 hrs weekends</span>
+              <span>Progress auto-saved to browser</span>
+            </>
+          }
+        />
 
         {/* ── Interactive roadmap (client-side, progress tracked in localStorage) ── */}
         <RoadmapClient />
 
-        {/* ── Visible FAQ section — good for long-tail rankings & FAQ rich results ── */}
-        <section
-          style={{
-            marginTop: "3.5rem",
-            paddingTop: "2rem",
-            borderTop: "1px solid var(--color-border)",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "16px",
-              fontWeight: 600,
-              color: "var(--color-text)",
-              marginBottom: "1.25rem",
-            }}
-          >
-            Frontend Roadmap — Common Questions
-          </h2>
-
-          {[
+        {/* ── Visible FAQ section, good for long-tail rankings & FAQ rich results ── */}
+        <DocSection title="Frontend Roadmap: Common Questions">
+          <div className="doc-details">
+            {[
             {
               q: "What does this frontend roadmap cover?",
               a: `${TOTAL_WEEKS} weeks and ${TOTAL_DAYS} days across four phases: Month 1 (JavaScript & browser internals), Month 2 (React deep dive), Month 3 (machine coding + projects), and Month 4 (interview mode — mocks, system design, and offer negotiation).`,
             },
             {
               q: "Should I learn JavaScript or React first?",
-              a: "JavaScript first — always. React is built on JavaScript, so closures, event loop, prototypes, and async patterns must be solid before React makes sense. This roadmap dedicates the entire first month to JavaScript mastery.",
+              a: "JavaScript first, always. React is built on JavaScript, so closures, event loop, prototypes, and async patterns must be solid before React makes sense. This roadmap dedicates the entire first month to JavaScript mastery.",
             },
             {
               q: "Do I need DSA as a frontend developer?",
@@ -448,75 +362,18 @@ export default function RoadmapPage() {
               a: "roadmap.sh shows you what to learn. This roadmap tells you what to do each day, gives you practice tasks, machine coding builds, and DSA problems — all ordered to build interview-ready skill, not just knowledge. It's an execution plan, not a topic map.",
             },
           ].map(({ q, a }) => (
-            <details
-              key={q}
-              style={{
-                borderBottom: "1px solid var(--color-border)",
-                padding: "0.875rem 0",
-              }}
-            >
-              <summary
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  color: "var(--color-text)",
-                  cursor: "pointer",
-                  listStyle: "none",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
-                {q}
-                <span
-                  style={{
-                    fontSize: "16px",
-                    color: "var(--color-muted)",
-                    flexShrink: 0,
-                  }}
-                >
-                  +
-                </span>
-              </summary>
-              <p
-                style={{
-                  fontSize: "13px",
-                  color: "var(--color-muted)",
-                  lineHeight: 1.6,
-                  marginTop: "0.625rem",
-                  marginBottom: 0,
-                }}
-              >
-                {a}
-              </p>
-            </details>
-          ))}
-        </section>
+              <details key={q}>
+                <summary>{q}</summary>
+                <p>{a}</p>
+              </details>
+            ))}
+          </div>
+        </DocSection>
 
-        {/* ── Internal links — help Google understand site structure ── */}
-        <nav
-          aria-label="Related resources"
-          style={{
-            marginTop: "2rem",
-            padding: "1rem 1.25rem",
-            background: "var(--color-bg-subtle)",
-            borderRadius: "10px",
-            border: "1px solid var(--color-border)",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "12px",
-              color: "var(--color-muted)",
-              fontFamily: "var(--font-mono, monospace)",
-              marginBottom: "0.625rem",
-            }}
-          >
-            Practice alongside this roadmap →
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {[
+        {/* ── Internal links, help Google understand site structure ── */}
+        <DocSection title="Practice alongside this roadmap">
+          <LinkGrid
+            items={[
               { label: "JavaScript Questions", href: "/topics/javascript" },
               { label: "React Questions", href: "/topics/react" },
               { label: "Polyfill Lab", href: "/polyfill-lab" },
@@ -533,26 +390,9 @@ export default function RoadmapPage() {
                 label: "Event Loop",
                 href: "/javascript-event-loop-interview-questions",
               },
-            ].map(({ label, href }) => (
-              <a
-                key={href}
-                href={href}
-                style={{
-                  fontSize: "12px",
-                  color: "var(--color-accent)",
-                  textDecoration: "none",
-                  padding: "4px 10px",
-                  borderRadius: "6px",
-                  border: "1px solid var(--color-border)",
-                  background: "transparent",
-                  fontFamily: "var(--font-mono, monospace)",
-                }}
-              >
-                {label}
-              </a>
-            ))}
-          </div>
-        </nav>
+            ].map(({ label, href }) => ({ href, title: label }))}
+          />
+        </DocSection>
       </main>
     </>
   );

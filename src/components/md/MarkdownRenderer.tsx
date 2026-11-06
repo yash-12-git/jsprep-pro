@@ -97,7 +97,7 @@ const styles = (compact: boolean) => css`
     padding: ${compact ? "0.625rem 0.875rem" : "0.875rem 1.125rem"};
     overflow-x: auto;
     margin: ${compact ? "0.5rem 0" : "0.875rem 0"};
-    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-family: var(--font-outlier);
     font-size: ${compact ? "0.6875rem" : "0.75rem"};
     line-height: 1.75;
     tab-size: 2;
@@ -117,7 +117,7 @@ const styles = (compact: boolean) => css`
     border: 1px solid ${C.border};
     padding: 0.125rem 0.4rem;
     border-radius: 0.3rem;
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--font-outlier);
     font-size: 0.8em;
     color: ${C.codeText};
   }

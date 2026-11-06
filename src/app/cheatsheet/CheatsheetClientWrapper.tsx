@@ -163,8 +163,6 @@ const catName = css`
   font-size: 0.8125rem;
   font-weight: 700;
   color: ${C.text};
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 `;
 
 const catCount = css`
@@ -221,8 +219,6 @@ const topicKeyword = css`
 const diffPill = (color: string, bg: string) => css`
   font-size: 0.6rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: ${color};
   background: ${bg};
   border: 1px solid ${color}40;
@@ -257,8 +253,6 @@ const sectionLabel = (color: string) => css`
   gap: 0.375rem;
   font-size: 0.625rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: ${color};
   margin-bottom: 0.5rem;
 `;
@@ -346,7 +340,7 @@ export default function CheatSheetClientPage({
             onClose={() => setShowPaywall(false)}
           />
         )}
-        <div css={proGateIcon}>📄</div>
+        
         <h2 css={proGateTitle}>Cheat Sheet is Pro</h2>
         <p css={proGateText}>
           Get instant access to crisp topic-by-topic revision cards covering
@@ -362,7 +356,7 @@ export default function CheatSheetClientPage({
           }}
           onClick={() => setShowPaywall(true)}
         >
-          Upgrade to Pro →
+          Upgrade to Pro
         </button>
       </div>
     );
@@ -455,7 +449,7 @@ export default function CheatSheetClientPage({
         <div css={pageHeader}>
           <h1 css={pageTitle}>{`${topics?.[0]?.track} Interview Cheat Sheet`}</h1>
           <p css={pageSubtitle}>
-            {totalTopics} topics · crisp bullet points for every concept you
+            {totalTopics} topics, crisp bullet points for every concept you
             need to know. Use this the night before your interview.
           </p>
         </div>
@@ -480,7 +474,7 @@ export default function CheatSheetClientPage({
         {Object.entries(grouped).map(([cat, catTopics]) => (
           <div key={cat} css={catSection}>
             <div css={catHeader}>
-              <span css={catEmoji}>{"🌟"}</span>
+              
               <span css={catName}>{cat}</span>
               <span css={catCount}>{catTopics.length} topics</span>
             </div>
@@ -551,7 +545,7 @@ export default function CheatSheetClientPage({
           className="print-hide"
         >
           <p style={{ fontSize: "0.75rem", color: C.muted }}>
-            jsprep.pro · JavaScript Interview Prep · Good luck! 🚀
+            jsprep.pro, JavaScript Interview Prep. Good luck.
           </p>
         </div>
       </div>

@@ -47,7 +47,7 @@ export const logo = css`
   justify-content: center;
   font-size: 1.125rem;
   font-weight: 900;
-  color: white;
+  color: ${C.accentInk};
   margin: 0 auto 1.5rem;
 `
 

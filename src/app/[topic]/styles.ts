@@ -8,8 +8,8 @@ export const list = css`
 `;
 
 export const emptyState = css`
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(255, 255, 255, 0.1);
+  background: ${C.bgSubtle};
+  border: 1px dashed ${C.borderStrong};
   border-radius: ${RADIUS.xl};
   padding: 2rem 1.5rem;
   text-align: center;
@@ -22,18 +22,18 @@ export const emptyText = css`
 `;
 
 export const emptyHint = css`
-  color: rgba(255, 255, 255, 0.3);
+  color: ${C.muted};
   font-size: 0.8125rem;
   margin: 0;
 `;
 
 export const emptyCode = css`
-  background: rgba(124, 106, 247, 0.15);
+  background: ${C.codeInlineBg};
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
   font-size: 0.75rem;
-  color: #c4b5fd;
-  font-family: "JetBrains Mono", monospace;
+  color: ${C.codeText};
+  font-family: var(--font-outlier);
 `;
 
 export const adminLink = css`

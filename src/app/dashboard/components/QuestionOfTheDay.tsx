@@ -274,7 +274,7 @@ const answerBody = css`
     margin: 0.625rem 0;
   }
   code {
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--font-outlier);
     color: ${C.codeText};
     font-size: 0.8rem;
   }

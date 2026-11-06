@@ -97,7 +97,7 @@ const S = {
     border: 1px solid ${color}33;
     border-radius: ${RADIUS.xl};
     text-decoration: none;
-    color: white;
+    color: ${C.text};
     transition: all 0.15s ease;
     &:hover {
       background: ${color}0d;

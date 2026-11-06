@@ -380,7 +380,7 @@ const S = {
     background: ${loading ? C.accent + "80" : C.accent};
     border: none;
     border-radius: ${RADIUS.xl};
-    color: white;
+    color: ${C.text};
     font-weight: 800;
     font-size: 1rem;
     cursor: ${loading ? "not-allowed" : "pointer"};
@@ -430,7 +430,7 @@ const S = {
     border: 1px solid ${C.border};
     border-radius: ${RADIUS.xl};
     padding: 1rem 1.25rem;
-    font-family: "JetBrains Mono", monospace;
+    font-family: var(--font-outlier);
     font-size: 0.75rem;
     line-height: 1.8;
     max-height: 20rem;
