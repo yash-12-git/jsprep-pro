@@ -32,9 +32,9 @@ export default function CodeConsole({ result, running = false }: Props) {
         ) : result?.timed_out ? (
           <span css={errorLine}>⏱ Execution timed out (infinite loop?)</span>
         ) : result?.error ? (
-          <span css={errorLine}>✗ {result.error}</span>
+          <span css={errorLine}>{result.error}</span>
         ) : result?.output.length === 0 ? (
-          <span css={mutedLine}>// no output</span>
+          <span css={mutedLine}>{"// no output"}</span>
         ) : (
           result?.output.map((line, i) => (
             <div key={i} css={outputLine}>
@@ -67,10 +67,8 @@ const header = css`
 `;
 
 const label = css`
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.muted};
   font-family: var(--font-outlier);
 `;

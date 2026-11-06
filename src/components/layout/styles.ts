@@ -51,7 +51,7 @@ export const logoLink = css`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1rem;
   text-decoration: none;
   color: ${C.text};
@@ -66,7 +66,7 @@ export const logoBadge = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: ${C.accentInk};
   flex-shrink: 0;
@@ -74,7 +74,7 @@ export const logoBadge = css`
 
 export const logoText = css`
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.025em;
   color: ${C.text};
   @media (max-width: ${BP.sm}) {
@@ -233,7 +233,7 @@ export const dropdownLabel = css`
 
 export const dropdownDesc = css`
   display: block;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   margin-top: 1px;
   line-height: 1.4;
@@ -248,7 +248,7 @@ export const aiCoachBtn = css`
   padding: 0.3125rem 0.75rem;
   border-radius: ${RADIUS.md};
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.accentText};
   background: ${C.accentSubtle};
   border: 1px solid ${C.border};
@@ -290,8 +290,8 @@ export const aiDropdownMenu = css`
 // ─── Badges ───────────────────────────────────────────────────────────────────
 
 export const proBadge = css`
-  font-size: 0.5625rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   background: ${C.amberSubtle};
   color: ${C.amber};
   border: 1px solid ${C.amberBorder};
@@ -323,8 +323,8 @@ export const streakChip = css`
   gap: 3px;
   padding: 2px 7px;
   border-radius: 9999px;
-  font-size: 0.625rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.amber};
   background: ${C.amberSubtle};
   border: 1px solid ${C.amberBorder};
@@ -404,8 +404,8 @@ export const avatarBtn = css`
 `;
 
 export const avatarInitials = css`
-  font-size: 0.6875rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.muted};
 `;
 
@@ -430,7 +430,7 @@ export const accountPanelHeader = css`
 
 export const accountName = css`
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   white-space: nowrap;
   overflow: hidden;
@@ -438,7 +438,7 @@ export const accountName = css`
 `;
 
 export const accountEmail = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   white-space: nowrap;
   overflow: hidden;
@@ -529,7 +529,7 @@ export const getStartedBtn = css`
   background: ${C.accent};
   color: ${C.accentInk};
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   padding: 0.375rem 0.875rem;
   border-radius: ${RADIUS.md};
   text-decoration: none;
@@ -590,13 +590,13 @@ export const mobileAvatar = css`
 
 export const mobileAvatarInitials = css`
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.muted};
 `;
 
 export const mobileUserName = css`
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
 `;
 
@@ -687,7 +687,7 @@ export const mobileItemContent = css`
 `;
 
 export const mobileItemDesc = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   font-weight: 400;
   margin-top: 1px;
@@ -696,8 +696,8 @@ export const mobileItemDesc = css`
 
 export const mobileProBadge = css`
   margin-left: auto;
-  font-size: 0.5625rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   background: ${C.amberSubtle};
   color: ${C.amber};
   border: 1px solid ${C.amberBorder};
@@ -803,7 +803,7 @@ export const mobileTabAiActive = css`
 `;
 
 export const mobileTabLabel = css`
-  font-size: 0.625rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 500;
   line-height: 1;
 `;

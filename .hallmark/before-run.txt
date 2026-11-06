@@ -1,0 +1,26 @@
+  FAIL 19 x46 src/app/HomePageClient.tsx:322 dash "–" in copy; src/app/[topic]/page.tsx:789 dash "—" in copy | fix: A comma, a colon, a full stop or parentheses; never a dash
+  FAIL 26a src/app/globals.css:1 no :focus-visible styling anywhere | fix: A focus ring at 3:1 or better, instant
+  FAIL 27 src/app/globals.css:175 motion present, no prefers-reduced-motion block | fix: Add a prefers-reduced-motion fallback
+  FAIL 30a x131 src/app/HomePageClient.tsx:281 text opens with an emoji: "⚡ Try the Sprint"; src/app/HomePageClient.tsx:452 text opens with an emoji: "⚡ New: Interview Sprint" | fix: One icon library, a custom SVG, or the word alone
+  FAIL 33 x7 src/app/javascript-interview-cheatsheet/DownloadPdfButton.tsx:15 <svg> without aria-hidden or aria-label; src/app/mock-interview/InterviewResult.tsx:784 <svg> without aria-hidden or aria-label | fix: Add aria-hidden or an aria-label
+  FAIL 34 src/app/globals.css:1 no overflow-x: clip on html and body | fix: overflow-x: clip on both html and body
+  FAIL 48 x63 src/app/[topic]/opengraph-image.tsx:145 inline-style colour literal #fff; src/app/[topic]/opengraph-image.tsx:386 inline-style colour literal #ffffff | fix: Lift the value into the token block
+  FAIL 54 src/app/HomePageClient.tsx:903 eyebrow "Pricing" before <h2> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+  FAIL 63 x55 src/app/HomePageClient.tsx:776 arrow glued to the label "Join the leaderboard — earn XP →" (<L…; src/app/HomePageClient.tsx:1009 middle-dot meta string "© 2026 JSPrep Pro · jsprep.pro · Built … | fix: A verb as the label; the link already says it goes somewhere
+  REFLEX 24b x5 src/app/globals.css:75 padding: 14px 16px (off the 4px scale) on pre; src/app/globals.css:77 margin: 14px 0 (off the 4px scale) on pre | fix: Use the 4px spacing scale
+  REFLEX 26b x2 src/app/admin/blog/page.tsx:1 no :disabled styling anywhere; src/app/globals.css:1 no :active styling anywhere | fix: All eight states; guard: not a form control, no aria-disabled anywhere
+  WARN 3 src/app/globals.css:94 side stripe border-left: 3px solid var(--tip-border) on .tip | fix: Hairline all round, none, or an accent square
+  WARN 46a src/app/HomePageClient.tsx:630 metric "86% accuracy": verify the user supplied this number | fix: Confirm the metric or drop the slot
+  WARN 49 x20 src/app/admin/generate/page.tsx:850 long clickable label "Generating… Generate Questions" without n…; src/app/admin/migrate/page.tsx:636 long clickable label "Migrating JS… Migrate JS items" without n… | fix: Shorten the label or set nowrap
+  WARN 58 x7 src/app/blog/[track]/page.tsx:117 hero paragraph runs 16 words; src/app/javascript-interview-cheatsheet/page.tsx:291 hero paragraph runs 18 words | fix: One sentence, twelve words or fewer
+  WARN F1 x19 src/app/HomePageClient.tsx:322 straight quote in prose x6 (first: ific gaps — not "great); src/app/[topic]/page.tsx:406 straight quote in prose x2 (first: Where You'll See This in) | fix: Use typographic quotes: “ ” ’
+  WARN F2 x2 src/app/HomePageClient.tsx:543 three-period ellipsis in prose x1; src/app/sprint/components/TheorySprintCard.tsx:491 three-period ellipsis in prose x1 | fix: Use a true ellipsis character (…)
+sloplint: 306 FAIL, 7 REFLEX, 50 WARN across 111 file(s) and 12 URL(s), grouped by gate; every line is in .hallmark/before.txt.
+render tier not run: Failed to launch the browser process:  Code: null
+
+stderr:
+
+
+TROUBLESHOOTING: https://pptr.dev/troubleshooting
+
+before: recorded 71 links, 1 fields, 277 handlers, 0 test hooks, 0 script hooks in .hallmark/before.json; --kept checks a redesign against it

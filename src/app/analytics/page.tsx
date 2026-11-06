@@ -6,7 +6,7 @@ import AnalyticsClientPage from "./AnalyticsClientPage";
 
 export const metadata: Metadata = pageMeta({
   title:
-    "JavaScript Analytics — Gain Insights into Your JS Learning Journey with JSPrep Pro",
+    "JavaScript Analytics, Gain Insights into Your JS Learning Journey with JSPrep Pro",
   description:
     "Unlock powerful analytics on JSPrep Pro to track your JavaScript learning progress. Visualize your strengths and weaknesses, monitor improvement over time, and make data-driven decisions to optimize your study plan. Start analyzing your JS journey today!",
   path: `/analytics`,

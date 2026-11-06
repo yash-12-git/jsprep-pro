@@ -20,7 +20,7 @@ export const iconBox = css`
 
 export const title = css`
   font-size: 1.625rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
   margin-bottom: 0.5rem;
@@ -146,7 +146,7 @@ export const sendBtn = css`
 
 export const turnCounter = css`
   text-align: center;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   padding: 0.75rem;
   border-top: 1px solid ${C.border};

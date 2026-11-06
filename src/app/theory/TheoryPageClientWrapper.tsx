@@ -93,7 +93,7 @@ export default function TheoryPageClientWrapper({
       <div css={Shared.pageHeader}>
         <div css={Shared.pageHeaderTop}>
           <div css={Shared.iconBox(C.accent)}>
-            <span style={{ fontSize: "1.125rem" }}>📖</span>
+            <span style={{ fontSize: "1.125rem" }}></span>
           </div>
           <div>
             <h1 css={Shared.pageTitleText}>Theory Questions</h1>

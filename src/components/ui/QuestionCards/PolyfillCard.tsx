@@ -43,10 +43,10 @@ function parseTestResults(output: string[]): TestResult[] {
     const passed = line.startsWith("PASS:");
     const name = line
       .replace(/^(PASS|FAIL):\s*/, "")
-      .split(" — ")[0]
+      .split(", ")[0]
       .trim();
-    const detail = line.includes(" — ")
-      ? line.split(" — ").slice(1).join(" — ")
+    const detail = line.includes(", ")
+      ? line.split(", ").slice(1).join(", ")
       : undefined;
     return { name, passed, detail };
   });
@@ -118,10 +118,17 @@ export default function PolyfillCard({
       const result = await runCode(fullCode);
       setRunResult(result);
       setHasRun(true);
-      if (result.output.length > 0)
-        setTestResults(parseTestResults(result.output));
+      const results = parseTestResults(result.output);
+      if (results.length > 0) setTestResults(results);
+      // A run that throws or times out can produce no output, and [].every()
+      // is true, so it needs to be ruled out explicitly.
+      const allTestsPassed =
+        !result.error &&
+        !result.timed_out &&
+        results.length > 0 &&
+        results.every((r) => r.passed);
       if (
-        parseTestResults(result.output).every((r) => r.passed) &&
+        allTestsPassed &&
         !isSolved(q.id) &&
         isPro
       ) {
@@ -133,7 +140,7 @@ export default function PolyfillCard({
     } finally {
       setRunning(false);
     }
-  }, [userCode, q.testCode]);
+  }, [userCode, q.id, q.testCode, isSolved, isPro, recordSolved]);
 
   function handleReset() {
     setUserCode(q.code ?? "");
@@ -164,7 +171,7 @@ export default function PolyfillCard({
               marginBottom: "0.375rem",
             }}
           >
-            <p css={{ fontWeight: 600, fontSize: "0.875rem", color: C.text }}>
+            <p css={{ fontWeight: 500, fontSize: "0.875rem", color: C.text }}>
               {q.title}
             </p>
             {isLocked && <Lock size={12} color={C.muted} />}
@@ -182,8 +189,8 @@ export default function PolyfillCard({
           >
             <span
               css={{
-                fontSize: "0.625rem",
-                fontWeight: 600,
+                fontSize: "0.75rem",
+                fontWeight: 500,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
                 border: `1px solid ${ds.border}`,
@@ -195,7 +202,7 @@ export default function PolyfillCard({
             </span>
             <span
               css={{
-                fontSize: "0.625rem",
+                fontSize: "0.75rem",
                 fontWeight: 500,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
@@ -209,8 +216,8 @@ export default function PolyfillCard({
             {hasRun && (
               <span
                 css={{
-                  fontSize: "0.625rem",
-                  fontWeight: 700,
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
                   padding: "0.125rem 0.5rem",
                   borderRadius: "9999px",
                   border: `1px solid ${allPassed ? C.greenBorder : C.redBorder}`,
@@ -266,7 +273,7 @@ export default function PolyfillCard({
             >
               <Lock size={14} color={C.muted} />
               <span css={{ fontSize: "0.875rem", color: C.muted, flex: 1 }}>
-                Pro feature — upgrade to unlock all polyfill challenges
+                Pro feature, upgrade for all polyfill challenges
               </span>
               <button css={Shared.primaryBtn(C.accent)} onClick={onPaywall}>
                 <Zap size={12} /> Upgrade
@@ -289,7 +296,7 @@ export default function PolyfillCard({
                 >
                   <Building2 size={11} css={{ color: C.accent }} />
                   <span
-                    css={{ fontSize: "11px", color: C.muted, fontWeight: 500 }}
+                    css={{ fontSize: "0.75rem", color: C.muted, fontWeight: 500 }}
                   >
                     Asked at:
                   </span>
@@ -297,12 +304,12 @@ export default function PolyfillCard({
                     <span
                       key={c}
                       css={{
-                        fontSize: "11px",
+                        fontSize: "0.75rem",
                         fontWeight: 500,
                         padding: "2px 8px",
                         borderRadius: "4px",
-                        background: `${C.accent}12`,
-                        border: `1px solid ${C.accent}28`,
+                        background: `color-mix(in oklab, ${C.accent} 7%, transparent)`,
+                        border: `1px solid color-mix(in oklab, ${C.accent} 16%, transparent)`,
                         color: C.accent,
                       }}
                     >
@@ -340,9 +347,8 @@ export default function PolyfillCard({
                 >
                   <span
                     css={{
-                      fontSize: "0.6875rem",
-                      fontWeight: 700,
-                      textTransform: "uppercase",
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
                       letterSpacing: ".07em",
                       color: C.muted,
                       display: "flex",
@@ -386,16 +392,15 @@ export default function PolyfillCard({
                   >
                     <div
                       css={{
-                        fontSize: "0.6875rem",
-                        fontWeight: 800,
-                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
                         letterSpacing: ".08em",
                         color: allPassed ? C.green : C.red,
                         marginBottom: 8,
                       }}
                     >
                       {allPassed
-                        ? "🎉 All tests passed!"
+                        ? "All tests passed"
                         : `${passCount}/${testResults.length} tests passing`}
                     </div>
                     <div
@@ -430,7 +435,7 @@ export default function PolyfillCard({
                           {!t.passed && t.detail && (
                             <span
                               css={{
-                                fontSize: "11px",
+                                fontSize: "0.75rem",
                                 color: C.red,
                                 fontFamily: "var(--font-outlier)",
                                 opacity: 0.8,
@@ -520,9 +525,8 @@ export default function PolyfillCard({
                   <div css={{ marginTop: 10 }}>
                     <p
                       css={{
-                        fontSize: "0.6875rem",
-                        fontWeight: 800,
-                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
                         letterSpacing: ".08em",
                         color: C.muted,
                         marginBottom: 6,
@@ -543,9 +547,8 @@ export default function PolyfillCard({
                   <div css={{ marginTop: 10 }}>
                     <p
                       css={{
-                        fontSize: "0.6875rem",
-                        fontWeight: 800,
-                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
                         letterSpacing: ".08em",
                         color: C.muted,
                         marginBottom: 6,
@@ -573,10 +576,10 @@ export default function PolyfillCard({
                           fontSize: "0.8125rem",
                           color: C.text,
                           marginBottom: 6,
-                          fontWeight: 600,
+                          fontWeight: 500,
                         }}
                       >
-                        💡 Explanation
+                        Explanation
                       </p>
                       <p
                         css={{
@@ -601,11 +604,11 @@ export default function PolyfillCard({
                           css={{
                             fontSize: "0.75rem",
                             color: C.amber,
-                            fontWeight: 700,
+                            fontWeight: 500,
                             margin: 0,
                           }}
                         >
-                          ⚡ {q.keyInsight}
+                          {q.keyInsight}
                         </p>
                       </div>
                     </div>
@@ -639,14 +642,14 @@ const cardHeader = css`
   user-select: none;
 `;
 const qNum = css`
-  font-size: 0.6875rem;
-  font-weight: 800;
+  font-size: 0.75rem;
+  font-weight: 500;
   font-family: var(--font-outlier);
   color: ${C.muted};
   flex-shrink: 0;
 `;
 const chip = css`
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 500;
   padding: 1px 6px;
   border-radius: 4px;
@@ -689,7 +692,7 @@ const actionBtn = css`
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
   &:hover {
     background: ${C.surface};
     color: ${C.text};

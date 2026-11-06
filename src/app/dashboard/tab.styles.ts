@@ -71,7 +71,7 @@ export const desktopBtnActive = css`
   background: ${C.bg};
   color: ${C.text};
   border: 1px solid ${C.border};
-  font-weight: 600;
+  font-weight: 500;
 `;
 
 // ─── Mobile bottom nav ────────────────────────────────────────────────────────
@@ -84,8 +84,6 @@ export const mobileNav = css`
   right: 0;
   z-index: 100;
   background: ${C.bg};
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid ${C.bgSubtle};
   padding-bottom: env(safe-area-inset-bottom, 0px);
   @media (min-width: ${BP.md}) {
@@ -126,9 +124,8 @@ export const mobileNavDot = css`
 `;
 
 export const mobileNavLabel = css`
-  font-size: 0.5625rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: inherit;
 `;
 
@@ -155,7 +152,7 @@ export const statCell = css`
 
 export const statNumber = (color: string) => css`
   font-size: 1.875rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${color};
   line-height: 1;
   margin-bottom: 0.3125rem;
@@ -163,11 +160,9 @@ export const statNumber = (color: string) => css`
 `;
 
 export const statLabel = css`
-  font-size: 0.5625rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 `;
 
 // ─── Jump button ──────────────────────────────────────────────────────────────
@@ -184,7 +179,7 @@ export const jumpBtn = css`
   color: ${C.accentText};
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition:
     border-color 0.12s ease,
@@ -206,7 +201,7 @@ export const sectionHead = css`
 
 export const sectionTitle = css`
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   display: flex;
   align-items: center;
@@ -270,7 +265,7 @@ export const pageNum = (active: boolean) => css`
   background: ${active ? C.accentSubtle : "transparent"};
   color: ${active ? C.accentText : C.muted};
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     background: ${C.accentSubtle};
     border-color: ${C.accent};

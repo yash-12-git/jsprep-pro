@@ -15,17 +15,14 @@ const card = css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   overflow: hidden;
-  animation: ${fadeIn} 0.3s ease;
 `;
 
 const typeTag = css`
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.green};
   background: ${C.greenSubtle};
   border: 1px solid ${C.greenBorder};
@@ -39,7 +36,7 @@ const questionBody = css`
 
 const questionTitle = css`
   font-size: 1.0625rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   line-height: 1.45;
   margin: 0.875rem 0 0.5rem;
@@ -48,11 +45,9 @@ const questionTitle = css`
 
 const prompt = css`
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.muted};
   margin-bottom: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 `;
 
 const codeBlock = css`
@@ -76,10 +71,8 @@ const inputSection = css`
 
 const inputLabel = css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.green};
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
   margin-bottom: 0.5rem;
 `;
 
@@ -115,7 +108,7 @@ const checkBtn = (active: boolean) => css`
   padding: 0.5rem 1rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   background: ${active ? C.greenSubtle : C.bgSubtle};
   border: 1px solid ${active ? C.greenBorder : C.border};
   color: ${active ? C.green : C.muted};
@@ -128,7 +121,6 @@ const resultBox = (correct: boolean) => css`
   padding: 1rem 1.375rem;
   border-top: 1px solid ${C.border};
   background: ${correct ? C.greenSubtle : C.redSubtle};
-  animation: ${fadeIn} 0.25s ease;
 `;
 
 const resultBadge = (correct: boolean) => css`
@@ -136,7 +128,7 @@ const resultBadge = (correct: boolean) => css`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${correct ? C.green : C.red};
   margin-bottom: 0.5rem;
 `;
@@ -172,7 +164,7 @@ const revealBtn = css`
   background: transparent;
   border: 1px solid ${C.border};
   color: ${C.muted};
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     color: ${C.text};
     border-color: ${C.borderStrong};
@@ -192,7 +184,7 @@ const skipBtn = css`
   background: transparent;
   border: 1px solid ${C.border};
   color: ${C.muted};
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     border-color: ${C.borderStrong};
     color: ${C.text};
@@ -207,7 +199,7 @@ const nextBtn = css`
   padding: 0.5625rem 1.375rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: ${C.accent};
   border: none;
@@ -255,7 +247,7 @@ export default function OutputSprintCard({ q, onComplete }: Props) {
   return (
     <div css={card}>
       <div css={questionBody}>
-        <div css={typeTag}>💻 Output</div>
+        <div css={typeTag}>Output</div>
         <p css={questionTitle}>{q.title || "What is the output?"}</p>
         <div css={prompt}>What does this print?</div>
         <pre css={codeBlock}>{q.code || q.question}</pre>
@@ -341,7 +333,7 @@ export default function OutputSprintCard({ q, onComplete }: Props) {
                 )
               }
             >
-              Next →
+              Next
             </button>
           </div>
         </>

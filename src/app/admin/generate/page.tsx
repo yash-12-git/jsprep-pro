@@ -165,17 +165,17 @@ const DIFFICULTY_OPTIONS = ["beginner", "core", "advanced", "expert"];
 
 function SimilarityBadge({ score }: { score: number }) {
   const pct = Math.round(score * 100);
-  const col = pct >= 85 ? "#f76a6a" : pct >= 60 ? "#f7c76a" : "#6af7c0";
+  const col = pct >= 85 ? C.red : pct >= 60 ? C.amber : C.green;
   return (
     <span
       style={{
-        fontSize: "0.7rem",
-        fontWeight: 800,
+        fontSize: "0.75rem",
+        fontWeight: 500,
         padding: "2px 8px",
         borderRadius: 12,
-        background: `${col}18`,
+        background: `color-mix(in oklab, ${col} 9%, transparent)`,
         color: col,
-        border: `1px solid ${col}30`,
+        border: `1px solid color-mix(in oklab, ${col} 19%, transparent)`,
       }}
     >
       {pct}% similar
@@ -202,11 +202,11 @@ function CandidateCard({
       <div
         style={{
           padding: "1rem",
-          background: "rgba(247,106,106,0.06)",
-          border: "1px solid rgba(247,106,106,0.2)",
+          background: C.redSubtle,
+          border: `1px solid ${C.redBorder}`,
           borderRadius: "0.875rem",
           fontSize: "0.85rem",
-          color: "#f76a6a",
+          color: C.red,
         }}
       >
         ⚠ Generation failed: {candidate.error}
@@ -218,9 +218,9 @@ function CandidateCard({
     <div
       style={{
         background: candidate.isDuplicate
-          ? "rgba(247,106,106,0.04)"
-          : "rgba(255,255,255,0.025)",
-        border: `1px solid ${candidate.isDuplicate ? "rgba(247,106,106,0.2)" : "rgba(255,255,255,0.08)"}`,
+          ? C.redSubtle
+          : "color-mix(in oklab, var(--color-ink) 2%, transparent)",
+        border: `1px solid ${candidate.isDuplicate ? "var(--color-red-border)" : "color-mix(in oklab, var(--color-ink) 8%, transparent)"}`,
         borderRadius: "1rem",
         overflow: "hidden",
       }}
@@ -246,35 +246,34 @@ function CandidateCard({
           >
             <span
               style={{
-                fontSize: "0.65rem",
-                fontWeight: 800,
-                textTransform: "uppercase",
+                fontSize: "0.75rem",
+                fontWeight: 500,
                 padding: "2px 8px",
                 borderRadius: 8,
                 background:
                   q.type === "theory"
-                    ? "rgba(196,181,253,0.15)"
+                    ? C.coolSoft
                     : q.type === "output"
-                      ? "rgba(106,247,192,0.15)"
-                      : "rgba(247,106,106,0.15)",
+                      ? C.greenSubtle
+                      : C.redSubtle,
                 color:
                   q.type === "theory"
-                    ? "#c4b5fd"
+                    ? C.cool
                     : q.type === "output"
-                      ? "#6af7c0"
-                      : "#f76a6a",
+                      ? C.green
+                      : C.red,
               }}
             >
               {q.type}
             </span>
             <span
               style={{
-                fontSize: "0.65rem",
-                fontWeight: 700,
-                color: "rgba(255,255,255,0.4)",
+                fontSize: "0.75rem",
+                fontWeight: 500,
+                color: "color-mix(in oklab, var(--color-ink) 40%, transparent)",
                 padding: "2px 8px",
                 borderRadius: 8,
-                background: "rgba(255,255,255,0.06)",
+                background: "color-mix(in oklab, var(--color-ink) 6%, transparent)",
               }}
             >
               {q.difficulty}
@@ -283,22 +282,22 @@ function CandidateCard({
             {candidate.isDuplicate && (
               <span
                 style={{
-                  fontSize: "0.65rem",
-                  fontWeight: 800,
-                  color: "#f76a6a",
-                  background: "rgba(247,106,106,0.12)",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: C.red,
+                  background: C.redSubtle,
                   padding: "2px 8px",
                   borderRadius: 8,
                 }}
               >
-                ⛔ DUPLICATE
+                Duplicate
               </span>
             )}
           </div>
           <p
             style={{
               fontSize: "0.9rem",
-              fontWeight: 700,
+              fontWeight: 500,
               color: C.text,
               margin: 0,
               lineHeight: 1.4,
@@ -310,11 +309,11 @@ function CandidateCard({
             <p
               style={{
                 fontSize: "0.75rem",
-                color: "#f7c76a",
+                color: C.amber,
                 marginTop: "0.375rem",
               }}
             >
-              Similar to: "{candidate.duplicateOf.title}" (
+              Similar to: &quot;{candidate.duplicateOf.title}&quot; (
               {Math.round(candidate.duplicateOf.score * 100)}% match)
             </p>
           )}
@@ -326,10 +325,10 @@ function CandidateCard({
             onClick={() => setExpanded((e) => !e)}
             style={{
               padding: "0.4rem 0.75rem",
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.1)",
+              background: "color-mix(in oklab, var(--color-ink) 6%, transparent)",
+              border: "1px solid color-mix(in oklab, var(--color-ink) 10%, transparent)",
               borderRadius: "0.5rem",
-              color: "rgba(255,255,255,0.6)",
+              color: "color-mix(in oklab, var(--color-ink) 60%, transparent)",
               cursor: "pointer",
               fontSize: "0.75rem",
               display: "flex",
@@ -345,13 +344,13 @@ function CandidateCard({
               disabled={approving}
               style={{
                 padding: "0.4rem 0.875rem",
-                background: "rgba(106,247,192,0.12)",
-                border: "1px solid rgba(106,247,192,0.25)",
+                background: C.greenSubtle,
+                border: `1px solid ${C.greenBorder}`,
                 borderRadius: "0.5rem",
-                color: "#6af7c0",
+                color: C.green,
                 cursor: approving ? "not-allowed" : "pointer",
                 fontSize: "0.75rem",
-                fontWeight: 700,
+                fontWeight: 500,
                 display: "flex",
                 alignItems: "center",
                 gap: "0.25rem",
@@ -365,13 +364,13 @@ function CandidateCard({
             onClick={onReject}
             style={{
               padding: "0.4rem 0.875rem",
-              background: "rgba(247,106,106,0.1)",
-              border: "1px solid rgba(247,106,106,0.2)",
+              background: C.redSubtle,
+              border: `1px solid ${C.redBorder}`,
               borderRadius: "0.5rem",
-              color: "#f76a6a",
+              color: C.red,
               cursor: "pointer",
               fontSize: "0.75rem",
-              fontWeight: 700,
+              fontWeight: 500,
               display: "flex",
               alignItems: "center",
               gap: "0.25rem",
@@ -386,7 +385,7 @@ function CandidateCard({
       {expanded && (
         <div
           style={{
-            borderTop: "1px solid rgba(255,255,255,0.06)",
+            borderTop: "1px solid color-mix(in oklab, var(--color-ink) 6%, transparent)",
             padding: "1rem 1.25rem",
             fontSize: "0.8rem",
             display: "flex",
@@ -398,10 +397,9 @@ function CandidateCard({
             <div>
               <div
                 style={{
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.3)",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: "color-mix(in oklab, var(--color-ink) 30%, transparent)",
                   marginBottom: "0.375rem",
                 }}
               >
@@ -409,13 +407,13 @@ function CandidateCard({
               </div>
               <pre
                 style={{
-                  background: "#0a0a14",
-                  border: "1px solid rgba(255,255,255,0.07)",
+                  background: C.paper3,
+                  border: "1px solid color-mix(in oklab, var(--color-ink) 7%, transparent)",
                   borderRadius: "0.5rem",
                   padding: "0.75rem",
                   fontFamily: "monospace",
                   fontSize: "0.8rem",
-                  color: "#c8d8e8",
+                  color: C.text,
                   overflow: "auto",
                   margin: 0,
                 }}
@@ -428,17 +426,16 @@ function CandidateCard({
             <div>
               <div
                 style={{
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.3)",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: "color-mix(in oklab, var(--color-ink) 30%, transparent)",
                   marginBottom: "0.375rem",
                 }}
               >
                 Answer
               </div>
               <div
-                style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}
+                style={{ color: "color-mix(in oklab, var(--color-ink) 60%, transparent)", lineHeight: 1.6 }}
                 dangerouslySetInnerHTML={{ __html: q.answer }}
               />
             </div>
@@ -447,10 +444,9 @@ function CandidateCard({
             <div>
               <div
                 style={{
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "#6af7c0",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: C.green,
                   marginBottom: "0.375rem",
                 }}
               >
@@ -458,12 +454,12 @@ function CandidateCard({
               </div>
               <pre
                 style={{
-                  background: "rgba(106,247,192,0.05)",
+                  background: C.greenSubtle,
                   border: "1px solid rgba(106,247,192,0.15)",
                   borderRadius: "0.5rem",
                   padding: "0.75rem",
                   fontFamily: "monospace",
-                  color: "#6af7c0",
+                  color: C.green,
                   margin: 0,
                 }}
               >
@@ -475,16 +471,15 @@ function CandidateCard({
             <div>
               <div
                 style={{
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "#f76a6a",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: C.red,
                   marginBottom: "0.375rem",
                 }}
               >
                 Bug
               </div>
-              <p style={{ color: "rgba(255,255,255,0.6)", margin: 0 }}>
+              <p style={{ color: "color-mix(in oklab, var(--color-ink) 60%, transparent)", margin: 0 }}>
                 {q.bugDescription}
               </p>
             </div>
@@ -493,16 +488,15 @@ function CandidateCard({
             <div>
               <div
                 style={{
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.3)",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: "color-mix(in oklab, var(--color-ink) 30%, transparent)",
                   marginBottom: "0.375rem",
                 }}
               >
                 Explanation
               </div>
-              <p style={{ color: "rgba(255,255,255,0.55)", margin: 0 }}>
+              <p style={{ color: "color-mix(in oklab, var(--color-ink) 55%, transparent)", margin: 0 }}>
                 {q.explanation}
               </p>
             </div>
@@ -511,10 +505,9 @@ function CandidateCard({
             <div>
               <div
                 style={{
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.3)",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: "color-mix(in oklab, var(--color-ink) 30%, transparent)",
                   marginBottom: "0.375rem",
                 }}
               >
@@ -527,9 +520,9 @@ function CandidateCard({
                     display: "flex",
                     justifyContent: "space-between",
                     fontSize: "0.75rem",
-                    color: "rgba(255,255,255,0.45)",
+                    color: "color-mix(in oklab, var(--color-ink) 45%, transparent)",
                     padding: "0.2rem 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.04)",
+                    borderBottom: "1px solid color-mix(in oklab, var(--color-ink) 4%, transparent)",
                   }}
                 >
                   <span>{s.title}</span>
@@ -583,7 +576,7 @@ export default function AdminGeneratePage() {
     if (type in CATEGORY_OPTIONS(track)) {
       setCategory((CATEGORY_OPTIONS(track) as any)[type][0]);
     }
-  }, [type]);
+  }, [type, track]);
 
   async function generate() {
     if (!topic.trim()) {
@@ -706,7 +699,7 @@ export default function AdminGeneratePage() {
       <div
         style={{
           padding: "2rem",
-          color: "rgba(255,255,255,0.4)",
+          color: "color-mix(in oklab, var(--color-ink) 40%, transparent)",
           textAlign: "center",
         }}
       >
@@ -723,22 +716,22 @@ export default function AdminGeneratePage() {
         maxWidth: "860px",
         margin: "0 auto",
         padding: "2rem 1.25rem 5rem",
-        color: "#c8c8d8",
+        color: C.text,
       }}
     >
       <div style={{ marginBottom: "2rem" }}>
         <h1
           style={{
             fontSize: "1.5rem",
-            fontWeight: 900,
+            fontWeight: 500,
             color: C.text,
             marginBottom: "0.375rem",
             letterSpacing: "-0.02em",
           }}
         >
-          ⚡ Question Generator
+          Question Generator
         </h1>
-        <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.4)" }}>
+        <p style={{ fontSize: "0.875rem", color: "color-mix(in oklab, var(--color-ink) 40%, transparent)" }}>
           AI generates questions → dedup check → preview → approve to publish
         </p>
       </div>
@@ -746,8 +739,8 @@ export default function AdminGeneratePage() {
       {/* ── Config panel ── */}
       <div
         style={{
-          background: "rgba(255,255,255,0.025)",
-          border: "1px solid rgba(255,255,255,0.07)",
+          background: "color-mix(in oklab, var(--color-ink) 2%, transparent)",
+          border: "1px solid color-mix(in oklab, var(--color-ink) 7%, transparent)",
           borderRadius: "1rem",
           padding: "1.5rem",
           marginBottom: "1.5rem",
@@ -835,7 +828,7 @@ export default function AdminGeneratePage() {
           <div
             style={{
               fontSize: "0.8rem",
-              color: "#f76a6a",
+              color: C.red,
               marginBottom: "0.75rem",
               display: "flex",
               alignItems: "center",
@@ -873,7 +866,7 @@ export default function AdminGeneratePage() {
           </button>
           {approvedCount > 0 && (
             <span
-              style={{ fontSize: "0.8rem", color: "#6af7c0", fontWeight: 700 }}
+              style={{ fontSize: "0.8rem", color: C.green, fontWeight: 700 }}
             >
               ✓ {approvedCount} approved this session
             </span>
@@ -885,7 +878,7 @@ export default function AdminGeneratePage() {
             style={{
               marginTop: "0.75rem",
               fontSize: "0.75rem",
-              color: "rgba(255,255,255,0.35)",
+              color: "color-mix(in oklab, var(--color-ink) 35%, transparent)",
             }}
           >
             Context: {meta.existingCount} existing questions,{" "}
@@ -901,14 +894,12 @@ export default function AdminGeneratePage() {
           <h2
             style={{
               fontSize: "0.875rem",
-              fontWeight: 700,
-              color: "rgba(255,255,255,0.4)",
-              textTransform: "uppercase",
-              letterSpacing: "0.07em",
+              fontWeight: 500,
+              color: "color-mix(in oklab, var(--color-ink) 40%, transparent)",
               marginBottom: "0.875rem",
             }}
           >
-            Generated — {candidates.length} candidate
+            Generated: {candidates.length} candidate
             {candidates.length > 1 ? "s" : ""}
           </h2>
           <div
@@ -941,13 +932,11 @@ export default function AdminGeneratePage() {
             <h2
               style={{
                 fontSize: "0.875rem",
-                fontWeight: 700,
-                color: "rgba(255,255,255,0.4)",
-                textTransform: "uppercase",
-                letterSpacing: "0.07em",
+                fontWeight: 500,
+                color: "color-mix(in oklab, var(--color-ink) 40%, transparent)",
               }}
             >
-              Cron Pending Queue — {pendingQueue.length} waiting
+              Cron Pending Queue, {pendingQueue.length} waiting
             </h2>
             <button
               onClick={() => setShowPending(false)}
@@ -961,11 +950,11 @@ export default function AdminGeneratePage() {
               style={{
                 padding: "2rem",
                 textAlign: "center",
-                color: "rgba(255,255,255,0.25)",
+                color: "color-mix(in oklab, var(--color-ink) 25%, transparent)",
                 fontSize: "0.875rem",
               }}
             >
-              No pending questions — cron hasn't run yet or all reviewed.
+              No pending questions, cron hasn&apos;t run yet or all reviewed.
             </div>
           ) : (
             <div
@@ -979,8 +968,8 @@ export default function AdminGeneratePage() {
                 <div
                   key={item.id}
                   style={{
-                    background: "rgba(255,255,255,0.025)",
-                    border: "1px solid rgba(255,255,255,0.07)",
+                    background: "color-mix(in oklab, var(--color-ink) 2%, transparent)",
+                    border: "1px solid color-mix(in oklab, var(--color-ink) 7%, transparent)",
                     borderRadius: "1rem",
                     padding: "1rem 1.25rem",
                     display: "flex",
@@ -999,10 +988,10 @@ export default function AdminGeneratePage() {
                     >
                       <span
                         style={{
-                          fontSize: "0.65rem",
-                          fontWeight: 700,
-                          color: "rgba(255,255,255,0.35)",
-                          background: "rgba(255,255,255,0.06)",
+                          fontSize: "0.75rem",
+                          fontWeight: 500,
+                          color: "color-mix(in oklab, var(--color-ink) 35%, transparent)",
+                          background: "color-mix(in oklab, var(--color-ink) 6%, transparent)",
                           padding: "2px 8px",
                           borderRadius: 8,
                         }}
@@ -1011,10 +1000,10 @@ export default function AdminGeneratePage() {
                       </span>
                       <span
                         style={{
-                          fontSize: "0.65rem",
-                          fontWeight: 700,
-                          color: "rgba(255,255,255,0.35)",
-                          background: "rgba(255,255,255,0.06)",
+                          fontSize: "0.75rem",
+                          fontWeight: 500,
+                          color: "color-mix(in oklab, var(--color-ink) 35%, transparent)",
+                          background: "color-mix(in oklab, var(--color-ink) 6%, transparent)",
                           padding: "2px 8px",
                           borderRadius: 8,
                         }}
@@ -1025,7 +1014,7 @@ export default function AdminGeneratePage() {
                     </div>
                     <p
                       style={{
-                        fontWeight: 700,
+                        fontWeight: 500,
                         fontSize: "0.9rem",
                         color: C.text,
                         margin: "0 0 0.25rem",
@@ -1036,7 +1025,7 @@ export default function AdminGeneratePage() {
                     <p
                       style={{
                         fontSize: "0.75rem",
-                        color: "rgba(255,255,255,0.35)",
+                        color: "color-mix(in oklab, var(--color-ink) 35%, transparent)",
                         margin: 0,
                       }}
                     >
@@ -1050,13 +1039,13 @@ export default function AdminGeneratePage() {
                       onClick={() => approvePending(item)}
                       style={{
                         padding: "0.4rem 0.875rem",
-                        background: "rgba(106,247,192,0.12)",
-                        border: "1px solid rgba(106,247,192,0.25)",
+                        background: C.greenSubtle,
+                        border: `1px solid ${C.greenBorder}`,
                         borderRadius: "0.5rem",
-                        color: "#6af7c0",
+                        color: C.green,
                         cursor: "pointer",
                         fontSize: "0.75rem",
-                        fontWeight: 700,
+                        fontWeight: 500,
                       }}
                     >
                       ✓ Approve
@@ -1065,13 +1054,13 @@ export default function AdminGeneratePage() {
                       onClick={() => rejectPending(item)}
                       style={{
                         padding: "0.4rem 0.875rem",
-                        background: "rgba(247,106,106,0.1)",
-                        border: "1px solid rgba(247,106,106,0.2)",
+                        background: C.redSubtle,
+                        border: `1px solid ${C.redBorder}`,
                         borderRadius: "0.5rem",
-                        color: "#f76a6a",
+                        color: C.red,
                         cursor: "pointer",
                         fontSize: "0.75rem",
-                        fontWeight: 700,
+                        fontWeight: 500,
                       }}
                     >
                       ✗ Reject
@@ -1093,18 +1082,16 @@ export default function AdminGeneratePage() {
 
 const labelStyle: React.CSSProperties = {
   display: "block",
-  fontSize: "0.7rem",
-  fontWeight: 700,
-  textTransform: "uppercase",
-  letterSpacing: "0.07em",
-  color: "rgba(255,255,255,0.35)",
+  fontSize: "0.75rem",
+  fontWeight: 500,
+  color: "color-mix(in oklab, var(--color-ink) 35%, transparent)",
   marginBottom: "0.375rem",
 };
 const selectStyle: React.CSSProperties = {
   width: "100%",
   padding: "0.5625rem 0.75rem",
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)",
+  background: "color-mix(in oklab, var(--color-ink) 4%, transparent)",
+  border: "1px solid color-mix(in oklab, var(--color-ink) 10%, transparent)",
   borderRadius: "0.625rem",
   color: C.text,
   fontSize: "0.875rem",
@@ -1121,7 +1108,7 @@ const generateBtnStyle = (loading: boolean): React.CSSProperties => ({
   borderRadius: "0.75rem",
   color: C.text,
   fontSize: "0.875rem",
-  fontWeight: 800,
+  fontWeight: 500,
   cursor: loading ? "not-allowed" : "pointer",
   opacity: loading ? 0.7 : 1,
 });
@@ -1130,11 +1117,11 @@ const secondaryBtnStyle: React.CSSProperties = {
   alignItems: "center",
   gap: "0.375rem",
   padding: "0.6875rem 1rem",
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(255,255,255,0.1)",
+  background: "color-mix(in oklab, var(--color-ink) 5%, transparent)",
+  border: "1px solid color-mix(in oklab, var(--color-ink) 10%, transparent)",
   borderRadius: "0.75rem",
-  color: "rgba(255,255,255,0.6)",
+  color: "color-mix(in oklab, var(--color-ink) 60%, transparent)",
   fontSize: "0.8rem",
-  fontWeight: 700,
+  fontWeight: 500,
   cursor: "pointer",
 };

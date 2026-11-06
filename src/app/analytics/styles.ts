@@ -3,7 +3,7 @@ import { C, RADIUS } from "@/styles/tokens";
 
 export const title = css`
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
   margin-bottom: 2rem;
@@ -46,7 +46,7 @@ export const section = css`
 
 export const sectionTitle = css`
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   margin-bottom: 0.25rem;
 `;
@@ -67,7 +67,7 @@ export const overallRow = css`
 
 export const overallPct = css`
   font-size: 1.375rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.accent};
   letter-spacing: -0.02em;
 `;
@@ -163,7 +163,7 @@ export const sprintScoreBlock = css`
 
 export const sprintScoreNum = css`
   font-size: 1.125rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
 `;
@@ -175,7 +175,7 @@ export const sprintScoreMax = css`
 
 export const sprintAccuracy = (pct: number) => css`
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${pct >= 80 ? C.green : pct >= 50 ? C.accent : C.amber};
   background: ${pct >= 80
     ? C.greenSubtle
@@ -202,7 +202,7 @@ export const sprintTagRow = css`
 
 export const sprintTag = (variant: "strength" | "weak") => css`
   font-size: 0.6rem;
-  font-weight: 600;
+  font-weight: 500;
   padding: 1px 7px;
   border-radius: 10px;
   ${variant === "strength"
@@ -230,15 +230,13 @@ export const sprintSummaryItem = css`
 
 export const sprintSummaryLabel = css`
   font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-weight: 500;
   color: ${C.muted};
 `;
 
 export const sprintSummaryValue = css`
   font-size: 1.0625rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
 `;

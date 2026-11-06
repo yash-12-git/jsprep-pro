@@ -25,17 +25,14 @@ const page = css`
 const inner = css`
   width: 100%;
   max-width: 520px;
-  animation: ${fadeUp} 0.45s ease;
 `;
 
 const badge = css`
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.accentText};
   background: ${C.accentSubtle};
   border: 1px solid ${C.border};
@@ -46,7 +43,7 @@ const badge = css`
 
 const headline = css`
   font-size: clamp(1.75rem, 5vw, 2.5rem);
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   line-height: 1.15;
   letter-spacing: -0.03em;
@@ -85,21 +82,17 @@ const statIcon = css`
 `;
 
 const statLabel = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 `;
 
 // ─── Count selector ───────────────────────────────────────────────────────────
 
 const sectionLabel = css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.muted};
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
   margin-bottom: 0.625rem;
 `;
 
@@ -121,7 +114,7 @@ const countOption = (active: boolean, isPro: boolean, locked: boolean) => css`
   border: 1px solid ${active ? C.accent : locked ? C.border : C.border};
   background: ${active ? C.accentSubtle : locked ? C.bgSubtle : C.bg};
   cursor: ${locked ? "not-allowed" : "pointer"};
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   opacity: ${locked ? 0.5 : 1};
   ${!active &&
   !locked &&
@@ -130,7 +123,7 @@ const countOption = (active: boolean, isPro: boolean, locked: boolean) => css`
 
 const countNum = (active: boolean) => css`
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1;
   color: ${active ? C.accentText : C.text};
   letter-spacing: -0.02em;
@@ -138,9 +131,7 @@ const countNum = (active: boolean) => css`
 
 const countSub = css`
   font-size: 0.6rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-weight: 500;
   color: ${C.muted};
   margin-top: 0.25rem;
 `;
@@ -154,10 +145,8 @@ const lockIcon = css`
 
 const proBadge = css`
   font-size: 0.55rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.amber};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   margin-top: 0.125rem;
 `;
 
@@ -195,7 +184,7 @@ const startBtn = css`
   padding: 0.875rem;
   border-radius: ${RADIUS.lg};
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 500;
   background: ${C.accent};
   border: none;
   color: ${C.accentInk};
@@ -282,7 +271,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
         <h1 css={headline}>
           Are you truly
           <br />
-          <span css={accentSpan}>interview ready?</span>
+          interview ready?
         </h1>
 
         <p css={tagline}>
@@ -301,7 +290,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
               />
             </div>
             <div
-              style={{ fontWeight: 600, color: C.text, fontSize: "0.875rem" }}
+              style={{ fontWeight: 500, color: C.text, fontSize: "0.875rem" }}
             >
               Mixed
             </div>
@@ -312,7 +301,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
               <Timer size={18} color={C.amber} style={{ margin: "0 auto" }} />
             </div>
             <div
-              style={{ fontWeight: 600, color: C.text, fontSize: "0.875rem" }}
+              style={{ fontWeight: 500, color: C.text, fontSize: "0.875rem" }}
             >
               {durationMins} min
             </div>
@@ -323,7 +312,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
               <Brain size={18} color={C.green} style={{ margin: "0 auto" }} />
             </div>
             <div
-              style={{ fontWeight: 600, color: C.text, fontSize: "0.875rem" }}
+              style={{ fontWeight: 500, color: C.text, fontSize: "0.875rem" }}
             >
               AI
             </div>
@@ -349,11 +338,9 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
                 <div
                   style={{
                     fontSize: "0.6rem",
-                    fontWeight: 600,
+                    fontWeight: 500,
                     color: active ? C.accentText : C.muted,
                     marginTop: "0.125rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.04em",
                   }}
                 >
                   {o.label}

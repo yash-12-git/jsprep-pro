@@ -16,7 +16,7 @@ export const headerRow = css`
 
 export const greeting = css`
   font-size: 1.375rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
 `;
@@ -29,7 +29,7 @@ export const subStats = css`
 
 export const statChip = (color: string) => css`
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${color};
 `;
 
@@ -85,8 +85,8 @@ export const shortcutEmoji = css`
 `;
 
 export const shortcutLabel = css`
-  font-size: 0.625rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.text};
 `;
 
@@ -112,10 +112,8 @@ export const filterGroup = css`
 `;
 
 export const filterLabel = css`
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.muted};
   white-space: nowrap;
   padding-top: 0.375rem;
@@ -125,13 +123,13 @@ export const chip = (active: boolean, color: string) => css`
   flex-shrink: 0;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   border: 1px solid ${active ? color : C.border};
   background: ${active ? C.accentSubtle : "transparent"};
   color: ${active ? color : C.muted};
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   white-space: nowrap;
   &:hover {
     border-color: ${color};
@@ -182,7 +180,7 @@ export const searchInput = css`
 `;
 
 export const resultCount = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   padding: 0 0.25rem;
   margin-bottom: 1rem;
@@ -204,7 +202,7 @@ export const emptyState = css`
 
 export const emptyTitle = css`
   font-size: 1.0625rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   margin-bottom: 0.5rem;
 `;
@@ -253,7 +251,7 @@ export const loadMoreBtn = css`
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     color: ${C.text};
     border-color: ${C.borderStrong};
@@ -292,7 +290,7 @@ export const cardSummary = css`
 
 export const qNum = css`
   font-family: var(--font-outlier);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: ${C.accentText};
   background: ${C.accentSubtle};
   border: 1px solid ${C.border};
@@ -308,7 +306,7 @@ export const qMeta = css`
 `;
 
 export const qTitle = css`
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.875rem;
   line-height: 1.45;
   margin-bottom: 0.5rem;
@@ -322,8 +320,8 @@ export const tagsRow = css`
 `;
 
 export const tag = (bg: string, color: string, border: string) => css`
-  font-size: 0.5625rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 500;
   padding: 0.125rem 0.5rem;
   border-radius: ${RADIUS.sm};
   background: ${bg};
@@ -361,7 +359,7 @@ export const answerArea = css`
   h1,
   h2,
   h3 {
-    font-weight: 700;
+    font-weight: 500;
     margin: 1rem 0 0.5rem;
     color: ${C.text};
     letter-spacing: -0.01em;
@@ -390,7 +388,7 @@ export const answerArea = css`
   }
   strong {
     color: ${C.text};
-    font-weight: 600;
+    font-weight: 500;
   }
   em {
     color: ${C.amber};
@@ -446,7 +444,7 @@ export const answerArea = css`
   }
   th {
     background: ${C.bgSubtle};
-    font-weight: 600;
+    font-weight: 500;
     color: ${C.text};
   }
   td {
@@ -466,7 +464,7 @@ export const listHeader = css`
 `;
 
 export const listHeaderCount = css`
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
 `;
 
@@ -517,7 +515,7 @@ export const pageNum = (active: boolean) => css`
   background: ${active ? C.accentSubtle : "transparent"};
   color: ${active ? C.accentText : C.muted};
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     background: ${C.accentSubtle};
     border-color: ${C.accent};
@@ -551,7 +549,7 @@ export const actionBtn = (color: string, active: boolean) => css`
   background: ${active ? C.accentSubtle : "transparent"};
   color: ${active ? color : C.muted};
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     border-color: ${color};
     color: ${color};

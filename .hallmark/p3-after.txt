@@ -1,0 +1,51 @@
+src/app/debug-lab/DebugLabClientWrapper.tsx
+  FAIL 19 :173 dash "—" in copy | fix: A comma, a colon, a full stop or parentheses; never a dash
+  FAIL 19 :180 buzzword "Unlock" | fix: Say what the product does, in its own nouns
+src/app/mock-interview/MockInterviewClient.tsx
+  FAIL 19 :1470 dash "—" in copy
+src/app/output-quiz/OutputClientWrapper.tsx
+  FAIL 19 :181 dash "—" in copy
+  FAIL 19 :188 buzzword "Unlock"
+src/app/polyfill-lab/PolyfillClientWrapper.tsx
+  FAIL 19 :142 dash "—" in copy
+  FAIL 19 :231 buzzword "Unlock"
+src/components/ui/AIChat/page.tsx
+  FAIL 19 :84 dash "—" in copy
+src/components/ui/AnswerEvaluator/page.tsx
+  FAIL 19 :67 dash "—" in copy
+  WARN 49 :109 long clickable label "Evaluating… Evaluate My Answer" without nowrap | fix: Shorten the label or set nowrap
+src/components/ui/InlineEvaluater.tsx
+  FAIL 19 :425 dash "–" in copy
+  WARN F1 :451 straight quote in prose x2 (first: Answer as if you're in a real i) | fix: Use typographic quotes: “ ” ’
+src/components/ui/PaywallBanner/page.tsx
+  FAIL 19 :33 buzzword "Unlock"
+src/components/ui/QuestionCards/DebugCard.tsx
+  FAIL 19 :349 buzzword "Unlock"
+  FAIL 19 :359 buzzword "unlocks"
+src/components/ui/QuestionCards/OutputCard.tsx
+  FAIL 19 :317 buzzword "Unlock"
+  FAIL 19 :327 buzzword "unlocks"
+  WARN F1 :409 straight quote in prose x1 (first: ↑ That's the error th)
+src/components/ui/QuestionCards/PolyfillCard.tsx
+  FAIL 19 :269 buzzword "unlock"
+  WARN 49 :481 long clickable label "Hide Solution Show Solution" without nowrap
+src/app/mock-interview/InterviewResult.tsx
+  FAIL 33 :772 <svg> without aria-hidden or aria-label | fix: Add aria-hidden or an aria-label
+  FAIL 33 :785 <svg> without aria-hidden or aria-label
+  WARN 49 :801 long clickable label "Copied to clipboard! Copy share text" without nowrap
+src/app/sprint/components/SprintResults.tsx
+  FAIL 33 :304 <svg> without aria-hidden or aria-label
+  FAIL 33 :944 <svg> without aria-hidden or aria-label
+  FAIL 33 :964 <svg> without aria-hidden or aria-label
+  FAIL 33 :978 <svg> without aria-hidden or aria-label
+  WARN 49 :994 long clickable label "Copied to clipboard! Copy share text" without nowrap
+src/app/dashboard/components/Leaderboard.tsx
+  FAIL 63 :325 middle-dot meta string "XP earned: 10 per mastered question · 8 per outpu…" | fix: Line breaks, columns or hairlines; one dot in a byline at most
+src/app/dashboard/page.tsx
+  FAIL 63 :94 middle-dot meta string "Timed · mixed questions · AI scored · one number …"
+src/app/sprint/components/TheorySprintCard.tsx
+  WARN 49 :472 long clickable label "Evaluating... Submit Answer" without nowrap
+  WARN F2 :483 three-period ellipsis in prose x1 | fix: Use a true ellipsis character (…)
+src/app/study-plan/StudyPlanClientWrapper.tsx
+  WARN 49 :218 long clickable label "Analyzing… Regenerate Plan Generate…" without nowrap
+sloplint: 24 FAIL, 9 WARN across 56 file(s).

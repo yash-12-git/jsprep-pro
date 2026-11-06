@@ -44,7 +44,7 @@ export function WeekCard({ week, isDayDone, onToggleDay, defaultOpen = false }: 
         <span style={styles.weekTitleWrap}>
           <span style={styles.weekTitle}>{week.title}</span>
           {isComplete && (
-            <span style={styles.completeBadge}>✓ Complete</span>
+            <span style={styles.completeBadge}>Complete</span>
           )}
         </span>
 

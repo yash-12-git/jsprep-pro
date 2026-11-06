@@ -43,7 +43,7 @@ const companyStrip = css`
 `;
 const coBadge = css`
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   padding: 0.25rem 0.75rem;
   background: ${C.bgSubtle};
   border: 1px solid ${C.border};
@@ -139,7 +139,7 @@ export default function PolyfillLabClientPage({
               <div>
                 <h1 css={Shared.pageTitleText}>Polyfill Lab</h1>
                 <p css={Shared.pageSubtitleText}>
-                  Implement JavaScript built-ins from scratch —{" "}
+                  Implement JavaScript built-ins from scratch:{" "}
                   {questions.length} challenges. Array.map, Function.bind,
                   Promise.all, debounce, curry, EventEmitter and more.
                 </p>
@@ -161,11 +161,11 @@ export default function PolyfillLabClientPage({
               css={{
                 fontSize: "0.75rem",
                 color: C.muted,
-                fontWeight: 600,
+                fontWeight: 500,
                 whiteSpace: "nowrap",
               }}
             >
-              🏢 Asked at:
+              Asked at:
             </span>
             {COMPANIES.map((c) => (
               <span key={c} css={coBadge}>
@@ -221,14 +221,14 @@ export default function PolyfillLabClientPage({
           {!isPro && (
             <div css={Shared.proNudge}>
               <span>
-                🔒 First {FREE_LIMIT} challenges free —{" "}
+                First {FREE_LIMIT} challenges free,{" "}
                 {questions.length - FREE_LIMIT} more with Pro
               </span>
               <button
                 css={Shared.upgradeBtn}
                 onClick={() => setShowPaywall(true)}
               >
-                Unlock All {questions.length} →
+                Get all {questions.length}
               </button>
             </div>
           )}

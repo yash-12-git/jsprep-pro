@@ -25,7 +25,7 @@ import {
 const S = {
   heading: css`
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 500;
     margin-bottom: 0.375rem;
   `,
   sub: css`
@@ -54,8 +54,8 @@ const S = {
   statIcon: (color: string) => css`
     width: 2rem;
     height: 2rem;
-    background: ${color}14;
-    border: 1px solid ${color}30;
+    background: color-mix(in oklab, ${color} 8%, transparent);
+    border: 1px solid color-mix(in oklab, ${color} 19%, transparent);
     border-radius: ${RADIUS.md};
     display: flex;
     align-items: center;
@@ -65,16 +65,14 @@ const S = {
 
   statValue: (color: string) => css`
     font-size: 1.875rem;
-    font-weight: 900;
+    font-weight: 500;
     color: ${color};
   `,
 
   statLabel: css`
-    font-size: 0.6875rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: ${C.muted};
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
     margin-top: 0.125rem;
   `,
 
@@ -94,21 +92,21 @@ const S = {
     gap: 0.5rem;
     padding: 1.25rem;
     background: ${C.card};
-    border: 1px solid ${color}33;
+    border: 1px solid color-mix(in oklab, ${color} 20%, transparent);
     border-radius: ${RADIUS.xl};
     text-decoration: none;
     color: ${C.text};
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
     &:hover {
-      background: ${color}0d;
-      border-color: ${color}55;
+      background: color-mix(in oklab, ${color} 5%, transparent);
+      border-color: color-mix(in oklab, ${color} 33%, transparent);
       transform: translateY(-1px);
     }
   `,
 
   actionTitle: css`
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 500;
   `,
   actionDesc: css`
     font-size: 0.75rem;
@@ -117,7 +115,7 @@ const S = {
 
   sectionTitle: css`
     font-size: 1rem;
-    font-weight: 800;
+    font-weight: 500;
     margin-bottom: 1rem;
   `,
 };
@@ -287,18 +285,18 @@ export default function AdminPage() {
           <div css={S.actionTitle}>All Questions</div>
           <div css={S.actionDesc}>Edit, delete, publish, archive questions</div>
         </Link>
-        <Link href="/admin/seed" css={S.actionCard("rgba(255,255,255,0.2)")}>
-          <Users size={20} color="rgba(255,255,255,0.4)" />
+        <Link href="/admin/seed" css={S.actionCard("color-mix(in oklab, var(--color-ink) 20%, transparent)")}>
+          <Users size={20} color="color-mix(in oklab, var(--color-ink) 40%, transparent)" />
           <div css={S.actionTitle}>Seed Questions</div>
           <div css={S.actionDesc}>Migrate question .ts files to Firestore</div>
         </Link>
         <Link href="/admin/generate">
           {/* same card styling as existing cards */}
-          <Zap size={20} color="#f7c76a" />
+          <Zap size={20} color="var(--color-accent)" />
           <div>
             <p>Generate Questions</p>
             <p>
-              AI pipeline · dedup check · approve to publish. Also shows the
+              AI pipeline, dedup check, approve to publish. Also shows the
               cron pending queue.
             </p>
           </div>

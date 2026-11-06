@@ -49,7 +49,7 @@ export default function AnswerEvaluator({
       const data = await res.json();
       setResult(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
     } catch {
-      alert("Evaluation failed — try again");
+      alert("Evaluation failed, try again");
     } finally {
       setLoading(false);
     }
@@ -64,7 +64,7 @@ export default function AnswerEvaluator({
             <Target size={12} color={C.amber} />
           </div>
           <span css={S.headerTitle}>Answer Evaluator</span>
-          <span css={S.headerSub}>— Type your answer, get scored</span>
+          <span css={S.headerSub}>Type your answer, get scored</span>
         </div>
         <button css={S.closeBtn} onClick={onClose}>
           <X size={14} />
@@ -148,7 +148,7 @@ export default function AnswerEvaluator({
             {/* Strengths */}
             {result.strengths.length > 0 && (
               <div css={S.listSection(C.green)}>
-                <p css={S.listTitle(C.green)}>✓ What you got right</p>
+                <p css={S.listTitle(C.green)}>What you got right</p>
                 {result.strengths.map((s, i) => (
                   <div key={i} css={S.listItem}>
                     <span style={{ color: C.green, flexShrink: 0 }}>•</span>
@@ -161,7 +161,7 @@ export default function AnswerEvaluator({
             {/* Missing */}
             {result.missing.length > 0 && (
               <div css={S.listSection(C.red)}>
-                <p css={S.listTitle(C.red)}>✗ What you missed</p>
+                <p css={S.listTitle(C.red)}>What you missed</p>
                 {result.missing.map((m, i) => (
                   <div key={i} css={S.listItem}>
                     <span style={{ color: C.red, flexShrink: 0 }}>•</span>

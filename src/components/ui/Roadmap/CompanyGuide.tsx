@@ -17,7 +17,7 @@ const COMPANIES: Company[] = [
     lpa: "28–38 LPA",
     rounds: "4 rounds: JS internals → Machine coding → System design → HM",
     tags: ["JS internals", "Type coercion", "async patterns", "Machine coding", "Payment SD"],
-    tip: "They probe JS internals hard — closures, event loop, type coercion. Machine coding round is timed. System design often revolves around payment flows.",
+    tip: "They probe JS internals hard, closures, event loop, type coercion. Machine coding round is timed. System design often revolves around payment flows.",
     mockFocus: "Core JavaScript",
   },
   {
@@ -25,7 +25,7 @@ const COMPANIES: Company[] = [
     lpa: "30–45 LPA",
     rounds: "5 rounds: Deep JS → React → SD → Assignment → Culture",
     tags: ["Deep JS", "React internals", "Opinions", "Take-home", "Culture fit"],
-    tip: "CRED hires for opinions. They'll ask 'what do you think is broken about React'. You need a real answer — not agreement. Have strong technical takes.",
+    tip: "CRED hires for opinions. They'll ask 'what do you think is broken about React'. You need a real answer, not agreement. Have strong technical takes.",
     mockFocus: "React & State Management",
   },
   {
@@ -33,7 +33,7 @@ const COMPANIES: Company[] = [
     lpa: "25–35 LPA",
     rounds: "4 rounds: DSA → JS → React → System design",
     tags: ["DSA medium", "React hooks", "State management", "DP sometimes"],
-    tip: "Fintech focus. They care about performance on mobile and accessibility. DSA rounds are genuine — solve 100 Leetcode mediums before applying.",
+    tip: "Fintech focus. They care about performance on mobile and accessibility. DSA rounds are genuine, solve 100 Leetcode mediums before applying.",
     mockFocus: "React & State Management",
   },
   {
@@ -41,7 +41,7 @@ const COMPANIES: Company[] = [
     lpa: "25–35 LPA",
     rounds: "3 rounds: Machine coding (1h) → React → SD",
     tags: ["Machine coding", "Vanilla JS", "React", "Speed"],
-    tip: "Machine coding is the hardest round — they give you 1 hour to build a working UI. Build 10+ components before applying: cart, search, accordion, modal, tabs.",
+    tip: "Machine coding is the hardest round, they give you 1 hour to build a working UI. Build 10+ components before applying: cart, search, accordion, modal, tabs.",
     mockFocus: "Mixed (all topics)",
   },
   {
@@ -57,7 +57,7 @@ const COMPANIES: Company[] = [
     lpa: "25–40 LPA",
     rounds: "5 rounds: DSA ×3 → SD → HM",
     tags: ["DSA heavy", "LC medium-hard", "System design", "Scale"],
-    tip: "Most DSA-heavy of all. Solve 100+ Leetcode mediums before applying. System design focuses on scale (100M users) — frame every answer with scale in mind.",
+    tip: "Most DSA-heavy of all. Solve 100+ Leetcode mediums before applying. System design focuses on scale (100M users), frame every answer with scale in mind.",
     mockFocus: "Mixed (all topics)",
   },
   {
@@ -65,7 +65,7 @@ const COMPANIES: Company[] = [
     lpa: "25–35 LPA",
     rounds: "4 rounds: JS → React → System design → HM",
     tags: ["JS fundamentals", "React", "Offline-first", "Payment SD"],
-    tip: "Prep service worker + offline patterns — PhonePe runs in Bharat where connectivity is poor. Payment flow system design is a near-certain ask.",
+    tip: "Prep service worker + offline patterns, PhonePe runs in Bharat where connectivity is poor. Payment flow system design is a near-certain ask.",
     mockFocus: "Core JavaScript",
   },
   {
@@ -73,7 +73,7 @@ const COMPANIES: Company[] = [
     lpa: "35–55 LPA",
     rounds: "5 rounds: DSA ×2 → SD → Values → HM",
     tags: ["DSA medium-hard", "Collaboration SD", "STAR behavioral", "Values"],
-    tip: "Highest ceiling but hardest process. Values interviews are serious — read their 5 values and map each to a concrete story. DSA difficulty is LC hard level.",
+    tip: "Highest ceiling but hardest process. Values interviews are serious, read their 5 values and map each to a concrete story. DSA difficulty is LC hard level.",
     mockFocus: "System Design (Frontend)",
   },
 ];
@@ -130,18 +130,18 @@ export function CompanyGuide() {
           >
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-text)" }}>
+              <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--color-text)" }}>
                 {co.name}
               </span>
               <span
                 style={{
-                  fontSize: "11px",
+                  fontSize: "0.75rem",
                   padding: "2px 8px",
                   borderRadius: "99px",
                   background: "var(--color-ok-soft)",
                   color: "var(--color-ok)",
                   border: "0.5px solid var(--color-green-border)",
-                  fontWeight: 600,
+                  fontWeight: 500,
                   whiteSpace: "nowrap",
                   fontFamily: "var(--font-outlier)",
                 }}
@@ -163,7 +163,7 @@ export function CompanyGuide() {
                   <span
                     key={tag}
                     style={{
-                      fontSize: "10px",
+                      fontSize: "0.75rem",
                       padding: "2px 6px",
                       borderRadius: "99px",
                       background: c.bg,

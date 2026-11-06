@@ -87,7 +87,7 @@ export function useQuestions({
     } finally {
       setLoading(false);
     }
-  }, [type, track, trackContext, category, enabled]);
+  }, [type, activeTrack, category, enabled]);
 
   useEffect(() => {
     fetchQuestions();

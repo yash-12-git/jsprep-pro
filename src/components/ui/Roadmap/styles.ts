@@ -22,7 +22,7 @@ export const styles = {
   } as CSSProperties,
 
   statLabel: {
-    fontSize: "10px",
+    fontSize: "0.75rem",
     textTransform: "uppercase" as const,
     color: "var(--color-muted)",
     marginBottom: "8px",
@@ -31,7 +31,7 @@ export const styles = {
 
   statValue: {
     fontSize: "26px",
-    fontWeight: 600,
+    fontWeight: 500,
     color: "var(--color-text)",
     fontFamily: "var(--font-outlier)",
     lineHeight: 1,
@@ -82,7 +82,7 @@ export const styles = {
   } as CSSProperties,
 
   weekNum: {
-    fontSize: "10px",
+    fontSize: "0.75rem",
     fontFamily: "var(--font-outlier)",
     color: "var(--color-muted)",
     minWidth: "36px",
@@ -103,7 +103,7 @@ export const styles = {
   } as CSSProperties,
 
   completeBadge: {
-    fontSize: "10px",
+    fontSize: "0.75rem",
     padding: "2px 8px",
     borderRadius: "20px",
     background: "var(--color-green-subtle)",
@@ -113,7 +113,7 @@ export const styles = {
   } as CSSProperties,
 
   weekProgText: {
-    fontSize: "11px",
+    fontSize: "0.75rem",
     fontFamily: "var(--font-outlier)",
     color: "var(--color-muted)",
     minWidth: "32px",
@@ -162,12 +162,12 @@ export const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    transition: "all 0.15s",
+    transition: "background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s",
     padding: 0,
   } as CSSProperties,
 
   dayLabel: {
-    fontSize: "10px",
+    fontSize: "0.75rem",
     fontFamily: "var(--font-outlier)",
     color: "var(--color-muted)",
     marginBottom: "4px",
@@ -189,7 +189,7 @@ export const styles = {
   taskArrow: {
     color: "var(--color-muted)",
     fontFamily: "var(--font-outlier)",
-    fontSize: "11px",
+    fontSize: "0.75rem",
     flexShrink: 0,
     marginTop: "2px",
   } as CSSProperties,
@@ -215,7 +215,7 @@ export const styles = {
   } as CSSProperties,
 
   taskLinkIcon: {
-    fontSize: "10px",
+    fontSize: "0.75rem",
     opacity: 0.6,
     flexShrink: 0,
   } as CSSProperties,

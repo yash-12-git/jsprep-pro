@@ -26,7 +26,7 @@ export default function AIChat({ question, answer, onClose }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: `Hi! I'm your AI tutor for this question. Ask me anything — a simpler explanation, a real-world example, edge cases, or how this relates to React.`,
+      content: `Hi! I'm your AI tutor for this question. Ask me anything, a simpler explanation, a real-world example, edge cases, or how this relates to React.`,
     },
   ]);
   const [input, setInput] = useState("");
@@ -81,7 +81,7 @@ export default function AIChat({ question, answer, onClose }: Props) {
             <Sparkles size={12} color={C.accentText} />
           </div>
           <span css={S.headerTitle}>AI Tutor</span>
-          <span css={S.headerSub}>— Ask anything about this question</span>
+          <span css={S.headerSub}>Ask anything about this question</span>
         </div>
         <button css={S.closeBtn} onClick={onClose}>
           <X size={14} />
@@ -142,7 +142,7 @@ export default function AIChat({ question, answer, onClose }: Props) {
           onClick={sendMessage}
           disabled={!input.trim() || loading}
         >
-          <Send size={12} color="#ffffff" />
+          <Send size={12} color="var(--color-accent-ink)" />
         </button>
       </div>
     </div>

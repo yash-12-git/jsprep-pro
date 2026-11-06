@@ -50,7 +50,7 @@ export default function ManageSubscription() {
       setConfirming(false);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Could not cancel — try again.",
+        err instanceof Error ? err.message : "Could not cancel, try again.",
       );
     } finally {
       setBusy(false);
@@ -115,15 +115,13 @@ const row = css`
 
 const label = css`
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
 `;
 
 const status = (cancelled: boolean) => css`
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${cancelled ? C.amber : C.green};
 `;
 

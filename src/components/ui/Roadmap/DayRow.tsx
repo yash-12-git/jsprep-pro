@@ -103,7 +103,7 @@ export function DayRow({ day, isDone, onToggle }: DayRowProps) {
               <span
                 key={tag}
                 style={{
-                  fontSize: "10px",
+                  fontSize: "0.75rem",
                   padding: "1px 6px",
                   borderRadius: "99px",
                   background: ts.bg,
@@ -188,7 +188,7 @@ export function DayRow({ day, isDone, onToggle }: DayRowProps) {
               border: "1px solid var(--color-green-border)",
               background: "var(--color-ok-soft)",
               color: "var(--color-ok)",
-              fontSize: "11px",
+              fontSize: "0.75rem",
               fontWeight: 500,
               textDecoration: "none",
               fontFamily: "var(--font-outlier)",

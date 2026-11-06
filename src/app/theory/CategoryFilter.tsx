@@ -104,13 +104,13 @@ const S = {
     flex-shrink: 0;
     padding: 0.25rem 0.75rem;
     border-radius: 100px;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 500;
     border: 1px solid ${active ? activeColor : C.border};
     background: ${active ? C.accentSubtle : "transparent"};
     color: ${active ? activeColor : C.muted};
     cursor: pointer;
-    transition: all 0.12s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
     white-space: nowrap;
     &:hover {
       border-color: ${activeColor};
@@ -126,13 +126,13 @@ const S = {
     gap: 0.3rem;
     padding: 0.25rem 0.75rem;
     border-radius: 100px;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 500;
     border: 1px solid ${active ? C.amber : C.border};
     background: ${active ? C.amberSubtle : "transparent"};
     color: ${active ? C.amber : C.muted};
     cursor: pointer;
-    transition: all 0.12s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
     white-space: nowrap;
     &:hover {
       border-color: ${C.amber};
@@ -142,7 +142,7 @@ const S = {
   `,
 
   resultCount: css`
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     color: ${C.muted};
     margin-bottom: 0.875rem;
     display: flex;
@@ -152,7 +152,7 @@ const S = {
 
   activeCount: css`
     color: ${C.text};
-    font-weight: 600;
+    font-weight: 500;
   `,
 };
 
@@ -264,7 +264,7 @@ export default function CategoryFilter({
                     align-items: center;
                     gap: 0.2rem;
                     margin-left: 0.5rem;
-                    font-size: 0.6875rem;
+                    font-size: 0.75rem;
                     color: ${C.accent};
                     &:hover {
                       color: ${C.accentHover};

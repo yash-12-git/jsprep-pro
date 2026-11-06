@@ -10,9 +10,9 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 
 // ─── Rank medal colours — kept intentional (gold/silver/bronze are universal) ─
-const RANK_GOLD = "#b45309"; // amber-700 — dark enough on white
-const RANK_SILVER = "#6b7280"; // gray-500
-const RANK_BRONZE = "#92400e"; // amber-800
+const RANK_GOLD = C.accent; // amber-700, dark enough on white
+const RANK_SILVER = C.muted; // gray-500
+const RANK_BRONZE = C.muted; // amber-800
 
 function rankTextColor(rank: number): string {
   if (rank === 1) return RANK_GOLD;
@@ -53,12 +53,12 @@ const title = css`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
 `;
 
 const resetLabel = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
 `;
 
@@ -91,7 +91,7 @@ const rankBadge = (rank: number) => css`
   justify-content: center;
   flex-shrink: 0;
   font-size: ${rank <= 3 ? "0.875rem" : "0.6875rem"};
-  font-weight: 700;
+  font-weight: 500;
   background: ${rankBg(rank)};
   color: ${rankTextColor(rank)};
   border: 1px solid ${rank <= 3 ? rankBorder(rank) : C.border};
@@ -107,7 +107,7 @@ const avatar = css`
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.accentText};
   flex-shrink: 0;
   overflow: hidden;
@@ -135,9 +135,7 @@ const nameRow = css`
 
 const proBadge = css`
   font-size: 0.5rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: ${C.accentText};
   background: ${C.accentSubtle};
   border: 1px solid ${C.border};
@@ -146,7 +144,7 @@ const proBadge = css`
 `;
 
 const metaLine = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   margin-top: 1px;
   display: flex;
@@ -159,7 +157,7 @@ const xpBadge = css`
   align-items: center;
   gap: 0.25rem;
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.amber};
   flex-shrink: 0;
 `;
@@ -174,7 +172,7 @@ const emptyState = css`
 
 const emptyTitle = css`
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   margin-bottom: 0.375rem;
 `;
@@ -192,7 +190,7 @@ const ctaLink = css`
   background: ${C.accent};
   color: ${C.accentInk};
   border-radius: ${RADIUS.md};
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.8125rem;
   text-decoration: none;
   transition: opacity 0.12s ease;
@@ -220,13 +218,13 @@ const skeletonRow = css`
 
 const weekNote = css`
   text-align: center;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   margin-top: 0.625rem;
   line-height: 1.5;
 `;
 
-const RANK_EMOJI = ["🥇", "🥈", "🥉"];
+const RANK_EMOJI = ["", "", ""];
 
 function getNextMonday(): string {
   const d = new Date();
@@ -259,7 +257,7 @@ export default function Leaderboard({  entries }: Props) {
             Master questions to earn XP and claim your spot.
           </div>
           <Link href="/dashboard" css={ctaLink}>
-            Start earning XP →
+            Start earning XP
           </Link>
         </div>
       ) : (
@@ -310,7 +308,7 @@ export default function Leaderboard({  entries }: Props) {
                   {entry.weeklyXp}
                   <span
                     style={{
-                      fontSize: "0.625rem",
+                      fontSize: "0.75rem",
                       color: C.muted,
                       fontWeight: 500,
                     }}
@@ -325,7 +323,7 @@ export default function Leaderboard({  entries }: Props) {
       )}
 
       <div css={weekNote}>
-        XP earned: 10 per mastered question · 8 per output/debug solve · 5 per
+        XP earned: 10 per mastered question, 8 per output/debug solve, 5 per
         quiz correct
       </div>
     </div>

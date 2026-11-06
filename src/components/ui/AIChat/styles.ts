@@ -33,7 +33,7 @@ export const headerIcon = css`
 
 export const headerTitle = css`
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.accentText};
 `;
 
@@ -117,7 +117,7 @@ export const quickPrompts = css`
 
 export const promptChip = css`
   flex-shrink: 0;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 500;
   padding: 0.25rem 0.625rem;
   border-radius: 9999px;
@@ -125,7 +125,7 @@ export const promptChip = css`
   color: ${C.muted};
   background: none;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   white-space: nowrap;
   &:hover {
     border-color: ${C.accent};

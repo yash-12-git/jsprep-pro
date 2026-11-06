@@ -33,7 +33,7 @@ export const headerIcon = css`
 
 export const headerTitle = css`
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.amber};
 `;
 
@@ -75,7 +75,7 @@ export const evalBtn = css`
   background: ${C.accentSubtle};
   border: 1px solid ${C.border};
   color: ${C.accentText};
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.75rem;
   padding: 0.5625rem;
   border-radius: ${RADIUS.lg};
@@ -113,7 +113,7 @@ export const scoreLeft = css`
 
 export const scoreNum = (score: number) => css`
   font-size: 2.25rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1;
   letter-spacing: -0.03em;
   color: ${score >= 8
@@ -132,7 +132,7 @@ export const scoreDenom = css`
 
 export const gradeText = (grade: string) => css`
   font-size: 1.0625rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${["A", "B"].includes(grade)
     ? C.green
     : grade === "C"
@@ -180,7 +180,7 @@ export const listSection = (_color: string) => css`
 
 export const listTitle = (color: string) => css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${color};
   margin-bottom: 0.25rem;
 `;

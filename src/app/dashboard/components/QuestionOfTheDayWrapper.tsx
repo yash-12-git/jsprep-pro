@@ -17,8 +17,8 @@ function QOTDSkeleton() {
   return (
     <div
       style={{
-        background: "#f7f7f5",
-        border: "1px solid #e9e9e7",
+        background: "var(--color-paper-2)",
+        border: "1px solid var(--color-rule)",
         borderRadius: "0.75rem",
         padding: "1.25rem",
       }}
@@ -34,7 +34,7 @@ function QOTDSkeleton() {
             height: h,
             width: w,
             borderRadius: "0.375rem",
-            background: "#ebebea",
+            background: "var(--color-bg-active)",
             marginBottom: i < 2 ? "0.625rem" : 0,
             animation: "pulse 1.5s ease-in-out infinite",
           }}

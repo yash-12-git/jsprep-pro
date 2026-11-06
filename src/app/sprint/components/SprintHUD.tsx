@@ -14,8 +14,6 @@ const hud = css`
   top: 0;
   z-index: 50;
   background: ${C.bgSubtle};
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid ${C.border};
   padding: 0.625rem 1.375rem;
 `;
@@ -37,7 +35,7 @@ const scoreBox = css`
 
 const scoreValue = css`
   font-size: 1.375rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1;
   color: ${C.amber};
   letter-spacing: -0.02em;
@@ -51,7 +49,7 @@ const progressSection = css`
 const progressMeta = css`
   display: flex;
   justify-content: space-between;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   font-weight: 500;
   margin-bottom: 0.3125rem;
@@ -86,10 +84,9 @@ const timerBox = (urgent: boolean) => css`
 
 const timerText = (urgent: boolean) => css`
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   color: ${urgent ? C.red : C.text};
-  letter-spacing: 0.02em;
 `;
 
 const qBadge = css`

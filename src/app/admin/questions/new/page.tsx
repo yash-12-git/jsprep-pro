@@ -29,7 +29,7 @@ export default function NewQuestionPage() {
           <ArrowLeft size={15} /> All Questions
         </Link>
         <span style={{ color: C.border }}>/</span>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: C.text }}>Add Question</h1>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: C.text }}>Add Question</h1>
       </div>
 
       <QuestionForm mode="create" onSubmit={handleSubmit} />

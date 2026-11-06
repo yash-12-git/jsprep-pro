@@ -273,8 +273,8 @@ export default function DebugCard({
               >
                 <span
                   css={{
-                    fontSize: "0.625rem",
-                    fontWeight: 600,
+                    fontSize: "0.75rem",
+                    fontWeight: 500,
                     padding: "0.125rem 0.5rem",
                     borderRadius: "9999px",
                     border: `1px solid ${ds.border}`,
@@ -286,7 +286,7 @@ export default function DebugCard({
                 </span>
                 <span
                   css={{
-                    fontSize: "0.625rem",
+                    fontSize: "0.75rem",
                     fontWeight: 500,
                     padding: "0.125rem 0.5rem",
                     borderRadius: "9999px",
@@ -301,7 +301,7 @@ export default function DebugCard({
               </div>
               <p
                 css={{
-                  fontWeight: 600,
+                  fontWeight: 500,
                   fontSize: "0.875rem",
                   color: C.text,
                   lineHeight: 1.4,
@@ -342,11 +342,11 @@ export default function DebugCard({
                     css={{
                       fontSize: "0.875rem",
                       color: C.text,
-                      fontWeight: 600,
+                      fontWeight: 500,
                       marginBottom: "0.25rem",
                     }}
                   >
-                    Unlock debug questions
+                    Debug questions are on Pro
                   </p>
                   <p
                     css={{
@@ -356,7 +356,7 @@ export default function DebugCard({
                       lineHeight: 1.5,
                     }}
                   >
-                    Pro unlocks all {q.category} challenges.
+                    Pro includes all {q.category} challenges.
                   </p>
                 </div>
                 <button
@@ -372,7 +372,7 @@ export default function DebugCard({
               {q.bugDescription && (
                 <div css={{ padding: "0.75rem 1rem 0" }}>
                   <div css={bugBanner}>
-                    <span css={bugLabel}>🐛 Bug</span>
+                    <span css={bugLabel}>Bug</span>
                     <span css={bugText}>{q.bugDescription}</span>
                   </div>
                 </div>
@@ -521,7 +521,7 @@ export default function DebugCard({
                       <p
                         css={{
                           fontSize: "0.8125rem",
-                          fontWeight: 600,
+                          fontWeight: 500,
                           color: C.text,
                           marginBottom: "0.5rem",
                         }}
@@ -532,7 +532,7 @@ export default function DebugCard({
                     {feedback.whatTheyGotRight && (
                       <div css={S.feedbackRow}>
                         <p css={S.feedbackRowTitle(C.green)}>
-                          ✓ What you got right
+                          What you got right
                         </p>
                         <p css={S.feedbackRowText}>
                           {feedback.whatTheyGotRight}
@@ -542,7 +542,7 @@ export default function DebugCard({
                     {feedback.remainingIssues && (
                       <div css={S.feedbackRow}>
                         <p css={S.feedbackRowTitle(C.red)}>
-                          ⚠ Remaining issues
+                          Remaining issues
                         </p>
                         <p css={S.feedbackRowText}>
                           {feedback.remainingIssues}
@@ -552,7 +552,7 @@ export default function DebugCard({
                     {feedback.betterApproach && (
                       <div css={S.feedbackRow}>
                         <p css={S.feedbackRowTitle(C.accent)}>
-                          💡 Better approach
+                          Better approach
                         </p>
                         <p css={S.feedbackRowText}>{feedback.betterApproach}</p>
                       </div>
@@ -565,7 +565,7 @@ export default function DebugCard({
                 <div css={{ padding: "0 1rem 1rem" }}>
                   {q.fixedCode && (
                     <div css={S.explanationBox}>
-                      <p css={S.explanationTitle(C.green)}>✓ Fixed Code</p>
+                      <p css={S.explanationTitle(C.green)}>Fixed Code</p>
                       <div css={{ marginTop: "0.5rem" }}>
                         <CodeEditor
                           value={q.fixedCode}
@@ -577,7 +577,7 @@ export default function DebugCard({
                   )}
                   {q.explanation && (
                     <div css={[S.explanationBox, { marginTop: "0.75rem" }]}>
-                      <p css={S.explanationTitle(C.accent)}>💡 Explanation</p>
+                      <p css={S.explanationTitle(C.accent)}>Explanation</p>
                       <p css={S.explanationText}>{q.explanation}</p>
                     </div>
                   )}
@@ -603,7 +603,7 @@ const bugBanner = css`
 `;
 const bugLabel = css`
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.red};
   white-space: nowrap;
   margin-top: 1px;
@@ -623,10 +623,8 @@ const toolbarLabel = css`
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.muted};
   font-family: var(--font-outlier);
 `;
@@ -650,7 +648,7 @@ const tbBtn = css`
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
   &:hover:not(:disabled) {
     background: ${C.surface};
     border-color: ${C.borderHover};

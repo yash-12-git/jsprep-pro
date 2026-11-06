@@ -70,7 +70,7 @@ const triggerIcon = css`
 
 const triggerLabel = css`
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.amber};
   flex: 1;
 `;
@@ -113,7 +113,7 @@ const signInLink = css`
   color: ${C.accentInk};
   border-radius: ${RADIUS.md};
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
@@ -144,7 +144,7 @@ const proUpgradeBtn = css`
   color: ${C.accentInk};
   border-radius: ${RADIUS.md};
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   cursor: pointer;
   transition: opacity 0.12s ease;
@@ -191,9 +191,9 @@ const evalBtn = (active: boolean) => css`
   border: 1px solid ${active ? C.accent : C.border};
   cursor: ${active ? "pointer" : "default"};
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   background: ${active ? C.accent : C.bgSubtle};
-  color: ${active ? "#ffffff" : C.muted};
+  color: ${active ? C.accentInk : C.muted};
   transition: opacity 0.12s ease;
   &:hover {
     opacity: ${active ? 0.88 : 1};
@@ -217,7 +217,7 @@ const scoreRow = css`
 
 const scoreNum = (n: number) => css`
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1;
   letter-spacing: -0.03em;
   color: ${n >= 8 ? C.green : n >= 5 ? C.amber : C.red};
@@ -228,10 +228,9 @@ const scoreDenom = css`
   font-weight: 500;
 `;
 const gradeLabel = (g: string) => css`
-  font-size: 0.6875rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   margin-top: 3px;
-  letter-spacing: 0.04em;
   color: ${g === "A"
     ? C.green
     : g === "B"
@@ -260,10 +259,8 @@ const barFill = (n: number) => css`
 `;
 
 const feedHead = (c: string) => css`
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${c};
   margin: 0.625rem 0 0.375rem;
 `;
@@ -392,7 +389,7 @@ export default function InlineEvaluator({
               {!user
                 ? "Sign in to test your answer"
                 : !progress?.isPro
-                  ? "Pro feature — upgrade to unlock"
+                  ? "Pro feature, upgrade to unlock"
                   : "Type your answer, get scored 1–10"}
             </div>
           </div>
@@ -425,7 +422,7 @@ export default function InlineEvaluator({
               <div css={proGateBox}>
                 <p css={proGateText}>
                   AI Answer Evaluator is a Pro feature. Type your answer and get
-                  a 1–10 score, see exactly what you got right, what you missed,
+                  a 1 to 10 score, see exactly what you got right, what you missed,
                   and a better answer.
                 </p>
                 <button
@@ -451,7 +448,7 @@ export default function InlineEvaluator({
                     lineHeight: 1.5,
                   }}
                 >
-                  Answer as if you're in a real interview — don't look at the
+                  Answer as if you&apos;re in a real interview, don&apos;t look at the
                   answer above.
                 </p>
                 <textarea
@@ -504,7 +501,7 @@ export default function InlineEvaluator({
 
                 {result.strengths.length > 0 && (
                   <>
-                    <div css={feedHead(C.green)}>✓ What you got right</div>
+                    <div css={feedHead(C.green)}>What you got right</div>
                     {result.strengths.map((s, i) => (
                       <div key={i} css={feedItem}>
                         <span style={{ color: C.green, flexShrink: 0 }}>•</span>
@@ -515,7 +512,7 @@ export default function InlineEvaluator({
                 )}
                 {result.missing.length > 0 && (
                   <>
-                    <div css={feedHead(C.red)}>✗ What you missed</div>
+                    <div css={feedHead(C.red)}>What you missed</div>
                     {result.missing.map((m, i) => (
                       <div key={i} css={feedItem}>
                         <span style={{ color: C.red, flexShrink: 0 }}>•</span>

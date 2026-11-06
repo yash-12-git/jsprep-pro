@@ -30,7 +30,7 @@ export default async function LearnSection() {
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                fontWeight: 600,
+                fontWeight: 500,
               }}
             >
               <Layers size={15} color={C.green} />
@@ -41,7 +41,7 @@ export default async function LearnSection() {
               href={`/topics/${track}`}
               style={{ fontSize: "0.75rem", color: C.muted }}
             >
-              All topics →
+              All topics
             </Link>
           </div>
 
@@ -77,7 +77,7 @@ export default async function LearnSection() {
                     style={{
                       display: "flex",
                       gap: "6px",
-                      fontSize: "0.7rem",
+                      fontSize: "0.75rem",
                       marginTop: "4px",
                     }}
                   >
@@ -109,7 +109,7 @@ export default async function LearnSection() {
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                fontWeight: 600,
+                fontWeight: 500,
               }}
             >
               <Newspaper size={15} color={C.accent} />
@@ -117,7 +117,7 @@ export default async function LearnSection() {
             </div>
 
             <Link href={`/blog/${track}`} style={{ fontSize: "0.75rem", color: C.muted }}>
-              All posts →
+              All posts
             </Link>
           </div>
 
@@ -153,7 +153,7 @@ export default async function LearnSection() {
 
                   <div
                     style={{
-                      fontSize: "0.7rem",
+                      fontSize: "0.75rem",
                       color: C.muted,
                       marginTop: "2px",
                     }}

@@ -34,7 +34,7 @@ const S = {
   `,
   heading: css`
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 500;
   `,
   addBtn: css`
     display: flex;
@@ -45,7 +45,7 @@ const S = {
     border: none;
     border-radius: ${RADIUS.xl};
     color: ${C.accentInk};
-    font-weight: 800;
+    font-weight: 500;
     font-size: 0.875rem;
     text-decoration: none;
     cursor: pointer;
@@ -63,7 +63,7 @@ const S = {
     padding: 0.5rem 0.875rem;
     margin-bottom: 1rem;
     &:focus-within {
-      border-color: ${C.accent}55;
+      border-color: color-mix(in oklab, ${C.accent} 33%, transparent);
     }
   `,
   searchInput: css`
@@ -88,10 +88,8 @@ const S = {
   `,
   th: css`
     text-align: left;
-    font-size: 0.6875rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: ${C.muted};
     padding: 0.5rem 0.75rem;
     border-bottom: 1px solid ${C.border};
@@ -99,7 +97,7 @@ const S = {
   tr: css`
     border-bottom: 1px solid ${C.border};
     &:hover td {
-      background: rgba(255, 255, 255, 0.02);
+      background: color-mix(in oklab, var(--color-ink) 2%, transparent);
     }
   `,
   td: css`
@@ -112,12 +110,10 @@ const S = {
     align-items: center;
     padding: 0.125rem 0.5rem;
     border-radius: 0.25rem;
-    font-size: 0.5625rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    background: ${color}14;
-    border: 1px solid ${color}33;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: color-mix(in oklab, ${color} 8%, transparent);
+    border: 1px solid color-mix(in oklab, ${color} 20%, transparent);
     color: ${color};
   `,
   actions: css`
@@ -131,12 +127,12 @@ const S = {
     padding: 0.375rem;
     border-radius: ${RADIUS.sm};
     background: transparent;
-    border: 1px solid ${color}33;
+    border: 1px solid color-mix(in oklab, ${color} 20%, transparent);
     color: ${color};
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
     &:hover {
-      background: ${color}14;
+      background: color-mix(in oklab, ${color} 8%, transparent);
     }
   `,
   empty: css`
@@ -280,14 +276,14 @@ export default function AdminTopicsPage() {
                 <td css={S.td}>
                   <div
                     style={{
-                      fontWeight: 600,
+                      fontWeight: 500,
                       color: C.text,
                       marginBottom: "0.1875rem",
                     }}
                   >
                     {t.keyword}
                   </div>
-                  <div style={{ fontSize: "0.6875rem", color: C.muted }}>
+                  <div style={{ fontSize: "0.75rem", color: C.muted }}>
                     {t.slug}
                   </div>
                 </td>

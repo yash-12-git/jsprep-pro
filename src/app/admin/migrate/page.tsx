@@ -35,7 +35,7 @@ const S = {
 
   heading: css`
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 500;
     margin-bottom: 0.375rem;
   `,
 
@@ -66,8 +66,8 @@ const S = {
   cardIcon: (color: string) => css`
     width: 2.25rem;
     height: 2.25rem;
-    background: ${color}14;
-    border: 1px solid ${color}30;
+    background: color-mix(in oklab, ${color} 8%, transparent);
+    border: 1px solid color-mix(in oklab, ${color} 19%, transparent);
     border-radius: ${RADIUS.md};
     display: flex;
     align-items: center;
@@ -77,13 +77,13 @@ const S = {
 
   cardTitle: css`
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 0.25rem;
   `,
 
   cardCount: (color: string) => css`
     font-size: 1.875rem;
-    font-weight: 900;
+    font-weight: 500;
     color: ${color};
     line-height: 1;
     margin-bottom: 0.25rem;
@@ -101,10 +101,8 @@ const S = {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: 0.5625rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: ${C.accent3};
     background: ${C.accent3}14;
     border: 1px solid ${C.accent3}33;
@@ -135,14 +133,14 @@ const S = {
     border-radius: ${RADIUS.xl};
     padding: 1rem 1.25rem;
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 500;
     color: ${C.accent3};
     margin-bottom: 1.5rem;
   `,
 
   errorBox: css`
-    background: ${C.danger}0d;
-    border: 1px solid ${C.danger}33;
+    background: color-mix(in oklab, ${C.danger} 5%, transparent);
+    border: 1px solid color-mix(in oklab, ${C.danger} 20%, transparent);
     border-radius: ${RADIUS.xl};
     padding: 1rem 1.25rem;
     font-size: 0.8125rem;
@@ -152,9 +150,7 @@ const S = {
 
   sectionTitle: css`
     font-size: 0.75rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-weight: 500;
     color: ${C.muted};
     margin-bottom: 0.875rem;
   `,
@@ -168,10 +164,10 @@ const S = {
     border: none;
     border-radius: ${RADIUS.xl};
     color: ${C.text};
-    font-weight: 800;
+    font-weight: 500;
     font-size: 0.9375rem;
     cursor: ${loading ? "not-allowed" : "pointer"};
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
     &:hover {
       background: ${loading ? "" : C.accent + "ee"};
     }
@@ -179,7 +175,7 @@ const S = {
 
   log: css`
     margin-top: 1.5rem;
-    background: #0a0a10;
+    background: var(--color-paper-3);
     border: 1px solid ${C.border};
     border-radius: ${RADIUS.xl};
     padding: 1rem 1.25rem;
@@ -207,7 +203,7 @@ const S = {
   `,
 
   indexBox: css`
-    background: #0a0a10;
+    background: var(--color-paper-3);
     border: 1px solid ${C.border};
     border-radius: ${RADIUS.md};
     padding: 0.875rem 1rem;
@@ -584,7 +580,7 @@ export default function MigratePage() {
       </p>
 
       {/* ── SECTION A: JS Topics + Blog Posts ──────────────────────────────── */}
-      <div css={S.sectionTitle}>Section A — JavaScript Topics + Blog Posts</div>
+      <div css={S.sectionTitle}>Section A: JavaScript Topics + Blog Posts</div>
       <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
         Legacy migration. Run once. These are the 37 core JS topics and 12 blog posts
         from the original static data. If these are already in Firestore, skip this section.
@@ -662,7 +658,7 @@ export default function MigratePage() {
       <hr css={S.divider} />
 
       {/* ── SECTION B: React Topics ─────────────────────────────────────────── */}
-      <div css={S.sectionTitle}>Section B — React Topics (Full Concept Hub)</div>
+      <div css={S.sectionTitle}>Section B: React Topics (Full Concept Hub)</div>
       <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
         New React topics written with all 8 sections: Mental Model, Deep Explanation,
         Common Mistakes, Real-World Usage, Cheat Sheet, Interview Tips, Questions, and
@@ -737,7 +733,7 @@ export default function MigratePage() {
       <hr css={S.divider} />
 
       {/* ── SECTION C: React Blog Posts ─────────────────────────────────────── */}
-      <div css={S.sectionTitle}>Section C — React Blog Posts</div>
+      <div css={S.sectionTitle}>Section C: React Blog Posts</div>
       <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
         10 React interview blog posts (track: react). Seeded to <code style={{ color: C.accent3 }}>blog_posts</code> collection.
         After seeding, set <code style={{ color: C.accent3 }}>topicSlug</code> on each post via Admin → Blog.
@@ -808,7 +804,7 @@ export default function MigratePage() {
       <hr css={S.divider} />
 
       {/* ── SECTION D: TypeScript Topics ───────────────────────────────────── */}
-      <div css={S.sectionTitle}>Section D — TypeScript Topics (Full Concept Hub)</div>
+      <div css={S.sectionTitle}>Section D: TypeScript Topics (Full Concept Hub)</div>
       <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
         TypeScript topics with Mental Model, Deep Explanation, Cheat Sheet, and Interview Tips.
         Add topics to <code style={{ color: C.accent3 }}>src/data/seo/typescriptTopics.ts</code>,
@@ -816,12 +812,12 @@ export default function MigratePage() {
       </p>
 
       <div css={S.grid}>
-        <div css={S.card("#3178c6", !!done.tsTopics)}>
-          <div css={S.cardIcon("#3178c6")}>
-            <Layers size={16} color="#3178c6" />
+        <div css={S.card("var(--color-cool)", !!done.tsTopics)}>
+          <div css={S.cardIcon("var(--color-cool)")}>
+            <Layers size={16} color="var(--color-cool)" />
           </div>
           <div css={S.cardTitle}>TypeScript Topics</div>
-          <div css={S.cardCount("#3178c6")}>{TYPESCRIPT_TOPICS.length}</div>
+          <div css={S.cardCount("var(--color-cool)")}>{TYPESCRIPT_TOPICS.length}</div>
           <div css={S.cardMeta}>
             {TYPESCRIPT_TOPICS.map((t) => t.keyword).join(", ")}
           </div>
@@ -878,19 +874,19 @@ export default function MigratePage() {
       <hr css={S.divider} />
 
       {/* ── SECTION E: TypeScript Blog Posts ───────────────────────────────── */}
-      <div css={S.sectionTitle}>Section E — TypeScript Blog Posts</div>
+      <div css={S.sectionTitle}>Section E: TypeScript Blog Posts</div>
       <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
         10 TypeScript interview blog posts (track: typescript). After seeding, set{" "}
         <code style={{ color: C.accent3 }}>topicSlug</code> on each post via Admin → Blog.
       </p>
 
       <div css={S.grid}>
-        <div css={S.card("#3178c6", !!done.tsBlogs)}>
-          <div css={S.cardIcon("#3178c6")}>
-            <Newspaper size={16} color="#3178c6" />
+        <div css={S.card("var(--color-cool)", !!done.tsBlogs)}>
+          <div css={S.cardIcon("var(--color-cool)")}>
+            <Newspaper size={16} color="var(--color-cool)" />
           </div>
           <div css={S.cardTitle}>TypeScript Blog Posts</div>
-          <div css={S.cardCount("#3178c6")}>{TYPESCRIPT_BLOG_POSTS.length}</div>
+          <div css={S.cardCount("var(--color-cool)")}>{TYPESCRIPT_BLOG_POSTS.length}</div>
           <div css={S.cardMeta}>
             {TYPESCRIPT_BLOG_POSTS.map((p) => p.slug).join(", ")}
           </div>
@@ -947,17 +943,17 @@ export default function MigratePage() {
       <hr css={S.divider} />
 
       {/* ── Section F: System Design Topics ─────────────────────────────── */}
-      <div css={S.sectionTitle}>Section F — System Design Topics (Full Concept Hub)</div>
+      <div css={S.sectionTitle}>Section F: System Design Topics (Full Concept Hub)</div>
       <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
-        Seeds {SYSTEM_DESIGN_TOPICS.length} system design topics — Rendering Strategies, Microfrontends, Monorepo, Bundle Optimization, Caching, Auth, Security, State Management, Network Optimization, Core Web Vitals.
+        Seeds {SYSTEM_DESIGN_TOPICS.length} system design topics, Rendering Strategies, Microfrontends, Monorepo, Bundle Optimization, Caching, Auth, Security, State Management, Network Optimization, Core Web Vitals.
       </p>
       <div css={S.grid}>
-        <div css={S.card("#7c3aed", !!done.sdTopics)}>
-          <div css={S.cardIcon("#7c3aed")}>
-            <Layers size={16} color="#7c3aed" />
+        <div css={S.card("var(--color-cool)", !!done.sdTopics)}>
+          <div css={S.cardIcon("var(--color-cool)")}>
+            <Layers size={16} color="var(--color-cool)" />
           </div>
           <div css={S.cardTitle}>System Design Topics</div>
-          <div css={S.cardCount("#7c3aed")}>{SYSTEM_DESIGN_TOPICS.length}</div>
+          <div css={S.cardCount("var(--color-cool)")}>{SYSTEM_DESIGN_TOPICS.length}</div>
           <div css={S.cardMeta}>
             {SYSTEM_DESIGN_TOPICS.map((t) => t.keyword).join(", ")}
           </div>
@@ -998,17 +994,17 @@ export default function MigratePage() {
       <hr css={S.divider} />
 
       {/* ── Section G: System Design Blog Posts ─────────────────────────── */}
-      <div css={S.sectionTitle}>Section G — System Design Blog Posts</div>
+      <div css={S.sectionTitle}>Section G: System Design Blog Posts</div>
       <p style={{ fontSize: "0.8125rem", color: C.muted, marginBottom: "1rem", lineHeight: 1.6 }}>
         Seeds {SYSTEM_DESIGN_BLOG_POSTS.length} blog posts covering rendering strategies, microfrontends, JWT auth, frontend security, and monorepo architecture.
       </p>
       <div css={S.grid}>
-        <div css={S.card("#7c3aed", !!done.sdBlogs)}>
-          <div css={S.cardIcon("#7c3aed")}>
-            <Newspaper size={16} color="#7c3aed" />
+        <div css={S.card("var(--color-cool)", !!done.sdBlogs)}>
+          <div css={S.cardIcon("var(--color-cool)")}>
+            <Newspaper size={16} color="var(--color-cool)" />
           </div>
           <div css={S.cardTitle}>System Design Blog Posts</div>
-          <div css={S.cardCount("#7c3aed")}>{SYSTEM_DESIGN_BLOG_POSTS.length}</div>
+          <div css={S.cardCount("var(--color-cool)")}>{SYSTEM_DESIGN_BLOG_POSTS.length}</div>
           <div css={S.cardMeta}>
             {SYSTEM_DESIGN_BLOG_POSTS.map((p) => p.slug).join(", ")}
           </div>
@@ -1062,7 +1058,7 @@ export default function MigratePage() {
         {submittingIndexNow ? (
           <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Submitting…</>
         ) : (
-          <>📡 Submit React + TypeScript URLs to IndexNow ({REACT_TOPICS.length + REACT_BLOG_POSTS.length + TYPESCRIPT_TOPICS.length + TYPESCRIPT_BLOG_POSTS.length + 6} URLs)</>
+          <>Submit React + TypeScript URLs to IndexNow ({REACT_TOPICS.length + REACT_BLOG_POSTS.length + TYPESCRIPT_TOPICS.length + TYPESCRIPT_BLOG_POSTS.length + 6} URLs)</>
         )}
       </button>
       {indexNowLog.length > 0 && (

@@ -21,7 +21,6 @@
 import { C } from "@/styles/tokens";
 import { Suspense } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { getQuestions } from "@/lib/cachedQueries";
 import HomeClient from "./components/HomeClient";
 import LeaderboardWrapper from "./components/LeaderboardWrapper";
@@ -59,71 +58,18 @@ async function getQuestionTotals() {
 
 function SprintCTA() {
   return (
-    <div style={{
-      maxWidth: "46rem",
-      margin: "0 auto",
-      padding: "0 1.25rem 1.5rem",
-    }}>
-      <Link
-        href="/sprint"
-        style={{
-          display:        "flex",
-          alignItems:     "center",
-          justifyContent: "space-between",
-          gap:            "1rem",
-          padding:        "1rem 1.25rem",
-          background:     "var(--color-bg, #ffffff)",
-          border:         "1px solid var(--color-border, #e9e9e7)",
-          borderRadius:   "0.75rem",
-          textDecoration: "none",
-          transition:     "border-color 0.12s, background 0.12s",
-        }}
-        // Hover handled via global CSS below — inline styles can't do :hover
-        className="sprint-cta-card"
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.875rem" }}>
-          <span style={{ fontSize: "1.5rem", flexShrink: 0 }}>⚡</span>
-          <div>
-            <div style={{
-              fontSize:   "0.9375rem",
-              fontWeight: 600,
-              color:      "var(--color-text, #37352f)",
-            }}>
-              Take an Interview Sprint
-            </div>
-            <div style={{
-              fontSize:  "0.75rem",
-              color:     "var(--color-muted, #787774)",
-              marginTop: "1px",
-            }}>
-              Timed · mixed questions · AI scored · one number tells you if you&apos;re ready
-            </div>
-          </div>
-        </div>
-        <span style={{
-          display:       "inline-flex",
-          alignItems:    "center",
-          gap:           "0.375rem",
-          padding:       "0.4375rem 1rem",
-          borderRadius:  "0.5rem",
-          background:    "var(--color-accent, #2383e2)",
-          color: C.accentInk,
-          fontSize:      "0.8125rem",
-          fontWeight:    600,
-          flexShrink:    0,
-          whiteSpace:    "nowrap",
-        }}>
-          Start <ArrowRight size={13} />
+    <div style={{ maxWidth: "60rem", margin: "0 auto", padding: "0 var(--gutter) var(--space-lg)" }}>
+      <Link href="/sprint" className="doc-panel doc-panel__head" style={{ border: "1px solid var(--color-rule)", textDecoration: "none", alignItems: "center" }}>
+        <span>
+          <span className="doc-h3" style={{ display: "block" }}>
+            Take an Interview Sprint
+          </span>
+          <span className="doc-line">
+            Timed, mixed questions, AI scored, one number tells you
+          </span>
         </span>
+        <span className="btn btn--primary btn--small">Start</span>
       </Link>
-
-      {/* Scoped hover style — tiny, no runtime cost */}
-      <style>{`
-        .sprint-cta-card:hover {
-          border-color: var(--color-accent, #2383e2) !important;
-          background: var(--color-accent-subtle, #e8f1fb) !important;
-        }
-      `}</style>
     </div>
   );
 }
@@ -139,7 +85,7 @@ export default async function HomePage() {
       <HomeClient {...totals} />
 
       {/* Question of the Day — server component with 24hr cache */}
-      <div style={{ maxWidth: "46rem", margin: "0 auto", padding: "0 1.25rem 1.5rem" }}>
+      <div style={{ maxWidth: "60rem", margin: "0 auto", padding: "0 var(--gutter) 1.5rem" }}>
         <Suspense fallback={null}>
           <QuestionOfTheDay />
         </Suspense>
@@ -149,14 +95,14 @@ export default async function HomePage() {
       <SprintCTA />
 
       {/* Leaderboard mini — uses getWeeklyLeaderboardCached */}
-      <div style={{ maxWidth: "46rem", margin: "0 auto", padding: "0 1.25rem 1.5rem" }}>
+      <div style={{ maxWidth: "60rem", margin: "0 auto", padding: "0 var(--gutter) 1.5rem" }}>
         <Suspense fallback={null}>
           <LeaderboardWrapper />
         </Suspense>
       </div>
 
       {/* Learn section — topics + blog teasers */}
-      <div style={{ maxWidth: "46rem", margin: "0 auto", padding: "0 1.25rem 5rem" }}>
+      <div style={{ maxWidth: "60rem", margin: "0 auto", padding: "0 var(--gutter) 5rem" }}>
         <Suspense fallback={null}>
           <LearnSection />
         </Suspense>

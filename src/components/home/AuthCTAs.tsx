@@ -16,7 +16,7 @@ import { btnP, btnO, ctas, qotdBtn, lbCta } from "@/app/page.styles";
 export function HeroCTAs() {
   const { user } = useAuth();
   const ctaHref = user ? "/dashboard" : "/auth";
-  const ctaLabel = user ? "Go to Dashboard" : "Start Free — No Card Needed";
+  const ctaLabel = user ? "Go to Dashboard" : "Start free, no card needed";
 
   return (
     <div css={ctas}>
@@ -51,7 +51,7 @@ export function SprintStartBtn({
       <Link href={user ? "/sprint" : "/auth"} css={sprintStartBtn}>
         <Zap size={16} /> Start Your Sprint <ArrowRight size={14} />
       </Link>
-      <span css={sprintCTASub}>Free 5-question warmup — no card needed</span>
+      <span css={sprintCTASub}>Free 5-question warmup, no card needed</span>
     </div>
   );
 }
@@ -61,7 +61,7 @@ export function QOTDBtn() {
   const { user } = useAuth();
   return (
     <Link href={user ? "/dashboard" : "/auth"} css={qotdBtn}>
-      <Calendar size={14} /> Try today's question
+      <Calendar size={14} /> Try today&apos;s question
     </Link>
   );
 }
@@ -71,7 +71,7 @@ export function LeaderboardCTA() {
   const { user } = useAuth();
   return (
     <Link href={user ? "/dashboard" : "/auth"} css={lbCta}>
-      Join the leaderboard — earn XP →
+      Join the leaderboard, earn XP
     </Link>
   );
 }
@@ -90,7 +90,7 @@ export function FreeTierBtn({ pBtnF }: { pBtnF: any }) {
 // ── Bottom CTA ────────────────────────────────────────────────────────────────
 export function BottomCTA({ btnP: btnPStyle }: { btnP: any }) {
   const { user } = useAuth();
-  const ctaLabel = user ? "Go to Dashboard" : "Start Free — No Card Needed";
+  const ctaLabel = user ? "Go to Dashboard" : "Start free, no card needed";
   return (
     <Link
       href={user ? "/dashboard" : "/auth"}

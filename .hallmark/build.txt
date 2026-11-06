@@ -1,0 +1,112 @@
+  ▲ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+ ⚠ Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/753) ...
+   Generating static pages (188/753) 
+   Generating static pages (376/753) 
+   Generating static pages (564/753) 
+ ✓ Generating static pages (753/753)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                                              Size     First Load JS
+┌ ƒ /                                                                                    12.4 kB         232 kB
+├ ○ /_not-found                                                                          876 B          88.3 kB
+├ ● /[topic]                                                                             3.69 kB         244 kB
+├   ├ /react-usestate-interview-questions
+├   ├ /javascript-memoization-interview-questions
+├   ├ /react-usecallback-interview-questions
+├   └ [+80 more paths]
+├ ƒ /[topic]/opengraph-image                                                             0 B                0 B
+├ ○ /admin                                                                               2.51 kB         219 kB
+├ ○ /admin/blog                                                                          5.63 kB         219 kB
+├ ƒ /admin/blog/[id]                                                                     792 B           225 kB
+├ ○ /admin/blog/new                                                                      1.89 kB         227 kB
+├ ○ /admin/generate                                                                      7.93 kB         205 kB
+├ ○ /admin/migrate                                                                       184 kB          389 kB
+├ ○ /admin/questions                                                                     5.77 kB         219 kB
+├ ƒ /admin/questions/[id]                                                                1.12 kB         228 kB
+├ ○ /admin/questions/new                                                                 623 B           227 kB
+├ ○ /admin/seed                                                                          138 kB          343 kB
+├ ○ /admin/tag-questions                                                                 7.48 kB         212 kB
+├ ○ /admin/topics                                                                        5.25 kB         219 kB
+├ ƒ /admin/topics/[id]                                                                   826 B           223 kB
+├ ○ /admin/topics/new                                                                    882 B           223 kB
+├ ƒ /analytics                                                                           14.3 kB         228 kB
+├ ƒ /api/ai                                                                              0 B                0 B
+├ ƒ /api/cancel-subscription                                                             0 B                0 B
+├ ƒ /api/create-subscription                                                             0 B                0 B
+├ ƒ /api/cron                                                                            0 B                0 B
+├ ƒ /api/embed                                                                           0 B                0 B
+├ ƒ /api/embeddings                                                                      0 B                0 B
+├ ƒ /api/generate                                                                        0 B                0 B
+├ ƒ /api/indexnow                                                                        0 B                0 B
+├ ƒ /api/pricing                                                                         0 B                0 B
+├ ƒ /api/razorpay/webhook                                                                0 B                0 B
+├ ƒ /api/verify-payment                                                                  0 B                0 B
+├ ○ /apple-icon.png                                                                      0 B                0 B
+├ ○ /auth                                                                                3.36 kB         208 kB
+├ ƒ /blog                                                                                147 B          87.5 kB
+├ ● /blog/[track]                                                                        187 B          96.3 kB
+├   ├ /blog/javascript
+├   ├ /blog/react
+├   ├ /blog/typescript
+├   └ /blog/system-design
+├ ● /blog/[track]/[slug]                                                                 187 B          96.3 kB
+├   ├ /blog/javascript/rag-powered-interview-platform
+├   ├ /blog/system-design/monorepo-turborepo-vs-nx
+├   ├ /blog/javascript/map-vs-foreach-in-javascript-which-one-to-use-and-why-it-matters
+├   └ [+41 more paths]
+├ ƒ /cheatsheet                                                                          4.53 kB         219 kB
+├ ƒ /dashboard                                                                           10.8 kB         232 kB
+├ ƒ /debug-lab                                                                           1.64 kB         239 kB
+├ ○ /icon.png                                                                            0 B                0 B
+├ ○ /javascript-interview-cheatsheet                                                     677 B          96.8 kB
+├ ƒ /javascript-interview-questions                                                      1.07 kB        97.2 kB
+├ ƒ /javascript-output-questions                                                         153 B           211 kB
+├ ƒ /javascript-tricky-questions                                                         154 B           211 kB
+├ ƒ /mock-interview                                                                      31.3 kB         246 kB
+├ ƒ /opengraph-image                                                                     0 B                0 B
+├ ƒ /output-quiz                                                                         1.66 kB         239 kB
+├ ƒ /polyfill-lab                                                                        5.01 kB         230 kB
+├ ● /q/[slug]                                                                            161 B           225 kB
+├   ├ /q/sd-6001-what-is-the-difference-between-csr-ssr-ssg-and-isr
+├   ├ /q/output-3001-stale-closure-in-setinterval-count-never
+├   ├ /q/what-is-the-difference-between-var-let-and-const
+├   └ [+526 more paths]
+├ ● /questions/[slug]                                                                    161 B           225 kB
+├   ├ /questions/rendering-strategies
+├   ├ /questions/core-js
+├   ├ /questions/type-system
+├   └ [+33 more paths]
+├ ○ /react-interview-cheatsheet                                                          677 B          96.8 kB
+├ ○ /react-interview-questions                                                           1.07 kB        97.2 kB
+├ ○ /roadmap                                                                             16.3 kB         112 kB
+├ ○ /robots.txt                                                                          0 B                0 B
+├ ○ /sitemap.xml                                                                         0 B                0 B
+├ ƒ /sprint                                                                              20.9 kB         232 kB
+├ ƒ /study-plan                                                                          5.1 kB          222 kB
+├ ○ /system-design-interview-questions                                                   1.07 kB        97.2 kB
+├ ƒ /theory                                                                              3.44 kB         241 kB
+├ ƒ /topics                                                                              147 B          87.5 kB
+├ ● /topics/[track]                                                                      187 B          96.3 kB
+├   ├ /topics/javascript
+├   ├ /topics/react
+├   ├ /topics/typescript
+├   └ /topics/system-design
+└ ○ /typescript-interview-questions                                                      1.07 kB        97.2 kB
++ First Load JS shared by all                                                            87.4 kB
+  ├ chunks/0bb29a85-15075e12c2c829f4.js                                                  53.6 kB
+  ├ chunks/8847-fbda9512b6899be2.js                                                      31.7 kB
+  └ other shared chunks (total)                                                          2.06 kB
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses getStaticProps)
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -17,7 +17,6 @@ const card = css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   overflow: hidden;
-  animation: ${fadeIn} 0.3s ease;
 `;
 
 const body = css`
@@ -28,10 +27,8 @@ const typeTag = css`
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.red};
   background: ${C.redSubtle};
   border: 1px solid ${C.redBorder};
@@ -41,7 +38,7 @@ const typeTag = css`
 
 const title = css`
   font-size: 1.0625rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   line-height: 1.45;
   margin: 0.875rem 0 0.375rem;
@@ -56,10 +53,8 @@ const hint = css`
 `;
 
 const label = (color: string = C.muted) => css`
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${color};
   margin-bottom: 0.4rem;
 `;
@@ -110,7 +105,6 @@ const compRow = css`
   grid-template-columns: 1fr 1fr;
   gap: 0.875rem;
   margin-bottom: 1rem;
-  animation: ${fadeIn} 0.3s ease;
   @media (max-width: 520px) {
     grid-template-columns: 1fr;
   }
@@ -118,7 +112,7 @@ const compRow = css`
 
 const compPanel = (color: string, bg: string) => css`
   background: ${bg};
-  border: 1px solid ${color}30;
+  border: 1px solid color-mix(in oklab, ${color} 19%, transparent);
   border-radius: ${RADIUS.lg};
   padding: 0.875rem 1rem;
 `;
@@ -142,7 +136,6 @@ const bugNote = css`
   color: ${C.text};
   line-height: 1.6;
   margin-bottom: 1rem;
-  animation: ${fadeIn} 0.3s ease;
 `;
 
 const divider = css`
@@ -166,11 +159,11 @@ const submitBtn = (disabled: boolean) => css`
   padding: 0.5625rem 1.25rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: ${disabled ? "not-allowed" : "pointer"};
   background: ${disabled ? C.bgSubtle : C.accent};
   border: 1px solid ${disabled ? C.border : C.accent};
-  color: ${disabled ? C.muted : "#ffffff"};
+  color: ${disabled ? C.muted : C.accentInk};
   transition: opacity 0.12s ease;
   ${!disabled ? "&:hover{ opacity: 0.88; }" : ""}
 `;
@@ -187,7 +180,7 @@ const ghostBtn = css`
   background: transparent;
   border: 1px solid ${C.border};
   color: ${C.muted};
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     border-color: ${C.borderStrong};
     color: ${C.text};
@@ -201,7 +194,6 @@ const selfMarkRow = css`
   flex-wrap: wrap;
   padding: 0.875rem 1.375rem;
   border-top: 1px solid ${C.border};
-  animation: ${fadeIn} 0.25s ease;
 `;
 
 const selfMarkLabel = css`
@@ -218,7 +210,7 @@ const gotItBtn = css`
   padding: 0.5rem 1rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: ${C.greenSubtle};
   border: 1px solid ${C.greenBorder};
@@ -236,7 +228,7 @@ const missedItBtn = css`
   padding: 0.5rem 1rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: ${C.redSubtle};
   border: 1px solid ${C.redBorder};
@@ -254,7 +246,7 @@ const nextBtn = css`
   padding: 0.5625rem 1.375rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: ${C.accent};
   border: none;
@@ -276,9 +268,8 @@ const resultBanner = (outcome: "correct" | "attempted") => css`
   background: ${outcome === "correct" ? C.greenSubtle : C.redSubtle};
   border-top: 1px solid ${outcome === "correct" ? C.greenBorder : C.redBorder};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${outcome === "correct" ? C.green : C.red};
-  animation: ${fadeIn} 0.2s ease;
 `;
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -319,19 +310,19 @@ export default function DebugSprintCard({ q, onComplete }: Props) {
   return (
     <div css={card}>
       <div css={body}>
-        <div css={typeTag}>🐛 Debug</div>
+        <div css={typeTag}>Debug</div>
         <p css={title}>{q.title || "Find and fix the bug"}</p>
         <p css={hint}>
           {phase === "editing"
             ? "Edit the code below to fix the bug. When you're done, click Submit Fix."
-            : "Compare your fix to the correct solution — then self-mark."}
+            : "Compare your fix to the correct solution, then self-mark."}
         </p>
 
         {phase === "editing" && (
           <>
-            <div css={label(C.red)}>🔴 Buggy Code</div>
+            <div css={label(C.red)}>Buggy Code</div>
             <pre css={codeBlock}>{brokenCode}</pre>
-            <div css={label(C.accentText)}>✏️ Your Fix</div>
+            <div css={label(C.accentText)}>Your Fix</div>
             <textarea
               css={textarea("idle")}
               value={userCode}
@@ -377,7 +368,7 @@ export default function DebugSprintCard({ q, onComplete }: Props) {
               </div>
               <div css={compPanel(C.green, C.greenSubtle)}>
                 <div css={label(C.green)} style={{ marginBottom: "0.5rem" }}>
-                  ✅ Correct fix
+                  Correct fix
                 </div>
                 <pre css={compPre}>
                   {fixedCode || "No fixed code available"}
@@ -406,7 +397,7 @@ export default function DebugSprintCard({ q, onComplete }: Props) {
           <div css={actionsRow}>
             <div />
             <button css={nextBtn} onClick={() => onComplete(finalOutcome)}>
-              Next →
+              Next
             </button>
           </div>
         </>

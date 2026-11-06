@@ -43,7 +43,7 @@ interface EvalResult {
 
 interface Props {
   question: Question;
-  storageKey: string; // e.g. "qotd_done_20015" — passed from server
+  storageKey: string; // e.g. "qotd_done_20015", passed from server
   formattedDate: string; // e.g. "Sunday, March 22, 2026"
 }
 
@@ -104,10 +104,8 @@ const pill = css`
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.accentText};
   background: ${C.accentSubtle};
   border: 1px solid ${C.border};
@@ -122,7 +120,7 @@ const pillDone = css`
 `;
 
 const dateLabel = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   margin-left: auto;
 `;
@@ -133,7 +131,7 @@ const qWrap = css`
 
 const qText = css`
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   line-height: 1.45;
   margin-bottom: 0.5rem;
@@ -144,9 +142,7 @@ const diffBadge = (color: string, bg: string, border: string) => css`
   display: inline-flex;
   align-items: center;
   font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-weight: 500;
   color: ${color};
   background: ${bg};
   border: 1px solid ${border};
@@ -156,7 +152,7 @@ const diffBadge = (color: string, bg: string, border: string) => css`
 `;
 
 const catBadge = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   font-weight: 500;
 `;
@@ -181,7 +177,7 @@ const revealBtn = css`
   background: transparent;
   border: 1px solid ${C.border};
   color: ${C.muted};
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     border-color: ${C.borderStrong};
     color: ${C.text};
@@ -261,7 +257,7 @@ const answerBody = css`
   }
   strong {
     color: ${C.text};
-    font-weight: 600;
+    font-weight: 500;
   }
   pre {
     background: ${C.codeBg};
@@ -293,10 +289,8 @@ const evalWrap = css`
 
 const evalLabel = css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.accentText};
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   margin-bottom: 0.625rem;
   display: flex;
   align-items: center;
@@ -337,9 +331,9 @@ const submitBtn = (active: boolean) => css`
   padding: 0.5rem 1rem;
   border-radius: ${RADIUS.md};
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   background: ${active ? C.accent : C.bgSubtle};
-  color: ${active ? "#ffffff" : C.muted};
+  color: ${active ? C.accentInk : C.muted};
   border: 1px solid ${active ? C.accent : C.border};
   cursor: ${active ? "pointer" : "default"};
   transition: opacity 0.12s;
@@ -361,7 +355,7 @@ const scoreCard = css`
 
 const scoreNum = (n: number) => css`
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1;
   letter-spacing: -0.03em;
   color: ${n >= 8 ? C.green : n >= 6 ? C.amber : C.red};
@@ -375,7 +369,7 @@ const scoreDenom = css`
 
 const gradeText = (g: string) => css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   margin-top: 0.25rem;
   color: ${g === "A"
     ? C.green
@@ -410,12 +404,10 @@ const feedSection = css`
   margin-top: 0.75rem;
 `;
 const feedTitle = (c: string) => css`
-  font-size: 0.6875rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${c};
   margin-bottom: 0.375rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 `;
 const feedItem = css`
   display: flex;
@@ -596,7 +588,7 @@ export default function QOTDInteractive({
                 rows={5}
                 value={userAnswer}
                 onChange={(e) => setUserAnswer(e.target.value)}
-                placeholder="Type your answer here — explain it in your own words..."
+                placeholder="Type your answer here, explain it in your own words..."
               />
               <button
                 css={submitBtn(!!userAnswer.trim() && !loading)}
@@ -638,7 +630,7 @@ export default function QOTDInteractive({
 
               {result.strengths.length > 0 && (
                 <div css={feedSection}>
-                  <div css={feedTitle(C.green)}>✓ Got right</div>
+                  <div css={feedTitle(C.green)}>Got right</div>
                   {result.strengths.map((s, i) => (
                     <div key={i} css={feedItem}>
                       <span style={{ color: C.green, flexShrink: 0 }}>•</span>
@@ -650,7 +642,7 @@ export default function QOTDInteractive({
 
               {result.missing.length > 0 && (
                 <div css={feedSection}>
-                  <div css={feedTitle(C.red)}>✗ Missed</div>
+                  <div css={feedTitle(C.red)}>Missed</div>
                   {result.missing.map((m, i) => (
                     <div key={i} css={feedItem}>
                       <span style={{ color: C.red, flexShrink: 0 }}>•</span>
@@ -722,7 +714,7 @@ export default function QOTDInteractive({
       {/* Full answer reveal */}
       {answerOpen && (
         <div css={answerSection}>
-          {q.hint && <div css={hintBox}>💡 {q.hint}</div>}
+          {q.hint && <div css={hintBox}>{q.hint}</div>}
           <div
             css={answerBody}
             dangerouslySetInnerHTML={{ __html: q.answer ?? "" }}

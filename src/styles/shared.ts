@@ -84,7 +84,7 @@ export const categoryChip = (
   background: ${active ? C.accentSubtle : "transparent"};
   color: ${active ? activeColor : C.muted};
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     border-color: ${activeColor};
     color: ${activeColor};
@@ -112,26 +112,24 @@ export const diffBadge = (level: "easy" | "medium" | "hard") => {
   };
   const t = map[level];
   return css`
-    font-size: 0.625rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 500;
     padding: 0.125rem 0.5rem;
     border-radius: 9999px;
     border: 1px solid ${t.border};
     background: ${t.bg};
     color: ${t.color};
-    letter-spacing: 0.02em;
   `;
 };
 
 export const proBadgeSmall = css`
   font-size: 0.5rem;
-  font-weight: 700;
+  font-weight: 500;
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
   background: ${C.amberSubtle};
   color: ${C.amber};
   border: 1px solid ${C.amberBorder};
-  letter-spacing: 0.04em;
 `;
 
 export const iconBox = (color: string, size = "2.25rem") => css`
@@ -159,10 +157,8 @@ export const infoBox = (color: string) => css`
 `;
 
 export const sectionLabel = (color = C.accent) => css`
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${color};
 `;
 
@@ -178,7 +174,7 @@ export const actionBtn = (color: string, active = false) => css`
   background: ${active ? C.accentSubtle : "transparent"};
   color: ${active ? color : C.muted};
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     border-color: ${color};
     color: ${color};
@@ -229,7 +225,7 @@ export const ghostBtn = css`
   color: ${C.muted};
   background: transparent;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     color: ${C.text};
     border-color: ${C.borderStrong};
@@ -273,7 +269,7 @@ export const codeBlock = (borderColor: string = C.border) => css`
   border-radius: ${RADIUS.lg};
   padding: 1rem;
   font-family: var(--font-outlier);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.codeText};
   overflow: auto;
   line-height: 1.75;
@@ -299,7 +295,7 @@ export const pageHeaderTop = css`
 
 export const pageTitleText = css`
   font-size: 1.375rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
 `;
@@ -319,7 +315,7 @@ export const pageProgressRow = css`
 
 export const pageProgressCount = (color: string = C.accent) => css`
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${color};
   white-space: nowrap;
 `;
@@ -338,18 +334,16 @@ export const statCard = css`
 
 export const statNum = (color: string) => css`
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${color};
   margin-bottom: 0.25rem;
   letter-spacing: -0.02em;
 `;
 
 export const statLabel = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 `;
 
 export const proNudge = css`
@@ -364,7 +358,7 @@ export const proNudge = css`
   border-radius: 0.75rem;
   font-size: 0.875rem;
   color: ${C.amber};
-  font-weight: 600;
+  font-weight: 500;
   flex-wrap: wrap;
 `;
 export const upgradeBtn = css`
@@ -373,7 +367,7 @@ export const upgradeBtn = css`
   color: ${C.accentInk};
   border: none;
   border-radius: 0.5rem;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
   white-space: nowrap;

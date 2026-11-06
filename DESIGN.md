@@ -33,5 +33,8 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
 ## Motion
 - Character: still. No reveals or hover lifts; a value changes when its source does. Under reduced motion everything ends at once.
 
+## App screens
+- Logged-in tools keep their own shell. Progress and scores are cool, mono and tabular; no load-in reveals; tables and ledgers before cards.
+
 ## Exports
 `src/app/tokens.css` in this project. Tailwind, DTCG or shadcn blocks are added here on request, per `export-formats.md`.

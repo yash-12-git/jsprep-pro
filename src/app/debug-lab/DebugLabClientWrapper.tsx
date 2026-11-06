@@ -170,14 +170,14 @@ export default function DebugLabClientPage({
           {!progress?.isPro && (
             <div css={Shared.proNudge}>
               <span>
-                🔒 First {FREE_DEBUG_LIMIT} challenges free —{" "}
+                First {FREE_DEBUG_LIMIT} challenges free,{" "}
                 {questions.length - FREE_DEBUG_LIMIT} more with Pro
               </span>
               <button
                 css={Shared.upgradeBtn}
                 onClick={() => setShowPaywall(true)}
               >
-                Unlock All {questions.length} →
+                Get all {questions.length}
               </button>
             </div>
           )}

@@ -92,11 +92,11 @@ export const BP = {
 // ─── Border radius ────────────────────────────────────────────────────────────
 export const RADIUS = {
   none: "0",
-  sm:   "0.375rem",
-  md:   "0.5rem",
-  lg:   "0.75rem",
-  xl:   "1rem",
-  xxl:  "1.25rem",
+  sm:   "4px",
+  md:   "var(--radius-pill)",
+  lg:   "var(--radius-card)",
+  xl:   "var(--radius-card)",
+  xxl:  "var(--radius-card)",
   full: "9999px",
 } as const;
 

@@ -21,10 +21,10 @@
 
 import { useMemo } from "react";
 import { css } from "@emotion/react";
-import { ArrowRight, Zap, BarChart2 } from "lucide-react";
+import { BarChart2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
-import { C, RADIUS } from "@/styles/tokens";
+import { C } from "@/styles/tokens";
 import ManageSubscription from "@/components/ui/ManageSubscription";
 import Link from "next/link";
 
@@ -65,15 +65,15 @@ function getMotivation(
   if (pct < 80) return "Top tier of prepared candidates. Keep the pressure on.";
   if (pct < 100)
     return "One more push. You're within striking distance of fully ready.";
-  return "Everything mastered. Go get that offer. 🎯";
+  return "Everything mastered. Go get that offer.";
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const page = css`
-  max-width: 46rem;
+  max-width: 60rem;
   margin: 0 auto;
-  padding: 2rem 1.25rem 0;
+  padding: var(--space-xl) var(--gutter) 0;
 `;
 
 const greetRow = css`
@@ -91,7 +91,7 @@ const greetLeft = css`
 
 const greetName = css`
   font-size: clamp(1.25rem, 4vw, 1.625rem);
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -119,129 +119,115 @@ const chip = (color: string, bg: string, border: string) => css`
   gap: 3px;
   padding: 3px 9px;
   border-radius: 9999px;
-  font-size: 0.6875rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${color};
   background: ${bg};
   border: 1px solid ${border};
 `;
 
 const modesSection = css`
-  margin-bottom: 1.5rem;
+  margin-block: var(--space-xl) var(--space-lg);
 `;
 
 const modesHeader = css`
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 0.625rem;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
 `;
 
 const modesTitle = css`
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: ${C.muted};
+  font-size: var(--text-lg);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: ${C.text};
 `;
 
 const analyticsLink = css`
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: ${C.accentText};
-  text-decoration: none;
-  transition: color 0.12s;
-  &:hover {
-    color: ${C.accent};
-  }
-`;
-
-const modesGrid = css`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-  @media (max-width: 540px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
-
-const modeCard = (color: string, bg: string) => css`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.875rem 0.875rem 0.75rem;
-  background: ${C.bg};
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.lg};
-  text-decoration: none;
-  transition:
-    border-color 0.12s,
-    background 0.12s;
-  &:hover {
-    border-color: ${color};
-    background: ${bg};
-  }
-`;
-
-const modeIconRow = css`
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  margin-bottom: 0.25rem;
-`;
-const modeIcon = css`
-  font-size: 0.9375rem;
-`;
-
-const modeLabel = (color: string) => css`
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: ${color};
-`;
-
-const modeCount = css`
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: ${C.text};
-  letter-spacing: -0.02em;
-  line-height: 1;
-`;
-
-const modeFrac = css`
-  font-size: 0.6875rem;
+  gap: var(--space-2xs);
+  min-height: 32px;
+  font-size: var(--text-sm);
   color: ${C.muted};
-  font-weight: 400;
+  text-decoration: none;
+  transition: color var(--dur-short) var(--ease-out);
+  &:hover {
+    color: ${C.text};
+  }
 `;
 
-const modeBar = css`
-  height: 3px;
-  background: ${C.border};
-  border-radius: 9999px;
+const ledger = css`
+  background: ${C.bgSubtle};
+  border: 1px solid ${C.border};
+  border-radius: var(--radius-card);
   overflow: hidden;
-  margin-top: 5px;
 `;
 
-const modeBarFill = (pct: number, color: string) => css`
-  height: 100%;
-  width: ${Math.min(pct, 100)}%;
-  background: ${color};
-  border-radius: 9999px;
-  transition: width 0.5s ease;
-`;
-
-const modeGo = (color: string) => css`
-  font-size: 0.5625rem;
-  font-weight: 700;
-  color: ${color};
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  display: flex;
+const ledgerRow = css`
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 5fr) 7rem 5rem;
+  gap: var(--space-md);
   align-items: center;
-  gap: 2px;
-  margin-top: 4px;
+  min-height: 56px;
+  padding: var(--space-xs) var(--space-lg);
+  border-bottom: 1px solid ${C.border};
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--dur-short) var(--ease-out);
+  &:last-of-type {
+    border-bottom: 0;
+  }
+  &:hover {
+    background: ${C.bgHover};
+  }
+  @media (max-width: 40rem) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-block: var(--space-sm);
+  }
+`;
+
+const ledgerName = css`
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: ${C.text};
+`;
+
+const ledgerBar = css`
+  height: 4px;
+  border-radius: 2px;
+  background: ${C.border};
+  overflow: hidden;
+  @media (max-width: 40rem) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+`;
+
+const ledgerFill = (pct: number) => css`
+  width: ${pct}%;
+  height: 100%;
+  background: ${C.cool};
+`;
+
+const ledgerCount = css`
+  font-family: var(--font-outlier);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: ${C.cool};
+  text-align: right;
+`;
+
+const ledgerGo = css`
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: ${C.text};
+  text-align: right;
+  @media (max-width: 40rem) {
+    display: none;
+  }
 `;
 
 // ─── Mode definitions ─────────────────────────────────────────────────────────
@@ -250,30 +236,18 @@ const MODES = [
   {
     href: "/theory",
     label: "Theory",
-    icon: "📖",
-    color: C.accent,
-    bg: C.accentSubtle,
   },
   {
     href: "/output-quiz",
     label: "Output",
-    icon: "💻",
-    color: C.amber,
-    bg: C.amberSubtle,
   },
   {
     href: "/debug-lab",
     label: "Debug",
-    icon: "🐛",
-    color: C.red,
-    bg: C.redSubtle,
   },
   {
     href: "/polyfill-lab",
     label: "Polyfill",
-    icon: "🧪",
-    color: C.green,
-    bg: C.greenSubtle,
   },
 ];
 
@@ -359,13 +333,13 @@ export default function HomeClient({
         <div css={greetLeft}>
           <h1 css={greetName}>
             {firstName
-              ? `Good ${tod}, ${firstName} 👋`
+              ? `Good ${tod}, ${firstName}`
               : "JavaScript Interview Prep"}
           </h1>
           <p css={greetSub}>
             {user
               ? getMotivation(totalSolved, totalModes, streakDays)
-              : "195+ questions · theory, output, debug & polyfill · AI evaluated."}
+              : "195+ questions: theory, output, debug & polyfill, AI evaluated."}
           </p>
         </div>
 
@@ -373,12 +347,12 @@ export default function HomeClient({
           <div css={greetPills}>
             {streakDays > 0 && (
               <span css={chip(C.amber, C.amberSubtle, C.amberBorder)}>
-                🔥 {streakDays}d
+                {streakDays}d
               </span>
             )}
             {progress?.isPro && (
               <span css={chip(C.accentText, C.accentSubtle, C.border)}>
-                <Zap size={9} /> PRO
+                Pro
               </span>
             )}
           </div>
@@ -394,44 +368,25 @@ export default function HomeClient({
           <span css={modesTitle}>Practice Modes</span>
           {user && (
             <Link href="/analytics" css={analyticsLink}>
-              <BarChart2 size={11} /> Full analysis
+              <BarChart2 size={16} aria-hidden="true" /> Full analysis
             </Link>
           )}
         </div>
 
-        <div css={modesGrid}>
-          {MODES.map(({ href, label, icon, color, bg }, i) => {
+        <div css={ledger}>
+          {MODES.map(({ href, label }, i) => {
             const { done, total, pct } = modeCounts[i];
             return (
-              <Link
-                key={href}
-                href={user ? href : "/auth"}
-                css={modeCard(color, bg)}
-              >
-                <div css={modeIconRow}>
-                  <span css={modeIcon}>{icon}</span>
-                  <span css={modeLabel(color)}>{label}</span>
+              <Link key={href} href={user ? href : "/auth"} css={ledgerRow}>
+                <span css={ledgerName}>{label}</span>
+                <div css={ledgerBar}>
+                  <div css={ledgerFill(user ? pct : 0)} />
                 </div>
-                <div>
-                  {/* Show live counts for logged-in users; totals-only for guests */}
-                  {user ? (
-                    <>
-                      <span css={modeCount}>{done}</span>
-                      <span css={modeFrac}>/{total}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span css={modeCount}>{total}</span>
-                      <span css={modeFrac}> qs</span>
-                    </>
-                  )}
-                </div>
-                <div css={modeBar}>
-                  <div css={modeBarFill(user ? pct : 0, color)} />
-                </div>
-                <span css={modeGo(color)}>
-                  {user ? "Practice" : "Start"} <ArrowRight size={8} />
+                {/* Show live counts for logged-in users; totals-only for guests */}
+                <span css={ledgerCount}>
+                  {user ? `${done}/${total}` : `${total} qs`}
                 </span>
+                <span css={ledgerGo}>{user ? "Practice" : "Start"}</span>
               </Link>
             );
           })}

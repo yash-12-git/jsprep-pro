@@ -39,7 +39,7 @@ const countUp = keyframes`from{opacity:0;transform:scale(.85)}to{opacity:1;trans
 // ─── Color helpers ────────────────────────────────────────────────────────────
 
 const scoreHex = (s: number) =>
-  s >= 75 ? "#22c55e" : s >= 50 ? "#f59e0b" : "#ef4444";
+  s >= 75 ? C.green : s >= 50 ? C.amber : C.red;
 
 const verdictMeta = (v: string) =>
   ({
@@ -48,28 +48,28 @@ const verdictMeta = (v: string) =>
       border: C.greenBorder,
       text: C.green,
       symbol: "✓",
-      glow: "rgba(34,197,94,0.3)",
+      glow: "transparent",
     },
     "Almost Ready": {
       bg: C.amberSubtle,
       border: C.amberBorder,
       text: C.amber,
       symbol: "≈",
-      glow: "rgba(245,158,11,0.3)",
+      glow: "transparent",
     },
     "Not Ready": {
       bg: C.redSubtle,
       border: C.redBorder,
       text: C.red,
       symbol: "✗",
-      glow: "rgba(239,68,68,0.3)",
+      glow: "transparent",
     },
   })[v] ?? {
     bg: C.bgSubtle,
     border: C.border,
     text: C.text,
     symbol: "?",
-    glow: "rgba(0,0,0,0)",
+    glow: "color-mix(in oklab, var(--color-paper-3) 0%, transparent)",
   };
 
 // ─── Canvas share card ────────────────────────────────────────────────────────
@@ -118,7 +118,7 @@ function buildCanvasCard(
   ctx.fillRect(0, 0, W, H);
 
   // Dot grid
-  ctx.fillStyle = "rgba(255,255,255,0.03)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 3%, transparent)";
   for (let x = 60; x < W; x += 60)
     for (let y = 60; y < H; y += 60) {
       ctx.beginPath();
@@ -127,7 +127,7 @@ function buildCanvasCard(
     }
 
   // Brand pill
-  ctx.fillStyle = "rgba(255,255,255,0.07)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 7%, transparent)";
   rx(ctx, 72, 60, 220, 34, 17);
   ctx.fill();
   ctx.font = "700 12px system-ui";
@@ -138,7 +138,7 @@ function buildCanvasCard(
   ctx.save();
   ctx.shadowColor = vm.glow;
   ctx.shadowBlur = 40;
-  ctx.fillStyle = "rgba(255,255,255,0.06)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 6%, transparent)";
   rx(ctx, 72, 116, 100, 100, 50);
   ctx.fill();
   ctx.restore();
@@ -161,7 +161,7 @@ function buildCanvasCard(
   ctx.fillText(`${scorecard.overall}`, 72, 380);
   const sw = ctx.measureText(`${scorecard.overall}`).width;
   ctx.font = "700 32px system-ui";
-  ctx.fillStyle = "rgba(255,255,255,0.28)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 28%, transparent)";
   ctx.fillText("/100", 72 + sw + 8, 368);
   ctx.font = "700 18px system-ui";
   ctx.fillStyle = vm.text;
@@ -176,31 +176,31 @@ function buildCanvasCard(
   ];
   subs.forEach(([label, val], i) => {
     const x = 72 + i * 158;
-    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 6%, transparent)";
     rx(ctx, x, 448, 144, 74, 10);
     ctx.fill();
     ctx.font = "900 24px system-ui";
     ctx.fillStyle = scoreHex(val);
     ctx.fillText(`${val}`, x + 14, 484);
     ctx.font = "600 10px system-ui";
-    ctx.fillStyle = "rgba(255,255,255,0.32)";
+    ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 32%, transparent)";
     ctx.fillText(label.toUpperCase(), x + 14, 502);
   });
 
   // Right col — config
   const RX = 760;
   ctx.font = "700 11px system-ui";
-  ctx.fillStyle = "rgba(255,255,255,0.28)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 28%, transparent)";
   ctx.fillText("INTERVIEW CONFIG", RX, 98);
   ctx.font = "600 15px system-ui";
-  ctx.fillStyle = "rgba(255,255,255,0.75)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 75%, transparent)";
   ctx.fillText(
     `${config.company}  ·  ${config.role}  ·  ${config.experience}`,
     RX,
     124,
   );
   ctx.font = "500 13px system-ui";
-  ctx.fillStyle = "rgba(255,255,255,0.35)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 35%, transparent)";
   ctx.fillText(`Focus: ${config.focus}`, RX, 146);
 
   // Strengths
@@ -212,7 +212,7 @@ function buildCanvasCard(
     rightY += 20;
     scorecard.strengths.slice(0, 3).forEach((s) => {
       ctx.font = "500 13px system-ui";
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 55%, transparent)";
       ctx.fillText(`• ${s}`, RX, rightY);
       rightY += 22;
     });
@@ -226,20 +226,20 @@ function buildCanvasCard(
     rightY += 20;
     scorecard.weaknesses.slice(0, 3).forEach((w) => {
       ctx.font = "500 13px system-ui";
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 55%, transparent)";
       ctx.fillText(`• ${w}`, RX, rightY);
       rightY += 22;
     });
   }
 
   // Footer
-  ctx.fillStyle = "rgba(255,255,255,0.04)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 4%, transparent)";
   ctx.fillRect(0, 610, W, 65);
   ctx.font = "700 15px system-ui";
   ctx.fillStyle = col;
   ctx.fillText("jsprep.pro/mock-interview", 72, 650);
   ctx.font = "500 14px system-ui";
-  ctx.fillStyle = "rgba(255,255,255,0.28)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 28%, transparent)";
   ctx.textAlign = "right";
   ctx.fillText(
     "JavaScript Mock Interview  •  Can you beat my score?",
@@ -278,23 +278,12 @@ const backBtn = css`
 
 const shareCard = css`
   position: relative;
-  background: linear-gradient(140deg, #0d1117 0%, #161b27 60%, #0d1117 100%);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: ${C.bgSubtle};
+  border: 1px solid color-mix(in oklab, var(--color-ink) 7%, transparent);
   border-radius: ${RADIUS.lg};
   padding: 2rem 2rem 1.5rem;
   margin-bottom: 1.25rem;
   overflow: hidden;
-  animation: ${fadeUp} 0.3s ease;
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 28px 28px;
-    pointer-events: none;
-  }
 `;
 const cardHeader = css`
   display: flex;
@@ -303,11 +292,9 @@ const cardHeader = css`
   margin-bottom: 1.75rem;
 `;
 const cardBrand = css`
-  font-size: 0.6875rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: color-mix(in oklab, var(--color-ink) 35%, transparent);
 `;
 const cardDots = css`
   display: flex;
@@ -325,17 +312,16 @@ const scoreCentre = css`
 `;
 const scoreNum = (s: number) => css`
   font-size: clamp(4rem, 14vw, 6rem);
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1;
   letter-spacing: -0.04em;
   color: ${scoreHex(s)};
-  animation: ${countUp} 0.4s ease;
   display: inline-block;
 `;
 const scoreDenom = css`
   font-size: 1rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.3);
+  font-weight: 500;
+  color: color-mix(in oklab, var(--color-ink) 30%, transparent);
   margin-left: 2px;
 `;
 const verdictPill = (v: string) => {
@@ -350,7 +336,7 @@ const verdictPill = (v: string) => {
     background: ${m.bg};
     border: 1px solid ${m.border};
     font-size: 0.8125rem;
-    font-weight: 700;
+    font-weight: 500;
     color: ${m.text};
   `;
 };
@@ -366,22 +352,20 @@ const miniGrid = css`
 const miniCell = (s: number) => css`
   padding: 0.75rem 0.5rem;
   border-radius: ${RADIUS.md};
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid color-mix(in oklab, var(--color-ink) 6%, transparent);
+  background: color-mix(in oklab, var(--color-ink) 3%, transparent);
   text-align: center;
   .n {
     font-size: 1.375rem;
-    font-weight: 800;
+    font-weight: 500;
     line-height: 1;
     letter-spacing: -0.02em;
     color: ${scoreHex(s)};
   }
   .l {
     font-size: 0.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: rgba(255, 255, 255, 0.3);
+    font-weight: 500;
+    color: color-mix(in oklab, var(--color-ink) 30%, transparent);
     margin-top: 3px;
   }
 `;
@@ -389,25 +373,24 @@ const cardFooter = css`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid color-mix(in oklab, var(--color-ink) 6%, transparent);
   padding-top: 1rem;
 `;
 const cardConfig = css`
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
+  color: color-mix(in oklab, var(--color-ink) 30%, transparent);
   font-weight: 500;
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
 `;
 const configDot = css`
-  color: rgba(255, 255, 255, 0.15);
+  color: color-mix(in oklab, var(--color-ink) 15%, transparent);
 `;
 const watermark = css`
-  font-size: 0.6875rem;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.2);
-  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: color-mix(in oklab, var(--color-ink) 20%, transparent);
 `;
 
 // ── Social share panel ──
@@ -417,13 +400,10 @@ const sharePanelWrap = css`
   border-radius: ${RADIUS.lg};
   padding: 1.25rem;
   margin-bottom: 0.75rem;
-  animation: ${fadeUp} 0.3s ease;
 `;
 const sharePanelHead = css`
   font-size: 0.675rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-weight: 500;
   color: ${C.muted};
   margin-bottom: 1rem;
   display: flex;
@@ -458,12 +438,12 @@ const sBtn = (bg: string, col: string, border: string) => css`
   padding: 0.625rem 0.875rem;
   border-radius: ${RADIUS.md};
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: ${bg};
   border: 1px solid ${border};
   color: ${col};
-  transition: all 0.12s;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s, opacity 0.12s, transform 0.12s;
   &:hover {
     opacity: 0.85;
     transform: translateY(-1px);
@@ -482,12 +462,12 @@ const copyFull = css`
   padding: 0.625rem;
   border-radius: ${RADIUS.md};
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: ${C.bg};
   border: 1px solid ${C.border};
   color: ${C.muted};
-  transition: all 0.12s;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s, opacity 0.12s, transform 0.12s;
   &:hover {
     border-color: ${C.borderStrong};
     color: ${C.text};
@@ -500,17 +480,14 @@ const section = css`
   border-radius: ${RADIUS.lg};
   overflow: hidden;
   margin-bottom: 0.75rem;
-  animation: ${fadeUp} 0.3s ease;
 `;
 const sectHead = (c: string) => css`
   padding: 0.5rem 1rem;
   background: ${C.bgSubtle};
   border-bottom: 1px solid ${C.border};
-  font-size: 0.625rem;
-  font-weight: 800;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${c};
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 `;
 const sectBody = css`
   padding: 0.875rem 1rem;
@@ -558,7 +535,7 @@ const topicLink = css`
   font-weight: 500;
   color: ${C.text};
   text-decoration: none;
-  transition: all 0.12s;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s, opacity 0.12s, transform 0.12s;
   &:hover {
     border-color: ${C.accent};
     background: ${C.accentSubtle};
@@ -596,7 +573,7 @@ const btnPri = css`
   border: none;
   cursor: pointer;
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -615,12 +592,12 @@ const btnSec = css`
   border: 1px solid ${C.border};
   cursor: pointer;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  transition: all 0.12s;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s, opacity 0.12s, transform 0.12s;
   &:hover {
     border-color: ${C.borderStrong};
     background: ${C.bgHover};
@@ -669,7 +646,7 @@ export default function InterviewResult({
     () =>
       `🎯 Mock Interview Result — jsprep.pro\n` +
       `${config.company} · ${config.role} · ${config.experience}\n\n` +
-      `Score: ${scorecard.overall}/100 — ${scorecard.verdict}\n\n` +
+      `Score: ${scorecard.overall}/100, ${scorecard.verdict}\n\n` +
       `Concepts: ${scorecard.concepts}   Problem Solving: ${scorecard.problemSolving}\n` +
       `Communication: ${scorecard.communication}   Depth: ${scorecard.depth}\n\n` +
       (scorecard.strengths.length
@@ -715,11 +692,6 @@ export default function InterviewResult({
       <div css={shareCard}>
         <div css={cardHeader}>
           <span css={cardBrand}>Mock Interview</span>
-          <div css={cardDots}>
-            <span css={cardDot("#ef4444")} />
-            <span css={cardDot("#f59e0b")} />
-            <span css={cardDot("#22c55e")} />
-          </div>
         </div>
         <div css={scoreCentre}>
           <div>
@@ -762,16 +734,16 @@ export default function InterviewResult({
       {/* ─── Social share panel ──────────────────────────── */}
       <div css={sharePanelWrap}>
         <div css={sharePanelHead}>
-          <span style={{ fontSize: ".875rem" }}>📣</span> Share your result
+          <span style={{ fontSize: ".875rem" }}></span> Share your result
         </div>
         <div css={sharePreview}>{shareStr}</div>
         <div css={shareBtnGrid}>
           {/* LinkedIn */}
           <button
             css={sBtn(
-              "rgba(10,102,194,0.08)",
-              "#1d6fa8",
-              "rgba(10,102,194,0.2)",
+              C.bgSubtle,
+              C.text,
+              C.borderStrong,
             )}
             onClick={() =>
               window.open(
@@ -781,7 +753,7 @@ export default function InterviewResult({
               )
             }
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
               <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
             </svg>
             Share on LinkedIn
@@ -794,7 +766,7 @@ export default function InterviewResult({
               window.open(twitterUrl, "_blank", "noopener,width=600,height=400")
             }
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
             </svg>
             Share on X
@@ -839,7 +811,7 @@ export default function InterviewResult({
       {/* ─── Strengths ───────────────────────────────────── */}
       {scorecard.strengths.length > 0 && (
         <div css={section}>
-          <div css={sectHead(C.green)}>✓ Strengths</div>
+          <div css={sectHead(C.green)}>Strengths</div>
           <div css={sectBody}>
             <div css={topicGrid}>
               {scorecard.strengths.map((s, i) => (
@@ -856,7 +828,7 @@ export default function InterviewResult({
       {/* ─── Weaknesses ──────────────────────────────────── */}
       {scorecard.weaknesses.length > 0 && (
         <div css={section}>
-          <div css={sectHead(C.red)}>✗ Areas to Improve</div>
+          <div css={sectHead(C.red)}>Areas to Improve</div>
           <div css={sectBody}>
             <div css={topicGrid}>
               {scorecard.weaknesses.map((w, i) => (
@@ -897,7 +869,7 @@ export default function InterviewResult({
       {/* ─── Recommended Topics ──────────────────────────── */}
       {suggestedTopics.length > 0 && (
         <div css={section}>
-          <div css={sectHead(C.accent)}>📚 Recommended Study Topics</div>
+          <div css={sectHead(C.accent)}>Recommended Study Topics</div>
           <div css={sectBody}>
             <div css={topicGrid}>
               {suggestedTopics.map((t) => (

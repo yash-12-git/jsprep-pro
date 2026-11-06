@@ -245,28 +245,28 @@ export default function AnalyticsClientPage({
             <div css={S.categoryRow}>
               {[
                 {
-                  label: "📖 Theory Questions",
+                  label: "Theory Questions",
                   pct: masterPct,
                   solved: masteredCount,
                   total: theoryQs.length,
                   color: C.accent,
                 },
                 {
-                  label: "💻 Output Quiz",
+                  label: "Output Quiz",
                   pct: outputPct,
                   solved: solvedOutputCount,
                   total: outputQs.length,
                   color: C.amber,
                 },
                 {
-                  label: "🐛 Debug Lab",
+                  label: "Debug Lab",
                   pct: debugPct,
                   solved: solvedDebugCount,
                   total: debugQs.length,
                   color: C.red,
                 },
                 {
-                  label: "🧩 Polyfill Lab",
+                  label: "Polyfill Lab",
                   pct: polyfillPct,
                   solved: solvedPolyfillCount,
                   total: polyfillQs.length,
@@ -291,22 +291,22 @@ export default function AnalyticsClientPage({
           {/* ── Category breakdowns ── */}
           {[
             {
-              title: "📖 Theory — Category Breakdown",
+              title: "Theory — Category Breakdown",
               sub: "Which JS concepts you've mastered",
               stats: catStats,
             },
             {
-              title: "💻 Output Quiz — Category Breakdown",
+              title: "Output Quiz — Category Breakdown",
               sub: "Where you predict code output correctly",
               stats: outputCatStats,
             },
             {
-              title: "🐛 Debug Lab — Category Breakdown",
+              title: "Debug Lab — Category Breakdown",
               sub: "Which bug types you can spot and fix",
               stats: debugCatStats,
             },
             {
-              title: "🧩 Polyfill Lab — Category Breakdown",
+              title: "Polyfill Lab — Category Breakdown",
               sub: "Which polyfill challenges you've mastered",
               stats: polyfillCatStats,
             },
@@ -348,7 +348,7 @@ export default function AnalyticsClientPage({
               }}
             >
               <div>
-                <h2 css={S.sectionTitle}>⚡ Interview Sprint History</h2>
+                <h2 css={S.sectionTitle}>Interview Sprint History</h2>
                 <p css={S.sectionSub} style={{ marginBottom: 0 }}>
                   Your last {Math.min(sprintCount, 10)} sprints
                 </p>
@@ -367,7 +367,7 @@ export default function AnalyticsClientPage({
                     border: `1px solid ${C.border}`,
                   }}
                 >
-                  Run another sprint →
+                  Run another sprint
                 </a>
               )}
             </div>
@@ -425,7 +425,7 @@ export default function AnalyticsClientPage({
                       <div css={S.sprintTagRow}>
                         {s.strengths?.slice(0, 3).map((cat) => (
                           <span key={cat} css={S.sprintTag("strength")}>
-                            ✓ {cat}
+                            {cat}
                           </span>
                         ))}
                         {s.weakAreas?.slice(0, 2).map((cat) => (
@@ -447,7 +447,7 @@ export default function AnalyticsClientPage({
                 >
                   Start your first sprint
                 </a>{" "}
-                — it takes 5 minutes and shows exactly where you stand.
+               , it takes 5 minutes and shows exactly where you stand.
               </div>
             )}
           </div>

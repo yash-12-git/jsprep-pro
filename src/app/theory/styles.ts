@@ -15,7 +15,7 @@ export const emptyState = css`
 
 export const emptyTitle = css`
   font-size: 1.0625rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   margin-bottom: 0.5rem;
 `;
@@ -63,7 +63,7 @@ export const listHeader = css`
 `;
 
 export const listHeaderCount = css`
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
 `;
 
@@ -114,7 +114,7 @@ export const pageNum = (active: boolean) => css`
   background: ${active ? C.accentSubtle : "transparent"};
   color: ${active ? C.accentText : C.muted};
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     background: ${C.accentSubtle};
     border-color: ${C.accent};

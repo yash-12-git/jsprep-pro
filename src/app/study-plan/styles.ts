@@ -8,7 +8,7 @@ export const header = css`
 
 export const title = css`
   font-size: 1.625rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
   margin-bottom: 0.5rem;
@@ -30,10 +30,8 @@ export const inputCard = css`
 
 export const inputLabel = css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.muted};
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   margin-bottom: 0.5rem;
 `;
 
@@ -81,7 +79,7 @@ export const readinessCircle = css`
 
 export const readinessPct = css`
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.amber};
   line-height: 1;
   letter-spacing: -0.02em;
@@ -90,8 +88,6 @@ export const readinessPct = css`
 export const readinessLabel = css`
   font-size: 0.5rem;
   color: ${C.muted};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 `;
 
 export const section = css`
@@ -104,7 +100,7 @@ export const section = css`
 
 export const sectionTitle = css`
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   margin-bottom: 1rem;
 `;
@@ -125,7 +121,7 @@ export const weakSpotHeader = css`
 `;
 
 export const weakSpotName = css`
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.875rem;
   color: ${C.text};
 `;
@@ -133,7 +129,7 @@ export const weakSpotName = css`
 export const weakSpotPct = css`
   font-size: 0.75rem;
   color: ${C.red};
-  font-weight: 600;
+  font-weight: 500;
 `;
 
 export const weakSpotTip = css`
@@ -152,10 +148,8 @@ export const dayCard = css`
 
 export const dayLabel = css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.accent};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
 `;
 

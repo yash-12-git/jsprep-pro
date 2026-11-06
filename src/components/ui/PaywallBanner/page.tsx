@@ -30,7 +30,7 @@ export default function PaywallBanner({ onClose, reason }: Props) {
           <Zap size={22} color={C.accent} />
         </div>
 
-        <h2 css={S.title}>Unlock Pro Features</h2>
+        <h2 css={S.title}>Get Pro features</h2>
         {reason && <p css={S.reasonText}>{reason}</p>}
 
         <p css={S.desc}>

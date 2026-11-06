@@ -42,7 +42,7 @@ const S = {
   `,
   heading: css`
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 500;
   `,
   addBtn: css`
     display: flex;
@@ -53,7 +53,7 @@ const S = {
     border: none;
     border-radius: ${RADIUS.xl};
     color: ${C.accentInk};
-    font-weight: 800;
+    font-weight: 500;
     font-size: 0.875rem;
     text-decoration: none;
     cursor: pointer;
@@ -71,7 +71,7 @@ const S = {
     padding: 0.5rem 0.875rem;
     margin-bottom: 1rem;
     &:focus-within {
-      border-color: ${C.accent}55;
+      border-color: color-mix(in oklab, ${C.accent} 33%, transparent);
     }
   `,
   searchInput: css`
@@ -94,13 +94,13 @@ const S = {
   filterChip: (active: boolean) => css`
     padding: 0.25rem 0.875rem;
     border-radius: 9999px;
-    font-size: 0.6875rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 500;
     border: 1px solid ${active ? C.accent + "66" : C.border};
     background: ${active ? C.accent + "18" : "transparent"};
     color: ${active ? C.accent : C.muted};
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
   `,
   table: css`
     display: flex;
@@ -117,17 +117,15 @@ const S = {
     border-radius: ${RADIUS.xl};
     transition: border-color 0.15s;
     &:hover {
-      border-color: rgba(255, 255, 255, 0.12);
+      border-color: color-mix(in oklab, var(--color-ink) 12%, transparent);
     }
   `,
   badge: (color: string) => css`
-    font-size: 0.5625rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    font-weight: 500;
     flex-shrink: 0;
-    background: ${color}14;
-    border: 1px solid ${color}30;
+    background: color-mix(in oklab, ${color} 8%, transparent);
+    border: 1px solid color-mix(in oklab, ${color} 19%, transparent);
     color: ${color};
     padding: 0.125rem 0.5rem;
     border-radius: 0.25rem;
@@ -155,7 +153,7 @@ const S = {
     border-radius: 0.375rem;
     transition: background 0.15s;
     &:hover {
-      background: ${color}18;
+      background: color-mix(in oklab, ${color} 9%, transparent);
     }
   `,
   empty: css`

@@ -9,9 +9,7 @@ export const overlay = css`
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(55, 53, 47, 0.4);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: color-mix(in oklab, var(--color-paper-3) 40%, transparent);
 `;
 
 export const modal = css`
@@ -22,9 +20,6 @@ export const modal = css`
   max-width: 28rem;
   width: 100%;
   position: relative;
-  box-shadow:
-    0 4px 6px rgba(55, 53, 47, 0.04),
-    0 20px 40px rgba(55, 53, 47, 0.12);
 `;
 
 export const closeBtn = css`
@@ -56,7 +51,7 @@ export const iconBox = css`
 
 export const title = css`
   font-size: 1.375rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
   margin-bottom: 0.5rem;
@@ -103,7 +98,7 @@ export const upgradeBtn = css`
   gap: 0.5rem;
   background: ${C.accent};
   color: ${C.accentInk};
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.9375rem;
   padding: 0.875rem;
   border-radius: ${RADIUS.lg};

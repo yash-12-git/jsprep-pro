@@ -2,7 +2,7 @@
 // app/mock-interview/MockInterviewClient.tsx
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import PageGuard from "@/components/ui/PageGuard";
@@ -98,7 +98,7 @@ const FOCUS_AREAS = [
 
 const fadeUp = keyframes`from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}`;
 const dotPulse = keyframes`0%,100%{opacity:0.3}50%{opacity:1}`;
-const timerPulse = keyframes`0%{box-shadow:0 0 0 0 rgba(239,68,68,0.4)}70%{box-shadow:0 0 0 5px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}`;
+const timerPulse = keyframes`0%,100%{opacity:1}50%{opacity:.7}`;
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -131,7 +131,7 @@ const setupWrap = css`
 `;
 const setupTitle = css`
   font-size: clamp(1.5rem, 4vw, 2rem);
-  font-weight: 800;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.03em;
   line-height: 1.1;
@@ -145,10 +145,8 @@ const setupSub = css`
 `;
 const fieldLabel = css`
   display: block;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.muted};
   margin-bottom: 0.5rem;
 `;
@@ -170,7 +168,7 @@ const chip = (a: boolean) => css`
   font-weight: 500;
   cursor: pointer;
   text-align: center;
-  transition: all 0.12s;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s, opacity 0.12s, transform 0.12s;
   white-space: nowrap;
   &:hover {
     border-color: ${C.accent};
@@ -186,7 +184,7 @@ const startBtn = css`
   border: none;
   cursor: pointer;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.01em;
   transition: opacity 0.12s;
   margin-top: 2rem;
@@ -230,17 +228,15 @@ const topBar = css`
 `;
 const ivTitle = css`
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   display: flex;
   align-items: center;
   gap: 0.5rem;
 `;
 const coTag = css`
-  font-size: 0.625rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 500;
   padding: 3px 8px;
   border-radius: ${RADIUS.sm};
   background: ${C.bgSubtle};
@@ -254,7 +250,7 @@ const topRight = css`
 `;
 const turnPill = css`
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.muted};
   font-variant-numeric: tabular-nums;
 `;
@@ -265,18 +261,18 @@ const timerNorm = css`
   padding: 4px 10px;
   border-radius: ${RADIUS.md};
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   border: 1px solid ${C.border};
   background: ${C.bgSubtle};
   color: ${C.muted};
-  transition: all 0.3s;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s, opacity 0.3s, transform 0.3s;
 `;
 const timerWarn = css`
   ${timerNorm};
-  background: rgba(239, 68, 68, 0.08);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.3);
+  background: ${C.redSubtle};
+  color: ${C.red};
+  border-color: ${C.redBorder};
   animation: ${timerPulse} 1.5s ease-in-out infinite;
 `;
 const pgTrack = css`
@@ -313,7 +309,6 @@ const msgRow = (u: boolean) => css`
   gap: 0.75rem;
   align-items: flex-start;
   flex-direction: ${u ? "row-reverse" : "row"};
-  animation: ${fadeUp} 0.2s ease;
 `;
 const ava = (u: boolean) => css`
   width: 1.875rem;
@@ -323,9 +318,8 @@ const ava = (u: boolean) => css`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.5625rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+  font-weight: 500;
   ${u
     ? `background:${C.bgSubtle};border:1px solid ${C.border};color:${C.muted};`
     : `background:${C.accent};color: ${C.accentInk};`}
@@ -404,18 +398,18 @@ const sendBtn = (a: boolean) => css`
   border: none;
   cursor: ${a ? "pointer" : "default"};
   background: ${a ? C.accent : C.bgSubtle};
-  color: ${a ? "#fff" : C.muted};
+  color: ${a ? C.accentInk : C.muted};
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.12s;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s, opacity 0.12s, transform 0.12s;
   align-self: flex-end;
   &:hover {
     opacity: ${a ? 0.88 : 1};
   }
 `;
 const lockNote = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   text-align: center;
   padding: 0.375rem 0;
@@ -447,7 +441,7 @@ const evalDisk = css`
 `;
 const evalTitle = css`
   font-size: 1.125rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
 `;
@@ -491,12 +485,12 @@ const COMPANY_DATA: Record<
     openingTopics: [
       "Explain how V8 optimizes JavaScript execution. What triggers deoptimization?",
       "What happens in the browser between when JavaScript calls document.createElement and when the user sees the new element on screen?",
-      "Walk me through what happens when you call Promise.resolve().then().then() — what exactly executes and when?",
+      "Walk me through what happens when you call Promise.resolve().then().then(), what exactly executes and when?",
     ],
     productScenarios: [
-      "You're a frontend engineer on Google Search. The team wants to add a 'People also ask' accordion that loads answers lazily on expansion. How do you architect this — component structure, lazy fetching, accessibility, and preventing layout shifts?",
-      "Design the frontend for Google Docs' real-time collaborative cursor system. Multiple users edit simultaneously — how do you render their cursors and selections without causing constant re-renders or visual jank?",
-      "You're building a virtualized inbox for Gmail containing 10,000 emails. Rows have variable heights depending on subject length. Describe your implementation — windowing strategy, scroll anchoring, and how you measure performance.",
+      "You're a frontend engineer on Google Search. The team wants to add a 'People also ask' accordion that loads answers lazily on expansion. How do you architect this, component structure, lazy fetching, accessibility, and preventing layout shifts?",
+      "Design the frontend for Google Docs' real-time collaborative cursor system. Multiple users edit simultaneously, how do you render their cursors and selections without causing constant re-renders or visual jank?",
+      "You're building a virtualized inbox for Gmail containing 10,000 emails. Rows have variable heights depending on subject length. Describe your implementation, windowing strategy, scroll anchoring, and how you measure performance.",
     ],
     machineCodingTasks: [
       "Build an autocomplete search input. It debounces API calls by 300ms, shows a loading spinner, displays results in a dropdown list, supports keyboard navigation (ArrowUp/ArrowDown, Enter to select, Escape to close), and handles fetch errors with a retry message.",
@@ -519,15 +513,15 @@ const COMPANY_DATA: Record<
     openingTopics: [
       "You're fetching user data on every keystroke. How do you prevent stale responses from arriving out of order?",
       "Implement a function that retries a failed Promise up to 3 times with exponential backoff.",
-      "What's the difference between Promise.all, Promise.allSettled, Promise.race, and Promise.any — when would you use each?",
+      "What's the difference between Promise.all, Promise.allSettled, Promise.race, and Promise.any, when would you use each?",
     ],
     productScenarios: [
-      "You're building the Amazon checkout page. After a user clicks 'Place Order', the payment API returns a 500. Design the entire frontend error handling flow — retry logic, idempotency key, user messaging, and recovery without double charging.",
+      "You're building the Amazon checkout page. After a user clicks 'Place Order', the payment API returns a 500. Design the entire frontend error handling flow, retry logic, idempotency key, user messaging, and recovery without double charging.",
       "Design the 'Recently viewed items' carousel for Amazon's homepage. It reads from localStorage, syncs to a server, deduplicates, must work offline, and limits to 10 items. How do you design the data layer and sync strategy?",
       "You're building the product review section showing 10,000 reviews with filter by star rating, sort by helpfulness, and pagination. The page must be usable on 3G. How do you architect the data fetching, rendering, and state?",
     ],
     machineCodingTasks: [
-      "Build a star rating component: display 1–5 stars with hover preview, lock rating on click, support half-stars, show the numeric average alongside the stars, and emit onRate(value). Make it keyboard accessible — Tab to focus, arrow keys to change rating.",
+      "Build a star rating component: display 1–5 stars with hover preview, lock rating on click, support half-stars, show the numeric average alongside the stars, and emit onRate(value). Make it keyboard accessible, Tab to focus, arrow keys to change rating.",
       "Build a countdown timer for a flash deal. It counts down from a given Unix end-timestamp (not a duration), displays HH:MM:SS, turns red below 5 minutes, shows 'Deal ended' at zero, and cleans up its interval on unmount.",
       "Build a debounced search component: fires an async searchProducts(query) 300ms after the user stops typing, shows a spinner during fetch, renders results as a list, allows clicking a result to call onSelect(item), and cancels the in-flight request if a new search starts before it resolves.",
     ],
@@ -545,7 +539,7 @@ const COMPANY_DATA: Record<
       "the DOM accessibility tree and ARIA",
     ],
     openingTopics: [
-      "Explain the difference between Object.create(null) and {} — when would you use each?",
+      "Explain the difference between Object.create(null) and {}, when would you use each?",
       "How does JavaScript resolve a circular import between module A and module B?",
       "What's the difference between interface and type in TypeScript, and when does it actually matter at the JavaScript level?",
     ],
@@ -606,7 +600,7 @@ const COMPANY_DATA: Record<
       "What's wrong with using localStorage to store a payment token? What's the secure alternative?",
     ],
     productScenarios: [
-      "You're building Razorpay's checkout modal — an iframe embedded in a merchant's page. It collects card details, sends them to Razorpay's server, and posts the payment result back to the parent. Walk through the complete security architecture: iframe isolation, postMessage validation, CSP, and token handling.",
+      "You're building Razorpay's checkout modal, an iframe embedded in a merchant's page. It collects card details, sends them to Razorpay's server, and posts the payment result back to the parent. Walk through the complete security architecture: iframe isolation, postMessage validation, CSP, and token handling.",
       "Design Razorpay's merchant dashboard transaction history. It shows thousands of transactions with live updates, filter by date/status/amount, and CSV export. The table must handle rapid real-time updates without flicker. How do you architect the data layer and rendering?",
       "You're building the Razorpay payment link generator. Merchants fill in amount, description, and expiry. They can preview the link, copy it, and share via WhatsApp. The link must encode tamper-proof data. Design the frontend end-to-end including the security model.",
     ],
@@ -634,9 +628,9 @@ const COMPANY_DATA: Record<
       "What's the difference between deep equality and reference equality in JavaScript? How does React use this distinction?",
     ],
     productScenarios: [
-      "You're building Jira's sprint board — a kanban view with To Do, In Progress, and Done columns. Cards can be dragged between columns. Column totals update instantly. Multiple users may move cards simultaneously and see each other's moves in real time. Design the frontend architecture.",
-      "Design the Confluence @mention and /command palette system. As the user types '@' or '/', show a fuzzy-search palette. Selecting an option inserts a React component (not plain text) into the editor — for example, a person chip or a macro block. How do you implement this?",
-      "You're building Jira's issue dependency graph — a visual DAG showing which issues block which. Nodes are issues, edges are dependencies. Users can add/remove dependencies by clicking and dragging. Design the rendering model, interaction layer, and cycle detection.",
+      "You're building Jira's sprint board, a kanban view with To Do, In Progress, and Done columns. Cards can be dragged between columns. Column totals update instantly. Multiple users may move cards simultaneously and see each other's moves in real time. Design the frontend architecture.",
+      "Design the Confluence @mention and /command palette system. As the user types '@' or '/', show a fuzzy-search palette. Selecting an option inserts a React component (not plain text) into the editor, for example, a person chip or a macro block. How do you implement this?",
+      "You're building Jira's issue dependency graph, a visual DAG showing which issues block which. Nodes are issues, edges are dependencies. Users can add/remove dependencies by clicking and dragging. Design the rendering model, interaction layer, and cycle detection.",
     ],
     machineCodingTasks: [
       "Build a drag-and-drop kanban board with 3 columns. Cards can be dragged between columns using native HTML5 drag events or pointer events (no library). Show a drop zone highlight during drag and animate the card into its new position on drop.",
@@ -663,13 +657,13 @@ const COMPANY_DATA: Record<
     ],
     productScenarios: [
       "You're building Swiggy's real-time order tracker. After placing an order, the user sees live updates pushed via WebSocket: 'Confirmed → Preparing → Picked up → Arriving'. The user may go offline mid-delivery and reopen the app 10 minutes later. Design the complete frontend including offline state recovery.",
-      "Design Swiggy Instamart's product listing page — 5,000 products across 60 categories. Users browse by category or search. The page must be usable on 2G. How do you architect category navigation, lazy loading, skeleton screens, and search with debounce?",
+      "Design Swiggy Instamart's product listing page, 5,000 products across 60 categories. Users browse by category or search. The page must be usable on 2G. How do you architect category navigation, lazy loading, skeleton screens, and search with debounce?",
       "You're building the Swiggy cart with customizable add-ons. Tapping 'Add' on a pizza opens a bottom sheet with customization options (size, crust, toppings). Selections update the price in real time. Multiple items with different customizations can be in the cart. Design the state model.",
     ],
     machineCodingTasks: [
       "Build a restaurant card with a skeleton loading state. The card shows name, cuisine tags, rating, delivery time, and a discount badge. While data is loading, show an animated shimmer skeleton. Transition smoothly to real content with a fade. No external skeleton library.",
       "Build a delivery countdown timer. It accepts a Unix end-timestamp and displays the remaining time as 'X min Y sec'. It updates every second, turns red and pulses below 3 minutes, and shows 'Arriving now!' at zero. It cleans up its interval on unmount.",
-      "Build a cart summary panel: line items with name, quantity, and price; subtotal, delivery fee, and total — all computed from props. Include + and − buttons per item (minimum quantity 1). If cart is empty, show an empty state. The component emits onQuantityChange(itemId, newQty).",
+      "Build a cart summary panel: line items with name, quantity, and price; subtotal, delivery fee, and total, all computed from props. Include + and − buttons per item (minimum quantity 1). If cart is empty, show an empty state. The component emits onQuantityChange(itemId, newQty).",
     ],
   },
 
@@ -691,13 +685,13 @@ const COMPANY_DATA: Record<
     ],
     productScenarios: [
       "You're building CRED's credit card bill payment flow. The user selects a card, sees the bill amount, chooses full/minimum/custom payment, and pays via UPI. Every transition between steps has a premium micro-animation. Design the component architecture, state machine, and animation strategy.",
-      "Design CRED's scratch card reward: after a successful payment, an animated scratch card appears. The user drags their finger to scratch and reveal a reward. Implement the scratch reveal using Canvas — track pointer movement, erase the overlay, and detect when enough area has been scratched to auto-reveal.",
-      "You're building CRED's credit score dashboard — a radial gauge from 300–900, an animated trend graph over 12 months, and recommended actions with projected score improvements. Each element animates on mount. Design the data flow and animation choreography.",
+      "Design CRED's scratch card reward: after a successful payment, an animated scratch card appears. The user drags their finger to scratch and reveal a reward. Implement the scratch reveal using Canvas, track pointer movement, erase the overlay, and detect when enough area has been scratched to auto-reveal.",
+      "You're building CRED's credit score dashboard, a radial gauge from 300–900, an animated trend graph over 12 months, and recommended actions with projected score improvements. Each element animates on mount. Design the data flow and animation choreography.",
     ],
     machineCodingTasks: [
-      "Build a credit card flip component. It displays card number (masked), cardholder name, expiry, and card type logo on the front. On hover/tap, it flips 180° to show the CVV on the back. Implement the 3D flip using CSS transforms only — no JavaScript animation libraries.",
+      "Build a credit card flip component. It displays card number (masked), cardholder name, expiry, and card type logo on the front. On hover/tap, it flips 180° to show the CVV on the back. Implement the 3D flip using CSS transforms only, no JavaScript animation libraries.",
       "Build an animated radial gauge for a credit score (300–900). The gauge arc fills smoothly from 0 to the target value on mount using requestAnimationFrame. Color transitions: red below 580, amber 580–720, green above 720. Display the numeric score at the center.",
-      "Build a swipeable bottom sheet. It can be dragged up to full-screen and down to dismiss. Implement using pointer events (not a library) — track pointermove, calculate drag distance, animate with transform: translateY, snap to open/closed on release based on velocity.",
+      "Build a swipeable bottom sheet. It can be dragged up to full-screen and down to dismiss. Implement using pointer events (not a library), track pointermove, calculate drag distance, animate with transform: translateY, snap to open/closed on release based on velocity.",
     ],
   },
 
@@ -719,18 +713,18 @@ const COMPANY_DATA: Record<
     ],
     productScenarios: [
       "You're building Zepto's product search experience. As the user types, results appear in under 200ms grouped by category. Users apply filters (price, brand, in-stock). On mobile, the keyboard must not cause layout shifts. The search must work partially offline. Design this end to end.",
-      "Design Zepto's 10-minute delivery checkout flow. User confirms cart, selects delivery slot, pays, and sees a confirmation — all optimized for a budget Android device on 4G. How do you minimize TTI, reduce JS bundle size, and handle payment failures gracefully?",
+      "Design Zepto's 10-minute delivery checkout flow. User confirms cart, selects delivery slot, pays, and sees a confirmation, all optimized for a budget Android device on 4G. How do you minimize TTI, reduce JS bundle size, and handle payment failures gracefully?",
       "You're building Zepto's category browsing page. The horizontal category strip is sticky. Tapping a category scrolls the product list to that section. Products load lazily as the user scrolls. There are 50 categories and 3,000 products. Design the implementation.",
     ],
     machineCodingTasks: [
       "Build a product search with debounced API calls (300ms). Show a loading spinner while fetching. Render results in a dropdown with product name, price, and an 'Add' button per result. The dropdown closes when the user clicks outside. Cancel the previous request if a new one starts.",
-      "Build a cart item row with a quantity stepper (+/−). Minimum quantity is 1 — at 1, the − button becomes a trash icon that calls onRemove. Animate the quantity number changing (slide up/down). Emit onQuantityChange(id, qty) and onRemove(id).",
+      "Build a cart item row with a quantity stepper (+/−). Minimum quantity is 1, at 1, the − button becomes a trash icon that calls onRemove. Animate the quantity number changing (slide up/down). Emit onQuantityChange(id, qty) and onRemove(id).",
       "Build a horizontal category strip with scroll snap. Categories are pills in a scrollable row. The active category is highlighted with a colored border. Clicking scrolls it into view if off-screen. Show left/right fade-gradient indicators when more items exist off screen.",
     ],
   },
 
   Meesho: {
-    profile: `Meesho tests knowledge of large product catalog handling: virtual scrolling, image lazy loading, Intersection Observer patterns, and building reusable component systems. React performance patterns (memo, useMemo, useCallback, React profiler) are asked at every level. They value practical knowledge over theoretical — expect questions about things you'd actually encounter building a large-scale shopping app.`,
+    profile: `Meesho tests knowledge of large product catalog handling: virtual scrolling, image lazy loading, Intersection Observer patterns, and building reusable component systems. React performance patterns (memo, useMemo, useCallback, React profiler) are asked at every level. They value practical knowledge over theoretical, expect questions about things you'd actually encounter building a large-scale shopping app.`,
     hardTopics: [
       "Intersection Observer for image lazy loading",
       "React.memo and when it prevents re-renders",
@@ -748,11 +742,11 @@ const COMPANY_DATA: Record<
     productScenarios: [
       "You're building Meesho's reseller product catalog. A reseller browses products, sets their margin, and shares a product link with a custom price. Design the product browsing page, margin calculator, shareable link generation, and the share flow (WhatsApp deep link, copy).",
       "Design Meesho's product listing page with 50,000+ products, infinite scroll, and multiple filter combinations. On a budget 4G device, the page must load in under 3 seconds and LCP must be under 2.5s. How do you optimize images, JS bundles, and rendering?",
-      "You're building Meesho's social share image generator. A reseller taps 'Share' and gets a product photo with their business name and custom price overlaid, ready for WhatsApp. Implement this using Canvas — overlay text on an image and trigger a download or Web Share API.",
+      "You're building Meesho's social share image generator. A reseller taps 'Share' and gets a product photo with their business name and custom price overlaid, ready for WhatsApp. Implement this using Canvas, overlay text on an image and trigger a download or Web Share API.",
     ],
     machineCodingTasks: [
       "Build a lazy-loading image grid for a product catalog using Intersection Observer. Show a shimmer placeholder while the image loads. Handle load errors with a fallback placeholder image. Disconnect the observer once the image has loaded.",
-      "Build a product card 'Share' button: clicking it copies '${productName} at ₹${price} — meesho.com/...' to the clipboard using the Clipboard API, shows a 'Copied!' checkmark for 2 seconds, then reverts. Fall back to the Web Share API on mobile if available.",
+      "Build a product card 'Share' button: clicking it copies '${productName} at ₹${price}, meesho.com/...' to the clipboard using the Clipboard API, shows a 'Copied!' checkmark for 2 seconds, then reverts. Fall back to the Web Share API on mobile if available.",
       "Build a margin calculator. Given a supplierPrice prop, the reseller types a margin percentage. Display in real time: supplier price, margin amount (₹), reseller price, and profit per unit. Validate that the margin is 0–200% and show an inline error outside that range.",
     ],
   },
@@ -770,11 +764,11 @@ const COMPANY_DATA: Record<
     ],
     openingTopics: [
       "What is shadow DOM and how does it achieve style encapsulation? What are its limitations?",
-      "Implement a reusable accordion component as a native Web Component — no framework.",
+      "Implement a reusable accordion component as a native Web Component, no framework.",
       "What's the difference between named exports and default exports for tree shaking? Which should you prefer?",
     ],
     productScenarios: [
-      "You're building a Shopify theme component as a native Web Component — no framework allowed. It's a product card with image, title, price, and 'Add to cart' button that dispatches a custom event. The merchant can drop it into any Liquid template. Design the API and implementation.",
+      "You're building a Shopify theme component as a native Web Component, no framework allowed. It's a product card with image, title, price, and 'Add to cart' button that dispatches a custom event. The merchant can drop it into any Liquid template. Design the API and implementation.",
       "Design a headless Shopify storefront's product listing page. It fetches from the Storefront API via GraphQL, supports infinite scroll, filtering by tag, and a cart that persists across sessions using localStorage. How do you design the data layer and state without a UI framework?",
       "You're building Shopify's checkout address autocomplete. As the user types, suggestions come from a mock Places API. Selecting fills address fields. The component must work in any Shopify theme without React or Vue. How do you implement this as framework-agnostic JS?",
     ],
@@ -786,7 +780,7 @@ const COMPANY_DATA: Record<
   },
 
   Stripe: {
-    profile: `Stripe values correctness and reliability above all. They ask about floating-point arithmetic (0.1 + 0.2), precision issues with currency, and why you should never store money as floats. Iframe security for payment flows, structured clone algorithm, and deep understanding of JavaScript's number system are expected. They probe error handling depth — how errors propagate, how to recover from partial failures, and how to build idempotent operations.`,
+    profile: `Stripe values correctness and reliability above all. They ask about floating-point arithmetic (0.1 + 0.2), precision issues with currency, and why you should never store money as floats. Iframe security for payment flows, structured clone algorithm, and deep understanding of JavaScript's number system are expected. They probe error handling depth, how errors propagate, how to recover from partial failures, and how to build idempotent operations.`,
     hardTopics: [
       "floating-point precision and currency arithmetic",
       "iframe security and cross-origin communication",
@@ -798,16 +792,16 @@ const COMPANY_DATA: Record<
     ],
     openingTopics: [
       "Why does 0.1 + 0.2 !== 0.3 in JavaScript? How do you handle money calculations correctly?",
-      "You're processing a payment that partially succeeds — the charge happened but the database write failed. How do you handle this idempotently?",
+      "You're processing a payment that partially succeeds, the charge happened but the database write failed. How do you handle this idempotently?",
       "What can structuredClone handle that JSON.parse(JSON.stringify()) cannot? What can neither handle?",
     ],
     productScenarios: [
-      "You're building Stripe's Payment Element — an embeddable iframe on a merchant's site. It collects card details, validates them, communicates securely with Stripe's server, and posts the result back to the parent page. Walk through the complete technical architecture: iframe isolation, postMessage protocol, token exchange, and error surface.",
+      "You're building Stripe's Payment Element, an embeddable iframe on a merchant's site. It collects card details, validates them, communicates securely with Stripe's server, and posts the result back to the parent page. Walk through the complete technical architecture: iframe isolation, postMessage protocol, token exchange, and error surface.",
       "Design Stripe's dashboard transaction list: thousands of transactions updating in real time via webhooks, each row expandable, with search, filter, and export. The list must handle rapid updates without flickering or losing scroll position. How do you architect data management and rendering?",
-      "You're building Stripe Radar's fraud review feed — a real-time feed of potentially fraudulent charges refreshing every 5 seconds. Each charge can be approved or blocked (optimistic update). Design the frontend including conflict handling if two reviewers act on the same charge simultaneously.",
+      "You're building Stripe Radar's fraud review feed, a real-time feed of potentially fraudulent charges refreshing every 5 seconds. Each charge can be approved or blocked (optimistic update). Design the frontend including conflict handling if two reviewers act on the same charge simultaneously.",
     ],
     machineCodingTasks: [
-      "Build a currency amount input for a payment form. As the user types, format the value as currency (e.g., '1234' → '$12.34'). Support USD, EUR, and JPY (which has no decimal places). Show an error if the amount is below the minimum ($0.50 for USD). Use integer arithmetic internally — never floats.",
+      "Build a currency amount input for a payment form. As the user types, format the value as currency (e.g., '1234' → '$12.34'). Support USD, EUR, and JPY (which has no decimal places). Show an error if the amount is below the minimum ($0.50 for USD). Use integer arithmetic internally, never floats.",
       "Build a copy-to-clipboard button. Clicking copies the provided text prop, shows a checkmark and 'Copied!' for 2 seconds, then reverts. Use the Clipboard API. Fall back gracefully if it's unavailable (show a tooltip with the text to copy manually).",
       "Build a sortable data table. Given an array of objects and a column config array (key, label, type), render a table. Clicking a header sorts ascending; clicking again sorts descending. Show a ↑↓ indicator. The component should be generic and not assume any specific data shape.",
     ],
@@ -837,7 +831,7 @@ const COMPANY_DATA: Record<
     machineCodingTasks: [
       "Build a restaurant rating widget: show an overall average with a star display (half-star support), an interactive rating picker (hover preview + click to rate), and a 'You rated X stars' confirmation. When a new rating is submitted, update the average optimistically before the API responds.",
       "Build a complete OTP verification flow: phone number input → 'Send OTP' button (triggers mock async fn) → 6-digit OTP input with auto-advance → 60-second resend countdown → success or error state. Manage all state locally with React hooks.",
-      "Build a food category tab bar. Categories are fetched async — show a skeleton loader while loading. The active tab has a sliding underline indicator that animates on tab change. Clicking a tab calls a mock filterByCategory(id) function and scrolls the tab into view if it's off-screen.",
+      "Build a food category tab bar. Categories are fetched async, show a skeleton loader while loading. The active tab has a sliding underline indicator that animates on tab change. Clicking a tab calls a mock filterByCategory(id) function and scrolls the tab into view if it's off-screen.",
     ],
   },
 
@@ -886,14 +880,14 @@ const COMPANY_DATA: Record<
       "What does this print and why?\nconsole.log(typeof null)\nconsole.log(null instanceof Object)\nconsole.log(null == undefined)\nconsole.log(null === undefined)",
     ],
     productScenarios: [
-      "You're the first frontend engineer at a fintech startup. Your task: build a dashboard showing portfolio value over time (chart), recent transactions list, and a quick-transfer widget. Describe your approach — tech choices, component architecture, data fetching strategy, and what you'd defer to v2.",
-      "Design a collaborative todo app: multiple users see each other's changes in real time. Users can add, edit, check off, and delete items. Design the frontend from scratch — state management, real-time sync, conflict handling when two users edit the same item simultaneously.",
-      "You're building a notification centre for a SaaS app: a bell icon with unread badge, a dropdown list of in-app notifications (new mentions, task assignments), and real-time updates. Design the full implementation — data model, real-time transport choice, UI, and mark-as-read optimistic update.",
+      "You're the first frontend engineer at a fintech startup. Your task: build a dashboard showing portfolio value over time (chart), recent transactions list, and a quick-transfer widget. Describe your approach, tech choices, component architecture, data fetching strategy, and what you'd defer to v2.",
+      "Design a collaborative todo app: multiple users see each other's changes in real time. Users can add, edit, check off, and delete items. Design the frontend from scratch, state management, real-time sync, conflict handling when two users edit the same item simultaneously.",
+      "You're building a notification centre for a SaaS app: a bell icon with unread badge, a dropdown list of in-app notifications (new mentions, task assignments), and real-time updates. Design the full implementation, data model, real-time transport choice, UI, and mark-as-read optimistic update.",
     ],
     machineCodingTasks: [
       "Build an accordion component. Given an array of { title, content } items, render them as an expandable list. Only one item can be open at a time. Include a smooth CSS expand/collapse animation (max-height or grid-rows trick). Make it keyboard accessible: Tab to focus, Enter/Space to toggle.",
       "Build a form with real-time validation: name (required, min 2 chars), email (valid format), password (min 8 chars, at least 1 number), confirm password (must match). Errors appear on blur for each field. The submit button is disabled until all fields are valid. Show a success message on submit.",
-      "Build a toast notification system. Expose a showToast(message, type: 'success' | 'error' | 'info') function. Toasts stack in the top-right corner, auto-dismiss after 3 seconds, support manual dismiss on click, and animate in/out. Multiple toasts should not overlap — stack with a gap.",
+      "Build a toast notification system. Expose a showToast(message, type: 'success' | 'error' | 'info') function. Toasts stack in the top-right corner, auto-dismiss after 3 seconds, support manual dismiss on click, and animate in/out. Multiple toasts should not overlap, stack with a gap.",
     ],
   },
 };
@@ -902,7 +896,7 @@ const COMPANY_DATA: Record<
 
 const LEVEL_DESC: Record<string, string> = {
   junior:
-    "JUNIOR (0-2 yrs): Test fundamentals — scope, basic closures, simple Promises, typeof/instanceof, DOM manipulation. Probe for understanding. Do not ask about advanced patterns. Expect incomplete answers.",
+    "JUNIOR (0-2 yrs): Test fundamentals, scope, basic closures, simple Promises, typeof/instanceof, DOM manipulation. Probe for understanding. Do not ask about advanced patterns. Expect incomplete answers.",
   mid: "MID-LEVEL (2-4 yrs): Core concepts + practical application. Test closure traps, event loop ordering, output prediction, polyfill implementations. Expect solid fundamentals. Probe for production experience.",
   senior:
     "SENIOR (4-7 yrs): Deep internals + architecture. Test memory management, complex async patterns, performance optimization, design patterns. Correct answers should immediately trigger harder follow-ups.",
@@ -911,12 +905,12 @@ const LEVEL_DESC: Record<string, string> = {
 
 // ─── Banned opening questions ─────────────────────────────────────────────────
 
-const BANNED_OPENERS = `NEVER ask these as your opening question — they are overused and every candidate has rehearsed them:
+const BANNED_OPENERS = `NEVER ask these as your opening question, they are overused and every candidate has rehearsed them:
 - "What is the difference between null and undefined?"
 - "What is the difference between var, let, and const?"
-- "What is a closure?" (too basic — ask a closure TRAP instead)
+- "What is a closure?" (too basic, ask a closure TRAP instead)
 - "What is hoisting?" (only acceptable for junior warm-up)
-- "What is the event loop?" (too generic — ask a specific output question instead)
+- "What is the event loop?" (too generic, ask a specific output question instead)
 - "What is async/await?" (too generic)
 - "Explain promises" (too generic)
 These questions do not distinguish candidates. Use the company-specific opening topics provided.`;
@@ -940,7 +934,7 @@ export function buildPrompt(
     .join("\n");
 
   const SCORECARD_BLOCK = `══════════════════════════════════════════════
-SCORECARD — READ CAREFULLY
+SCORECARD, READ CAREFULLY
 ══════════════════════════════════════════════
 You NEVER output JSON spontaneously. EVER.
 You ONLY output JSON when you receive the exact string: "GENERATE_SCORECARD"
@@ -970,7 +964,7 @@ Role: ${cfg.role}
 Level: ${level}
 
 ══════════════════════════════════════════════
-THE PROBLEM — PRESENT THIS ON TURN 1 VERBATIM
+THE PROBLEM, PRESENT THIS ON TURN 1 VERBATIM
 ══════════════════════════════════════════════
 ${task}
 
@@ -990,7 +984,7 @@ MANDATORY RULES
    - Missing edge case → "What happens when the user [specific scenario: paste, backspace, offline, rapid click]?"
    - Good answer → immediately escalate: "Now what if you had to support [harder constraint]?"
    - Performance gap → "How many re-renders does this trigger? How would you verify that?"
-4. NEVER say "Great!", "Exactly!", "Perfect!", "Good point!" — NEVER praise.
+4. NEVER say "Great!", "Exactly!", "Perfect!", "Good point!", NEVER praise.
 5. Tone: direct, senior engineer pairing with a candidate under observation. Slightly uncomfortable.
 
 ══════════════════════════════════════════════
@@ -1016,7 +1010,7 @@ Session: ${entropy}. Make this feel like a real machine coding round at ${cfg.co
     return `[PRODUCT SCENARIO SESSION: ${entropy} | ${tsNow}]
 
 You are a SENIOR ENGINEER at ${cfg.company === "General" ? "a top-tier product company" : cfg.company} conducting a PRODUCT + SYSTEM DESIGN interview.
-You are evaluating how this candidate thinks about building real product features end-to-end — not just JavaScript theory.
+You are evaluating how this candidate thinks about building real product features end-to-end, not just JavaScript theory.
 
 ══════════════════════════════════════════════
 CANDIDATE PROFILE
@@ -1025,7 +1019,7 @@ Role: ${cfg.role}
 Level: ${level}
 
 ══════════════════════════════════════════════
-THE SCENARIO — PRESENT THIS ON TURN 1
+THE SCENARIO, PRESENT THIS ON TURN 1
 ══════════════════════════════════════════════
 ${scenario}
 
@@ -1081,11 +1075,11 @@ ${co.profile}
 Topics this company is KNOWN to ask about:
 ${co.hardTopics.map((t, i) => `${i + 1}. ${t}`).join("\n")}
 
-YOUR OPENING QUESTION for this session (turn 1) — ask this or a close variant:
+YOUR OPENING QUESTION for this session (turn 1), ask this or a close variant:
 "${suggestedOpen}"
 
 ══════════════════════════════════════════════
-MANDATORY RULES — FOLLOW EXACTLY
+MANDATORY RULES, FOLLOW EXACTLY
 ══════════════════════════════════════════════
 1. ONE question per response. EXACTLY one. NEVER two questions.
 2. NEVER explain, hint at the answer, or teach. You EVALUATE. You do not HELP.
@@ -1095,7 +1089,7 @@ MANDATORY RULES — FOLLOW EXACTLY
    - Partially correct → dig for the missing piece: "What about edge cases?"
    - Strong and complete → immediately escalate difficulty
 4. Use REAL interviewer language: "What if...?", "Why not just...?", "How would this behave when...?"
-5. NEVER say: "Great answer!", "Good point!", "Exactly right!", "That's correct!" — NEVER praise.
+5. NEVER say: "Great answer!", "Good point!", "Exactly right!", "That's correct!", NEVER praise.
 6. Tone: direct, professional, slightly uncomfortable. Like an Atlassian or Google interviewer.
 
 ${BANNED_OPENERS}
@@ -1103,11 +1097,11 @@ ${BANNED_OPENERS}
 ══════════════════════════════════════════════
 INTERVIEW STRUCTURE
 ══════════════════════════════════════════════
-Turn 1:  The opening question provided above — ask it exactly or a close variant
-Turns 2–4: Core concept deep-dives based on the company's known topics. Follow the thread — if they struggle on closures, stay on closures.
-Turns 5–7: ONE practical problem — output prediction, debug a snippet, implement a polyfill, or solve a real-world scenario relevant to ${cfg.company}'s product
+Turn 1:  The opening question provided above, ask it exactly or a close variant
+Turns 2–4: Core concept deep-dives based on the company's known topics. Follow the thread, if they struggle on closures, stay on closures.
+Turns 5–7: ONE practical problem, output prediction, debug a snippet, implement a polyfill, or solve a real-world scenario relevant to ${cfg.company}'s product
 Turns 8–9: Target their specific weak spots identified from earlier answers. Maximum pressure.
-Turn 10:  One final question — ask it as plain text. NO JSON. Wait for their answer.
+Turn 10:  One final question, ask it as plain text. NO JSON. Wait for their answer.
 
 ${SCORECARD_BLOCK}
 
@@ -1115,7 +1109,7 @@ ${SCORECARD_BLOCK}
 FINAL INSTRUCTION
 ══════════════════════════════════════════════
 Session: ${entropy}. This is a UNIQUE interview for a ${cfg.experience}-level ${cfg.role} targeting ${cfg.company}.
-Start with the exact opening question above. Make this interview feel specific to ${cfg.company} — not generic JavaScript questions.
+Start with the exact opening question above. Make this interview feel specific to ${cfg.company}, not generic JavaScript questions.
 The candidate should leave feeling like they just talked to a real ${cfg.company} engineer.`;
 }
 
@@ -1218,6 +1212,25 @@ export default function MockInterviewClient({ topics }: Props) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
+  const endInterview = useCallback(() => {
+    setPhase("result");
+    setScorecard(
+      (current) =>
+        current ?? {
+          overall: 0,
+          concepts: 0,
+          problemSolving: 0,
+          communication: 0,
+          depth: 0,
+          verdict: "Not Ready",
+          strengths: [],
+          weaknesses: ["Interview timed out"],
+          suggestions: ["Complete within 25 minutes"],
+          rawFeedback: "Interview was not completed within the allotted time.",
+        },
+    );
+  }, []);
+
   useEffect(() => {
     if (phase !== "interview") return;
     timerRef.current = setInterval(() => {
@@ -1231,24 +1244,7 @@ export default function MockInterviewClient({ topics }: Props) {
       });
     }, 1000);
     return () => clearInterval(timerRef.current!);
-  }, [phase]);
-
-  function endInterview() {
-    setPhase("result");
-    if (!scorecard)
-      setScorecard({
-        overall: 0,
-        concepts: 0,
-        problemSolving: 0,
-        communication: 0,
-        depth: 0,
-        verdict: "Not Ready",
-        strengths: [],
-        weaknesses: ["Interview timed out"],
-        suggestions: ["Complete within 25 minutes"],
-        rawFeedback: "Interview was not completed within the allotted time.",
-      });
-  }
+  }, [phase, endInterview]);
 
   function handleTA(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
@@ -1472,14 +1468,14 @@ export default function MockInterviewClient({ topics }: Props) {
             <div css={warnBanner}>
               <AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
               <span>
-                <strong>Answers lock on submit.</strong> No editing once sent —
-                exactly like a real interview. 25 min limit · {TOTAL_TURNS}{" "}
+                <strong>Answers lock on submit.</strong> No editing once sent ,
+                exactly like a real interview. 25 min limit, {TOTAL_TURNS}{" "}
                 exchanges.
               </span>
             </div>
 
             <button css={startBtn} onClick={startInterview}>
-              Begin Interview →
+              Begin Interview
             </button>
           </div>
         )}
@@ -1559,7 +1555,7 @@ export default function MockInterviewClient({ topics }: Props) {
               </div>
               <p css={lockNote}>
                 <AlertCircle size={9} />
-                Answers lock on submit — no editing
+                Answers lock on submit, no editing
               </p>
             </div>
           </div>

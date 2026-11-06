@@ -101,13 +101,12 @@ export default function EditQuestionPage({ params }: Props) {
           {question?.type && (
             <span
               style={{
-                fontSize: "0.6875rem",
-                fontWeight: 700,
-                textTransform: "uppercase",
+                fontSize: "0.75rem",
+                fontWeight: 500,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
-                background: TYPE_BG[question.type] ?? "#f0f0f0",
-                color: TYPE_COLOR[question.type] ?? "#666",
+                background: TYPE_BG[question.type] ?? "var(--color-ink)",
+                color: TYPE_COLOR[question.type] ?? "var(--color-muted)",
                 marginRight: "0.5rem",
               }}
             >
@@ -118,7 +117,7 @@ export default function EditQuestionPage({ params }: Props) {
         <h1
           style={{
             fontSize: "1.25rem",
-            fontWeight: 900,
+            fontWeight: 500,
             color: C.text,
             flex: 1,
           }}

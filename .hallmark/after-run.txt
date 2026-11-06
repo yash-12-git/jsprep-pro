@@ -1,0 +1,379 @@
+src/app/[topic]/page.tsx
+  FAIL 19 :789 dash "—" in copy | fix: A comma, a colon, a full stop or parentheses; never a dash
+  FAIL 30a :383 emoji icon "⚠️" in <span class=""> | fix: One icon library or custom SVG
+  FAIL 30a :470 emoji icon "⚡" in <span class="">
+  FAIL 30a :535 emoji icon "💡" in <span class="">
+  FAIL 30a :609 text opens with an emoji: "📖 Deep Dive Articles" | fix: One icon library, a custom SVG, or the word alone
+  FAIL 30a :766 emoji icon "🎯" in <div class="">
+  FAIL 63 :800 arrow glued to the label "Practice Free →" (<Link>) | fix: A verb as the label; the link already says it goes somewhere
+  WARN F1 :406 straight quote in prose x2 (first: Where You'll See This in) | fix: Use typographic quotes: “ ” ’
+src/app/admin/blog/page.tsx
+  FAIL 19 :244 dash "—" in copy
+src/app/admin/components/BlogForm.tsx
+  FAIL 19 :648 dash "—" in copy
+  WARN F1 :656 straight quote in prose x5 (first: — shown as "Read More" on t)
+src/app/admin/components/QuestionForm.tsx
+  FAIL 19 :575 dash "—" in copy
+  FAIL 30a :477 emoji in <option> "📖 Theory"
+  FAIL 30a :478 emoji in <option> "💻 Output (What prints?)"
+  FAIL 30a :479 emoji in <option> "🐛 Debug (Find the bug)"
+  FAIL 30a :480 emoji in <option> "🧪 Polyfill (Write from scratch)"
+  FAIL 30a :659 text opens with an emoji: "⚡ Sandbox contract"
+  WARN F1 :854 straight quote in prose x2 (first: hen user clicks "Get a)
+src/app/admin/generate/page.tsx
+  FAIL 19 :911 dash "—" in copy
+  FAIL 30a :294 text opens with an emoji: "⛔ DUPLICATE"
+  FAIL 30a :739 emoji in <h1> "⚡ Question Generator"
+  FAIL 48 :203 inline-style colour literal #f76a6a | fix: Lift the value into the token block
+  FAIL 48 :248 inline-style colour literal #c4b5fd
+  FAIL 48 :285 inline-style colour literal #f76a6a
+  FAIL 48 :311 inline-style colour literal #f7c76a
+  FAIL 48 :346 inline-style colour literal #6af7c0
+  FAIL 48 :366 inline-style colour literal #f76a6a
+  FAIL 48 :411 inline-style colour literal #0a0a14
+  FAIL 48 :460 inline-style colour literal #6af7c0
+  FAIL 48 :722 inline-style colour literal #c8c8d8
+  FAIL 48 :836 inline-style colour literal #f76a6a
+  FAIL 48 :876 inline-style colour literal #6af7c0
+  FAIL 48 :1051 inline-style colour literal #6af7c0
+  FAIL 48 :1066 inline-style colour literal #f76a6a
+  WARN 49 :851 long clickable label "Generating… Generate Questions" without nowrap | fix: Shorten the label or set nowrap
+  WARN F1 :968 straight quote in prose x1 (first: tions — cron hasn't run yet or a)
+src/app/admin/migrate/page.tsx
+  FAIL 19 :587 dash "—" in copy
+  FAIL 30a :1065 emoji in <button> "Submitting… 📡 Submit React + T…"
+  WARN 49 :636 long clickable label "Migrating JS… Migrate JS items" without nowrap
+  WARN 49 :711 long clickable label "Seeding React Topics… Seed React To…" without nowrap
+  WARN 49 :780 long clickable label "Seeding React Blogs… Seed React Blo…" without nowrap
+  WARN 49 :852 long clickable label "Seeding TypeScript Topics… Seed Typ…" without nowrap
+  WARN 49 :921 long clickable label "Seeding TypeScript Blogs… Seed Type…" without nowrap
+  WARN 49 :972 long clickable label "Seeding System Design Topics… Seed …" without nowrap
+  WARN 49 :1023 long clickable label "Seeding System Design Blogs… Seed S…" without nowrap
+  WARN 49 :1057 long clickable label "Submitting… 📡 Submit React + TypeS…" without nowrap
+src/app/admin/seed/page.tsx
+  FAIL 19 :861 dash "—" in copy
+  FAIL 48 :1038 inline-style colour literal #f7f7f5
+  FAIL 48 :1105 inline-style colour literal #3178c680
+  FAIL 48 :1157 inline-style colour literal #7c3aed80
+  WARN 49 :940 long clickable label "Seed Questions + Embeddings" without nowrap
+  WARN 49 :956 long clickable label "Embedding… Re-Embed Missing" without nowrap
+  WARN 49 :976 long clickable label "Clearing… Clear All Questions" without nowrap
+  WARN 49 :1101 long clickable label "Seeding TypeScript… Seed TypeScript…" without nowrap
+  WARN 49 :1153 long clickable label "Seeding System Design… Seed System …" without nowrap
+  WARN F1 :927 straight quote in prose x3 (first: es. Use "Clear All Quest)
+src/app/admin/tag-questions/page.tsx
+  FAIL 19 :238 dash "—" in copy
+  FAIL 30a :319 text opens with an emoji: "💡"
+  WARN F1 :222 straight quote in prose x2 (first: The question's own URL neve)
+src/app/analytics/AnalyticsClientPage.tsx
+  FAIL 19 :450 dash "—" in copy
+  FAIL 30a :351 emoji in <h2> "⚡ Interview Sprint History"
+  FAIL 63 :357 arrow glued to the label "Run another sprint →"
+src/app/blog/[track]/page.tsx
+  FAIL 19 :137 dash "—" in copy
+  FAIL 63 :210 arrow glued to the label "Read article →" (<Link>)
+  FAIL 63 :258 arrow glued to the label "Start Practicing Free →" (<Link>)
+  WARN F1 :137 straight quote in prose x1 (first: ck back soon — we're adding cont)
+  NOTE 58 :117 hero paragraph runs 16 words | fix: One sentence, twelve words or fewer
+src/app/debug-lab/DebugLabClientWrapper.tsx
+  FAIL 19 :173 dash "—" in copy
+  FAIL 19 :180 buzzword "Unlock" | fix: Say what the product does, in its own nouns
+  FAIL 30a :173 text opens with an emoji: "🔒 First"
+  FAIL 63 :176 arrow glued to the label "Unlock All →"
+src/app/javascript-interview-cheatsheet/page.tsx
+  FAIL 19 :538 dash "—" in copy
+  FAIL 63 :313 arrow glued to the label "Or practice these concepts interactivel…" (<Link>)
+  FAIL 63 :541 arrow glued to the label "Start Practicing Free →" (<Link>)
+  WARN F1 :453 straight quote in prose x1 (first: What's Not Covered)
+  NOTE 58 :291 hero paragraph runs 18 words
+src/app/javascript-interview-questions/page.tsx
+  FAIL 19 :197 dash "—" in copy
+  FAIL 30a :85 emoji passed as an icon: 🧠
+  FAIL 30a :90 emoji passed as an icon: 💻
+  FAIL 30a :95 emoji passed as an icon: 🐛
+  FAIL 30a :100 emoji passed as an icon: 📐
+  FAIL 30a :197 text opens with an emoji: "🚀 Practice Now — It's Free"
+  FAIL 30a :208 text opens with an emoji: "💻 Output Quiz"
+  FAIL 30a :219 text opens with an emoji: "🐛 Debug Lab"
+  FAIL 30a :491 text opens with an emoji: "⚡ Daily Sprint"
+  FAIL 63 :267 arrow glued to the label "Browse All Topics →" (<Link>)
+  FAIL 63 :468 arrow glued to the label "Start Practicing Free →" (<Link>)
+  WARN F1 :197 straight quote in prose x1 (first: Practice Now — It's Free)
+src/app/javascript-output-questions/page.tsx
+  FAIL 19 :274 dash "—" in copy
+  FAIL 19 :453 buzzword "unlocks"
+  FAIL 30a :49 emoji passed as an icon: ⚙️
+  FAIL 30a :50 emoji passed as an icon: 🔒
+  FAIL 30a :51 emoji passed as an icon: 👉
+  FAIL 30a :162 text opens with an emoji: "⚡ Predict the Output"
+  FAIL 30a :212 text opens with an emoji: "✅"
+  FAIL 30a :261 emoji in <h2> "⚡ How to use this page"
+  FAIL 30a :301 emoji in <h2> "📋 Topics"
+  FAIL 30a :431 emoji icon "🔒" in <div class="">
+  FAIL 30a :479 text opens with an emoji: "⚡ Start Free — 5 Questions"
+  FAIL 63 :205 middle-dot meta string "✅ questions · ✅ First interactive free · ✅ Progre…" | fix: Line breaks, columns or hairlines; one dot in a byline at most
+  FAIL 63 :481 arrow glued to the label "View Pro — /mo →" (<Link>)
+  NOTE 58 :164 h1 runs 8 words ("JavaScript Output Questions What Does T…") | fix: Seven words or fewer, 50 characters or fewer
+  NOTE 58 :178 hero paragraph runs 14 words
+src/app/javascript-tricky-questions/page.tsx
+  FAIL 19 :251 dash "—" in copy
+  FAIL 19 :460 buzzword "unlocks"
+  FAIL 30a :91 text opens with an emoji: "🤯 Mark as Tricky"
+  FAIL 30a :175 text opens with an emoji: "🤯 JavaScript &quot;Wat?&quot; …"
+  FAIL 30a :213 text opens with an emoji: "✅"
+  FAIL 30a :238 emoji in <h2> "🎯 How to use this page"
+  FAIL 30a :279 emoji in <h2> "🎯 Why interviewers love these …"
+  FAIL 30a :316 emoji in <h2> "📋 Categories"
+  FAIL 30a :438 emoji icon "🔒" in <div class="">
+  FAIL 30a :486 text opens with an emoji: "⚡ Start Free — 5 Questions"
+  FAIL 63 :206 middle-dot meta string "✅ tricky questions · ✅ First interactive free · ✅…"
+  FAIL 63 :488 arrow glued to the label "View Pro — /mo →" (<Link>)
+  NOTE 58 :177 h1 runs 8 words ("JavaScript Tricky Questions The Rules B…")
+  NOTE 58 :191 hero paragraph runs 21 words
+src/app/mock-interview/MockInterviewClient.tsx
+  FAIL 19 :1475 dash "—" in copy
+  FAIL 63 :1481 arrow glued to the label "Begin Interview →"
+src/app/output-quiz/OutputClientWrapper.tsx
+  FAIL 19 :181 dash "—" in copy
+  FAIL 19 :188 buzzword "Unlock"
+  FAIL 30a :181 text opens with an emoji: "🔒 First"
+  FAIL 63 :184 arrow glued to the label "Unlock All →"
+src/app/polyfill-lab/PolyfillClientWrapper.tsx
+  FAIL 19 :142 dash "—" in copy
+  FAIL 19 :231 buzzword "Unlock"
+  FAIL 30a :168 text opens with an emoji: "🏢 Asked at:"
+  FAIL 30a :224 text opens with an emoji: "🔒 First"
+  FAIL 63 :227 arrow glued to the label "Unlock All →"
+src/app/react-interview-cheatsheet/page.tsx
+  FAIL 19 :528 dash "—" in copy
+  FAIL 63 :303 arrow glued to the label "Or practice these concepts interactivel…" (<Link>)
+  FAIL 63 :531 arrow glued to the label "Start Practicing Free →" (<Link>)
+  WARN F1 :443 straight quote in prose x1 (first: What's Not Covered)
+  NOTE 58 :281 hero paragraph runs 18 words
+src/app/react-interview-questions/page.tsx
+  FAIL 19 :198 dash "—" in copy
+  FAIL 30a :93 emoji passed as an icon: 🧠
+  FAIL 30a :98 emoji passed as an icon: 💻
+  FAIL 30a :103 emoji passed as an icon: 🐛
+  FAIL 30a :108 emoji passed as an icon: 📐
+  FAIL 30a :198 text opens with an emoji: "🚀 Practice Now — It's Free"
+  FAIL 30a :209 text opens with an emoji: "💻 Output Quiz"
+  FAIL 30a :220 text opens with an emoji: "🐛 Debug Lab"
+  FAIL 30a :492 text opens with an emoji: "⚡ Daily Sprint"
+  FAIL 63 :268 arrow glued to the label "Browse All Topics →" (<Link>)
+  FAIL 63 :469 arrow glued to the label "Start Practicing Free →" (<Link>)
+  WARN F1 :198 straight quote in prose x1 (first: Practice Now — It's Free)
+src/app/roadmap/RoadmapClient.tsx
+  FAIL 19 :196 dash "—" in copy
+  FAIL 30a :167 emoji in <button> "🏢 Company guide"
+  FAIL 30a :209 emoji icon "⏱" in <p class="">
+  FAIL 48 :152 inline-style colour literal #f97316
+src/app/roadmap/page.tsx
+  FAIL 19 :212 dash "—" in copy
+  FAIL 30a :380 text opens with an emoji: "🔥 Roadmap"
+  FAIL 63 :395 middle-dot meta string "2–3 hrs weekdays · 5–6 hrs weekends · Progress au…"
+src/app/topics/[track]/page.tsx
+  FAIL 19 :135 dash "—" in copy
+  FAIL 30a :252 emoji icon "📌" in <span class="">
+  FAIL 63 :455 arrow glued to the label "Start Practicing Free →" (<Link>)
+  WARN F1 :176 straight quote in prose x2 (first: ck back soon — we're adding cont)
+src/app/typescript-interview-questions/page.tsx
+  FAIL 19 :187 dash "—" in copy
+  FAIL 30a :87 emoji passed as an icon: 🧠
+  FAIL 30a :92 emoji passed as an icon: 💻
+  FAIL 30a :97 emoji passed as an icon: 🐛
+  FAIL 30a :102 emoji passed as an icon: 📐
+  FAIL 30a :187 text opens with an emoji: "🚀 Practice Now — It's Free"
+  FAIL 30a :198 text opens with an emoji: "📚 TypeScript Topics"
+  FAIL 30a :209 text opens with an emoji: "✍️ TS Blog"
+  FAIL 30a :469 text opens with an emoji: "⚡ Daily Sprint"
+  FAIL 48 :142 inline-style colour literal #3178c6
+  FAIL 48 :180 inline-style colour literal #317
+  FAIL 48 :257 inline-style colour literal #3178c6
+  FAIL 48 :448 inline-style colour literal #317
+  FAIL 63 :255 arrow glued to the label "Browse All Topics →" (<Link>)
+  FAIL 63 :446 arrow glued to the label "Start Practicing Free →" (<Link>)
+  WARN F1 :187 straight quote in prose x1 (first: Practice Now — It's Free)
+src/components/home/AuthCTAs.tsx
+  FAIL 19 :54 dash "—" in copy
+  FAIL 63 :73 arrow glued to the label "Join the leaderboard — earn XP →" (<Link>)
+  WARN F1 :64 straight quote in prose x1 (first: Try today's question)
+src/components/seo/SEOPredictionCard.tsx
+  FAIL 19 :488 dash "—" in copy
+  FAIL 30a :625 text opens with an emoji: "💡 Explanation"
+  FAIL 30a :653 text opens with an emoji: "⚡ Key Insight"
+  FAIL 48 :452 inline-style colour literal #ffffff
+  FAIL 63 :344 arrow glued to the label "Open Interactive Quiz →" (<Link>)
+src/components/ui/AIChat/page.tsx
+  FAIL 19 :84 dash "—" in copy
+src/components/ui/AnswerEvaluator/page.tsx
+  FAIL 19 :67 dash "—" in copy
+  WARN 49 :109 long clickable label "Evaluating… Evaluate My Answer" without nowrap
+src/components/ui/InlineEvaluater.tsx
+  FAIL 19 :428 dash "–" in copy
+  WARN F1 :454 straight quote in prose x2 (first: Answer as if you're in a real i)
+src/components/ui/PaywallBanner/page.tsx
+  FAIL 19 :33 buzzword "Unlock"
+src/components/ui/QuestionCards/DebugCard.tsx
+  FAIL 19 :349 buzzword "Unlock"
+  FAIL 19 :359 buzzword "unlocks"
+  FAIL 30a :375 text opens with an emoji: "🐛 Bug"
+  FAIL 30a :555 text opens with an emoji: "💡 Better approach"
+  FAIL 30a :580 text opens with an emoji: "💡 Explanation"
+src/components/ui/QuestionCards/OutputCard.tsx
+  FAIL 19 :317 buzzword "Unlock"
+  FAIL 19 :327 buzzword "unlocks"
+  FAIL 19 :401 dash "—" in copy
+  FAIL 30a :401 text opens with an emoji: "💡 Exploration mode — edit free…"
+  FAIL 30a :579 text opens with an emoji: "💡 Exact wording not required —…"
+  FAIL 30a :586 text opens with an emoji: "💡 Explanation"
+  FAIL 30a :591 text opens with an emoji: "⚡ Key Insight"
+  WARN F1 :409 straight quote in prose x1 (first: ↑ That's the error th)
+src/components/ui/QuestionCards/PolyfillCard.tsx
+  FAIL 19 :269 dash "—" in copy
+  FAIL 19 :269 buzzword "unlock"
+  FAIL 30a :579 text opens with an emoji: "💡 Explanation"
+  FAIL 30a :600 emoji icon "⚡" in <p class="">
+  WARN 49 :483 long clickable label "Hide Solution Show Solution" without nowrap
+src/components/ui/Roadmap/CompanyGuide.tsx
+  FAIL 19 :106 dash "—" in copy
+  FAIL 30a :181 emoji icon "💡" in <div class="">
+  FAIL 30a :215 text opens with an emoji: "🎤 Start"
+  FAIL 48 :137 inline-style colour literal #E1F5EE
+  FAIL 63 :196 arrow glued to the label "🎤 Start mock →" (<Link>)
+  WARN F1 :106 straight quote in prose x2 (first: u apply — click "Start mock" to)
+src/components/ui/TrackSwitcher.tsx
+  FAIL 19 :120 dash "—" in copy
+src/app/[topic]/opengraph-image.tsx
+  FAIL 30a :360 text opens with an emoji: "⚡ AI scored"
+  FAIL 48 :145 inline-style colour literal #fff
+  FAIL 48 :386 inline-style colour literal #ffffff
+src/app/blog/[track]/[slug]/page.tsx
+  FAIL 30a :250 text opens with an emoji: "💡 Practice these concepts inte…"
+  FAIL 30a :305 text opens with an emoji: "📚 Practice These Topics"
+  FAIL 63 :252 arrow glued to the label "Start Practicing →" (<Link>)
+  FAIL 63 :388 arrow glued to the label "Start Free →" (<Link>)
+src/app/cheatsheet/CheatsheetClientWrapper.tsx
+  FAIL 30a :349 emoji icon "📄" in <div class="">
+  FAIL 30a :483 emoji passed as an icon: 🌟
+  FAIL 63 :355 arrow glued to the label "Upgrade to Pro →"
+  FAIL 63 :553 middle-dot meta string "jsprep.pro · JavaScript Interview Prep · Good luc…"
+src/app/dashboard/components/HomeClient.tsx
+  FAIL 30a :253 emoji passed as an icon: 📖
+  FAIL 30a :260 emoji passed as an icon: 💻
+  FAIL 30a :267 emoji passed as an icon: 🐛
+  FAIL 30a :274 emoji passed as an icon: 🧪
+  FAIL 30a :376 text opens with an emoji: "🔥"
+src/app/dashboard/components/Leaderboard.tsx
+  FAIL 30a :229 emoji passed as an icon: 🥇
+  FAIL 63 :261 arrow glued to the label "Start earning XP →" (<Link>)
+  FAIL 63 :327 middle-dot meta string "XP earned: 10 per mastered question · 8 per outpu…"
+src/app/dashboard/components/QuestionOfTheDay.tsx
+  FAIL 30a :725 emoji icon "💡" in <div class="">
+src/app/dashboard/page.tsx
+  FAIL 30a :85 emoji icon "⚡" in <span class="">
+  FAIL 48 :69 inline-style colour literal #ffffff
+  FAIL 48 :87 inline-style colour literal #37352f
+  FAIL 48 :94 inline-style colour literal #787774
+  FAIL 48 :103 inline-style colour literal #2383e2
+  FAIL 63 :94 middle-dot meta string "Timed · mixed questions · AI scored · one number …"
+src/app/javascript-interview-questions/QuestionListClientWrapper.tsx
+  FAIL 30a :170 text opens with an emoji: "🏢 Asked at:"
+src/app/mock-interview/InterviewResult.tsx
+  FAIL 30a :765 emoji icon "📣" in <span class="">
+  FAIL 30a :900 text opens with an emoji: "📚 Recommended Study Topics"
+  FAIL 33 :784 <svg> without aria-hidden or aria-label | fix: Add aria-hidden or an aria-label
+  FAIL 33 :797 <svg> without aria-hidden or aria-label
+  WARN 49 :813 long clickable label "Copied to clipboard! Copy share text" without nowrap
+src/app/q/[slug]/page.tsx
+  FAIL 30a :257 emoji icon "💡" in <span class="">
+  FAIL 63 :474 arrow glued to the label "→" (<Link>)
+src/app/questions/[slug]/page.tsx
+  FAIL 30a :370 text opens with an emoji: "💡"
+  FAIL 63 :203 arrow glued to the label "Practice Interactively →" (<Link>)
+  FAIL 63 :396 arrow glued to the label "Practice this question →" (<Link>)
+  FAIL 63 :442 arrow glued to the label "→" (<Link>)
+  FAIL 63 :494 arrow glued to the label "Start Free Practice →" (<Link>)
+src/app/sprint/components/DebugSprintCard.tsx
+  FAIL 30a :322 text opens with an emoji: "🐛 Debug"
+  FAIL 30a :332 text opens with an emoji: "🔴 Buggy Code"
+  FAIL 30a :334 text opens with an emoji: "✏️ Your Fix"
+  FAIL 30a :380 text opens with an emoji: "✅ Correct fix"
+  FAIL 63 :408 arrow glued to the label "Next →"
+src/app/sprint/components/OutputSprintCard.tsx
+  FAIL 30a :258 text opens with an emoji: "💻 Output"
+  FAIL 63 :336 arrow glued to the label "Next →"
+src/app/sprint/components/SprintResults.tsx
+  FAIL 30a :936 emoji icon "📣" in <span class="">
+  FAIL 33 :304 <svg> without aria-hidden or aria-label
+  FAIL 33 :954 <svg> without aria-hidden or aria-label
+  FAIL 33 :974 <svg> without aria-hidden or aria-label
+  FAIL 33 :988 <svg> without aria-hidden or aria-label
+  WARN 49 :1004 long clickable label "Copied to clipboard! Copy share text" without nowrap
+src/app/sprint/components/TheorySprintCard.tsx
+  FAIL 30a :442 text opens with an emoji: "📖 Theory"
+  FAIL 63 :609 arrow glued to the label "Next →"
+  WARN 49 :480 long clickable label "Evaluating... Submit Answer" without nowrap
+  WARN F2 :491 three-period ellipsis in prose x1 | fix: Use a true ellipsis character (…)
+src/app/study-plan/StudyPlanClientWrapper.tsx
+  FAIL 30a :143 emoji in <h1> "🧠 AI Study Plan"
+  FAIL 30a :327 emoji icon "💡" in <p class="">
+  WARN 49 :220 long clickable label "Analyzing… Regenerate Plan Generate…" without nowrap
+src/app/system-design-interview-questions/page.tsx
+  FAIL 30a :103 emoji passed as an icon: 🏗️
+  FAIL 30a :108 emoji passed as an icon: 📊
+  FAIL 30a :113 emoji passed as an icon: 🔒
+  FAIL 30a :118 emoji passed as an icon: 🧩
+  FAIL 30a :206 text opens with an emoji: "🚀 Practice Now — It&apos;s Free"
+  FAIL 30a :217 text opens with an emoji: "🏗️ Browse All Topics"
+  FAIL 30a :228 text opens with an emoji: "📖 Deep-Dive Blogs"
+  FAIL 30a :472 text opens with an emoji: "⚡ Daily Sprint"
+  FAIL 48 :158 inline-style colour literal #7c3aed
+  FAIL 48 :199 inline-style colour literal #7c3
+  FAIL 48 :276 inline-style colour literal #7c3aed
+  FAIL 48 :451 inline-style colour literal #7c3
+  FAIL 63 :274 arrow glued to the label "Browse All Topics →" (<Link>)
+  FAIL 63 :449 arrow glued to the label "Start Practicing Free →" (<Link>)
+src/app/theory/TheoryPageClientWrapper.tsx
+  FAIL 30a :96 emoji icon "📖" in <span class="">
+src/components/ui/QuestionCards/TheoryCard.tsx
+  FAIL 30a :128 emoji icon "💡" in <span class="">
+  FAIL 30a :146 text opens with an emoji: "💡 Hint:"
+src/components/ui/Roadmap/DayRow.tsx
+  FAIL 30a :14 emoji passed as an icon: 📖
+  FAIL 30a :15 emoji passed as an icon: 🛠️
+  FAIL 30a :16 emoji passed as an icon: 🎤
+  FAIL 30a :196 text opens with an emoji: "🎤 Start mock interview →"
+  FAIL 48 :151 inline-style colour literal #3B6D11
+  FAIL 48 :179 inline-style colour literal #C0DD97
+  FAIL 63 :177 arrow glued to the label "🎤 Start mock interview →" (<Link>)
+src/components/ui/Roadmap/WeekCard.tsx
+  FAIL 30a :54 emoji icon "▶" in <span class="">
+src/app/javascript-interview-cheatsheet/DownloadPdfButton.tsx
+  FAIL 33 :15 <svg> without aria-hidden or aria-label
+src/app/admin/questions/[id]/page.tsx
+  FAIL 48 :103 inline-style colour literal #f0f0f0
+src/app/dashboard/components/QuestionOfTheDayWrapper.tsx
+  FAIL 48 :19 inline-style colour literal #f7f7f5
+  FAIL 48 :33 inline-style colour literal #ebebea
+src/app/opengraph-image.tsx
+  FAIL 48 :81 inline-style colour literal #ffffff
+  FAIL 48 :207 inline-style colour literal #f76a6a
+  FAIL 48 :215 inline-style colour literal #f7c76a
+  FAIL 48 :223 inline-style colour literal #6af7c0
+  FAIL 63 :143 middle-dot meta string "200+ questions · Theory, Output & Debug · 6 AI to…"
+src/app/admin/page.tsx
+  FAIL 63 :300 middle-dot meta string "AI pipeline · dedup check · approve to publish. A…"
+src/app/dashboard/components/LearnSection.tsx
+  FAIL 63 :40 arrow glued to the label "All topics →" (<Link>)
+  FAIL 63 :119 arrow glued to the label "All posts →" (<Link>)
+.hallmark/before.json
+  FAIL kept :1 handlers the page had before and no longer has: onMouseEnter={(e) => { (e.currentTarget as HTML…, onMouseEnter={(e) => { (e.currentTarget as HTML…, onMouseLeave={(e) => { (e.currentTarget as HTML…, onMouseLeave={(e) => { (e.currentTarget as HTML… | fix: Restore each one, or record it in the stamp: /* Hallmark · dropped <item>, <item> · <the reason> */
+src/app/base.css
+  REFLEX 26b :1 no :active styling anywhere | fix: All eight states; guard: not a form control, no aria-disabled anywhere
+src/app/HomePageClient.tsx
+  WARN 46a :406 metric "86% accuracy": verify the user supplied this number | fix: Confirm the metric or drop the slot
+src/app/admin/components/TopicForm.tsx
+  WARN F1 :648 straight quote in prose x1 (first: tly click. e.g. "A closure)
+sloplint: 263 FAIL, 1 REFLEX, 40 WARN, 7 NOTE across 113 file(s).
+kept: links 71/71, fields 1/1, handlers 273/277; before 306 FAIL, 7 REFLEX, now 263 FAIL, 1 REFLEX

@@ -55,7 +55,7 @@ const S = {
 
   logoText: css`
     font-size: 0.875rem;
-    font-weight: 900;
+    font-weight: 500;
     color: ${C.text};
   `,
 
@@ -63,10 +63,8 @@ const S = {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: 0.5625rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: ${C.accent2};
     background: ${C.accent2}14;
     border: 1px solid ${C.accent2}33;
@@ -81,11 +79,9 @@ const S = {
   `,
 
   navSection: css`
-    font-size: 0.5625rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: rgba(255, 255, 255, 0.25);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: color-mix(in oklab, var(--color-ink) 25%, transparent);
     padding: 0.75rem 0.5rem 0.375rem;
   `,
 
@@ -101,11 +97,11 @@ const S = {
     background: ${active ? C.accent + "18" : "transparent"};
     border: 1px solid ${active ? C.accent + "33" : "transparent"};
     text-decoration: none;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
     margin-bottom: 0.125rem;
     &:hover {
       color: ${C.text};
-      background: rgba(255, 255, 255, 0.05);
+      background: color-mix(in oklab, var(--color-ink) 5%, transparent);
     }
   `,
 

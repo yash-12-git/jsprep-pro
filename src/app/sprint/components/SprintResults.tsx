@@ -46,7 +46,7 @@ function getGrade(accuracy: number): GradeInfo {
       label: "Elite Performance",
       sub: "You're interview-ready.",
       color: C.amber,
-      glow: `${C.amber}55`,
+      glow: `color-mix(in oklab, ${C.amber} 33%, transparent)`,
       bg: C.amberSubtle,
       border: C.amberBorder,
       shareMsg: "S-tier JavaScript interview performance",
@@ -57,7 +57,7 @@ function getGrade(accuracy: number): GradeInfo {
       label: "Strong Result",
       sub: "Well above average.",
       color: C.accent,
-      glow: `${C.accent}44`,
+      glow: `color-mix(in oklab, ${C.accent} 27%, transparent)`,
       bg: C.accentSubtle,
       border: C.border,
       shareMsg: "Strong JavaScript interview score",
@@ -67,8 +67,8 @@ function getGrade(accuracy: number): GradeInfo {
       grade: "B",
       label: "Solid Effort",
       sub: "On the right track.",
-      color: "#0d7377",
-      glow: "rgba(13,115,119,0.2)",
+      color: C.cool,
+      glow: "transparent",
       bg: C.greenSubtle,
       border: C.greenBorder,
       shareMsg: "Solid JavaScript sprint result",
@@ -79,7 +79,7 @@ function getGrade(accuracy: number): GradeInfo {
       label: "Getting There",
       sub: "Keep the reps up.",
       color: C.green,
-      glow: `${C.green}33`,
+      glow: `color-mix(in oklab, ${C.green} 20%, transparent)`,
       bg: C.greenSubtle,
       border: C.greenBorder,
       shareMsg: "JavaScript interview practice in progress",
@@ -89,7 +89,7 @@ function getGrade(accuracy: number): GradeInfo {
     label: "Early Days",
     sub: "Every rep counts.",
     color: C.orange,
-    glow: `${C.orange}33`,
+    glow: `color-mix(in oklab, ${C.orange} 20%, transparent)`,
     bg: C.amberSubtle,
     border: C.amberBorder,
     shareMsg: "Starting my JavaScript interview prep",
@@ -164,14 +164,14 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
   grd.addColorStop(1, "transparent");
   ctx.fillStyle = grd;
   ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = "rgba(255,255,255,0.035)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 4%, transparent)";
   for (let x = 60; x < W; x += 60)
     for (let y = 60; y < H; y += 60) {
       ctx.beginPath();
       ctx.arc(x, y, 1.5, 0, Math.PI * 2);
       ctx.fill();
     }
-  ctx.fillStyle = "rgba(255,255,255,0.07)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 7%, transparent)";
   rx(ctx, 72, 66, 200, 32, 16);
   ctx.fill();
   ctx.font = "700 12px system-ui";
@@ -201,7 +201,7 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
   ctx.fillText(`${score}`, 72, 375);
   const sw = ctx.measureText(`${score}`).width;
   ctx.font = "700 34px system-ui";
-  ctx.fillStyle = "rgba(255,255,255,0.3)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 30%, transparent)";
   ctx.fillText(`/${maxScore} pts`, 72 + sw + 8, 363);
   ctx.font = "700 18px system-ui";
   ctx.fillStyle = g.color;
@@ -217,25 +217,25 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
   ];
   stats.forEach((s, i) => {
     const x = 72 + i * 158;
-    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 6%, transparent)";
     rx(ctx, x, 450, 144, 72, 12);
     ctx.fill();
     ctx.font = "900 22px system-ui";
     ctx.fillStyle = "#ffffff";
     ctx.fillText(s.val, x + 14, 485);
     ctx.font = "600 11px system-ui";
-    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 35%, transparent)";
     ctx.fillText(s.label.toUpperCase(), x + 14, 503);
   });
   const RX = 770;
   ctx.font = "700 11px system-ui";
-  ctx.fillStyle = "rgba(255,255,255,0.3)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 30%, transparent)";
   ctx.fillText("CATEGORY PERFORMANCE", RX, 98);
   const cats = getCategoryStats(results).slice(0, 5);
   cats.forEach((c, i) => {
     const y = 120 + i * 68;
     ctx.font = "600 14px system-ui";
-    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 70%, transparent)";
     ctx.fillText(c.cat, RX, y);
     const col = c.pct >= 80 ? "#6af7c0" : c.pct >= 50 ? "#f7c76a" : "#f76a6a";
     ctx.font = "800 14px system-ui";
@@ -243,7 +243,7 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
     ctx.textAlign = "right";
     ctx.fillText(`${c.pct}%`, RX + 370, y);
     ctx.textAlign = "left";
-    ctx.fillStyle = "rgba(255,255,255,0.08)";
+    ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 8%, transparent)";
     rx(ctx, RX, y + 10, 370, 6, 3);
     ctx.fill();
     ctx.fillStyle = col;
@@ -257,7 +257,7 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
     ctx.fillText("✓ STRENGTHS", RX, insY);
     strengths.slice(0, 2).forEach((s, i) => {
       ctx.font = "500 13px system-ui";
-      ctx.fillStyle = "rgba(255,255,255,0.5)";
+      ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 50%, transparent)";
       ctx.fillText(`• ${s}`, RX, insY + 18 + i * 20);
     });
   }
@@ -267,17 +267,17 @@ function buildCard(summary: SprintSummary, g: GradeInfo): string {
     ctx.fillText("↻ FOCUS ON", RX + 200, insY);
     weakAreas.slice(0, 2).forEach((w, i) => {
       ctx.font = "500 13px system-ui";
-      ctx.fillStyle = "rgba(255,255,255,0.5)";
+      ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 50%, transparent)";
       ctx.fillText(`• ${w}`, RX + 200, insY + 18 + i * 20);
     });
   }
-  ctx.fillStyle = "rgba(255,255,255,0.04)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 4%, transparent)";
   ctx.fillRect(0, 612, W, 63);
   ctx.font = "700 15px system-ui";
   ctx.fillStyle = g.color;
   ctx.fillText("jsprep.pro/sprint", 72, 651);
   ctx.font = "500 14px system-ui";
-  ctx.fillStyle = "rgba(255,255,255,0.3)";
+  ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 30%, transparent)";
   ctx.textAlign = "right";
   ctx.fillText(
     "Interview Sprint  •  Can you beat my score?",
@@ -301,7 +301,7 @@ function AccuracyArc({ pct, color }: { pct: number; color: string }) {
         gap: 2,
       }}
     >
-      <svg
+      <svg aria-hidden="true"
         width="68"
         height="68"
         viewBox="0 0 100 100"
@@ -332,15 +332,13 @@ function AccuracyArc({ pct, color }: { pct: number; color: string }) {
         />
       </svg>
       <div
-        style={{ fontSize: "0.8125rem", fontWeight: 700, color, marginTop: -4 }}
+        style={{ fontSize: "0.8125rem", fontWeight: 500, color, marginTop: -4 }}
       >
         {pct}%
       </div>
       <div
         style={{
           fontSize: "0.55rem",
-          textTransform: "uppercase",
-          letterSpacing: "0.07em",
           color: C.muted,
         }}
       >
@@ -419,7 +417,6 @@ export default function SprintResults({ summary, onRetry }: Props) {
       border: 1px solid ${g.border};
       border-radius: ${RADIUS.xl};
       padding: 1.75rem;
-      animation: ${fadeUp} 0.5s ease both;
     `,
     gradeRow: css`
       display: flex;
@@ -438,22 +435,20 @@ export default function SprintResults({ summary, onRetry }: Props) {
       align-items: center;
       justify-content: center;
       font-size: 2.25rem;
-      font-weight: 700;
+      font-weight: 500;
       color: ${g.color};
       animation: ${pop} 0.55s ease 0.1s both;
     `,
     h1: css`
       font-size: 1.375rem;
-      font-weight: 700;
+      font-weight: 500;
       color: ${C.text};
       letter-spacing: -0.02em;
       margin-bottom: 0.2rem;
-      animation: ${fadeUp} 0.4s ease 0.15s both;
     `,
     sub: css`
       font-size: 0.875rem;
       color: ${C.muted};
-      animation: ${fadeUp} 0.4s ease 0.2s both;
     `,
     scoreRow: css`
       display: flex;
@@ -463,11 +458,10 @@ export default function SprintResults({ summary, onRetry }: Props) {
     `,
     bigScore: css`
       font-size: 3rem;
-      font-weight: 700;
+      font-weight: 500;
       letter-spacing: -0.04em;
       line-height: 1;
       color: ${g.color};
-      animation: ${countUp} 0.5s ease 0.25s both;
     `,
     maxScore: css`
       font-size: 1.125rem;
@@ -487,20 +481,17 @@ export default function SprintResults({ summary, onRetry }: Props) {
       gap: 0.75rem;
       padding-top: 1.25rem;
       border-top: 1px solid ${C.border};
-      animation: ${fadeIn} 0.5s ease 0.35s both;
     `,
     statBox: css`
       .val {
         font-size: 1.125rem;
-        font-weight: 700;
+        font-weight: 500;
         color: ${C.text};
         letter-spacing: -0.02em;
       }
       .lbl {
         font-size: 0.6rem;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+        font-weight: 500;
         color: ${C.muted};
         margin-top: 0.2rem;
       }
@@ -512,13 +503,10 @@ export default function SprintResults({ summary, onRetry }: Props) {
       border: 1px solid ${C.border};
       border-radius: ${RADIUS.lg};
       padding: 1.25rem;
-      animation: ${fadeUp} 0.5s ease 0.25s both;
     `,
     panelHead: css`
       font-size: 0.675rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-weight: 500;
       color: ${C.muted};
       margin-bottom: 1rem;
       display: flex;
@@ -532,7 +520,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
     `,
     catPct: css`
       font-size: 0.75rem;
-      font-weight: 700;
+      font-weight: 500;
       color: ${C.text};
     `,
     barTrack: css`
@@ -548,7 +536,6 @@ export default function SprintResults({ summary, onRetry }: Props) {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.75rem;
-      animation: ${fadeUp} 0.5s ease 0.3s both;
       @media (max-width: 400px) {
         grid-template-columns: 1fr;
       }
@@ -561,9 +548,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
     `,
     insightHead: (col: string) => css`
       font-size: 0.6rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-weight: 500;
       color: ${col};
       margin-bottom: 0.625rem;
       display: flex;
@@ -589,7 +574,6 @@ export default function SprintResults({ summary, onRetry }: Props) {
       border: 1px solid ${C.border};
       border-radius: ${RADIUS.lg};
       overflow: hidden;
-      animation: ${fadeUp} 0.5s ease 0.35s both;
     `,
     bkRow: (o: string) => css`
       display: flex;
@@ -604,9 +588,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
     `,
     typeChip: (t: string) => css`
       font-size: 0.5rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-weight: 500;
       padding: 2px 6px;
       border-radius: 6px;
       flex-shrink: 0;
@@ -625,8 +607,8 @@ export default function SprintResults({ summary, onRetry }: Props) {
       white-space: nowrap;
     `,
     bkPts: (p: number) => css`
-      font-size: 0.7rem;
-      font-weight: 700;
+      font-size: 0.75rem;
+      font-weight: 500;
       flex-shrink: 0;
       color: ${p >= 10 ? C.green : p > 0 ? C.amber : C.muted};
     `,
@@ -636,7 +618,6 @@ export default function SprintResults({ summary, onRetry }: Props) {
       border: 1px solid ${C.border};
       border-radius: ${RADIUS.lg};
       padding: 1.25rem;
-      animation: ${fadeUp} 0.5s ease 0.4s both;
     `,
     sharePreview: css`
       background: ${C.bg};
@@ -666,12 +647,12 @@ export default function SprintResults({ summary, onRetry }: Props) {
       padding: 0.625rem 0.875rem;
       border-radius: ${RADIUS.md};
       font-size: 0.8rem;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
       background: ${bg};
       border: 1px solid ${border};
       color: ${col};
-      transition: all 0.12s ease;
+      transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
       white-space: nowrap;
       &:hover {
         opacity: 0.85;
@@ -690,12 +671,12 @@ export default function SprintResults({ summary, onRetry }: Props) {
       padding: 0.625rem;
       border-radius: ${RADIUS.md};
       font-size: 0.8rem;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
       background: ${C.bg};
       border: 1px solid ${C.border};
       color: ${C.muted};
-      transition: all 0.12s ease;
+      transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
       &:hover {
         border-color: ${C.borderStrong};
         color: ${C.text};
@@ -706,7 +687,6 @@ export default function SprintResults({ summary, onRetry }: Props) {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.75rem;
-      animation: ${fadeUp} 0.5s ease 0.45s both;
       @media (max-width: 380px) {
         grid-template-columns: 1fr;
       }
@@ -715,7 +695,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
       padding: 0.875rem;
       border-radius: ${RADIUS.lg};
       font-size: 0.875rem;
-      font-weight: 600;
+      font-weight: 500;
       background: ${C.bgSubtle};
       border: 1px solid ${C.border};
       color: ${C.muted};
@@ -724,7 +704,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      transition: all 0.12s ease;
+      transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
       &:hover {
         border-color: ${C.borderStrong};
         color: ${C.text};
@@ -735,7 +715,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
       padding: 0.875rem;
       border-radius: ${RADIUS.lg};
       font-size: 0.875rem;
-      font-weight: 600;
+      font-weight: 500;
       background: ${C.accent};
       border: none;
       color: ${C.accentInk};
@@ -933,15 +913,15 @@ export default function SprintResults({ summary, onRetry }: Props) {
         {/* Share */}
         <div css={S.shareCard}>
           <div css={S.panelHead} style={{ marginBottom: "1rem" }}>
-            <span style={{ fontSize: "0.875rem" }}>📣</span> Share your result
+            <span style={{ fontSize: "0.875rem" }}></span> Share your result
           </div>
           <div css={S.sharePreview}>{shareText}</div>
           <div css={S.shareBtns}>
             <button
               css={S.sBtn(
-                "rgba(10,102,194,0.08)",
-                "#1d6fa8",
-                "rgba(10,102,194,0.2)",
+                C.bgSubtle,
+                C.text,
+                C.borderStrong,
               )}
               onClick={() =>
                 window.open(
@@ -951,7 +931,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
                 )
               }
             >
-              <svg
+              <svg aria-hidden="true"
                 width="13"
                 height="13"
                 viewBox="0 0 24 24"
@@ -971,7 +951,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
                 )
               }
             >
-              <svg
+              <svg aria-hidden="true"
                 width="13"
                 height="13"
                 viewBox="0 0 24 24"
@@ -985,7 +965,7 @@ export default function SprintResults({ summary, onRetry }: Props) {
               css={S.sBtn(C.accentSubtle, C.accentText, C.border)}
               onClick={downloadCard}
             >
-              <svg
+              <svg aria-hidden="true"
                 width="13"
                 height="13"
                 viewBox="0 0 24 24"

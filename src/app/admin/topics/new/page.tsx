@@ -29,7 +29,7 @@ export default function NewTopicPage() {
         <Link href="/admin/topics" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: C.muted, textDecoration: 'none', fontSize: '0.875rem' }}>
           <ArrowLeft size={15} /> All Topics
         </Link>
-        <span style={{ color: 'rgba(255,255,255,0.2)' }}>/</span>
+        <span style={{ color: 'color-mix(in oklab, var(--color-ink) 20%, transparent)' }}>/</span>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 900 }}>New Topic</h1>
       </div>
       <TopicForm mode="create" onSubmit={handleSubmit} />

@@ -54,10 +54,8 @@ const S = {
 
   label: css`
     display: block;
-    font-size: 0.6875rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: ${C.muted};
     margin-bottom: 0.375rem;
   `,
@@ -86,10 +84,10 @@ const S = {
     outline: none;
     transition: border-color 0.15s ease;
     &:focus {
-      border-color: ${C.accent}55;
+      border-color: color-mix(in oklab, ${C.accent} 33%, transparent);
     }
     &::placeholder {
-      color: rgba(255, 255, 255, 0.2);
+      color: color-mix(in oklab, var(--color-ink) 20%, transparent);
     }
   `,
 
@@ -104,11 +102,11 @@ const S = {
     outline: none;
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='rgba(255,255,255,0.4)' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='color-mix(in oklab, var(--color-ink) 40%, transparent)' stroke-width='1.5'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.875rem center;
     &:focus {
-      border-color: ${C.accent}55;
+      border-color: color-mix(in oklab, ${C.accent} 33%, transparent);
     }
     option {
       background: ${C.card};
@@ -126,10 +124,10 @@ const S = {
     outline: none;
     resize: vertical;
     &:focus {
-      border-color: ${C.accent}55;
+      border-color: color-mix(in oklab, ${C.accent} 33%, transparent);
     }
     &::placeholder {
-      color: rgba(255, 255, 255, 0.2);
+      color: color-mix(in oklab, var(--color-ink) 20%, transparent);
     }
   `,
 
@@ -140,10 +138,8 @@ const S = {
   `,
 
   sectionLabel: css`
-    font-size: 0.6875rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: ${C.muted};
     margin-bottom: 1rem;
   `,
@@ -158,7 +154,7 @@ const S = {
     flex-direction: column;
     gap: 0.375rem;
     &:focus-within {
-      border-color: ${C.accent}55;
+      border-color: color-mix(in oklab, ${C.accent} 33%, transparent);
     }
   `,
 
@@ -179,7 +175,7 @@ const S = {
     resize: none;
     line-height: 1.5;
     &::placeholder {
-      color: rgba(255, 255, 255, 0.2);
+      color: color-mix(in oklab, var(--color-ink) 20%, transparent);
     }
   `,
 
@@ -205,15 +201,15 @@ const S = {
     margin-top: 0.5rem;
     padding: 0.3125rem 0.625rem;
     background: none;
-    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border: 1px dashed color-mix(in oklab, var(--color-ink) 10%, transparent);
     border-radius: ${RADIUS.sm};
     color: ${C.muted};
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
     &:hover {
-      border-color: ${C.accent}55;
+      border-color: color-mix(in oklab, ${C.accent} 33%, transparent);
       color: ${C.accent};
     }
   `,
@@ -225,12 +221,12 @@ const S = {
     padding: 0.375rem 0.875rem;
     border-radius: ${RADIUS.md};
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 500;
     border: 1px solid ${active ? color + "55" : C.border};
     background: ${active ? color + "14" : "transparent"};
     color: ${active ? color : C.muted};
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
   `,
 
   footer: css`
@@ -252,7 +248,7 @@ const S = {
     border: none;
     border-radius: ${RADIUS.xl};
     color: ${C.text};
-    font-weight: 800;
+    font-weight: 500;
     font-size: 0.9375rem;
     cursor: ${loading ? "not-allowed" : "pointer"};
     &:hover {
@@ -266,15 +262,15 @@ const S = {
     gap: 0.375rem;
     padding: 0.625rem 1rem;
     background: transparent;
-    border: 1px solid ${C.danger}44;
+    border: 1px solid color-mix(in oklab, ${C.danger} 27%, transparent);
     border-radius: ${RADIUS.xl};
     color: ${C.danger};
     font-size: 0.8125rem;
-    font-weight: 700;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
     &:hover {
-      background: ${C.danger}12;
+      background: color-mix(in oklab, ${C.danger} 7%, transparent);
     }
   `,
 
@@ -288,14 +284,14 @@ const S = {
     border-radius: ${RADIUS.xl};
     color: ${C.accent3};
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 1.5rem;
   `,
 
   error: css`
     padding: 0.875rem 1.25rem;
-    background: ${C.danger}12;
-    border: 1px solid ${C.danger}33;
+    background: color-mix(in oklab, ${C.danger} 7%, transparent);
+    border: 1px solid color-mix(in oklab, ${C.danger} 20%, transparent);
     border-radius: ${RADIUS.xl};
     color: ${C.danger};
     font-size: 0.875rem;
@@ -645,8 +641,8 @@ export default function TopicForm({
         <label css={S.label}>
           Mental Model
           <span css={S.labelNote}>
-            One analogy that makes the concept instantly click. e.g. "A closure
-            is like a backpack…"
+            One analogy that makes the concept instantly click. e.g. &quot;A closure
+            is like a backpack…&quot;
           </span>
         </label>
         <textarea

@@ -236,7 +236,7 @@ export default function OutputCard({
               marginBottom: "0.375rem",
             }}
           >
-            <p css={{ fontWeight: 600, fontSize: "0.875rem", color: C.text }}>
+            <p css={{ fontWeight: 500, fontSize: "0.875rem", color: C.text }}>
               {q.title}
             </p>
             {isLocked && <Lock size={12} color={C.muted} />}
@@ -254,8 +254,8 @@ export default function OutputCard({
           >
             <span
               css={{
-                fontSize: "0.625rem",
-                fontWeight: 600,
+                fontSize: "0.75rem",
+                fontWeight: 500,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
                 border: `1px solid ${ds.border}`,
@@ -267,7 +267,7 @@ export default function OutputCard({
             </span>
             <span
               css={{
-                fontSize: "0.625rem",
+                fontSize: "0.75rem",
                 fontWeight: 500,
                 padding: "0.125rem 0.5rem",
                 borderRadius: "9999px",
@@ -310,11 +310,11 @@ export default function OutputCard({
                     css={{
                       fontSize: "0.875rem",
                       color: C.text,
-                      fontWeight: 600,
+                      fontWeight: 500,
                       marginBottom: "0.25rem",
                     }}
                   >
-                    Unlock all output questions
+                    All output questions are on Pro
                   </p>
                   <p
                     css={{
@@ -324,7 +324,7 @@ export default function OutputCard({
                       lineHeight: 1.5,
                     }}
                   >
-                    Pro unlocks all questions.
+                    Pro includes all questions.
                   </p>
                 </div>
                 <button
@@ -346,7 +346,7 @@ export default function OutputCard({
                     css={{ color: C.accent, flexShrink: 0, marginTop: 1 }}
                   />
                   <span
-                    css={{ fontSize: "11px", color: C.muted, fontWeight: 500 }}
+                    css={{ fontSize: "0.75rem", color: C.muted, fontWeight: 500 }}
                   >
                     Asked at:
                   </span>
@@ -398,7 +398,7 @@ export default function OutputCard({
 
                 {monacoMode === "edit" && (
                   <div css={exploreBanner}>
-                    💡 Exploration mode — edit freely. Your prediction below
+                    Exploration mode, edit freely. Your prediction below
                     should still be for the <strong>original</strong> code.
                   </div>
                 )}
@@ -406,7 +406,7 @@ export default function OutputCard({
                   runResult?.error &&
                   monacoMode === "edit" && (
                     <div css={runErrNote}>
-                      ↑ That's the error this code throws. Describe it in your
+                      ↑ That&apos;s the error this code throws. Describe it in your
                       own words below.
                     </div>
                   )}
@@ -460,7 +460,7 @@ export default function OutputCard({
                   value={
                     state === "correct"
                       ? isErrorQuestion
-                        ? "Correct ✓"
+                        ? "Correct"
                         : originalExpectedOut
                       : answer
                   }
@@ -468,7 +468,7 @@ export default function OutputCard({
                   disabled={state === "correct"}
                   placeholder={
                     isErrorQuestion
-                      ? 'e.g. "ReferenceError — x is in the TDZ before initialization"'
+                      ? 'e.g. "ReferenceError, x is in the TDZ before initialization"'
                       : "Type the expected output...\nOne value per line"
                   }
                   rows={
@@ -487,7 +487,7 @@ export default function OutputCard({
                       onClick={checkAnswer}
                       disabled={!answer.trim()}
                     >
-                      ✓ Check Answer
+                      Check Answer
                     </button>
                     <button css={Shared.actionBtn(C.muted)} onClick={reveal}>
                       <Lightbulb size={12} /> Reveal
@@ -547,7 +547,7 @@ export default function OutputCard({
                         <>
                           <CheckCircle size={14} color={C.green} />
                           <span css={S.explanationTitle(C.green)}>
-                            Correct! 🎉
+                            Correct
                           </span>
                         </>
                       ) : (
@@ -576,19 +576,19 @@ export default function OutputCard({
                           lineHeight: 1.5,
                         }}
                       >
-                        💡 Exact wording not required — understanding{" "}
+                        Exact wording not required, understanding{" "}
                         <em>why</em> it throws is what matters.
                       </p>
                     )}
                   </div>
                   {q.explanation && (
                     <div css={[S.explanationBox, { marginTop: "0.75rem" }]}>
-                      <p css={S.explanationTitle(C.accent)}>💡 Explanation</p>
+                      <p css={S.explanationTitle(C.accent)}>Explanation</p>
                       <p css={S.explanationText}>{q.explanation}</p>
                       {(q as any).keyInsight && (
                         <div css={S.insightRow}>
                           <p css={S.explanationTitle(C.amber)}>
-                            ⚡ Key Insight
+                            Key Insight
                           </p>
                           <p css={S.explanationText}>{(q as any).keyInsight}</p>
                         </div>
@@ -614,7 +614,7 @@ const companyRow = css`
   flex-wrap: wrap;
 `;
 const companyChip = css`
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 500;
   padding: 1px 6px;
   border-radius: 4px;
@@ -633,12 +633,12 @@ const companyBanner = css`
   flex-wrap: wrap;
 `;
 const companyFull = css`
-  font-size: 11px;
+  font-size: 0.75rem;
   font-weight: 500;
   padding: 2px 8px;
   border-radius: 4px;
-  background: ${C.accent}12;
-  border: 1px solid ${C.accent}28;
+  background: color-mix(in oklab, ${C.accent} 7%, transparent);
+  border: 1px solid color-mix(in oklab, ${C.accent} 16%, transparent);
   color: ${C.accent};
 `;
 const toolbar = css`
@@ -648,10 +648,8 @@ const toolbar = css`
   margin-bottom: 6px;
 `;
 const tlabel = css`
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.muted};
   font-family: var(--font-outlier);
 `;
@@ -668,7 +666,7 @@ const tbBtn = css`
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
   &:hover:not(:disabled) {
     background: ${C.surface};
     border-color: ${C.borderHover};
@@ -698,7 +696,7 @@ const exploreBanner = css`
   line-height: 1.5;
   strong {
     color: ${C.text};
-    font-weight: 600;
+    font-weight: 500;
   }
 `;
 const runErrNote = css`

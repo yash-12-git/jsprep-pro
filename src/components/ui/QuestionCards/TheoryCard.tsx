@@ -125,7 +125,7 @@ export default function TheoryCard({
                   <Zap size={7} /> PRO
                 </span>
               )}
-              {q.hint && <span css={S.hintChip}>💡 {q.hint}</span>}
+              {q.hint && <span css={S.hintChip}>{q.hint}</span>}
             </div>
           </div>
 
@@ -143,7 +143,7 @@ export default function TheoryCard({
                 mastered
               </div>
             )}
-            {q.hint && <div css={S.hintBanner(C.green)}>💡 Hint: {q.hint}</div>}
+            {q.hint && <div css={S.hintBanner(C.green)}>Hint: {q.hint}</div>}
 
             <div css={S.answerPad}>
               <MarkdownRenderer content={q.answer} />
@@ -162,7 +162,7 @@ export default function TheoryCard({
                   ) : (
                     <CheckCircle size={12} />
                   )}
-                  {isMastered ? "Mastered ✓" : "Mark mastered"}
+                  {isMastered ? "Mastered" : "Mark mastered"}
                 </button>
               )}
               {onBookmark && (
@@ -179,7 +179,7 @@ export default function TheoryCard({
                   ) : (
                     <Bookmark size={12} />
                   )}
-                  {isBookmarked ? "Saved ✓" : "Bookmark"}
+                  {isBookmarked ? "Saved" : "Bookmark"}
                 </button>
               )}
               <button

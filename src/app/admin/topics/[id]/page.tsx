@@ -70,7 +70,7 @@ export default function EditTopicPage({ params }: { params: { id: string } }) {
         >
           <ArrowLeft size={15} /> All Topics
         </Link>
-        <span style={{ color: "rgba(255,255,255,0.2)" }}>/</span>
+        <span style={{ color: "color-mix(in oklab, var(--color-ink) 20%, transparent)" }}>/</span>
         <h1 style={{ fontSize: "1.5rem", fontWeight: 900 }}>
           Edit: {topic.keyword}
         </h1>

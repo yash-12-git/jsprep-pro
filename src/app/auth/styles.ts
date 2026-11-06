@@ -14,7 +14,7 @@ export const glow = css`
   width: 500px;
   height: 500px;
   border-radius: 9999px;
-  background: ${C.accent}0d;
+  background: color-mix(in oklab, ${C.accent} 5%, transparent);
   filter: blur(80px);
   top: 0;
   left: 50%;
@@ -46,14 +46,14 @@ export const logo = css`
   align-items: center;
   justify-content: center;
   font-size: 1.125rem;
-  font-weight: 900;
+  font-weight: 500;
   color: ${C.accentInk};
   margin: 0 auto 1.5rem;
 `
 
 export const title = css`
   font-size: 1.5rem;
-  font-weight: 900;
+  font-weight: 500;
   margin-bottom: 0.5rem;
 `
 
@@ -70,16 +70,16 @@ export const googleBtn = css`
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  background: white;
-  color: #111;
-  font-weight: 700;
+  background: ${C.bgSubtle};
+  color: ${C.text};
+  font-weight: 500;
   font-size: 0.875rem;
   padding: 0.75rem 1rem;
   border-radius: ${RADIUS.lg};
-  border: none;
+  border: 1px solid ${C.borderStrong};
   cursor: pointer;
-  transition: background 0.15s ease;
-  &:hover { background: #f5f5f5; }
+  transition: background-color var(--dur-short) var(--ease-out);
+  &:hover { background: ${C.bgHover}; }
 `
 
 export const legal = css`

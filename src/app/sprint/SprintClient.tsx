@@ -54,14 +54,11 @@ const questionMeta = css`
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
-  animation: ${fadeIn} 0.25s ease;
 `;
 
 const qNumBadge = css`
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.muted};
   background: ${C.bgSubtle};
   border: 1px solid ${C.border};
@@ -197,6 +194,56 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
     setPhase("active");
   }
 
+  // ── Finish sprint ───────────────────────────────────────────────────────────
+
+  const finishSprint = useCallback(
+    (finalResults: QuestionResult[], finalScore: number) => {
+      const timeUsedSecs = Math.round(
+        (Date.now() - startTimeRef.current) / 1000,
+      );
+      const attempted = finalResults.filter((r) => r.outcome !== "skipped");
+      const correct = finalResults.filter((r) => r.outcome === "correct");
+      const accuracy =
+        attempted.length > 0
+          ? Math.round((correct.length / attempted.length) * 100)
+          : 0;
+      const maxScore =
+        (config?.questionCount ?? finalResults.length) * MAX_POINTS;
+      const { strengths, weakAreas } = computeInsights(finalResults);
+
+      const s: SprintSummary = {
+        score: finalScore,
+        maxScore,
+        accuracy,
+        timeUsedSecs,
+        results: finalResults,
+        strengths,
+        weakAreas,
+        questionCount: finalResults.length,
+        completedAt: new Date().toISOString(),
+      };
+      setSummary(s);
+      setPhase("results");
+
+      if (uid && isPro) {
+        const sprintId = `${uid}_${Date.now()}`;
+        setDoc(doc(db, "users", uid, "sprints", sprintId), {
+          score: finalScore,
+          maxScore,
+          accuracy,
+          timeUsedSecs,
+          questionCount: finalResults.length,
+          strengths,
+          weakAreas,
+          completedAt: s.completedAt,
+        }).catch(() => {});
+        const xpEarned = Math.max(10, Math.floor(finalScore / 2));
+        awardProgressXP(uid, xpEarned, 0).catch(() => {});
+      }
+    },
+    [config, uid, isPro],
+  );
+
   // ── Question complete ───────────────────────────────────────────────────────
 
   const handleQuestionComplete = useCallback(
@@ -220,7 +267,7 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
         finishSprint(newResults, newScore);
       else setCurrentIdx((i) => i + 1);
     },
-    [questions, currentIdx, results, score],
+    [questions, currentIdx, results, score, finishSprint],
   );
 
   // ── Time up ─────────────────────────────────────────────────────────────────
@@ -228,52 +275,7 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
   const handleTimeUp = useCallback(() => {
     if (phase !== "active") return;
     finishSprint(results, score);
-  }, [phase, results, score]);
-
-  // ── Finish sprint ───────────────────────────────────────────────────────────
-
-  function finishSprint(finalResults: QuestionResult[], finalScore: number) {
-    const timeUsedSecs = Math.round((Date.now() - startTimeRef.current) / 1000);
-    const attempted = finalResults.filter((r) => r.outcome !== "skipped");
-    const correct = finalResults.filter((r) => r.outcome === "correct");
-    const accuracy =
-      attempted.length > 0
-        ? Math.round((correct.length / attempted.length) * 100)
-        : 0;
-    const maxScore =
-      (config?.questionCount ?? finalResults.length) * MAX_POINTS;
-    const { strengths, weakAreas } = computeInsights(finalResults);
-
-    const s: SprintSummary = {
-      score: finalScore,
-      maxScore,
-      accuracy,
-      timeUsedSecs,
-      results: finalResults,
-      strengths,
-      weakAreas,
-      questionCount: finalResults.length,
-      completedAt: new Date().toISOString(),
-    };
-    setSummary(s);
-    setPhase("results");
-
-    if (uid && isPro) {
-      const sprintId = `${uid}_${Date.now()}`;
-      setDoc(doc(db, "users", uid, "sprints", sprintId), {
-        score: finalScore,
-        maxScore,
-        accuracy,
-        timeUsedSecs,
-        questionCount: finalResults.length,
-        strengths,
-        weakAreas,
-        completedAt: s.completedAt,
-      }).catch(() => {});
-      const xpEarned = Math.max(10, Math.floor(finalScore / 2));
-      awardProgressXP(uid, xpEarned, 0).catch(() => {});
-    }
-  }
+  }, [phase, results, score, finishSprint]);
 
   // ── Retry ───────────────────────────────────────────────────────────────────
 
@@ -305,7 +307,7 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
           color={C.accent}
           style={{ animation: "spin 1s linear infinite" }}
         />
-        <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: C.text }}>
+        <span style={{ fontSize: "0.9375rem", fontWeight: 500, color: C.text }}>
           Building your sprint…
         </span>
         <span style={{ fontSize: "0.8125rem", color: C.muted }}>

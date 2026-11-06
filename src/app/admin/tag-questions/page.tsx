@@ -16,7 +16,7 @@ import { useTrack } from '@/contexts/TrackContext'
 const S = {
   page: css`padding: 2rem; max-width: 1100px;`,
 
-  heading: css`font-size: 1.5rem; font-weight: 900; color: ${C.text}; margin-bottom: 0.25rem;`,
+  heading: css`font-size: 1.5rem; font-weight: 500; color: ${C.text}; margin-bottom: 0.25rem;`,
   sub: css`color: ${C.muted}; font-size: 0.875rem; margin-bottom: 2rem;`,
 
   toolbar: css`
@@ -54,8 +54,8 @@ const S = {
   `,
   statChip: (color: string) => css`
     padding: 0.375rem 0.875rem;
-    background: ${color}18; border: 1px solid ${color}30;
-    border-radius: 100px; font-size: 0.75rem; font-weight: 700;
+    background: color-mix(in oklab, ${color} 9%, transparent); border: 1px solid color-mix(in oklab, ${color} 19%, transparent);
+    border-radius: 100px; font-size: 0.75rem; font-weight: 500;
     color: ${color};
   `,
 
@@ -66,9 +66,8 @@ const S = {
   `,
   th: css`
     padding: 0.75rem 1rem; text-align: left;
-    font-size: 0.6875rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    color: ${C.muted}; background: rgba(255,255,255,0.03);
+    font-size: 0.75rem; font-weight: 500; 
+    color: ${C.muted}; background: color-mix(in oklab, var(--color-ink) 3%, transparent);
     border-bottom: 1px solid ${C.border};
   `,
   tr: (saving: boolean) => css`
@@ -76,7 +75,7 @@ const S = {
     transition: background 0.15s;
     opacity: ${saving ? 0.6 : 1};
     &:last-child { border-bottom: none; }
-    &:hover { background: rgba(255,255,255,0.02); }
+    &:hover { background: color-mix(in oklab, var(--color-ink) 2%, transparent); }
   `,
   td: css`padding: 0.75rem 1rem; vertical-align: middle;`,
 
@@ -85,14 +84,13 @@ const S = {
     line-height: 1.4;
   `,
   qMeta: css`
-    font-size: 0.6875rem; color: ${C.muted}; margin-top: 3px;
+    font-size: 0.75rem; color: ${C.muted}; margin-top: 3px;
     display: flex; gap: 0.5rem; align-items: center;
   `,
   tag: (color: string) => css`
     padding: 1px 7px; border-radius: 100px;
-    font-size: 0.625rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.05em;
-    background: ${color}18; color: ${color};
+    font-size: 0.75rem; font-weight: 500; 
+    background: color-mix(in oklab, ${color} 9%, transparent); color: ${color};
   `,
 
   topicSelect: (hasValue: boolean) => css`
@@ -106,11 +104,11 @@ const S = {
 
   savedBadge: css`
     display: inline-flex; align-items: center; gap: 4px;
-    font-size: 0.6875rem; color: #6af7c0; font-weight: 600;
+    font-size: 0.75rem; color: #6af7c0; font-weight: 500;
   `,
   savingBadge: css`
     display: inline-flex; align-items: center; gap: 4px;
-    font-size: 0.6875rem; color: ${C.muted};
+    font-size: 0.75rem; color: ${C.muted};
   `,
 
   untaggedBanner: css`
@@ -219,7 +217,7 @@ export default function TagQuestionsPage() {
       <p css={S.sub}>
         Assign each question to its topic page. Tagged questions appear on the corresponding
         <code style={{ background: C.surface, padding: '1px 5px', borderRadius: 4, fontSize: '0.8125rem', color: C.accent3 }}>/[topic-slug]</code> page.
-        The question's own URL never changes.
+        The question&apos;s own URL never changes.
       </p>
 
       {/* Stats */}
@@ -235,7 +233,7 @@ export default function TagQuestionsPage() {
         <div css={S.untaggedBanner}>
           <AlertTriangle size={16} style={{ flexShrink: 0 }} />
           <span>
-            <strong>{untaggedCount} questions</strong> have no topic assigned — they won't appear on any topic page.
+            <strong>{untaggedCount} questions</strong> have no topic assigned, so they won&apos;t appear on any topic page.
             Use the <strong>Untagged</strong> filter to find them quickly.
           </span>
         </div>
@@ -316,7 +314,7 @@ export default function TagQuestionsPage() {
                     <div css={S.qTitle}>{q.title}</div>
                     <div css={S.qMeta}>
                       <span>{q.difficulty}</span>
-                      {q.hint && <><span>·</span><span style={{ fontStyle: 'italic' }}>💡 {q.hint.slice(0, 40)}…</span></>}
+                      {q.hint && <><span>·</span><span style={{ fontStyle: 'normal' }}>{q.hint.slice(0, 40)}…</span></>}
                     </div>
                   </td>
                   <td css={S.td}>
@@ -337,7 +335,7 @@ export default function TagQuestionsPage() {
                       onChange={e => handleTopicChange(q.id, e.target.value)}
                       disabled={saveState === 'saving'}
                     >
-                      <option value="">— unassigned —</option>
+                      <option value="">Unassigned</option>
                       {topics.map(t => (
                         <option key={t.slug} value={t.slug}>
                           {t.keyword.charAt(0).toUpperCase() + t.keyword.slice(1)}

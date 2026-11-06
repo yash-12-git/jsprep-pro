@@ -1,0 +1,57 @@
+[
+ {
+  "mode": "redesign",
+  "depth": "restyle",
+  "scope": "site, phase 4 of 4, admin",
+  "shape": "app screen",
+  "theme": "console",
+  "waived": [],
+  "prompt": "admin screens for interview prep content",
+  "date": "2026-11-06"
+ },
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "site, phase 3 of 4, app screens",
+  "shape": "app screen",
+  "theme": "console",
+  "signature": "the practice ledger on the dashboard",
+  "waived": [],
+  "prompt": "dashboard and practice tools for interview prep",
+  "date": "2026-11-06"
+ },
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "site, phase 1 of 4",
+  "shape": "Narrative Workflow",
+  "theme": "console",
+  "axes": "dark/grotesk-sans/chromatic-amber",
+  "hero": "Settled",
+  "nav": "floating pill",
+  "footer": "letter close",
+  "imagery": "the product built (answer evaluator, sprint)",
+  "photos": [],
+  "entry": "hero",
+  "sections": [
+   "hero",
+   "figures",
+   "rows",
+   "pinned",
+   "trail",
+   "split",
+   "diff",
+   "index",
+   "panels",
+   "quotes",
+   "offer",
+   "band"
+  ],
+  "signature": "a real interview answer scored in the hero",
+  "waived": [
+   "84"
+  ],
+  "prompt": "practice site where frontend developers prepare for JavaScript and React interviews",
+  "date": "2026-11-06"
+ }
+]

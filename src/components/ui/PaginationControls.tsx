@@ -35,7 +35,7 @@ interface Props {
   page: number;
   totalPages: number;
   totalItems: number;
-  itemLabel?: string; // singular — "question" | "challenge". Defaults to "question"
+  itemLabel?: string; // singular, "question" | "challenge". Defaults to "question"
   onPage: (n: number) => void;
   children: ReactNode;
 }
@@ -53,7 +53,7 @@ const headerRow = css`
 `;
 
 const headerCount = css`
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
 `;
 

@@ -140,7 +140,7 @@ export default function StudyPlanClientPage({
 
         {/* Header */}
         <div css={S.header}>
-          <h1 css={S.title}>🧠 AI Study Plan</h1>
+          <h1 css={S.title}>AI Study Plan</h1>
           <p css={S.subtitle}>
             Personalized based on your mastery, quiz history, and weak areas.
           </p>
@@ -196,7 +196,7 @@ export default function StudyPlanClientPage({
                 <div
                   css={{
                     fontSize: "1.25rem",
-                    fontWeight: 700,
+                    fontWeight: 500,
                     color: c,
                     letterSpacing: "-0.02em",
                   }}
@@ -205,10 +205,8 @@ export default function StudyPlanClientPage({
                 </div>
                 <div
                   css={{
-                    fontSize: "0.625rem",
+                    fontSize: "0.75rem",
                     color: C.muted,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
                   }}
                 >
                   {l}
@@ -250,7 +248,7 @@ export default function StudyPlanClientPage({
               <div
                 css={{
                   fontSize: "3.25rem",
-                  fontWeight: 700,
+                  fontWeight: 500,
                   letterSpacing: "-0.03em",
                   color: readColor(plan.readinessScore),
                   marginBottom: "0.25rem",
@@ -261,7 +259,7 @@ export default function StudyPlanClientPage({
               <div
                 css={{
                   fontSize: "1.0625rem",
-                  fontWeight: 600,
+                  fontWeight: 500,
                   color: C.text,
                   marginBottom: "0.75rem",
                 }}
@@ -307,7 +305,7 @@ export default function StudyPlanClientPage({
                     <p
                       css={{
                         fontSize: "0.875rem",
-                        fontWeight: 600,
+                        fontWeight: 500,
                         color: C.text,
                         marginBottom: "0.25rem",
                       }}
@@ -331,7 +329,7 @@ export default function StudyPlanClientPage({
                         lineHeight: 1.55,
                       }}
                     >
-                      💡 {ws.tip}
+                      {ws.tip}
                     </p>
                   </div>
                 ))}
@@ -417,12 +415,10 @@ export default function StudyPlanClientPage({
                   >
                     <span
                       css={{
-                        fontSize: "0.6875rem",
-                        fontWeight: 600,
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
                         color: C.accent,
                         marginRight: "0.5rem",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.05em",
                       }}
                     >
                       {q.category}
@@ -482,7 +478,6 @@ export default function StudyPlanClientPage({
                       css={{
                         fontSize: "0.5rem",
                         color: C.muted,
-                        textTransform: "uppercase",
                       }}
                     >
                       Day
@@ -490,7 +485,7 @@ export default function StudyPlanClientPage({
                     <span
                       css={{
                         fontSize: "0.875rem",
-                        fontWeight: 700,
+                        fontWeight: 500,
                         color: C.amber,
                         lineHeight: 1,
                       }}
@@ -510,7 +505,7 @@ export default function StudyPlanClientPage({
                       <p
                         css={{
                           fontSize: "0.875rem",
-                          fontWeight: 600,
+                          fontWeight: 500,
                           color: C.text,
                         }}
                       >
@@ -518,7 +513,7 @@ export default function StudyPlanClientPage({
                       </p>
                       <span
                         css={{
-                          fontSize: "0.625rem",
+                          fontSize: "0.75rem",
                           color: C.muted,
                           whiteSpace: "nowrap",
                         }}

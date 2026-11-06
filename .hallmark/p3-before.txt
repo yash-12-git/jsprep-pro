@@ -1,0 +1,118 @@
+src/app/analytics/AnalyticsClientPage.tsx
+  FAIL 19 :450 dash "—" in copy | fix: A comma, a colon, a full stop or parentheses; never a dash
+  FAIL 30a :351 emoji in <h2> "⚡ Interview Sprint History" | fix: One icon library, a custom SVG, or the word alone
+  FAIL 63 :357 arrow glued to the label "Run another sprint →" | fix: A verb as the label; the link already says it goes somewhere
+src/app/debug-lab/DebugLabClientWrapper.tsx
+  FAIL 19 :173 dash "—" in copy
+  FAIL 19 :180 buzzword "Unlock" | fix: Say what the product does, in its own nouns
+  FAIL 30a :173 text opens with an emoji: "🔒 First"
+  FAIL 63 :176 arrow glued to the label "Unlock All →"
+src/app/mock-interview/MockInterviewClient.tsx
+  FAIL 19 :1475 dash "—" in copy
+  FAIL 63 :1481 arrow glued to the label "Begin Interview →"
+src/app/output-quiz/OutputClientWrapper.tsx
+  FAIL 19 :181 dash "—" in copy
+  FAIL 19 :188 buzzword "Unlock"
+  FAIL 30a :181 text opens with an emoji: "🔒 First"
+  FAIL 63 :184 arrow glued to the label "Unlock All →"
+src/app/polyfill-lab/PolyfillClientWrapper.tsx
+  FAIL 19 :142 dash "—" in copy
+  FAIL 19 :231 buzzword "Unlock"
+  FAIL 30a :168 text opens with an emoji: "🏢 Asked at:"
+  FAIL 30a :224 text opens with an emoji: "🔒 First"
+  FAIL 63 :227 arrow glued to the label "Unlock All →"
+src/components/ui/AIChat/page.tsx
+  FAIL 19 :84 dash "—" in copy
+src/components/ui/AnswerEvaluator/page.tsx
+  FAIL 19 :67 dash "—" in copy
+  WARN 49 :109 long clickable label "Evaluating… Evaluate My Answer" without nowrap | fix: Shorten the label or set nowrap
+src/components/ui/InlineEvaluater.tsx
+  FAIL 19 :428 dash "–" in copy
+  WARN F1 :454 straight quote in prose x2 (first: Answer as if you're in a real i) | fix: Use typographic quotes: “ ” ’
+src/components/ui/PaywallBanner/page.tsx
+  FAIL 19 :33 buzzword "Unlock"
+src/components/ui/QuestionCards/DebugCard.tsx
+  FAIL 19 :349 buzzword "Unlock"
+  FAIL 19 :359 buzzword "unlocks"
+  FAIL 30a :375 text opens with an emoji: "🐛 Bug"
+  FAIL 30a :555 text opens with an emoji: "💡 Better approach"
+  FAIL 30a :580 text opens with an emoji: "💡 Explanation"
+src/components/ui/QuestionCards/OutputCard.tsx
+  FAIL 19 :317 buzzword "Unlock"
+  FAIL 19 :327 buzzword "unlocks"
+  FAIL 19 :401 dash "—" in copy
+  FAIL 30a :401 text opens with an emoji: "💡 Exploration mode — edit free…"
+  FAIL 30a :579 text opens with an emoji: "💡 Exact wording not required —…"
+  FAIL 30a :586 text opens with an emoji: "💡 Explanation"
+  FAIL 30a :591 text opens with an emoji: "⚡ Key Insight"
+  WARN F1 :409 straight quote in prose x1 (first: ↑ That's the error th)
+src/components/ui/QuestionCards/PolyfillCard.tsx
+  FAIL 19 :269 dash "—" in copy
+  FAIL 19 :269 buzzword "unlock"
+  FAIL 30a :579 text opens with an emoji: "💡 Explanation"
+  FAIL 30a :600 emoji icon "⚡" in <p class=""> | fix: One icon library or custom SVG
+  WARN 49 :483 long clickable label "Hide Solution Show Solution" without nowrap
+src/components/ui/TrackSwitcher.tsx
+  FAIL 19 :120 dash "—" in copy
+src/app/dashboard/components/HomeClient.tsx
+  FAIL 30a :253 emoji passed as an icon: 📖
+  FAIL 30a :260 emoji passed as an icon: 💻
+  FAIL 30a :267 emoji passed as an icon: 🐛
+  FAIL 30a :274 emoji passed as an icon: 🧪
+  FAIL 30a :376 text opens with an emoji: "🔥"
+src/app/dashboard/components/Leaderboard.tsx
+  FAIL 30a :229 emoji passed as an icon: 🥇
+  FAIL 63 :261 arrow glued to the label "Start earning XP →" (<Link>)
+  FAIL 63 :327 middle-dot meta string "XP earned: 10 per mastered question · 8 per outpu…" | fix: Line breaks, columns or hairlines; one dot in a byline at most
+src/app/dashboard/components/QuestionOfTheDay.tsx
+  FAIL 30a :725 emoji icon "💡" in <div class="">
+src/app/dashboard/page.tsx
+  FAIL 30a :85 emoji icon "⚡" in <span class="">
+  FAIL 48 :69 inline-style colour literal #ffffff | fix: Lift the value into the token block
+  FAIL 48 :87 inline-style colour literal #37352f
+  FAIL 48 :94 inline-style colour literal #787774
+  FAIL 48 :103 inline-style colour literal #2383e2
+  FAIL 63 :94 middle-dot meta string "Timed · mixed questions · AI scored · one number …"
+src/app/mock-interview/InterviewResult.tsx
+  FAIL 30a :765 emoji icon "📣" in <span class="">
+  FAIL 30a :900 text opens with an emoji: "📚 Recommended Study Topics"
+  FAIL 33 :784 <svg> without aria-hidden or aria-label | fix: Add aria-hidden or an aria-label
+  FAIL 33 :797 <svg> without aria-hidden or aria-label
+  WARN 49 :813 long clickable label "Copied to clipboard! Copy share text" without nowrap
+src/app/sprint/components/DebugSprintCard.tsx
+  FAIL 30a :322 text opens with an emoji: "🐛 Debug"
+  FAIL 30a :332 text opens with an emoji: "🔴 Buggy Code"
+  FAIL 30a :334 text opens with an emoji: "✏️ Your Fix"
+  FAIL 30a :380 text opens with an emoji: "✅ Correct fix"
+  FAIL 63 :408 arrow glued to the label "Next →"
+src/app/sprint/components/OutputSprintCard.tsx
+  FAIL 30a :258 text opens with an emoji: "💻 Output"
+  FAIL 63 :336 arrow glued to the label "Next →"
+src/app/sprint/components/SprintResults.tsx
+  FAIL 30a :936 emoji icon "📣" in <span class="">
+  FAIL 33 :304 <svg> without aria-hidden or aria-label
+  FAIL 33 :954 <svg> without aria-hidden or aria-label
+  FAIL 33 :974 <svg> without aria-hidden or aria-label
+  FAIL 33 :988 <svg> without aria-hidden or aria-label
+  WARN 49 :1004 long clickable label "Copied to clipboard! Copy share text" without nowrap
+src/app/sprint/components/TheorySprintCard.tsx
+  FAIL 30a :442 text opens with an emoji: "📖 Theory"
+  FAIL 63 :609 arrow glued to the label "Next →"
+  WARN 49 :480 long clickable label "Evaluating... Submit Answer" without nowrap
+  WARN F2 :491 three-period ellipsis in prose x1 | fix: Use a true ellipsis character (…)
+src/app/study-plan/StudyPlanClientWrapper.tsx
+  FAIL 30a :143 emoji in <h1> "🧠 AI Study Plan"
+  FAIL 30a :327 emoji icon "💡" in <p class="">
+  WARN 49 :220 long clickable label "Analyzing… Regenerate Plan Generate…" without nowrap
+src/app/theory/TheoryPageClientWrapper.tsx
+  FAIL 30a :96 emoji icon "📖" in <span class="">
+src/components/ui/QuestionCards/TheoryCard.tsx
+  FAIL 30a :128 emoji icon "💡" in <span class="">
+  FAIL 30a :146 text opens with an emoji: "💡 Hint:"
+src/app/dashboard/components/QuestionOfTheDayWrapper.tsx
+  FAIL 48 :19 inline-style colour literal #f7f7f5
+  FAIL 48 :33 inline-style colour literal #ebebea
+src/app/dashboard/components/LearnSection.tsx
+  FAIL 63 :40 arrow glued to the label "All topics →" (<Link>)
+  FAIL 63 :119 arrow glued to the label "All posts →" (<Link>)
+sloplint: 81 FAIL, 9 WARN across 55 file(s).

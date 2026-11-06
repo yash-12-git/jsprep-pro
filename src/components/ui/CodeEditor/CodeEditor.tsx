@@ -103,7 +103,7 @@ const wrap = css`
   .monaco-editor,
   .monaco-editor .margin,
   .monaco-editor-background {
-    background-color: var(--color-code-bg, #f7f7f5) !important;
+    background-color: var(--color-code-bg) !important;
   }
 
   /* Hide the cursor-line background highlight */
@@ -121,7 +121,7 @@ const wrap = css`
 
 const placeholder = css`
   height: 180px;
-  background: var(--color-code-bg, #f7f7f5);
+  background: var(--color-code-bg);
   border: 1px solid ${C.border};
   border-radius: 6px;
   display: flex;

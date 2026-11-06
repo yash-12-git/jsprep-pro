@@ -39,17 +39,14 @@ const card = css`
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
   overflow: hidden;
-  animation: ${fadeIn} 0.3s ease;
 `;
 
 const typeTag = css`
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.accentText};
   background: ${C.accentSubtle};
   border: 1px solid ${C.border};
@@ -63,7 +60,7 @@ const questionBody = css`
 
 const questionTitle = css`
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.text};
   line-height: 1.45;
   letter-spacing: -0.02em;
@@ -81,9 +78,7 @@ const diffBadge = (color: string, bg: string, border: string) => css`
   display: inline-flex;
   align-items: center;
   font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-weight: 500;
   color: ${color};
   background: ${bg};
   border: 1px solid ${border};
@@ -104,15 +99,12 @@ const divider = css`
 
 const answerPhase = css`
   padding: 1.125rem 1.375rem;
-  animation: ${fadeIn} 0.25s ease;
 `;
 
 const answerLabel = css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.amber};
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
   margin-bottom: 0.625rem;
   display: flex;
   align-items: center;
@@ -153,9 +145,9 @@ const submitBtn = (active: boolean) => css`
   padding: 0.5625rem 1.125rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   background: ${active ? C.accent : C.bgSubtle};
-  color: ${active ? "#ffffff" : C.muted};
+  color: ${active ? C.accentInk : C.muted};
   border: 1px solid ${active ? C.accent : C.border};
   cursor: ${active ? "pointer" : "not-allowed"};
   transition: opacity 0.12s ease;
@@ -164,7 +156,6 @@ const submitBtn = (active: boolean) => css`
 `;
 
 const evalWrap = css`
-  animation: ${fadeIn} 0.3s ease;
 `;
 
 const scoreCard = css`
@@ -180,7 +171,7 @@ const scoreCard = css`
 
 const scoreNum = (n: number) => css`
   font-size: 2.25rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1;
   letter-spacing: -0.03em;
   color: ${n >= 7 ? C.green : n >= 5 ? C.amber : C.red};
@@ -189,7 +180,7 @@ const scoreNum = (n: number) => css`
 
 const gradeText = (g: string) => css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   margin-top: 0.25rem;
   color: ${g === "A"
     ? C.green
@@ -225,12 +216,10 @@ const feedSection = css`
   margin-top: 0.875rem;
 `;
 const feedTitle = (c: string) => css`
-  font-size: 0.625rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${c};
   margin-bottom: 0.375rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 `;
 const feedItem = css`
   display: flex;
@@ -266,7 +255,6 @@ const betterBox = css`
   font-size: 0.8125rem;
   color: ${C.muted};
   line-height: 1.7;
-  animation: ${fadeIn} 0.2s ease;
 `;
 
 const actionsRow = css`
@@ -286,7 +274,7 @@ const tryBtn = css`
   padding: 0.5625rem 1.125rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: ${C.amberSubtle};
   border: 1px solid ${C.amberBorder};
@@ -309,7 +297,7 @@ const skipBtn = css`
   background: transparent;
   border: 1px solid ${C.border};
   color: ${C.muted};
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   &:hover {
     border-color: ${C.borderStrong};
     color: ${C.text};
@@ -324,7 +312,7 @@ const nextBtn = css`
   padding: 0.5625rem 1.375rem;
   border-radius: ${RADIUS.lg};
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   background: ${C.accent};
   border: none;
@@ -422,7 +410,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
       setResult({
         score: 3,
         grade: "C",
-        verdict: "Could not evaluate — good effort!",
+        verdict: "Could not evaluate, good effort!",
         strengths: [],
         missing: [],
         betterAnswer: "",
@@ -439,7 +427,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
   return (
     <div css={card}>
       <div css={questionBody}>
-        <div css={typeTag}>📖 Theory</div>
+        <div css={typeTag}>Theory</div>
         <p css={questionTitle}>{q.title}</p>
         <div css={metaRow}>
           <span css={diffBadge(dm.color, dm.bg, dm.border)}>{dm.label}</span>
@@ -494,7 +482,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                     <>Submit Answer</>
                   )}
                 </button>
-                <span style={{ fontSize: "0.7rem", color: C.muted }}>
+                <span style={{ fontSize: "0.75rem", color: C.muted }}>
                   ⌘ + Enter to submit
                 </span>
               </div>
@@ -517,7 +505,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                 <div css={scoreCard}>
                   <div>
                     <div css={scoreNum(result.score)}>{result.score}</div>
-                    <div style={{ fontSize: "0.6875rem", color: C.muted }}>
+                    <div style={{ fontSize: "0.75rem", color: C.muted }}>
                       /10
                     </div>
                     <div css={gradeText(result.grade)}>{result.grade}</div>
@@ -529,7 +517,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                     <div css={verdict}>{result.verdict}</div>
                     {result.strengths?.length > 0 && (
                       <div css={feedSection}>
-                        <div css={feedTitle(C.green)}>✓ Covered</div>
+                        <div css={feedTitle(C.green)}>Covered</div>
                         {result.strengths.map((s, i) => (
                           <div key={i} css={feedItem}>
                             <CheckCircle
@@ -547,7 +535,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                     )}
                     {result.missing?.length > 0 && (
                       <div css={feedSection}>
-                        <div css={feedTitle(C.red)}>✗ Missing</div>
+                        <div css={feedTitle(C.red)}>Missing</div>
                         {result.missing.map((m, i) => (
                           <div key={i} css={feedItem}>
                             <XCircle
@@ -607,7 +595,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
         )}
         {phase === "done" && result && (
           <button css={nextBtn} onClick={handleNext}>
-            Next →
+            Next
           </button>
         )}
       </div>

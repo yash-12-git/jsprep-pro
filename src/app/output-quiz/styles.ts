@@ -16,7 +16,7 @@ export const titleBlock = css``;
 
 export const pageTitle = css`
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
   letter-spacing: -0.02em;
 `;
@@ -36,7 +36,7 @@ export const progressRow = css`
 
 export const progressCount = css`
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${C.amber};
   white-space: nowrap;
 `;
@@ -128,10 +128,8 @@ export const codeSection = css`
 
 export const codeSectionLabel = css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.muted};
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
   margin-bottom: 0.5rem;
 `;
 
@@ -141,10 +139,8 @@ export const inputSection = css`
 
 export const textareaLabel = css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.muted};
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
   margin-bottom: 0.5rem;
 `;
 
@@ -170,7 +166,7 @@ export const explanationBox = css`
 
 export const explanationTitle = (color: string) => css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${color};
   margin-bottom: 0.5rem;
 `;

@@ -86,10 +86,8 @@ export const qNumber = (accentColor: string) => css`
 
 export const sectionLabel = (color: string = C.muted) => css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${color};
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
   margin-bottom: 0.5rem;
 `;
 
@@ -132,7 +130,7 @@ export const explanationBox = css`
 
 export const explanationTitle = (color: string) => css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${color};
   margin-bottom: 0.5rem;
 `;
@@ -232,7 +230,7 @@ export const scoreRow = css`
 
 export const scoreNumber = (correct: boolean, score: number) => css`
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.03em;
   color: ${correct ? C.green : score >= 5 ? C.amber : C.red};
 `;
@@ -267,7 +265,7 @@ export const feedbackRow = css`
 
 export const feedbackRowTitle = (color: string) => css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${color};
   margin-bottom: 0.25rem;
 `;
@@ -293,7 +291,7 @@ export const diffGrid = css`
 
 export const diffLabel = (color: string) => css`
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${color};
   margin-bottom: 0.5rem;
 `;
@@ -311,7 +309,7 @@ export const actionChip = (color: string, active: boolean) => css`
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   padding: 0.25rem 0.625rem;
   border-radius: ${RADIUS.sm};
@@ -319,7 +317,7 @@ export const actionChip = (color: string, active: boolean) => css`
   background: ${active ? C.accentSubtle : "transparent"};
   color: ${active ? color : C.muted};
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, opacity 0.12s ease, transform 0.12s ease;
   white-space: nowrap;
   text-decoration: none;
   &:hover {
@@ -371,7 +369,7 @@ export const CAT_STYLE: Record<
 // ─── Theory card tokens ───────────────────────────────────────────────────────
 
 export const titleRow = css`
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.875rem;
   color: ${C.text};
   margin-bottom: 0.375rem;
@@ -389,8 +387,8 @@ export const diffBadge = (style: {
   color: string;
   border: string;
 }) => css`
-  font-size: 0.625rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 500;
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
   border: 1px solid ${style.border};
@@ -399,7 +397,7 @@ export const diffBadge = (style: {
 `;
 
 export const catBadge = (_accent: string) => css`
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 500;
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
@@ -412,8 +410,8 @@ export const proBadge = css`
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
-  font-size: 0.5625rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   padding: 0.125rem 0.4rem;
   border-radius: ${RADIUS.sm};
   background: ${C.amberSubtle};
@@ -422,7 +420,7 @@ export const proBadge = css`
 `;
 
 export const hintChip = css`
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
   background: ${C.bgSubtle};
@@ -436,9 +434,9 @@ export const masteredBanner = (_accent3: string) => css`
   background: ${C.greenSubtle};
   border: 1px solid ${C.greenBorder};
   border-radius: ${RADIUS.md};
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.green};
-  font-weight: 600;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 0.375rem;

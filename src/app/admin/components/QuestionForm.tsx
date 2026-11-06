@@ -101,7 +101,7 @@ const S = {
     border-radius: ${RADIUS.lg};
     color: ${C.green};
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 500;
   `,
   error: css`
     padding: 0.875rem 1rem;
@@ -112,10 +112,8 @@ const S = {
     font-size: 0.875rem;
   `,
   sectionLabel: css`
-    font-size: 0.6875rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: ${C.muted};
     padding-bottom: 0.5rem;
     border-bottom: 1px solid ${C.border};
@@ -127,7 +125,7 @@ const S = {
   `,
   label: css`
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     color: ${C.text};
   `,
   required: css`
@@ -244,7 +242,7 @@ const S = {
     font-weight: ${active ? "600" : "400"};
     cursor: pointer;
     text-align: left;
-    transition: all 0.1s;
+    transition: background-color 0.1s, border-color 0.1s, color 0.1s, opacity 0.1s, transform 0.1s;
     &:hover {
       border-color: ${C.accent};
       color: ${C.accent};
@@ -279,7 +277,7 @@ const S = {
     border: none;
     border-radius: ${RADIUS.xl};
     color: ${C.accentInk};
-    font-weight: 700;
+    font-weight: 500;
     font-size: 0.9375rem;
     cursor: pointer;
     &:hover {
@@ -329,7 +327,7 @@ const S = {
     background: ${active ? C.accent + "14" : "transparent"};
     color: ${active ? C.accent : C.muted};
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
   `,
   toggle: (active: boolean, color: string) => css`
@@ -339,12 +337,12 @@ const S = {
     padding: 0.375rem 0.875rem;
     border-radius: ${RADIUS.md};
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 500;
     border: 1px solid ${active ? color + "55" : C.border};
     background: ${active ? color + "14" : "transparent"};
     color: ${active ? color : C.muted};
     cursor: pointer;
-    transition: all 0.1s;
+    transition: background-color 0.1s, border-color 0.1s, color 0.1s, opacity 0.1s, transform 0.1s;
     &:hover {
       border-color: ${color};
       color: ${color};
@@ -474,10 +472,10 @@ export default function QuestionForm({
             value={form.type}
             onChange={(e) => set("type", e.target.value as QuestionType)}
           >
-            <option value="theory">📖 Theory</option>
-            <option value="output">💻 Output (What prints?)</option>
-            <option value="debug">🐛 Debug (Find the bug)</option>
-            <option value="polyfill">🧪 Polyfill (Write from scratch)</option>
+            <option value="theory">Theory</option>
+            <option value="output">Output (What prints?)</option>
+            <option value="debug">Debug (Find the bug)</option>
+            <option value="polyfill">Polyfill (Write from scratch)</option>
           </select>
         </div>
         <div css={S.field}>
@@ -572,7 +570,7 @@ export default function QuestionForm({
             value={form.topicSlug ?? ""}
             onChange={(e) => set("topicSlug", e.target.value)}
           >
-            <option value="">— none —</option>
+            <option value="">None</option>
             {topics.map((t) => (
               <option key={t.slug} value={t.slug}>
                 {t.title}
@@ -607,7 +605,7 @@ export default function QuestionForm({
           />
         </div>
         <span css={S.labelHint}>
-          e.g. closure, async, promise — used for search and filtering
+          e.g. closure, async, promise, used for search and filtering
         </span>
       </div>
 
@@ -629,7 +627,7 @@ export default function QuestionForm({
                 css={S.labelHint}
                 style={{ marginLeft: 8, display: "inline" }}
               >
-                — {selectedCompanies.join(", ")}
+               , {selectedCompanies.join(", ")}
               </span>
             )}
           </label>
@@ -656,8 +654,8 @@ export default function QuestionForm({
       {/* ── Sandbox contract notice ── */}
       {(isOutputOrDebug || isPolyfill) && (
         <div css={S.sandboxNote}>
-          <strong>⚡ Sandbox contract</strong>
-          {" — "}
+          <strong>Sandbox contract</strong>
+          {": "}
           {form.type === "output"
             ? "Pure JS only (no fetch/DOM/React). All output via console.log. expectedOutput = exact logs, never an error string."
             : form.type === "polyfill"
@@ -695,7 +693,7 @@ export default function QuestionForm({
               placeholder={"3\n3\n3"}
             />
             <span css={S.labelHint}>
-              Exact console.log output — one value per line. Never include error
+              Exact console.log output, one value per line. Never include error
               strings.
             </span>
           </div>
@@ -742,7 +740,7 @@ export default function QuestionForm({
               placeholder={"0\n1\n2"}
             />
             <span css={S.labelHint}>
-              Never an error string — must be actual console.log values.
+              Never an error string, must be actual console.log values.
             </span>
           </div>
           <div css={S.field}>
@@ -789,7 +787,7 @@ export default function QuestionForm({
               }
             />
             <span css={S.labelHint}>
-              What the user sees in Monaco — function signature + TODO comment
+              What the user sees in Monaco, function signature + TODO comment
             </span>
           </div>
           <div css={S.field}>
@@ -851,8 +849,8 @@ export default function QuestionForm({
               }
             />
             <span css={S.labelHint}>
-              Progressive hints — shown one at a time when user clicks "Get a
-              hint"
+              Progressive hints, shown one at a time when user clicks &quot;Get a
+              hint&quot;
             </span>
           </div>
         </>

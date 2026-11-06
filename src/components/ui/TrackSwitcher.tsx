@@ -117,7 +117,7 @@ export default function TrackSwitcher() {
           ))}
 
           <div css={dropdownFooter}>
-            More tracks coming — React, TypeScript, System Design
+            More tracks coming, React, TypeScript, System Design
           </div>
         </div>
       )}
@@ -138,13 +138,13 @@ const trigger = (color: string) => css`
   gap: 0.375rem;
   padding: 0.3125rem 0.625rem;
   border-radius: ${RADIUS.md};
-  border: 1px solid ${color}33;
-  background: ${color}0d;
+  border: 1px solid color-mix(in oklab, ${color} 20%, transparent);
+  background: color-mix(in oklab, ${color} 5%, transparent);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
   &:hover {
-    background: ${color}18;
-    border-color: ${color}55;
+    background: color-mix(in oklab, ${color} 9%, transparent);
+    border-color: color-mix(in oklab, ${color} 33%, transparent);
   }
 `;
 
@@ -158,20 +158,18 @@ const dot = (color: string) => css`
 
 const triggerLabel = css`
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 500;
   color: ${C.text};
 `;
 
 const badgePill = (color: string) => css`
-  font-size: 0.5625rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 500;
   padding: 1px 5px;
   border-radius: 4px;
-  background: ${color}20;
+  background: color-mix(in oklab, ${color} 13%, transparent);
   color: ${color};
-  border: 1px solid ${color}33;
+  border: 1px solid color-mix(in oklab, ${color} 20%, transparent);
 `;
 
 const chevron = (open: boolean) => css`
@@ -188,16 +186,13 @@ const dropdown = css`
   background: ${C.card};
   border: 1px solid ${C.border};
   border-radius: ${RADIUS.lg};
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   z-index: 200;
 `;
 
 const dropdownLabel = css`
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: ${C.muted};
   padding: 0.75rem 1rem 0.375rem;
 `;
@@ -216,7 +211,7 @@ const trackItem = (active: boolean, available: boolean, color: string) => css`
   text-align: left;
   transition: background 0.1s;
   &:hover:not(:disabled) {
-    background: ${color}12;
+    background: color-mix(in oklab, ${color} 7%, transparent);
   }
 `;
 
@@ -241,15 +236,13 @@ const trackName = (available: boolean) => css`
   align-items: center;
   gap: 0.375rem;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: ${available ? C.text : C.muted};
 `;
 
 const trackBadge = (color: string, available: boolean) => css`
-  font-size: 0.5625rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 500;
   padding: 1px 5px;
   border-radius: 4px;
   background: ${available ? color + "18" : C.bgSubtle};
@@ -274,7 +267,7 @@ const activeDot = css`
 
 const dropdownFooter = css`
   padding: 0.625rem 1rem;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   border-top: 1px solid ${C.border};
   background: ${C.bgSubtle};

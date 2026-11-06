@@ -302,7 +302,7 @@ const S = {
 
   heading: css`
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 500;
     margin-bottom: 0.375rem;
     color: ${C.text};
   `,
@@ -331,8 +331,8 @@ const S = {
   dataIcon: (color: string) => css`
     width: 2.25rem;
     height: 2.25rem;
-    background: ${color}14;
-    border: 1px solid ${color}30;
+    background: color-mix(in oklab, ${color} 8%, transparent);
+    border: 1px solid color-mix(in oklab, ${color} 19%, transparent);
     border-radius: ${RADIUS.md};
     display: flex;
     align-items: center;
@@ -342,17 +342,17 @@ const S = {
 
   dataTitle: css`
     font-size: 0.9375rem;
-    font-weight: 800;
+    font-weight: 500;
     color: ${C.text};
     margin-bottom: 0.25rem;
   `,
   dataCount: (color: string) => css`
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 500;
     color: ${color};
   `,
   dataMeta: css`
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     color: ${C.muted};
     margin-top: 0.25rem;
   `,
@@ -361,11 +361,10 @@ const S = {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: 0.625rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    background: ${color}14;
-    border: 1px solid ${color}33;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: color-mix(in oklab, ${color} 8%, transparent);
+    border: 1px solid color-mix(in oklab, ${color} 20%, transparent);
     color: ${color};
     padding: 0.125rem 0.5rem;
     border-radius: 0.25rem;
@@ -381,10 +380,10 @@ const S = {
     border: none;
     border-radius: ${RADIUS.xl};
     color: ${C.text};
-    font-weight: 800;
+    font-weight: 500;
     font-size: 1rem;
     cursor: ${loading ? "not-allowed" : "pointer"};
-    transition: all 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
     &:hover {
       background: ${loading ? "" : C.accent + "ee"};
     }
@@ -399,10 +398,10 @@ const S = {
     border: 1px solid ${C.accent3}44;
     border-radius: ${RADIUS.xl};
     color: ${C.accent3};
-    font-weight: 700;
+    font-weight: 500;
     font-size: 0.875rem;
     cursor: ${loading ? "not-allowed" : "pointer"};
-    transition: all 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
     &:hover {
       background: ${loading ? "" : C.accent3 + "28"};
     }
@@ -414,19 +413,19 @@ const S = {
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
     background: transparent;
-    border: 1px solid ${C.danger}44;
+    border: 1px solid color-mix(in oklab, ${C.danger} 27%, transparent);
     border-radius: ${RADIUS.xl};
     color: ${C.danger};
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 500;
     cursor: pointer;
     &:hover {
-      background: ${C.danger}12;
+      background: color-mix(in oklab, ${C.danger} 7%, transparent);
     }
   `,
 
   log: css`
-    background: var(--color-code-bg, #f7f7f5);
+    background: var(--color-code-bg);
     border: 1px solid ${C.border};
     border-radius: ${RADIUS.xl};
     padding: 1rem 1.25rem;
@@ -469,7 +468,7 @@ const S = {
     font-size: 0.9rem;
     color: ${C.green};
     margin-bottom: 1.5rem;
-    font-weight: 700;
+    font-weight: 500;
     display: flex;
     align-items: center;
     gap: 0.625rem;
@@ -482,10 +481,8 @@ const S = {
   `,
 
   sectionTitle: css`
-    font-size: 0.6875rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: ${C.muted};
     margin-bottom: 0.875rem;
   `,
@@ -692,9 +689,9 @@ export default function SeedPage() {
       addTsLog("info", `Starting TypeScript seed as ${user.email}`);
       addTsLog("info", `Total: ${totalTsQs} TypeScript questions`);
       addTsLog("info", "─────────────────────────────");
-      await seedBatch(tsTheoryQs, "TS-Theory", "#3178c6");
-      await seedBatch(tsOutputQs, "TS-Output", "#3178c6");
-      await seedBatch(tsDebugQs, "TS-Debug", "#3178c6");
+      await seedBatch(tsTheoryQs, "TS-Theory", "var(--color-cool)");
+      await seedBatch(tsOutputQs, "TS-Output", "var(--color-cool)");
+      await seedBatch(tsDebugQs, "TS-Debug", "var(--color-cool)");
       addTsLog("info", "─────────────────────────────");
       addTsLog("success", `TypeScript seed complete! ${totalTsQs} questions in Firestore.`);
     } catch (e: any) {
@@ -858,7 +855,7 @@ export default function SeedPage() {
         Import static question files into Firestore. Run once after setup. Use{" "}
         <strong>Clear All</strong> before re-seeding to avoid duplicates.
         <br />
-        Embeddings are generated automatically after seeding — required for the
+        Embeddings are generated automatically after seeding, required for the
         dedup pipeline in the AI generator.
       </p>
 
@@ -924,7 +921,7 @@ export default function SeedPage() {
 
       <div css={S.warningBox}>
         ⚠ <strong>Run this only once.</strong> Running again creates duplicates.
-        Use "Clear All Questions" first if you need to re-seed from scratch.
+        Use &quot;Clear All Questions&quot; first if you need to re-seed from scratch.
       </div>
 
       {/* Action buttons */}
@@ -1036,7 +1033,7 @@ export default function SeedPage() {
           Create Firestore composite indexes:
           <pre
             style={{
-              background: "var(--color-code-bg, #f7f7f5)",
+              background: "var(--color-code-bg)",
               border: `1px solid ${C.border}`,
               borderRadius: "0.5rem",
               padding: "0.75rem",
@@ -1058,11 +1055,11 @@ Index 4:  status ASC + category ASC + order ASC`}
           <a href="/dashboard" style={{ color: C.accent }}>
             dashboard
           </a>{" "}
-          — questions now load from Firestore.
+         , questions now load from Firestore.
         </li>
         <li>
           If embedding generation failed for some questions, click{" "}
-          <strong>Re-Embed Missing</strong> to retry. The AI generator's dedup
+          <strong>Re-Embed Missing</strong> to retry. The AI generator&apos;s dedup
           feature requires embeddings on all output + debug questions.
         </li>
       </ol>
@@ -1073,14 +1070,14 @@ Index 4:  status ASC + category ASC + order ASC`}
       <div css={S.sectionTitle}>TypeScript Questions (separate seed)</div>
       <p style={{ fontSize: "0.875rem", color: C.muted, marginBottom: "1.25rem", lineHeight: 1.7 }}>
         Seed TypeScript-track questions independently. These are separate from the React questions above.
-        Run once — use Clear All first if re-seeding.
+        Run once, use Clear All first if re-seeding.
       </p>
 
       <div css={S.grid}>
         {[
-          { label: "TS Theory", count: tsTheoryQs.length, icon: BookOpen, color: "#3178c6", desc: "Type system, generics, utility types", key: "TS-Theory" },
-          { label: "TS Output", count: tsOutputQs.length, icon: Code2, color: "#3178c6", desc: "Type inference & resolution questions", key: "TS-Output" },
-          { label: "TS Debug", count: tsDebugQs.length, icon: Bug, color: "#3178c6", desc: "Find & fix TypeScript type errors", key: "TS-Debug" },
+          { label: "TS Theory", count: tsTheoryQs.length, icon: BookOpen, color: "var(--color-cool)", desc: "Type system, generics, utility types", key: "TS-Theory" },
+          { label: "TS Output", count: tsOutputQs.length, icon: Code2, color: "var(--color-cool)", desc: "Type inference & resolution questions", key: "TS-Output" },
+          { label: "TS Debug", count: tsDebugQs.length, icon: Bug, color: "var(--color-cool)", desc: "Find & fix TypeScript type errors", key: "TS-Debug" },
         ].map(({ label, count, icon: Icon, color, desc, key }) => (
           <div key={key} css={S.dataCard(color, !!doneTs[key])}>
             <div css={S.dataIcon(color)}>
@@ -1102,7 +1099,7 @@ Index 4:  status ASC + category ASC + order ASC`}
         css={S.seedBtn(seedingTs)}
         onClick={handleSeedTypescript}
         disabled={seedingTs || seeding || clearing}
-        style={{ background: seedingTs ? "#3178c680" : "#3178c6" }}
+        style={{ background: seedingTs ? "color-mix(in oklab, var(--color-accent) 50%, transparent)" : "var(--color-accent)" }}
       >
         {seedingTs ? (
           <><Loader2 size={16} css={{ animation: "spin 1s linear infinite" }} /> Seeding TypeScript…</>
@@ -1130,20 +1127,20 @@ Index 4:  status ASC + category ASC + order ASC`}
       {/* ── System Design Questions Section ──────────────────────────────────── */}
       <div css={S.sectionTitle}>System Design Questions (separate seed)</div>
       <p style={{ fontSize: "0.875rem", color: C.muted, marginBottom: "1.25rem", lineHeight: 1.7 }}>
-        Seed System Design–track theory questions independently. {totalSdQs} questions across 10 categories.
-        Run once — use Clear All first if re-seeding.
+        Seed System Design track theory questions independently. {totalSdQs} questions across 10 categories.
+        Run once, use Clear All first if re-seeding.
       </p>
 
       <div css={S.grid}>
-        <div css={S.dataCard("#7c3aed", !!doneSd["SD-Theory"])}>
-          <div css={S.dataIcon("#7c3aed")}>
-            <BookOpen size={16} color="#7c3aed" />
+        <div css={S.dataCard("var(--color-cool)", !!doneSd["SD-Theory"])}>
+          <div css={S.dataIcon("var(--color-cool)")}>
+            <BookOpen size={16} color="var(--color-cool)" />
           </div>
           <div css={S.dataTitle}>SD Theory</div>
-          <div css={S.dataCount("#7c3aed")}>{sdTheoryQs.length}</div>
+          <div css={S.dataCount("var(--color-cool)")}>{sdTheoryQs.length}</div>
           <div css={S.dataMeta}>Rendering, MFEs, Auth, Security, CWV…</div>
           {doneSd["SD-Theory"] && (
-            <div css={S.doneBadge("#7c3aed")}>
+            <div css={S.doneBadge("var(--color-cool)")}>
               <CheckCircle2 size={9} /> Imported
             </div>
           )}
@@ -1154,7 +1151,7 @@ Index 4:  status ASC + category ASC + order ASC`}
         css={S.seedBtn(seedingSd)}
         onClick={handleSeedSystemDesign}
         disabled={seedingSd || seeding || seedingTs || clearing}
-        style={{ background: seedingSd ? "#7c3aed80" : "#7c3aed" }}
+        style={{ background: seedingSd ? "color-mix(in oklab, var(--color-accent) 50%, transparent)" : "var(--color-accent)" }}
       >
         {seedingSd ? (
           <><Loader2 size={16} css={{ animation: "spin 1s linear infinite" }} /> Seeding System Design…</>
