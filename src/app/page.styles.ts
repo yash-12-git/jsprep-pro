@@ -818,44 +818,6 @@ export const diffPlus = css`
 
 // ─── Testimonials ─────────────────────────────────────────────────────────────
 
-export const tGrid = css`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--gap-columns);
-  @media (max-width: ${SMALL}) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-`;
-
-export const tCard = css`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-xl);
-  margin: 0;
-  padding-top: var(--space-lg);
-  border-top: 1px solid ${C.rule2};
-`;
-
-export const tQuote = css`
-  font-size: var(--text-lg);
-  line-height: 1.4;
-  color: ${C.text};
-  text-wrap: pretty;
-`;
-
-export const tName = css`
-  font-size: var(--text-md);
-  font-weight: 500;
-  color: ${C.accent};
-`;
-
-export const tRole = css`
-  margin-top: var(--space-3xs);
-  font-size: var(--text-sm);
-  color: ${C.muted};
-`;
-
 // ─── Topics, as an index ──────────────────────────────────────────────────────
 
 export const tpList = css`
@@ -1068,15 +1030,3 @@ export const btmD = css`
   color: ${C.ink2};
 `;
 
-export const foot = css`
-  padding-block: var(--space-xl) var(--space-3xl);
-  border-top: 1px solid ${C.border};
-  font-size: var(--text-sm);
-  line-height: 1.6;
-  color: ${C.muted};
-  strong {
-    display: block;
-    font-weight: 500;
-    color: ${C.text};
-  }
-`;

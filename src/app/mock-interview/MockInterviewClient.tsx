@@ -2,7 +2,8 @@
 // app/mock-interview/MockInterviewClient.tsx
 "use client";
 
-import { postAI } from "@/lib/aiClient";
+import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -501,6 +502,7 @@ export default function MockInterviewClient({ topics }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   const [turns, setTurns] = useState(0);
   const [timeLeft, setTimeLeft] = useState(INTERVIEW_SECS);
   const [isTyping, setIsTyping] = useState(false);
@@ -558,11 +560,8 @@ export default function MockInterviewClient({ topics }: Props) {
     e.target.style.height = Math.min(e.target.scrollHeight, 160) + "px";
   }
 
-  async function startInterview() {
-    setPhase("interview");
-    setMessages([]);
-    setTurns(0);
-    setTimeLeft(INTERVIEW_SECS);
+  async function requestOpening() {
+    setAiError(null);
     setIsTyping(true);
     try {
       const data = await postAI({
@@ -573,35 +572,29 @@ export default function MockInterviewClient({ topics }: Props) {
       await new Promise((r) => setTimeout(r, 800 + Math.random() * 1200));
       setIsTyping(false);
       setMessages([{ role: "assistant", content: data.text }]);
-    } catch {
+    } catch (err) {
+      console.error("[MockInterview] opening failed", err);
       setIsTyping(false);
-      setMessages([
-        {
-          role: "assistant",
-          content: "Connection error. Please refresh and try again.",
-        },
-      ]);
+      setAiError(aiErrorMessage(err));
     }
   }
 
-  async function sendAnswer() {
-    if (!input.trim() || aiLoading || isTyping) return;
-    const userMsg: Message = {
-      role: "user",
-      content: input.trim(),
-      lockedAt: Date.now(),
-    };
-    const newMsgs = [...messages, userMsg];
-    setMessages(newMsgs);
-    setInput("");
-    if (taRef.current) taRef.current.style.height = "auto";
-    const newTurns = turns + 1;
-    setTurns(newTurns);
-    const isFinal = newTurns >= TOTAL_TURNS;
+  function startInterview() {
+    setPhase("interview");
+    setMessages([]);
+    setTurns(0);
+    setTimeLeft(INTERVIEW_SECS);
+    requestOpening();
+  }
+
+  // On failure the conversation stays as it was, ending on the user's locked
+  // answer, so retrying sends the same messages again.
+  async function requestReply(msgs: Message[], isFinal: boolean) {
+    setAiError(null);
     setIsTyping(true);
     setAiLoading(true);
     if (isFinal) setEvaluating(true);
-    const apiMsgs = newMsgs.map((m) => ({ role: m.role, content: m.content }));
+    const apiMsgs = msgs.map((m) => ({ role: m.role, content: m.content }));
     if (isFinal) apiMsgs.push({ role: "user", content: "GENERATE_SCORECARD" });
     try {
       const data = await postAI({
@@ -617,8 +610,10 @@ export default function MockInterviewClient({ topics }: Props) {
         setEvaluating(false);
         setScorecard(card);
         clearInterval(timerRef.current!);
-        await saveHistory(newMsgs, card);
+        await saveHistory(msgs, card);
         setPhase("result");
+      } else if (isFinal) {
+        throw new Error("Final reply had no scorecard");
       } else {
         setEvaluating(false);
         setMessages((prev) => [
@@ -626,20 +621,35 @@ export default function MockInterviewClient({ topics }: Props) {
           { role: "assistant", content: data.text },
         ]);
       }
-    } catch {
+    } catch (err) {
+      console.error("[MockInterview] reply failed", err);
       setIsTyping(false);
       setEvaluating(false);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "Connection error. Your answer was recorded. Please try again.",
-        },
-      ]);
+      setAiError(aiErrorMessage(err));
     } finally {
       setAiLoading(false);
     }
+  }
+
+  function retryLastRequest() {
+    if (messages.length === 0) requestOpening();
+    else requestReply(messages, turns >= TOTAL_TURNS);
+  }
+
+  function sendAnswer() {
+    if (!input.trim() || aiLoading || isTyping || aiError) return;
+    const userMsg: Message = {
+      role: "user",
+      content: input.trim(),
+      lockedAt: Date.now(),
+    };
+    const newMsgs = [...messages, userMsg];
+    setMessages(newMsgs);
+    setInput("");
+    if (taRef.current) taRef.current.style.height = "auto";
+    const newTurns = turns + 1;
+    setTurns(newTurns);
+    requestReply(newMsgs, newTurns >= TOTAL_TURNS);
   }
 
   async function saveHistory(msgs: Message[], card: ScoreBreakdown) {
@@ -671,10 +681,11 @@ export default function MockInterviewClient({ topics }: Props) {
     setIsTyping(false);
     setAiLoading(false);
     setEvaluating(false);
+    setAiError(null);
   }
 
   const isWarn = timeLeft <= 5 * 60 && phase === "interview";
-  const canSend = !!input.trim() && !aiLoading && !isTyping;
+  const canSend = !!input.trim() && !aiLoading && !isTyping && !aiError;
 
   return (
     <PageGuard
@@ -693,8 +704,8 @@ export default function MockInterviewClient({ topics }: Props) {
             </button>
             <h1 css={setupTitle}>Mock Interview</h1>
             <p css={setupSub}>
-              Configure your session. Questions are calibrated to your role,
-              level, and target company.
+              Configure your session. Questions are tailored to your role and level.
+              Company styles are AI approximations, not real interview questions.
             </p>
 
             <div style={{ marginBottom: "1.5rem" }}>
@@ -819,6 +830,9 @@ export default function MockInterviewClient({ topics }: Props) {
             </div>
 
             <div>
+              {aiError && (
+                <AIErrorNotice message={aiError} onRetry={retryLastRequest} />
+              )}
               <div css={inputRow}>
                 <textarea
                   ref={taRef}

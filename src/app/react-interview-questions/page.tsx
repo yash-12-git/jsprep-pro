@@ -16,9 +16,9 @@ import InterviewQuestionList from "../javascript-interview-questions/QuestionLis
 // ─── Static metadata ──────────────────────────────────────────────────────────
 
 export const metadata: Metadata = pageMeta({
-  title: "150+ React Interview Questions With Answers (2026)",
+  title: "React Interview Questions With Answers (2026)",
   description:
-    "The most complete list of React interview questions with detailed answers and code examples. Covers components, hooks, state management, lifecycle methods, context, and more. Asked at Razorpay, Flipkart, Google, Atlassian.",
+    "React interview questions with detailed answers and code examples. Covers components, hooks, state management, lifecycle methods, context, and more.",
   path: "/react-interview-questions",
 });
 
@@ -143,12 +143,10 @@ export default async function ReactInterviewQuestionsPage() {
 
       <main className="doc">
         <DocHero
-          title="200+ React Interview Questions"
+          title="React Interview Questions"
           lede={
             <>
-              Comprehensive React interview prep covering components, hooks, state management, lifecycle methods, context, and more. Questions asked at{" "}
-            <strong>Razorpay, Flipkart, Google, Atlassian, Swiggy, CRED</strong>{" "}
-            and other top tech companies.
+              Comprehensive React interview prep covering components, hooks, state management, lifecycle methods, context, and more.
             </>
           }
           actions={

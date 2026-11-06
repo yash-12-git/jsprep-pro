@@ -293,7 +293,7 @@ export default function CheatsheetPage() {
               items={[
               {
                 href: "/react-interview-questions",
-                text: "200+ full React interview questions with answers",
+                text: "Full React interview questions with answers",
               },
               {
                 href: "/output-quiz",

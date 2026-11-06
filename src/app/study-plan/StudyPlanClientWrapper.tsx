@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
-import { postAI } from "@/lib/aiClient";
+import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,6 +51,7 @@ export default function StudyPlanClientPage({
 
   const [plan, setPlan] = useState<StudyPlan | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
   const [interviewDate, setInterviewDate] = useState("");
 
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function StudyPlanClientPage({
 
   async function generatePlan() {
     setGenerating(true);
-    setPlan(null);
+    setPlanError(null);
     try {
       const data = await postAI({
         type: "studyplan",
@@ -89,8 +91,9 @@ export default function StudyPlanClientPage({
         },
       });
       setPlan(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
-    } catch {
-      alert("Failed to generate plan. Try again.");
+    } catch (err) {
+      console.error("[StudyPlan] generation failed", err);
+      setPlanError(aiErrorMessage(err));
     } finally {
       setGenerating(false);
     }
@@ -211,6 +214,7 @@ export default function StudyPlanClientPage({
             ))}
           </div>
 
+          {planError && <AIErrorNotice message={planError} />}
           <button
             css={Shared.primaryBtn(C.amber)}
             onClick={generatePlan}

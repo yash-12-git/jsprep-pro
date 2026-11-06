@@ -103,7 +103,7 @@ export function CompanyGuide() {
           Company-specific prep guide
         </p>
         <p style={{ fontSize: "12px", color: "var(--color-muted)", lineHeight: 1.6, margin: 0 }}>
-          Each company tests differently. Know their format before you apply: click “Start mock” to practice with company context pre-loaded.
+          Our best understanding of each company&apos;s process, and not verified with the companies. Rounds and pay change, so confirm with your recruiter. Click “Start mock” to practice with company context pre-loaded.
         </p>
       </div>
 

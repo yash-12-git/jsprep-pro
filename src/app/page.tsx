@@ -5,6 +5,7 @@
 //   2. Injects JSON-LD schema tags (crawlers see this in initial HTML)
 //   3. Renders <HomePageClient> which handles all Emotion / client logic
 
+import { CONTENT_COUNTS } from "@/lib/contentCounts";
 import type { Metadata } from "next";
 import { courseSchema, faqSchema, pageMeta } from "@/lib/seo/seo";
 import HomePageClient from "./HomePageClient";
@@ -12,7 +13,7 @@ import HomePageClient from "./HomePageClient";
 export const metadata: Metadata = pageMeta({
   title: "JavaScript Interview Questions & React Interview Prep — JSPrep Pro",
   description:
-    "600+ frontend interview questions with AI scoring. Practice JavaScript closures, event loop, promises, React hooks, output prediction, and debugging. Used by developers at Razorpay, Flipkart, Google, and Atlassian.",
+    `${CONTENT_COUNTS.total} frontend interview questions with AI scoring. Practice JavaScript closures, event loop, promises, React hooks, output prediction, and debugging.`,
   path: "/",
   keywords: [
     "javascript interview questions",
@@ -46,7 +47,7 @@ const TRACK_FAQ: Record<Track, FAQItem[]> = {
     {
       question: "What are JavaScript output prediction questions?",
       answer:
-        "Output prediction questions show you a snippet of JavaScript and ask what the console prints. They test real knowledge of coercion, hoisting, closures, and async behaviour — exactly how top companies like Razorpay, Atlassian, and Flipkart interview.",
+        "Output prediction questions show you a snippet of JavaScript and ask what the console prints. They test real knowledge of coercion, hoisting, closures, and async behaviour — a common format in frontend interviews.",
     },
     {
       question: "What is a JavaScript polyfill interview question?",
@@ -98,7 +99,7 @@ const TRACK_FAQ: Record<Track, FAQItem[]> = {
     {
       question: "Is system design asked in frontend interviews?",
       answer:
-        "Yes — especially for senior roles. Companies like Google, Meta, and top Indian startups ask frontend system design questions like 'design a real-time chat UI', 'design an infinite scroll feed', or 'how would you architect a micro-frontend at scale'. JSPrep Pro prepares you for all of these.",
+        "Yes — especially for senior roles. Common frontend system design questions include 'design a real-time chat UI', 'design an infinite scroll feed', or 'how would you architect a micro-frontend at scale'. JSPrep Pro prepares you for all of these.",
     },
     {
       question: "How does JSPrep Pro teach frontend system design?",
@@ -113,12 +114,12 @@ const SHARED_FAQ: FAQItem[] = [
   {
     question: "What is JSPrep Pro?",
     answer:
-      "JSPrep Pro is a frontend interview preparation platform with 600+ questions covering JavaScript, React, TypeScript, and System Design. It includes AI-scored written answers, output prediction, debug challenges, Interview Sprint, and 40+ topic deep-dives — all tailored for frontend developers.",
+      `JSPrep Pro is a frontend interview preparation platform with ${CONTENT_COUNTS.total} questions covering JavaScript, React, TypeScript, and System Design. It includes AI-scored written answers, output prediction, debug challenges, Interview Sprint, and ${CONTENT_COUNTS.topics} topic deep-dives — all tailored for frontend developers.`,
   },
   {
     question: "Is JSPrep Pro free to use?",
     answer:
-      "Yes. JSPrep Pro offers 200+ theory questions completely free across JavaScript, React, TypeScript, and System Design — forever, no credit card required. The Pro plan unlocks all 900+ questions, unlimited Interview Sprints, AI tools, Study Plan, Cheat Sheet, and more.",
+      `Yes. JSPrep Pro offers ${CONTENT_COUNTS.theory} theory questions free across JavaScript, React, TypeScript, and System Design, with no credit card required. The Pro plan unlocks all ${CONTENT_COUNTS.total} questions, unlimited Interview Sprints, AI tools, Study Plan, and more.`,
   },
   {
     question: "What is the Interview Sprint?",
@@ -133,7 +134,7 @@ const SHARED_FAQ: FAQItem[] = [
   {
     question: "Which tracks does JSPrep Pro support?",
     answer:
-      "JSPrep Pro currently supports JavaScript (200+ questions), React (150+ questions), and TypeScript and System Design (coming soon with early access). Switch between tracks from the top navigation.",
+      `JSPrep Pro supports JavaScript (${CONTENT_COUNTS.javascript} questions), React (${CONTENT_COUNTS.react}), TypeScript (${CONTENT_COUNTS.typescript}), and Frontend System Design (${CONTENT_COUNTS.systemDesign}). Switch between tracks from the top navigation.`,
   },
 ];
 

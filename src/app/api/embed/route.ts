@@ -11,11 +11,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyAdmin } from '@/lib/firebaseAdmin'
 
 const COHERE_URL  = 'https://api.cohere.ai/v1/embed'
 const EMBED_MODEL = 'embed-english-light-v3.0'
 
 export async function POST(req: NextRequest) {
+  if (!(await verifyAdmin(req.headers.get('authorization')))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const apiKey = process.env.COHERE_API_KEY
   if (!apiKey) {
     return NextResponse.json({ error: 'COHERE_API_KEY not set on server' }, { status: 500 })

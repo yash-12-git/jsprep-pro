@@ -8,6 +8,7 @@ export const metadata: Metadata = pageMeta({
   title: "JavaScript Polyfill Lab — Master JS Concepts by Building Polyfills | JSPrep Pro",
   description: "Dive into the JavaScript Polyfill Lab on JSPrep Pro. Learn by building polyfills for modern JavaScript features, enhancing your understanding of core concepts and improving your coding skills. Start mastering JavaScript today!",
   path: `/polyfill-lab`,
+  noindex: true, // Requires sign-in; has no content for search visitors
 });
 
 export default async function PolyfillLabPage() {

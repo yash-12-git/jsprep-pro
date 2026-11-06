@@ -16,9 +16,9 @@ import {
 // ─── Static metadata ──────────────────────────────────────────────────────────
 
 export const metadata: Metadata = pageMeta({
-  title: "150+ JavaScript Interview Questions With Answers (2026)",
+  title: "JavaScript Interview Questions With Answers (2026)",
   description:
-    "The most complete list of JavaScript interview questions with detailed answers and code examples. Covers closures, event loop, promises, async/await, prototypes, this keyword, type coercion and more. Asked at Razorpay, Flipkart, Google, Atlassian.",
+    "JavaScript interview questions with detailed answers and code examples. Covers closures, event loop, promises, async/await, prototypes, this keyword, type coercion and more.",
   path: "/javascript-interview-questions",
 });
 
@@ -106,8 +106,8 @@ const PREP_TIPS = [
     desc: "Closures, this binding, event loop, prototypes, async/await, type coercion, hoisting, and ES6+ features cover 90% of JavaScript interviews.",
   },
   {
-    title: "Company patterns vary",
-    desc: "Razorpay loves event loop. Flipkart tests closures heavily. Google digs into prototypes and generators. Know which concepts each company emphasizes.",
+    title: "Formats vary by company",
+    desc: "Rounds and emphasis differ between companies. Ask your recruiter what to expect, and look for recent interview reports from candidates at that company.",
   },
   {
     title: "Practice under time pressure",
@@ -138,14 +138,12 @@ export default async function JSInterviewQuestionsPage() {
 
       <main className="doc">
         <DocHero
-          title="200+ JavaScript Interview Questions"
+          title="JavaScript Interview Questions"
           lede={
             <>
               Comprehensive JavaScript interview prep covering closures, event
               loop, promises, async/await, prototypes, <code>this</code> keyword,
-              type coercion and more. Questions asked at{" "}
-              <strong>Razorpay, Flipkart, Google, Atlassian, Swiggy, CRED</strong>{" "}
-              and other top tech companies.
+              type coercion and more.
             </>
           }
           actions={

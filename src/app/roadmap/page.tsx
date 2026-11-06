@@ -14,7 +14,7 @@ const CANONICAL = "https://jsprep.pro/roadmap";
 export const metadata: Metadata = {
   title: "Frontend Developer Roadmap 2026 — JavaScript, React & DSA | JSPrep",
   description:
-    "The complete frontend developer roadmap for 2026. A 16-week, 112-day structured plan covering JavaScript, React, system design, machine coding, and DSA to crack ₹25+ LPA interviews at Zepto, Razorpay, CRED, and top startups.",
+    "The complete frontend developer roadmap for 2026. A 16-week, 112-day structured plan covering JavaScript, React, system design, machine coding, and DSA to prepare for product-company interviews.",
   keywords: [
     "frontend roadmap",
     "frontend developer roadmap 2026",
@@ -351,7 +351,7 @@ export default function RoadmapPage() {
             },
             {
               q: "Do I need DSA as a frontend developer?",
-              a: "Yes. Most senior frontend interviews at Razorpay, CRED, Groww, and Flipkart include a DSA round. This roadmap integrates focused DSA sprints in Weeks 4, 12, and 14 — covering arrays, trees, graphs, and dynamic programming.",
+              a: "Often, yes. Many senior frontend loops at product companies include a DSA round, so check with your recruiter. This roadmap integrates focused DSA sprints in Weeks 4, 12, and 14 — covering arrays, trees, graphs, and dynamic programming.",
             },
             {
               q: "What is machine coding and why does this roadmap spend two weeks on it?",

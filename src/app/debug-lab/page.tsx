@@ -8,6 +8,7 @@ export const metadata: Metadata = pageMeta({
   title: "JavaScript Debug Lab — Enhance Your Debugging Skills with JSPrep Pro",
   description: "Improve your JavaScript debugging skills with the Debug Lab on JSPrep Pro. Learn to identify and fix issues in your code effectively, enhancing your problem-solving abilities and coding proficiency. Start debugging like a pro today!",
   path: `/debug-lab`,
+  noindex: true, // Requires sign-in; has no content for search visitors
 });
 
 export default async function DebugLabPage() {

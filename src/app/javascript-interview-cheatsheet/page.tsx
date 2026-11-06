@@ -303,7 +303,7 @@ export default function CheatsheetPage() {
               items={[
               {
                 href: "/javascript-interview-questions",
-                text: "200+ full JavaScript interview questions with answers",
+                text: "Full JavaScript interview questions with answers",
               },
               {
                 href: "/output-quiz",

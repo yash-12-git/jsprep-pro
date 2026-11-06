@@ -15,7 +15,6 @@ import {
   RotateCcw,
   Play,
   Code2,
-  Building2,
 } from "lucide-react";
 import { css } from "@emotion/react";
 import * as Shared from "@/styles/shared";
@@ -136,7 +135,6 @@ export default function OutputCard({
   const isErrorQuestion = ERROR_PATTERNS.some((p) =>
     originalExpectedOut.includes(p),
   );
-  const companies = (q as any).companies as string[] | undefined;
   const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
 
   function conceptMatches(userAnswer: string): boolean {
@@ -278,19 +276,6 @@ export default function OutputCard({
             >
               {q.category}
             </span>
-            {companies && companies.length > 0 && (
-              <div css={companyRow}>
-                <Building2 size={10} css={{ color: C.muted, flexShrink: 0 }} />
-                {companies.slice(0, 3).map((c) => (
-                  <span key={c} css={companyChip}>
-                    {c}
-                  </span>
-                ))}
-                {companies.length > 3 && (
-                  <span css={companyChip}>+{companies.length - 3}</span>
-                )}
-              </div>
-            )}
           </div>
         </div>
         <div css={S.chevronWrapper(isOpen)}>
@@ -338,26 +323,6 @@ export default function OutputCard({
             </div>
           ) : (
             <>
-              {/* Company banner — shown when expanded */}
-              {companies && companies.length > 0 && (
-                <div css={companyBanner}>
-                  <Building2
-                    size={11}
-                    css={{ color: C.accent, flexShrink: 0, marginTop: 1 }}
-                  />
-                  <span
-                    css={{ fontSize: "0.75rem", color: C.muted, fontWeight: 500 }}
-                  >
-                    Asked at:
-                  </span>
-                  {companies.map((c) => (
-                    <span key={c} css={companyFull}>
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              )}
-
               <div css={{ padding: "1rem 1rem 0" }}>
                 <div css={toolbar}>
                   <span css={tlabel}>Code</span>
@@ -607,40 +572,6 @@ export default function OutputCard({
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const companyRow = css`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-`;
-const companyChip = css`
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: ${C.bgSubtle};
-  border: 1px solid ${C.border};
-  color: ${C.muted};
-  white-space: nowrap;
-`;
-const companyBanner = css`
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  padding: 8px 16px;
-  background: ${C.bgSubtle};
-  border-bottom: 1px solid ${C.border};
-  flex-wrap: wrap;
-`;
-const companyFull = css`
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: color-mix(in oklab, ${C.accent} 7%, transparent);
-  border: 1px solid color-mix(in oklab, ${C.accent} 16%, transparent);
-  color: ${C.accent};
-`;
 const toolbar = css`
   display: flex;
   align-items: center;

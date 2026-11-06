@@ -26,25 +26,12 @@ export default function QuestionListClientWrapper({
   // Return null — parent renders static fallback
   if (!questions.length) return null;
 
-  // Company counts
-  const companyCounts: Record<string, number> = {};
-  questions.forEach((q) => {
-    (((q as any).companies as string[]) ?? []).forEach((c: string) => {
-      companyCounts[c] = (companyCounts[c] ?? 0) + 1;
-    });
-  });
-
   const byCategory = questions.reduce<Record<string, Question[]>>((acc, q) => {
     const cat = q.category ?? "General";
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(q);
     return acc;
   }, {});
-
-  const topCompanies = Object.entries(companyCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([name]) => name);
 
   return (
     <>
@@ -53,10 +40,6 @@ export default function QuestionListClientWrapper({
         {[
           { label: "Questions", value: `${questions.length}+` },
           { label: "Categories", value: `${categories.length}` },
-          {
-            label: "Companies",
-            value: `${Object.keys(companyCounts).length}+`,
-          },
           {
             label: "With Code",
             value: `${questions.filter((q) => q.type === "output" || q.type === "debug").length}+`,
@@ -68,18 +51,6 @@ export default function QuestionListClientWrapper({
           </div>
         ))}
       </div>
-
-      {/* Companies banner */}
-      {topCompanies.length > 0 && (
-        <div className="doc-meta" style={{ marginBlock: "var(--space-lg)" }}>
-          <span>Asked at:</span>
-          {topCompanies.map((c) => (
-            <span key={c} className="chip">
-              {c}
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* Category sections */}
       <section className="doc-section">
@@ -101,17 +72,10 @@ export default function QuestionListClientWrapper({
 
               <div className="q-list">
                 {visible.map((q) => {
-                  const companies = (q as any).companies as string[] | undefined;
                   return (
                     <Link key={q.id} href={`/q/${q.slug}`} className="q-row">
                       <span className="chip">{q.difficulty}</span>
                       <span className="q-row__title">{q.title}</span>
-                      {companies &&
-                        companies.slice(0, 2).map((c) => (
-                          <span key={c} className="chip">
-                            {c}
-                          </span>
-                        ))}
                       {(q.type === "output" || q.type === "debug") && (
                         <span className="chip chip--cool">{q.type}</span>
                       )}

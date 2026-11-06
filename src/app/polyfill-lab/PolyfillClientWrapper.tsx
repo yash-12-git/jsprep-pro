@@ -23,34 +23,6 @@ import { Question } from "@/types/question";
 const FREE_LIMIT = 5;
 const PAGE_SIZE = 10;
 
-const COMPANIES = [
-  "Razorpay",
-  "Flipkart",
-  "Google",
-  "Amazon",
-  "Atlassian",
-  "Microsoft",
-  "CRED",
-  "Swiggy",
-];
-
-const companyStrip = css`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.25rem;
-`;
-const coBadge = css`
-  font-size: 0.8125rem;
-  font-weight: 500;
-  padding: 0.25rem 0.75rem;
-  background: ${C.bgSubtle};
-  border: 1px solid ${C.border};
-  border-radius: 9999px;
-  color: ${C.text};
-`;
-
 export default function PolyfillLabClientPage({
   categories,
   questions,
@@ -153,25 +125,6 @@ export default function PolyfillLabClientPage({
                 {solvedCount}/{questions.length} solved
               </span>
             </div>
-          </div>
-
-          {/* Company strip — unique to Polyfill */}
-          <div css={companyStrip}>
-            <span
-              css={{
-                fontSize: "0.75rem",
-                color: C.muted,
-                fontWeight: 500,
-                whiteSpace: "nowrap",
-              }}
-            >
-              Asked at:
-            </span>
-            {COMPANIES.map((c) => (
-              <span key={c} css={coBadge}>
-                {c}
-              </span>
-            ))}
           </div>
 
           <CategoryFilter

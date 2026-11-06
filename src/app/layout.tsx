@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SITE, softwareSchema, websiteSchema, organizationSchema, KEYWORDS } from "@/lib/seo/seo";
 import Navbar from "@/components/layout/Navbar";
+import SiteFooter from "@/components/layout/SiteFooter";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TrackProvider } from "@/contexts/TrackContext";
 import Script from "next/script";
@@ -52,9 +53,6 @@ export const metadata: Metadata = {
     title: "Frontend Interview Questions — JSPrep Pro",
     description: SITE.description,
     images: [`${SITE.domain}/og-default.png`],
-  },
-  alternates: {
-    canonical: SITE.domain,
   },
 };
 
@@ -121,6 +119,7 @@ export default function RootLayout({
             <AuthProvider>
               <Navbar />
               {children}
+              <SiteFooter />
             </AuthProvider>
           </ThemeProvider>
         </TrackProvider>

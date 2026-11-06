@@ -5,6 +5,8 @@
  * Change the site name once, updates everywhere.
  */
 
+import { LEGAL } from "@/lib/legal";
+import { CONTENT_COUNTS } from "@/lib/contentCounts";
 import { proFeatures } from "@/data/homepageStaticData";
 import { getPricingForCountry, PricingInfo } from "@/lib/pricing";
 import type { Metadata } from "next";
@@ -17,7 +19,7 @@ export const SITE = {
   domain: "https://jsprep.pro",
   twitterHandle: "@jspreppro",
   description:
-    "Free frontend interview prep platform with 500+ JavaScript, React, TypeScript, and System Design questions. AI-graded answers, output prediction, debug challenges, mock interviews, and concept deep-dives. Free forever — no card required.",
+    `Frontend interview prep with ${CONTENT_COUNTS.total} JavaScript, React, TypeScript, and System Design questions. AI-graded answers, output prediction, debug challenges, mock interviews, and concept deep-dives. Start free, no card required.`,
 };
 
 // ─── Keywords ─────────────────────────────────────────────────────────────────
@@ -131,6 +133,8 @@ interface PageMetaOptions {
   modifiedAt?: string;
   image?: string;
   track?: Track;
+  /** App, gated or thin pages: keep out of search, but still follow their links. */
+  noindex?: boolean;
 }
 
 export function pageMeta(opts: PageMetaOptions): Metadata {
@@ -143,6 +147,7 @@ export function pageMeta(opts: PageMetaOptions): Metadata {
     publishedAt,
     modifiedAt,
     track,
+    noindex = false,
   } = opts;
 
   const url = `${SITE.domain}${path}`;
@@ -161,10 +166,10 @@ export function pageMeta(opts: PageMetaOptions): Metadata {
     creator: SITE.name,
     publisher: SITE.name,
     robots: {
-      index: true,
+      index: !noindex,
       follow: true,
       googleBot: {
-        index: true,
+        index: !noindex,
         follow: true,
         "max-video-preview": -1,
         "max-image-preview": "large",
@@ -286,8 +291,8 @@ const TRACK_COURSE_META: Record<
   javascript: {
     name: "JavaScript Interview Preparation",
     description:
-      "200+ JavaScript interview questions across theory, output prediction, and debugging. " +
-      "AI scoring, Interview Sprint, and 36 topic deep-dives.",
+      `${CONTENT_COUNTS.javascript} JavaScript interview questions across theory, output prediction, and debugging. ` +
+      "AI scoring, Interview Sprint, and 40 topic deep-dives.",
     teaches: [
       "JavaScript Closures",
       "JavaScript Event Loop",
@@ -302,7 +307,7 @@ const TRACK_COURSE_META: Record<
   react: {
     name: "React Interview Preparation",
     description:
-      "150+ React interview questions covering hooks, state management, rendering, and patterns. " +
+      `${CONTENT_COUNTS.react} React interview questions covering hooks, state management, rendering, and patterns. ` +
       "AI scoring, output prediction, and debug challenges.",
     teaches: [
       "React Hooks (useState, useEffect, useMemo, useCallback)",
@@ -317,7 +322,7 @@ const TRACK_COURSE_META: Record<
   typescript: {
     name: "TypeScript Interview Preparation",
     description:
-      "100+ TypeScript interview questions covering types, generics, utility types, and type narrowing. " +
+      `${CONTENT_COUNTS.typescript} TypeScript interview questions covering types, generics, utility types, and type narrowing. ` +
       "AI scoring and debug challenges.",
     teaches: [
       "TypeScript Types and Interfaces",
@@ -409,7 +414,7 @@ export function organizationSchema(): string {
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
-      email: "support@jsprep.pro",
+      email: LEGAL.contactEmail,
     },
   });
 }

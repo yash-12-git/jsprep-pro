@@ -564,7 +564,10 @@ export default function SeedPage() {
   async function embedText(text: string): Promise<number[]> {
     const res = await fetch("/api/embed", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${await user!.getIdToken()}`,
+      },
       body: JSON.stringify({ text }),
     });
     if (!res.ok) {

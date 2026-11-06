@@ -8,6 +8,7 @@ export const metadata: Metadata = pageMeta({
   title: "JavaScript Output Quiz — Test Your JS Knowledge with JSPrep Pro",
   description: "Challenge yourself with the JavaScript Output Quiz on JSPrep Pro. Test your understanding of JavaScript concepts through practical questions and improve your coding skills. Start your JS journey today!",
   path: `/output-quiz`,
+  noindex: true, // Requires sign-in; has no content for search visitors
 });
 
 export default async function OutputQuizPage() {

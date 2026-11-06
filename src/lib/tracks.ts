@@ -1,3 +1,4 @@
+import { CONTENT_COUNTS } from "@/lib/contentCounts";
 export type Track = "javascript" | "react" | "typescript" | "system-design";
 
 export interface TrackConfig {
@@ -17,7 +18,7 @@ export const TRACKS: TrackConfig[] = [
     label: "JavaScript",
     emoji: "🟨",
     color: "#dcd108",
-    tagline: "200+ questions · Closures, async, prototypes",
+    tagline: `${CONTENT_COUNTS.javascript} questions · Closures, async, prototypes`,
     available: true,
     questionsPage: "/javascript-interview-questions",
   },
@@ -26,7 +27,7 @@ export const TRACKS: TrackConfig[] = [
     label: "React",
     emoji: "⚛️",
     color: "#61dafb",
-    tagline: "150+ questions · Hooks, state, patterns",
+    tagline: `${CONTENT_COUNTS.react} questions · Hooks, state, patterns`,
     badge: "NEW",
     available: true,
     questionsPage: "/react-interview-questions",
@@ -36,7 +37,7 @@ export const TRACKS: TrackConfig[] = [
     label: "TypeScript",
     emoji: "🔷",
     color: "#3178c6",
-    tagline: "100+ questions · Types, generics, utility types",
+    tagline: `${CONTENT_COUNTS.typescript} questions · Types, generics, utility types`,
     badge: "NEW",
     available: true,
     questionsPage: "/typescript-interview-questions",
@@ -46,7 +47,7 @@ export const TRACKS: TrackConfig[] = [
     label: "System Design",
     emoji: "🏗️",
     color: "#f7c76a",
-    tagline: "Coming soon · Frontend architecture at scale",
+    tagline: `${CONTENT_COUNTS.systemDesign} questions · Frontend architecture at scale`,
     badge: "NEW",
     available: true,
     questionsPage: "/system-design-interview-questions",

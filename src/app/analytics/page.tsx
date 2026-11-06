@@ -10,6 +10,7 @@ export const metadata: Metadata = pageMeta({
   description:
     "Unlock powerful analytics on JSPrep Pro to track your JavaScript learning progress. Visualize your strengths and weaknesses, monitor improvement over time, and make data-driven decisions to optimize your study plan. Start analyzing your JS journey today!",
   path: `/analytics`,
+  noindex: true, // Requires sign-in; has no content for search visitors
 });
 
 export default async function AnalyticsPage() {

@@ -1,27 +1,6 @@
 import { Track } from "@/lib/tracks";
 import { Brain, Bug, FileText, Mic, Sparkles, Target } from "lucide-react";
 
-export const TESTIMONIALS = [
-  {
-    name: "Yogita Munjal",
-    role: "Backend Dev → EasyEcom",
-    quote:
-      "The questions I practiced were almost identical to what was asked in my interview, something I wouldn’t have prepared on my own. Great platform for targeted prep.",
-  },
-  {
-    name: "Yash Maheshwari",
-    role: "React Dev → Bajaj Finserv Health",
-    quote:
-      "The AI evaluator is the real thing. It told me I was hand-waving through closures. Fixed it, aced the Bajaj Finser Health round. Worth every rupee.",
-  },
-  {
-    name: "Smridhi Soni",
-    role: "2 YOE → Atlassian",
-    quote:
-      "Failed my first Atlassian screen because of the event loop. Spent a week here, went back for round 2, passed. Completely different outcome.",
-  },
-];
-
 export const TRACK_HERO: Record<
   Track,
   {
@@ -37,28 +16,28 @@ export const TRACK_HERO: Record<
     title: "JavaScript Interview",
     accent: "Questions & Practice.",
     sub: "Practice real JavaScript interview questions, take timed Interview Sprint and know exactly if you're ready.",
-    freeLine: "core JavaScript questions, free forever.",
+    freeLine: "core JavaScript questions free.",
   },
   react: {
     badge: "Train for Real React Interviews",
     title: "React Interview",
     accent: "Questions & Practice.",
     sub: "Master React hooks, state management, and component patterns. AI-scored answers, not just multiple choice.",
-    freeLine: "core React questions, free forever.",
+    freeLine: "core React questions free.",
   },
   typescript: {
     badge: "Train for Real TypeScript Interviews",
     title: "TypeScript Interview",
     accent: "Questions & Practice.",
     sub: "Level up with TypeScript types, generics, and utility types. Real interview questions with AI-graded answers.",
-    freeLine: "core TypeScript questions, free forever.",
+    freeLine: "core TypeScript questions free.",
   },
   "system-design": {
     badge: "Train for Frontend System Design",
     title: "System Design Interview",
     accent: "Questions & Practice.",
     sub: "Master frontend architecture, scalability patterns, and system design for senior engineering roles.",
-    freeLine: "system design questions, free forever.",
+    freeLine: "system design questions free.",
   },
 };
 
@@ -308,20 +287,8 @@ export const AI_TOOLS = [
   },
   {
     icon: FileText,
-    label: "Cheat Sheet",
+    label: "Revision Cards",
     desc: "36-topic revision cards, printable PDF",
-  },
-];
-
-export const LEADERS = [
-  {
-    name: "Yash Maheshwari",
-    xp: 380,
-  },
-  { name: "Susnata Das", xp: 290 },
-  {
-    name: "Shiv Malhar Dixit",
-    xp: 215,
   },
 ];
 
@@ -347,7 +314,6 @@ export const FREE_F = [
   "Daily Question of the Day + AI eval",
   "First 5 output + 5 debug questions",
   "First 5 polyfill challenges",
-  "Weekly XP leaderboard",
-  "Interview Cheat Sheet",
+  "JavaScript and React cheat sheets",
   "Deep Dives (in-depth concept explanations)",
 ];

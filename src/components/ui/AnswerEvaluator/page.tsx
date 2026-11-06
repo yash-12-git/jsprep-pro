@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
-import { postAI } from "@/lib/aiClient";
+import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useState } from "react";
 import { Loader2, Target, X, ChevronDown, ChevronUp } from "lucide-react";
 import * as S from "./styles";
@@ -29,11 +30,13 @@ export default function AnswerEvaluator({
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<EvalResult | null>(null);
   const [showBetter, setShowBetter] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   async function evaluate() {
     if (!answer.trim() || loading) return;
     setLoading(true);
     setResult(null);
+    setAiError(null);
     try {
       const data = await postAI({
         type: "evaluate",
@@ -44,8 +47,9 @@ export default function AnswerEvaluator({
         },
       });
       setResult(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
-    } catch {
-      alert("Evaluation failed, try again");
+    } catch (err) {
+      console.error("[AnswerEvaluator] evaluation failed", err);
+      setAiError(aiErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -102,6 +106,7 @@ export default function AnswerEvaluator({
                 e.target.style.boxShadow = "none";
               }}
             />
+            {aiError && <AIErrorNotice message={aiError} />}
             <button
               css={S.evalBtn}
               onClick={evaluate}

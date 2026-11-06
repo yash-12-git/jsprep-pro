@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle, Flame, Trophy } from "lucide-react";
+import { CheckCircle, Flame } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrack } from "@/contexts/TrackContext";
 import { useRouter } from "next/navigation";
@@ -13,9 +13,7 @@ import * as S from "./page.styles";
 import {
   AI_TOOLS,
   FREE_F,
-  LEADERS,
   proFeatures,
-  TESTIMONIALS,
   TRACK_HERO,
   TRACK_MODES,
   TRACK_WHY,
@@ -196,8 +194,8 @@ export default function HomePageClient({
   const totalQs = theoryCt + outputCt + debugCt + polyfillCt;
   const topicsCt = topics?.length ?? 0;
 
-  // Free count = theory questions (they're all free per your copy)
-  const freeCount = theoryCt > 0 ? theoryCt : 90;
+  // Theory questions are free to read for anyone with an account.
+  const freeCount = theoryCt;
 
   return (
     <main css={S.page} id="main">
@@ -219,9 +217,9 @@ export default function HomePageClient({
             </div>
             <p css={S.freeLine}>
               <strong>
-                {freeCount}+ {hero_content.freeLine}
+                {freeCount} {hero_content.freeLine}
               </strong>{" "}
-              No card. No trial. No paywall.
+              No card needed.
             </p>
           </div>
 
@@ -442,11 +440,11 @@ export default function HomePageClient({
           <div css={S.headBlock}>
             <h2 css={S.sh2}>4. A full interview prep ecosystem</h2>
             <p css={S.ssub}>
-              Not just a list of Q&As: habits, accountability, and depth.
+              Not just a list of Q&As: daily habits and depth.
             </p>
           </div>
 
-          <div css={S.twoCol}>
+          <div>
             <div css={S.qotdCard}>
               <div>
                 <span css={S.chipPerson}>
@@ -457,7 +455,7 @@ export default function HomePageClient({
                 </div>
                 <p css={S.qotdSub}>
                   Builds the daily prep habit without overwhelm. Free for
-                  everyone, no Pro needed. Track your streak.
+                  everyone, no Pro needed.
                 </p>
               </div>
               <Link href={ctaHref} css={S.qotdBtn}>
@@ -465,29 +463,6 @@ export default function HomePageClient({
               </Link>
             </div>
 
-            <div css={S.lbCard}>
-              <div css={S.panelHead}>
-                <div css={S.lbHeadT}>
-                  <Trophy
-                    size={16}
-                    aria-hidden="true"
-                    style={{ display: "inline", marginRight: "var(--space-xs)" }}
-                  />
-                  Top Learners This Week
-                </div>
-                <span css={S.lbReset}>Resets Monday</span>
-              </div>
-              {LEADERS.map((l, i) => (
-                <div key={l.name} css={S.lbRow}>
-                  <span css={S.lbRank}>{i + 1}</span>
-                  <div css={S.lbName}>{l.name}</div>
-                  <div css={S.measured}>{l.xp} XP</div>
-                </div>
-              ))}
-              <Link href={ctaHref} css={S.lbCta}>
-                Join the leaderboard, earn XP
-              </Link>
-            </div>
           </div>
 
           <h3 css={S.diffHead}>Why devs switch to JSPrep Pro</h3>
@@ -560,28 +535,6 @@ export default function HomePageClient({
           </div>
         </section>
 
-        {/* ── TESTIMONIALS ── */}
-        <section css={S.sec} style={{ paddingTop: 0 }}>
-          <div css={S.headBlock}>
-            <h2 css={S.sh2}>They prepped here. They got in.</h2>
-            <p css={S.ssub}>
-              Not “I liked the UI.” Developers, interviews, outcomes.
-            </p>
-          </div>
-          <div css={S.tGrid}>
-            {TESTIMONIALS.map((t) => (
-              <figure key={t.name} css={S.tCard}>
-                <blockquote css={S.tQuote} style={{ margin: 0 }}>
-                  “{t.quote}”
-                </blockquote>
-                <figcaption>
-                  <div css={S.tName}>{t.name}</div>
-                  <div css={S.tRole}>{t.role}</div>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
       </div>
 
       {/* ── PRICING ── */}
@@ -590,8 +543,8 @@ export default function HomePageClient({
           <div css={S.headBlock}>
             <h2 css={S.sh2}>Pricing</h2>
             <p css={S.ssub}>
-              Simple. Transparent. Start free with {freeCount} real questions and
-              AI feedback from day one.
+              Simple. Transparent. Start free with {freeCount} questions and a
+              daily AI-scored question.
             </p>
           </div>
           <div css={S.priceG}>
@@ -600,7 +553,7 @@ export default function HomePageClient({
               <div css={S.pPrice}>
                 {pricing.symbol}0<span css={S.pPer}>/month</span>
               </div>
-              <div css={S.pNote}>Forever free, no card needed</div>
+              <div css={S.pNote}>No card needed</div>
               <ul css={S.pFeats}>
                 {FREE_F.map((f) => (
                   <li key={f} css={S.pFeat}>
@@ -646,7 +599,7 @@ export default function HomePageClient({
           <h2 css={S.sh2}>Ready to prep smarter?</h2>
           <div>
             <p css={S.btmD}>
-              {freeCount} questions free. AI feedback from question one. No card
+              {freeCount} questions free, plus a daily AI-scored question. No card
               needed.
             </p>
             <Link href={ctaHref} css={S.btnP}>
@@ -655,11 +608,6 @@ export default function HomePageClient({
           </div>
         </div>
 
-        <footer css={S.foot}>
-          <strong>Built for frontend developers</strong>
-          JSPrep Pro, jsprep.pro
-          <br />© 2026
-        </footer>
       </div>
     </main>
   );

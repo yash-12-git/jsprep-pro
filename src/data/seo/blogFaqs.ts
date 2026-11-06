@@ -27,8 +27,8 @@ export const BLOG_FAQS: Record<string, FAQItem[]> = {
       answer: 'A closure is a function that retains access to variables from its outer scope after the outer function has returned. It is heavily tested because it is the mechanism behind private state, memoization, function factories, and event handlers that remember context. Understanding closures reveals whether a candidate truly understands JavaScript\'s execution model.',
     },
     {
-      question: 'What JavaScript topics do FAANG companies focus on?',
-      answer: 'FAANG and top-tier tech interviews typically focus on async JavaScript (promises, event loop, async/await), closures and scope, prototypal inheritance, the this keyword, performance optimization, and practical implementations like debounce, throttle, deep clone, and custom event emitters.',
+      question: 'What JavaScript topics come up most in frontend interviews?',
+      answer: 'Frontend interviews typically focus on async JavaScript (promises, event loop, async/await), closures and scope, prototypal inheritance, the this keyword, performance optimization, and practical implementations like debounce, throttle, deep clone, and custom event emitters.',
     },
   ],
 
@@ -259,7 +259,7 @@ export const REACT_BLOG_FAQS: Record<string, FAQItem[]> = {
       answer: 'Focus on hooks deeply — especially useEffect dependency arrays, stale closures, and cleanup functions. Understand the reconciliation process well enough to explain why keys matter. Practice memoization trade-offs (when React.memo helps vs hurts). Be able to discuss state management choices — useState vs useReducer vs Context vs Zustand. Then practice output and behavior questions to build your mental execution model.',
     },
     {
-      question: 'What React topics do top tech companies focus on?',
+      question: 'What React topics come up most in frontend interviews?',
       answer: 'Senior React interviews at product companies focus on performance optimization (rendering behavior, memoization, code splitting), state management architecture (Context, Redux, React Query), concurrent features (Suspense, useTransition), and design patterns (HOCs, compound components, render props vs custom hooks). Foundational hook questions are almost always included at every level.',
     },
   ],

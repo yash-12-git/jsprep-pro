@@ -314,11 +314,8 @@ ${
   "expectedOutput": "<exact console.log output, one value per line — NEVER an error string>",
   "explanation": "<why this is the output — step by step reasoning>",
   "keyInsight": "<the one JS concept this question tests>",
-  "hint": "<a hint that guides thinking without revealing the answer>",
-  "companies": ["<co1>", "<co2>"]
-}
-
-For companies: pick 2-4 from Razorpay, Flipkart, Swiggy, Zomato, CRED, PhonePe, Google, Atlassian, Amazon, Microsoft, Paytm based on which are known to interview on this JS concept.`
+  "hint": "<a hint that guides thinking without revealing the answer>"
+}`
       : `Respond ONLY with this JSON (no markdown, no backticks):
 {
   "title": "<concise title describing the bug>",
@@ -328,11 +325,8 @@ For companies: pick 2-4 from Razorpay, Flipkart, Swiggy, Zomato, CRED, PhonePe, 
   "expectedOutput": "<what fixedCode logs — NEVER contains 'Error' or 'error'>",
   "explanation": "<why it was broken and exactly how the fix works>",
   "keyInsight": "<the JS concept this teaches>",
-  "hint": "<a hint pointing toward the bug without revealing it>",
-  "companies": ["<co1>", "<co2>"]
-}
-
-For companies: pick 2-4 from Razorpay, Flipkart, Swiggy, CRED, PhonePe, Google, Atlassian, Amazon, Microsoft based on which ask about this JS bug pattern in interviews.`
+  "hint": "<a hint pointing toward the bug without revealing it>"
+}`
 }`;
         break;
 

@@ -14,9 +14,9 @@ import { pageMeta } from "@/lib/seo/seo";
 import InterviewQuestionList from "../javascript-interview-questions/QuestionList";
 
 export const metadata: Metadata = pageMeta({
-  title: "50+ Frontend System Design Interview Questions (2026)",
+  title: "Frontend System Design Interview Questions (2026)",
   description:
-    "The most complete list of frontend system design interview questions with detailed answers. Covers rendering strategies, microfrontends, bundle optimization, caching, authentication, security, state management, Core Web Vitals, and more. Asked at FAANG, Stripe, Shopify.",
+    "Frontend system design interview questions with detailed answers. Covers rendering strategies, microfrontends, bundle optimization, caching, authentication, security, state management, Core Web Vitals, and more.",
   path: "/system-design-interview-questions",
 });
 
@@ -150,14 +150,12 @@ export default async function SystemDesignInterviewQuestionsPage() {
 
       <main className="doc">
         <DocHero
-          title="50+ Frontend System Design Interview Questions"
+          title="Frontend System Design Interview Questions"
           lede={
             <>
               Senior-level system design interview prep covering rendering strategies, microfrontend
             architecture, bundle optimization, caching, authentication, security, state management,
-            and Core Web Vitals. Questions asked at{" "}
-            <strong>Google, Meta, Stripe, Shopify, Atlassian, Razorpay, Flipkart</strong>{" "}
-            and other top tech companies.
+            and Core Web Vitals.
             </>
           }
           actions={

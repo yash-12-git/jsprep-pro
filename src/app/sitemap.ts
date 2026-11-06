@@ -15,6 +15,7 @@ const DATES = {
   cheatsheets: new Date("2026-03-01").toISOString(),
   topics: new Date("2026-04-01").toISOString(),
   blog: new Date("2026-04-01").toISOString(),
+  company: new Date("2026-11-07").toISOString(),
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -33,9 +34,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...new Set((theoryResult.questions as any[]).map((q) => q.category)),
   ] as string[];
 
-  // Content-only pages — no interactive tools (sprint, output-quiz, debug-lab,
-  // polyfill-lab, theory) because they are client-rendered shells with no
-  // static content for crawlers.
+  // Pages meant for search. Gated tools (output-quiz, debug-lab, polyfill-lab,
+  // theory) are client-rendered shells with no static content for crawlers.
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: SITE.domain,
@@ -145,8 +145,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.85,
     },
-    // Removed (client-rendered tool pages — no crawlable static content):
-    // /sprint, /output-quiz, /debug-lab, /polyfill-lab, /theory
+    ...["/about", "/pricing", "/contact", "/privacy", "/terms", "/refunds"].map(
+      (path) => ({
+        url: `${SITE.domain}${path}`,
+        lastModified: DATES.company,
+        changeFrequency: "yearly" as const,
+        priority: 0.3,
+      }),
+    ),
+    {
+      url: `${SITE.domain}/sprint`,
+      lastModified: DATES.company,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // Left out because they're noindex: /output-quiz, /debug-lab, /polyfill-lab,
+    // /theory require sign-in and have no content for search visitors.
   ];
 
   const topicPages: MetadataRoute.Sitemap = topicSlugs.map((slug) => ({

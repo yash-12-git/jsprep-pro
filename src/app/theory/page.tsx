@@ -8,6 +8,7 @@ export const metadata: Metadata = pageMeta({
   title: "JavaScript Theory Questions — Deepen Your JS Knowledge with JSPrep Pro",
   description: "Explore a vast collection of JavaScript theory questions on JSPrep Pro. Perfect for interview preparation and deepening your understanding of JavaScript concepts. Start mastering JS theory today!",
   path: `/theory`,
+  noindex: true, // Requires sign-in; has no content for search visitors
 });
 
 export default async function TheoryPage() {

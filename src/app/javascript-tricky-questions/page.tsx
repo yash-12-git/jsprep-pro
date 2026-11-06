@@ -277,7 +277,7 @@ export default async function JavaScriptTrickyQuestionsPage() {
               },
               {
                 href: "/javascript-interview-questions",
-                text: "150+ JavaScript Interview Questions with Answers",
+                text: "JavaScript Interview Questions with Answers",
               },
               {
                 href: "/javascript-interview-cheatsheet",

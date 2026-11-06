@@ -10,7 +10,6 @@ import Link from "next/link";
 import { DocClose, DocHero } from "@/components/seo/DocParts";
 import {
   pageMeta,
-  faqSchema,
   breadcrumbSchema,
   catToSlug,
 } from "@/lib/seo/seo";
@@ -43,6 +42,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${q.title} — ${track} ${typeLabel}`,
     description: `${diff} ${track} ${typeLabel.toLowerCase()}: ${q.title.slice(0, 70)} — answer with code examples.`,
     path: `/q/${params.slug}`,
+    // Every answer here is also on its category page, so that page is the one
+    // to rank. Links stay followed so they still pass equity (see sitemap.ts).
+    noindex: true,
     keywords: [
       q.title.toLowerCase(),
       `${q.category.toLowerCase()} ${track}`,
@@ -90,10 +92,6 @@ export default async function QuestionPage({ params }: Props) {
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")
     .trim();
-  const jsonLd = faqSchema([
-    { question: question.title, answer: plainAnswer.slice(0, 500) },
-  ]);
-
   const typeLabel = isOutput
     ? "Output Question"
     : isDebug
@@ -113,10 +111,6 @@ export default async function QuestionPage({ params }: Props) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLd }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

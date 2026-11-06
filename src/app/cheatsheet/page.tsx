@@ -8,6 +8,7 @@ export const metadata: Metadata = pageMeta({
   title: "JavaScript cheatsheet: Quick reference for JS concepts | JSPrep Pro",
   description: "Challenge yourself with the JavaScript cheatsheet on JSPrep Pro. Test your understanding of JavaScript concepts through practical examples and improve your coding skills. Start your JS journey today!",
   path: `/cheatsheet`,
+  noindex: true, // Requires sign-in; has no content for search visitors
 });
 
 export default async function CheatSheetPage() {

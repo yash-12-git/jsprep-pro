@@ -1,3 +1,4 @@
+import { CONTENT_COUNTS } from "@/lib/contentCounts";
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
@@ -148,15 +149,15 @@ export default function Image() {
                 lineHeight: 1.55,
               }}
             >
-              200+ questions · Theory, Output & Debug · 6 AI tools
+              {CONTENT_COUNTS.total} questions · Theory, Output & Debug · 6 AI tools
             </div>
 
             {/* Stat pills */}
             <div style={{ display: "flex", gap: 10 }}>
               {[
-                ["200+", "Questions"],
+                [CONTENT_COUNTS.total, "Questions"],
                 ["3", "Modes"],
-                ["36", "Topics"],
+                [CONTENT_COUNTS.topics, "Topics"],
                 ["6", "AI Tools"],
               ].map(([n, l]) => (
                 <div

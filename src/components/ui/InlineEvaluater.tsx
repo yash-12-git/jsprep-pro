@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
-import { postAI } from "@/lib/aiClient";
+import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { css } from "@emotion/react";
 import { useState } from "react";
 import Link from "next/link";
@@ -326,11 +327,13 @@ export default function InlineEvaluator({
   const [result, setResult] = useState<EvalResult | null>(null);
   const [showBetter, setShowBetter] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   async function evaluate() {
     if (!answer.trim() || loading) return;
     setLoading(true);
     setResult(null);
+    setAiError(null);
     try {
       const data = await postAI({
         type: "evaluate",
@@ -338,8 +341,9 @@ export default function InlineEvaluator({
         context: { question, idealAnswer },
       });
       setResult(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
-    } catch {
-      /* keep form open */
+    } catch (err) {
+      console.error("[InlineEvaluator] evaluation failed", err);
+      setAiError(aiErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -454,6 +458,7 @@ export default function InlineEvaluator({
                   placeholder="Type your answer here…"
                   rows={5}
                 />
+                {aiError && <AIErrorNotice message={aiError} />}
                 <button
                   css={evalBtn(!!answer.trim() && !loading)}
                   onClick={evaluate}

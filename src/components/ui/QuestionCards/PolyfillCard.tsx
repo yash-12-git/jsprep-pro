@@ -11,7 +11,6 @@ import {
   EyeOff,
   Play,
   RotateCcw,
-  Building2,
   Lock,
   Zap,
   FlaskConical,
@@ -228,21 +227,6 @@ export default function PolyfillCard({
                 {passCount}/{testResults.length} tests
               </span>
             )}
-            {!!q?.companies?.length && (
-              <div
-                css={{ display: "inline-flex", alignItems: "center", gap: 4 }}
-              >
-                <Building2 size={10} css={{ color: C.muted }} />
-                {q.companies?.slice(0, 3).map((c) => (
-                  <span key={c} css={chip}>
-                    {c}
-                  </span>
-                ))}
-                {!!q?.companies?.length && q.companies.length > 3 && (
-                  <span css={chip}>+{q.companies.length - 3}</span>
-                )}
-              </div>
-            )}
           </div>
         </div>
         <div
@@ -281,44 +265,6 @@ export default function PolyfillCard({
             </div>
           ) : (
             <>
-              {/* Company banner */}
-              {!!q?.companies?.length && (
-                <div
-                  css={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    padding: "8px 16px",
-                    background: C.bgSubtle,
-                    borderBottom: `1px solid ${C.border}`,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <Building2 size={11} css={{ color: C.accent }} />
-                  <span
-                    css={{ fontSize: "0.75rem", color: C.muted, fontWeight: 500 }}
-                  >
-                    Asked at:
-                  </span>
-                  {q.companies?.map((c) => (
-                    <span
-                      key={c}
-                      css={{
-                        fontSize: "0.75rem",
-                        fontWeight: 500,
-                        padding: "2px 8px",
-                        borderRadius: "4px",
-                        background: `color-mix(in oklab, ${C.accent} 7%, transparent)`,
-                        border: `1px solid color-mix(in oklab, ${C.accent} 16%, transparent)`,
-                        color: C.accent,
-                      }}
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              )}
-
               <div css={{ padding: "1rem" }}>
                 {/* Description */}
                 <p
@@ -647,16 +593,6 @@ const qNum = css`
   font-family: var(--font-outlier);
   color: ${C.muted};
   flex-shrink: 0;
-`;
-const chip = css`
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: ${C.bgSubtle};
-  border: 1px solid ${C.border};
-  color: ${C.muted};
-  white-space: nowrap;
 `;
 const runBtn = css`
   display: inline-flex;

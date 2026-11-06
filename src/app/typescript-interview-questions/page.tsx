@@ -14,9 +14,9 @@ import { pageMeta } from "@/lib/seo/seo";
 import InterviewQuestionList from "../javascript-interview-questions/QuestionList";
 
 export const metadata: Metadata = pageMeta({
-  title: "100+ TypeScript Interview Questions With Answers (2026)",
+  title: "TypeScript Interview Questions With Answers (2026)",
   description:
-    "The most complete list of TypeScript interview questions with detailed answers and code examples. Covers types vs interfaces, generics, utility types, type guards, mapped types, decorators, and more. Asked at top tech companies.",
+    "TypeScript interview questions with detailed answers and code examples. Covers types vs interfaces, generics, utility types, type guards, mapped types, decorators, and more.",
   path: "/typescript-interview-questions",
 });
 
@@ -134,11 +134,10 @@ export default async function TypeScriptInterviewQuestionsPage() {
 
       <main className="doc">
         <DocHero
-          title="100+ TypeScript Interview Questions"
+          title="TypeScript Interview Questions"
           lede={
             <>
-              Complete TypeScript interview prep covering types vs interfaces, generics, utility types, type guards, mapped types, decorators, and more. Questions asked at{" "}
-            <strong>Google, Microsoft, Atlassian, Razorpay, Flipkart</strong> and other top tech companies.
+              Complete TypeScript interview prep covering types vs interfaces, generics, utility types, type guards, mapped types, decorators, and more.
             </>
           }
           actions={

@@ -1,3 +1,4 @@
+import { CONTENT_COUNTS } from "@/lib/contentCounts";
 import { ImageResponse } from "next/og";
 import { getTopicBySlug } from "@/lib/cachedQueries";
 
@@ -403,7 +404,7 @@ export default async function Image({ params }: { params: { topic: string } }) {
 
         {/* Stat boxes */}
         {[
-          { value: "200+", label: "Questions" },
+          { value: CONTENT_COUNTS.total, label: "Questions" },
           { value: "3", label: "Modes" },
           { value: "6", label: "AI Tools" },
         ].map(({ value, label }) => (

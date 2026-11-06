@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
-import { postAI } from "@/lib/aiClient";
+import { aiErrorMessage, postAI } from "@/lib/aiClient";
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User, Loader2, Sparkles, X } from "lucide-react";
 import * as S from "./styles";
@@ -55,13 +55,11 @@ export default function AIChat({ question, answer, onClose }: Props) {
         ...prev,
         { role: "assistant", content: data.text },
       ]);
-    } catch {
+    } catch (err) {
+      console.error("[AIChat] request failed", err);
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: "Sorry, something went wrong. Try again!",
-        },
+        { role: "assistant", content: aiErrorMessage(err) },
       ]);
     } finally {
       setLoading(false);

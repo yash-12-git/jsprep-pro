@@ -11,7 +11,8 @@
  * 3. Shows the correct AI score and verdict, never "0/10 Evaluation failed".
  */
 
-import { postAI } from "@/lib/aiClient";
+import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -120,6 +121,7 @@ export default function DebugCard({
   const [showReveal, setShowReveal] = useState(false);
   const [runResult, setRunResult] = useState<RunResult | null>(null);
   const [runWarning, setRunWarning] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const toggle = onToggle ?? (() => setInternalOpen((o) => !o));
@@ -164,6 +166,7 @@ export default function DebugCard({
     }
     if (!hasEdited) return;
 
+    setAiError(null);
     setUiPhase("checking");
     try {
       const data = await postAI({
@@ -191,31 +194,20 @@ export default function DebugCard({
         const braced = raw.match(/({[\s\S]*})/);
         const jsonStr =
           fenced?.[1]?.trim() ?? braced?.[1]?.trim() ?? raw.trim();
-        try {
-          raw = JSON.parse(jsonStr);
-        } catch {
-          /* leave as string */
-        }
+        raw = JSON.parse(jsonStr);
       }
 
       const fb = normalizeAIResponse(raw);
       setFeedback(fb);
       if (fb.correct && isPro && !persistedSolved)
         recordSolved(q.id).catch(() => {});
-    } catch (err: any) {
-      // Show a real error, never "Could not reach AI" when the actual problem differs
-      setFeedback({
-        correct: false,
-        score: 0,
-        verdict: "Evaluation failed.",
-        whatTheyGotRight: "",
-        remainingIssues: err?.message ?? "Could not reach AI.",
-        betterApproach: null,
-        hint: "",
-        explanation: "",
-      });
-    } finally {
       setUiPhase("feedback");
+    } catch (err) {
+      // A failed check says nothing about the code, so it must not look like a
+      // wrong answer. Keep the user's code and let them try again.
+      console.error("[DebugCard] AI check failed", err);
+      setAiError(aiErrorMessage(err));
+      setUiPhase("editing");
     }
   }
 
@@ -231,6 +223,7 @@ export default function DebugCard({
     setShowReveal(false);
     setRunResult(null);
     setRunWarning(null);
+    setAiError(null);
     setUiPhase("editing");
   }
 
@@ -477,6 +470,7 @@ export default function DebugCard({
                     </button>
                   )}
                 </div>
+                {aiError && <AIErrorNotice message={aiError} />}
                 {!hasEdited && uiPhase !== "checking" && (
                   <p
                     css={{

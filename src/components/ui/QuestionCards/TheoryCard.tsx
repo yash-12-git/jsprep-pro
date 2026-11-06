@@ -120,11 +120,6 @@ export default function TheoryCard({
                 {S.DIFF_LABEL[q.difficulty] ?? q.difficulty}
               </span>
               <span css={S.catBadge(C.accent)}>{q.category}</span>
-              {q.isPro && !isPro && (
-                <span css={S.proBadge}>
-                  <Zap size={7} /> PRO
-                </span>
-              )}
               {q.hint && <span css={S.hintChip}>{q.hint}</span>}
             </div>
           </div>

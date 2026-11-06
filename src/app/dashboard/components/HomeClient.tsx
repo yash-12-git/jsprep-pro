@@ -339,7 +339,7 @@ export default function HomeClient({
           <p css={greetSub}>
             {user
               ? getMotivation(totalSolved, totalModes, streakDays)
-              : "195+ questions: theory, output, debug & polyfill, AI evaluated."}
+              : "Theory, output, debug & polyfill questions, with AI feedback."}
           </p>
         </div>
 

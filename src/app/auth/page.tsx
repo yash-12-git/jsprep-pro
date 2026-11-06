@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Chrome } from 'lucide-react'
+import Link from 'next/link'
 import * as S from './styles'
 
 export default function AuthPage() {
@@ -22,7 +23,7 @@ export default function AuthPage() {
           <button css={S.googleBtn} onClick={signInWithGoogle}>
             <Chrome size={18} /> Continue with Google
           </button>
-          <p css={S.legal}>By signing in, you agree to our Terms of Service. Your progress is saved securely to your account.</p>
+          <p css={S.legal}>By signing in, you agree to our <Link href="/terms" style={{ textDecoration: 'underline' }}>Terms of Service</Link> and <Link href="/privacy" style={{ textDecoration: 'underline' }}>Privacy Policy</Link>.</p>
         </div>
       </div>
     </main>

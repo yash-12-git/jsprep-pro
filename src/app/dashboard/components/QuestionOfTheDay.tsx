@@ -17,7 +17,8 @@
  * via a dynamic() import to keep it out of the server bundle.
  */
 
-import { postAI } from "@/lib/aiClient";
+import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 import {
@@ -472,6 +473,7 @@ export default function QOTDInteractive({
   const [evalOpen, setEvalOpen] = useState(false);
   const [userAnswer, setUserAnswer] = useState("");
   const [loading, setLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   const [result, setResult] = useState<EvalResult | null>(null);
   const [showBetter, setShowBetter] = useState(false);
 
@@ -489,6 +491,7 @@ export default function QOTDInteractive({
     if (!userAnswer.trim() || loading) return;
     setLoading(true);
     setResult(null);
+    setAiError(null);
     try {
       const data = await postAI({
         type: "evaluate",
@@ -506,8 +509,9 @@ export default function QOTDInteractive({
       ) as EvalResult;
       setResult(parsed);
       if (parsed.score >= 7) markDone();
-    } catch {
-      // fail silently — don't break the page if AI is unavailable
+    } catch (err) {
+      console.error("[QuestionOfTheDay] evaluation failed", err);
+      setAiError(aiErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -586,6 +590,7 @@ export default function QOTDInteractive({
                 onChange={(e) => setUserAnswer(e.target.value)}
                 placeholder="Type your answer here, explain it in your own words..."
               />
+              {aiError && <AIErrorNotice message={aiError} />}
               <button
                 css={submitBtn(!!userAnswer.trim() && !loading)}
                 onClick={evaluate}

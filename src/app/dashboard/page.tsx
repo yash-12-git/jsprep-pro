@@ -18,6 +18,8 @@
  * Individual sections degrade gracefully when user is null.
  */
 
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo/seo";
 import { C } from "@/styles/tokens";
 import { Suspense } from "react";
 import Link from "next/link";
@@ -75,6 +77,13 @@ function SprintCTA() {
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
+
+export const metadata: Metadata = pageMeta({
+  title: "Dashboard",
+  description: "Your JSPrep Pro practice dashboard.",
+  path: "/dashboard",
+  noindex: true,
+});
 
 export default async function HomePage() {
   const totals = await getQuestionTotals();

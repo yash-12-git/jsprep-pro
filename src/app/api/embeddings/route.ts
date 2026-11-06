@@ -10,8 +10,13 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getEmbedding, buildEmbeddingInput } from '@/lib/embeddings'
+import { verifyAdmin } from '@/lib/firebaseAdmin'
 
 export async function POST(req: NextRequest) {
+  if (!(await verifyAdmin(req.headers.get('authorization')))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await req.json()
 

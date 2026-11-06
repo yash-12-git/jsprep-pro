@@ -11,6 +11,41 @@ export const metadata: Metadata = pageMeta({
   path: `/sprint`,
 });
 
+// The sprint itself renders in the browser, so this is what search engines and
+// visitors without JavaScript can read.
+function SprintGuide() {
+  return (
+    <section className="doc doc--narrow" aria-label="About the Interview Sprint">
+      <div className="legal">
+        <h2>What is the Interview Sprint?</h2>
+        <p>
+          A timed frontend interview practice round that mixes three question
+          types, so you have to switch between them as you would in a real
+          technical screen. It covers JavaScript, React, TypeScript and frontend
+          system design. Choose your track from the top of the page.
+        </p>
+        <h2>How it works</h2>
+        <ul>
+          <li><strong>Theory:</strong> write your answer in your own words, and AI scores it from 1 to 10 and lists what you covered and missed.</li>
+          <li><strong>Output:</strong> read a code snippet and type exactly what it logs to the console.</li>
+          <li><strong>Debug:</strong> find the bug in a snippet, then check the fix and mark yourself.</li>
+        </ul>
+        <p>
+          A correct answer earns 10 points, an attempt earns 3, and a skipped
+          question earns none. At the end you get a score, your accuracy and a
+          breakdown by category showing where to focus. Answers the AI
+          couldn&apos;t score are left out of the result.
+        </p>
+        <h2>Is it free?</h2>
+        <p>
+          Yes, the 5-question warmup takes 5 minutes and needs no account. Pro
+          unlocks sprints of 10, 15 and 20 questions.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default async function SprintPage() {
   const track = await getServerTrack();
   const [theory, output, debug] = await Promise.all([
@@ -32,5 +67,10 @@ export default async function SprintPage() {
     debug: debug.questions,
     output: output.questions,
   };
-  return <SprintWrapper allQuestions={allQuestions} />;
+  return (
+    <>
+      <SprintWrapper allQuestions={allQuestions} />
+      <SprintGuide />
+    </>
+  );
 }
