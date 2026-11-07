@@ -5,11 +5,6 @@ import {
   updateDoc,
   arrayUnion,
   increment,
-  collection,
-  query,
-  orderBy,
-  limit,
-  getDocs,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -167,48 +162,3 @@ export async function awardProgressXP(
   await updateDoc(ref, updates).catch(() => {});
 }
 
-// ─── Leaderboard ──────────────────────────────────────────────────────────────
-
-export interface LeaderboardEntry {
-  uid: string;
-  displayName: string;
-  photoURL?: string;
-  weeklyXp: number;
-  xp: number;
-  streakDays: number;
-  masteredCount: number;
-  isPro: boolean;
-}
-
-export async function getWeeklyLeaderboard(
-  topN = 10,
-): Promise<LeaderboardEntry[]> {
-  try {
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, orderBy("weeklyXp", "desc"), limit(topN));
-    const snap = await getDocs(q);
-    const thisMonday = getMondayISO();
-    
-    return (
-      snap.docs
-        .map((d) => {
-          const data = d.data() as UserProgress;
-          return {
-            uid: data.uid,
-            displayName: data.displayName ?? "Anonymous",
-            photoURL: data.photoURL,
-            weeklyXp: data.weeklyXp ?? 0,
-            xp: data.xp ?? 0,
-            streakDays: data.streakDays ?? 0,
-            masteredCount: data.masteredCount ?? 0, // counter field, not old array
-            isPro: data.isPro ?? false,
-            weeklyXpResetDate: data.weeklyXpResetDate ?? "",
-          };
-        })
-        // Only show users who have actually earned XP this week (not stale values from previous weeks)
-        .filter((e) => e.weeklyXp > 0 && e.weeklyXpResetDate >= thisMonday)
-    );
-  } catch(error) {
-    return [];
-  }
-}

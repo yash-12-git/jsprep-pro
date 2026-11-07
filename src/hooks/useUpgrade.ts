@@ -104,7 +104,7 @@ export function useUpgrade({
 
   const handleUpgrade = useCallback(async () => {
     if (!user) {
-      window.location.href = "/auth";
+      window.location.href = `/auth?next=${encodeURIComponent(window.location.pathname)}`;
       return;
     }
 

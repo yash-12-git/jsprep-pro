@@ -25,6 +25,7 @@ import { getServerTrack } from "@/lib/getServerTrack";
 import { callGroq, GroqError } from "@/lib/groq";
 import { parseSetupConfig } from "@/lib/mockInterviewOptions";
 import { buildPrompt } from "@/lib/mockInterviewPrompt";
+import { buildStudyPlanPrompt } from "@/lib/studyPlanPrompt";
 
 // evaluate stays open to everyone because the free sprint warmup and Question
 // of the Day use it without an account. Daily limits bound what that can cost.
@@ -220,30 +221,7 @@ Accept alternative correct solutions. A fix is correct if it solves the core bug
 
       // ── Study Plan ────────────────────────────────────────────────────────
       case "studyplan":
-        systemPrompt = `You are a JavaScript interview coach creating a personalized study plan.
-
-The developer has the following profile:
-- Experience: 1-3 years frontend
-- Mastered questions: ${context.masteredIds?.length ?? 0} out of ${context.totalQuestions ?? 150}
-- Weak categories (low mastery): ${JSON.stringify(context.weakCategories ?? [])}
-- Strong categories (high mastery): ${JSON.stringify(context.strongCategories ?? [])}
-- Sprint history: ${JSON.stringify(context.sprintHistory?.slice(-3) ?? [])}
-- Interview date: ${context.interviewDate ?? "not set"}
-
-Respond with ONLY a JSON object in this exact format:
-{
-  "readinessScore": <number 0-100>,
-  "readinessLabel": "<Not Ready / Getting There / Almost Ready / Interview Ready>",
-  "summary": "<2 sentence honest assessment>",
-  "weakSpots": [
-    {"category": "<n>", "reason": "<why they struggle>", "tip": "<specific advice>"}
-  ],
-  "dailyPlan": [
-    {"day": 1, "focus": "<category>", "tasks": ["<task 1>", "<task 2>", "<task 3>"], "timeMinutes": <number>}
-  ],
-  "quickWins": ["<thing they can improve fast 1>", "<thing 2>", "<thing 3>"],
-  "focusQuestions": ["<question id 1>", "<question id 2>", "<question id 3>", "<question id 4>", "<question id 5>"]
-}`;
+        systemPrompt = buildStudyPlanPrompt(context);
         break;
 
       // ── Mock Interview ────────────────────────────────────────────────────
@@ -261,6 +239,15 @@ Respond with ONLY a JSON object in this exact format:
 
         const isFinal = context.isFinal === true;
         const clientMsgs = messages;
+
+        // The timer can end an interview before all 10 answers are in.
+        const answered = clientMsgs.filter(
+          (m: { role: string; content: string }) =>
+            m.role === "user" && m.content !== "GENERATE_SCORECARD",
+        ).length;
+        if (isFinal && answered < 10) {
+          systemPrompt += `\n\nThis interview ended early because time ran out. The candidate gave ${answered} of 10 answers. Score only those answers, and do not penalise questions that were never asked or answered. Say in the summary that the score is based on ${answered} answers.`;
+        }
 
         // Per-request entropy prevents model caching / identical responses
         const entropy = Math.random().toString(36).slice(2, 8);

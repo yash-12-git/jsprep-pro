@@ -126,6 +126,15 @@ const LEARN_LINKS = (track: string) => [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+const MARKETING_LINKS = (track: string) => [
+  { href: "/#features", label: "Features" },
+  { href: "/#practice", label: "Practice" },
+  { href: `/topics/${track}`, label: "Topics" },
+  { href: "/#roadmap", label: "Roadmap" },
+  { href: `/blog/${track}`, label: "Blog" },
+  { href: "/#pricing", label: "Pricing" },
+];
+
 export default function Navbar() {
   const { user, progress, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
@@ -341,14 +350,7 @@ export default function Navbar() {
           ) : (
             /* Marketing links — logged-out visitors */
             <div css={S.marketingLinks}>
-              {[
-                { href: "/#features", label: "Features" },
-                { href: "/#practice", label: "Practice" },
-                { href: "/topics", label: "Topics" },
-                {href: "/#roadmap", label: "Roadmap" },
-                { href: `/blog/${track}`, label: "Blog" },
-                { href: "/#pricing", label: "Pricing" },
-              ].map(({ href, label }) => (
+              {MARKETING_LINKS(track).map(({ href, label }) => (
                 <Link key={href} href={href} css={S.marketingLink}>
                   {label}
                 </Link>
@@ -491,11 +493,59 @@ export default function Navbar() {
                 <Link href="/auth" css={S.getStartedBtn}>
                   Start free
                 </Link>
+                <button
+                  css={S.hamburgerBtn}
+                  onClick={() => setMobileOpen((v) => !v)}
+                  aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                  aria-expanded={mobileOpen}
+                >
+                  {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+                </button>
               </div>
             )}
           </div>
         </div>
       </nav>
+
+      {/* ── Mobile sheet, signed out ── */}
+      {!user && mobileOpen && (
+        <div css={S.mobileSheet}>
+          <div css={S.mobileSheetInner}>
+            <Link
+              href="/sprint"
+              css={[S.mobileNavLink, S.mobileSprintLink]}
+              onClick={() => setMobileOpen(false)}
+            >
+              <div css={S.mobileIconBadge(C.amber)}>
+                <Zap size={14} color={C.amber} />
+              </div>
+              <div css={S.mobileItemContent}>
+                <span>Try the Sprint</span>
+                <span css={S.mobileItemDesc}>5 questions, no account needed</span>
+              </div>
+            </Link>
+            {MARKETING_LINKS(track).map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                css={S.mobileNavLink}
+                onClick={() => setMobileOpen(false)}
+              >
+                {label}
+              </Link>
+            ))}
+            <hr css={S.mobileDivider} />
+            <Link
+              href="/auth"
+              className="btn btn--primary"
+              style={{ width: "100%" }}
+              onClick={() => setMobileOpen(false)}
+            >
+              Start free
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* ── Mobile Slide-down Sheet ── */}
       {user && mobileOpen && (

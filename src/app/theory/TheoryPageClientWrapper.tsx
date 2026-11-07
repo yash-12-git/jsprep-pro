@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import SignInPrompt from "@/components/ui/SignInPrompt";
+import { useMemo, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
 import * as Shared from "@/styles/shared";
@@ -22,7 +22,6 @@ export default function TheoryPageClientWrapper({
   categories: string[];
 }) {
   const { user, progress, loading: authLoading } = useAuth();
-  const router = useRouter();
   const {
     loading: pLoading,
     masteredIds,
@@ -34,9 +33,6 @@ export default function TheoryPageClientWrapper({
 
   const [filters, setFilters] = useState<FilterState>(defaultFilters());
 
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/auth");
-  }, [user, authLoading, router]);
 
   const masteredCount = masteredIds.length;
   const totalQ = questions.length;
@@ -80,7 +76,7 @@ export default function TheoryPageClientWrapper({
     [toggleBookmark],
   );
 
-  if (authLoading || !user || !progress) {
+  if (authLoading || (user && !progress)) {
     return (
       <div css={Shared.spinner}>
         <div css={Shared.spinnerDot} />
@@ -111,6 +107,8 @@ export default function TheoryPageClientWrapper({
           </span>
         </div>
       </div>
+
+      <SignInPrompt message="Theory questions are free to read. Sign in to save your progress." />
 
       <CategoryFilter
         categories={categories}

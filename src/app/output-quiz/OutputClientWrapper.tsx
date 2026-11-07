@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
+import SignInPrompt from "@/components/ui/SignInPrompt";
 import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
 import PageGuard from "@/components/ui/PageGuard";
@@ -31,7 +31,6 @@ export default function OutputQuizClientPage({
   outputQuestions: Question[];
 }) {
   const { user, progress, loading: authLoading } = useAuth();
-  const router = useRouter();
 
   const {
     isSolved,
@@ -45,9 +44,6 @@ export default function OutputQuizClientPage({
   const [filters, setFilters] = useState<FilterState>(defaultFilters());
   const [showPaywall, setShowPaywall] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/auth");
-  }, [user, authLoading, router]);
 
   const bookmarkedSet = useMemo(
     () => new Set(bookmarkIds ?? []),
@@ -93,7 +89,7 @@ export default function OutputQuizClientPage({
       : 0;
 
   return (
-    <PageGuard loading={authLoading || !user || !progress} ready={!!progress}>
+    <PageGuard loading={authLoading || (!!user && !progress)} ready>
       <>
         {showPaywall && (
           <PaywallBanner
@@ -127,6 +123,8 @@ export default function OutputQuizClientPage({
           </div>
 
           {/* Full filter — same component as theory page */}
+          <SignInPrompt message="Your first 5 output questions are free. Sign in to save your progress." />
+
           <CategoryFilter
             categories={categories}
             filters={filters}

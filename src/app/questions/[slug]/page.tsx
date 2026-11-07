@@ -9,6 +9,7 @@ import {
   breadcrumbSchema,
   catToSlug,
   SITE,
+  demoteH1,
 } from "@/lib/seo/seo";
 import type { Question } from "@/types/question";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
@@ -228,7 +229,7 @@ export default async function CategoryQuestionsPage({ params }: Props) {
                   <div
                     itemProp="text"
                     className="answer-body"
-                    dangerouslySetInnerHTML={{ __html: q.answer ?? "" }}
+                    dangerouslySetInnerHTML={{ __html: demoteH1(q.answer ?? "") }}
                   />
                 </div>
                 <div className="doc-actions" style={{ marginTop: "var(--space-md)" }}>

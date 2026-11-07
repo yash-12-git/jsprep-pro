@@ -12,6 +12,7 @@ import {
   pageMeta,
   breadcrumbSchema,
   catToSlug,
+  demoteH1,
 } from "@/lib/seo/seo";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
 import { C } from "@/styles/tokens";
@@ -87,7 +88,7 @@ export default async function QuestionPage({ params }: Props) {
     .filter((q) => q.id !== question.id && q.category === question.category)
     .slice(0, 4);
 
-  const answerHtml = markdownToHtml(question.answer ?? "");
+  const answerHtml = demoteH1(markdownToHtml(question.answer ?? ""));
   const plainAnswer = (question.answer ?? "")
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")
@@ -97,10 +98,13 @@ export default async function QuestionPage({ params }: Props) {
     : isDebug
       ? "Debug Challenge"
       : "Theory Question";
+  // Only JavaScript has a dedicated output questions page.
+  const outputPath =
+    track === "javascript" ? "/javascript-output-questions" : "/output-quiz";
   const categoryPath = isTheory
     ? `/questions/${catSlug}`
     : isOutput
-      ? `/${track.toLowerCase()}-output-questions`
+      ? outputPath
       : "/debug-lab";
   const categoryLabel = isTheory
     ? question.category
@@ -260,7 +264,7 @@ export default async function QuestionPage({ params }: Props) {
             <Link
               href={
                 isOutput
-                  ? `/${track.toLowerCase()}-output-questions`
+                  ? outputPath
                   : isDebug
                     ? "/debug-lab"
                     : "/sprint"

@@ -11,7 +11,6 @@
  * What stays client-side:
  *   - HomeClient   → greeting + mode progress cards (needs useAuth, useUserProgress)
  *   - QuestionOfTheDay (already a server component with client shell)
- *   - LeaderboardWrapper → uses getWeeklyLeaderboardCached internally
  *   - LearnSection → already handles its own cached reads
  *
  * Auth: intentionally NOT checked here — logged-out users can visit /home.
@@ -25,7 +24,6 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { getQuestions } from "@/lib/cachedQueries";
 import HomeClient from "./components/HomeClient";
-import LeaderboardWrapper from "./components/LeaderboardWrapper";
 import LearnSection from "./components/LearnSection";
 import QuestionOfTheDay from "./components/QuestionOfTheDayWrapper";
 import { getServerTrack } from "@/lib/getServerTrack";
@@ -103,12 +101,6 @@ export default async function HomePage() {
       {/* Sprint CTA — static, server-rendered */}
       <SprintCTA />
 
-      {/* Leaderboard mini — uses getWeeklyLeaderboardCached */}
-      <div style={{ maxWidth: "60rem", margin: "0 auto", padding: "0 var(--gutter) 1.5rem" }}>
-        <Suspense fallback={null}>
-          <LeaderboardWrapper />
-        </Suspense>
-      </div>
 
       {/* Learn section — topics + blog teasers */}
       <div style={{ maxWidth: "60rem", margin: "0 auto", padding: "0 var(--gutter) 5rem" }}>

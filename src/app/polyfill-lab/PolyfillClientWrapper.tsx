@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
+import SignInPrompt from "@/components/ui/SignInPrompt";
 import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { css } from "@emotion/react";
 import { FlaskConical } from "lucide-react";
 import { C, RADIUS } from "@/styles/tokens";
@@ -31,7 +31,6 @@ export default function PolyfillLabClientPage({
   questions: Question[];
 }) {
   const { user, progress, loading: authLoading } = useAuth();
-  const router = useRouter();
 
   const {
     isSolved,
@@ -45,9 +44,6 @@ export default function PolyfillLabClientPage({
   const [filters, setFilters] = useState<FilterState>(defaultFilters());
   const [showPaywall, setShowPaywall] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading && !user) router.push("/auth");
-  }, [user, authLoading, router]);
 
   const bookmarkedSet = useMemo(
     () => new Set(bookmarkIds ?? []),
@@ -93,7 +89,7 @@ export default function PolyfillLabClientPage({
       : 0;
 
   return (
-    <PageGuard loading={authLoading || !user || !progress} ready={!!progress}>
+    <PageGuard loading={authLoading || (!!user && !progress)} ready>
       <>
         {showPaywall && (
           <PaywallBanner
@@ -126,6 +122,8 @@ export default function PolyfillLabClientPage({
               </span>
             </div>
           </div>
+
+          <SignInPrompt message="Your first 5 polyfill challenges are free. Sign in to save your progress." />
 
           <CategoryFilter
             categories={categories}

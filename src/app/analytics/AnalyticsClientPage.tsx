@@ -68,7 +68,7 @@ export default function AnalyticsClientPage({
   }, [user]);
 
   useEffect(() => {
-    if (!authLoading && !user) router.push("/auth");
+    if (!authLoading && !user) router.push("/auth?next=/analytics");
   }, [user, authLoading, router]);
 
   // ── Counts ────────────────────────────────────────────────────────────────

@@ -29,6 +29,7 @@ interface Props {
   topics: TopicRef[];
   saving: boolean;
   onRetake: () => void;
+  note?: string;
 }
 
 // ─── Animations ───────────────────────────────────────────────────────────────
@@ -618,6 +619,7 @@ export default function InterviewResult({
   topics,
   saving,
   onRetake,
+  note,
 }: Props) {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -687,6 +689,12 @@ export default function InterviewResult({
         <ChevronLeft size={15} />
         New Interview
       </button>
+
+      {note && (
+        <p style={{ margin: "0 0 1rem", fontSize: "0.875rem", color: C.muted }}>
+          {note}
+        </p>
+      )}
 
       {/* ─── Dark share card ─────────────────────────────── */}
       <div css={shareCard}>

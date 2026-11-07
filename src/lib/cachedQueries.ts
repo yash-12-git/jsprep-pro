@@ -40,8 +40,6 @@ import {
   getBlogPostsForTopic as _getBlogPostsForTopic,
 } from "@/lib/blogPosts";
 
-import { getWeeklyLeaderboard as _getWeeklyLeaderboard } from "@/lib/userProgress";
-
 import {
   getQuestions as _getQuestions,
   getPublishedCategories as _getPublishedCategories,
@@ -134,13 +132,6 @@ export const getTopicSlugs = async ({ track }: { track?: string } = {}) =>
     ["topic-slugs", track ? `track-${track}` : "all-tracks"],
     [CACHE_TAGS.topics],
   )();
-
-/** Weekly leaderboard — shared across all users */
-export const getWeeklyLeaderboardCached = cacheNonEmpty(
-  async () => await _getWeeklyLeaderboard(10),
-  ["weekly-leaderboard"],
-  [CACHE_TAGS.leaderboard],
-);
 
 /** Single topic by slug — slug baked into key AND per-slug tag for granular invalidation */
 export const getTopicBySlug = (slug: string) =>

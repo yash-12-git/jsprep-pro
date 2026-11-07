@@ -10,7 +10,7 @@ import Link from "next/link";
 import { ArrowRight, Zap, Calendar } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { C } from "@/styles/tokens";
-import { btnP, btnO, ctas, qotdBtn, lbCta } from "@/app/page.styles";
+import { btnP, btnO, ctas, qotdBtn } from "@/app/page.styles";
 
 // ── Hero CTA pair ─────────────────────────────────────────────────────────────
 export function HeroCTAs() {
@@ -62,16 +62,6 @@ export function QOTDBtn() {
   return (
     <Link href={user ? "/dashboard" : "/auth"} css={qotdBtn}>
       <Calendar size={14} /> Try today&apos;s question
-    </Link>
-  );
-}
-
-// ── Leaderboard join CTA ──────────────────────────────────────────────────────
-export function LeaderboardCTA() {
-  const { user } = useAuth();
-  return (
-    <Link href={user ? "/dashboard" : "/auth"} css={lbCta}>
-      Join the leaderboard, earn XP
     </Link>
   );
 }

@@ -4,9 +4,7 @@
 import Link from "next/link";
 import { CheckCircle, Flame } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useTrack } from "@/contexts/TrackContext";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import * as S from "./page.styles";
 
@@ -159,6 +157,7 @@ interface HomePageClientProps {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function HomePageClient({
+  track,
   theory: theoryCt,
   debug: debugCt,
   output: outputCt,
@@ -166,18 +165,7 @@ export default function HomePageClient({
   topics,
 }: HomePageClientProps) {
   const { user } = useAuth();
-  const { track } = useTrack();
   const pricing = usePricing();
-  const router = useRouter();
-  const prevTrack = useRef(track);
-
-  // When user switches track client-side, refresh server data
-  useEffect(() => {
-    if (prevTrack.current !== track) {
-      prevTrack.current = track;
-      router.refresh();
-    }
-  }, [track, router]);
 
   const trackCfg = TRACK_MAP[track];
   const evalDemo = EVAL_DEMO[track];

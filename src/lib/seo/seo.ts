@@ -198,6 +198,11 @@ export function pageMeta(opts: PageMetaOptions): Metadata {
   };
 }
 
+/** Stored answers can contain h1 tags, but the page already has its own h1. */
+export function demoteH1(html: string): string {
+  return html.replace(/<(\/?)h1\b/gi, "<$1h2");
+}
+
 // ─── FAQ schema ───────────────────────────────────────────────────────────────
 
 export interface FAQItem {

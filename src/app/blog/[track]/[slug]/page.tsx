@@ -56,15 +56,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ─── Lightweight Markdown → HTML ─────────────────────────────────────────────
 function md(content: string): string {
+  // Code is set aside first, so that `# comments`, blank lines and asterisks
+  // inside it aren't treated as Markdown. The page hero already shows the title,
+  // so a leading `# Title` is dropped and any other `#` heading becomes an h2.
+  const code: string[] = [];
+  const stash = (html: string) => `@@CODE${code.push(html) - 1}@@`;
   return content
     .replace(
       /```(\w*)\n([\s\S]*?)```/g,
-      (_, lang, code) =>
-        `<pre><code class="language-${lang}">${code.replace(/</g, "&lt;").replace(/>/g, "&gt;").trim()}</code></pre>`,
+      (_, lang, block) =>
+        "\n\n" +
+        stash(
+          `<pre><code class="language-${lang}">${block.replace(/</g, "&lt;").replace(/>/g, "&gt;").trim()}</code></pre>`,
+        ) +
+        "\n\n",
     )
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
+    .replace(/`([^`]+)`/g, (_, inline) => stash(`<code>${inline}</code>`))
+    .replace(/^\s*# .+\n?/, "")
+    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+    .replace(/^##? (.+)$/gm, "<h2>$1</h2>")
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
     .replace(/^> (.+)$/gm, "<blockquote>$1</blockquote>")
@@ -74,10 +84,11 @@ function md(content: string): string {
     .map((b) => {
       const t = b.trim();
       if (!t) return "";
-      if (/^<(h[1-2]|pre|ul|blockquote)/.test(t)) return t;
+      if (/^(<(h[2-3]|ul|blockquote)|@@CODE\d+@@$)/.test(t)) return t;
       return `<p>${t.replace(/\n/g, " ")}</p>`;
     })
-    .join("\n");
+    .join("\n")
+    .replace(/@@CODE(\d+)@@/g, (_, i) => code[Number(i)]);
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────

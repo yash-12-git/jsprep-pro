@@ -4,9 +4,11 @@
 import { css, keyframes } from "@emotion/react";
 import { useState, useRef, useCallback } from "react";
 import { Loader2 } from "lucide-react";
-import { awardProgressXP } from "@/lib/userProgress";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import {
+  holdSprintForSignIn,
+  saveSprint,
+  type SavedSprint,
+} from "@/lib/sprintHistory";
 import type { Question } from "@/types/question";
 import type {
   SprintConfig,
@@ -229,23 +231,25 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
       setSummary(s);
       setPhase("results");
 
-      if (uid && isPro) {
-        const sprintId = `${uid}_${Date.now()}`;
-        setDoc(doc(db, "users", uid, "sprints", sprintId), {
-          score: finalScore,
-          maxScore,
-          accuracy,
-          timeUsedSecs,
-          questionCount: finalResults.length,
-          strengths,
-          weakAreas,
-          completedAt: s.completedAt,
-        }).catch(() => {});
-        const xpEarned = Math.max(10, Math.floor(finalScore / 2));
-        awardProgressXP(uid, xpEarned, 0).catch(() => {});
+      const saved: SavedSprint = {
+        score: finalScore,
+        maxScore,
+        accuracy,
+        timeUsedSecs,
+        questionCount: finalResults.length,
+        strengths,
+        weakAreas,
+        completedAt: s.completedAt,
+      };
+      if (uid) {
+        saveSprint(uid, saved).catch((err) =>
+          console.error("[sprint] could not save result", err),
+        );
+      } else {
+        holdSprintForSignIn(saved);
       }
     },
-    [config, uid, isPro],
+    [config, uid],
   );
 
   // ── Question complete ───────────────────────────────────────────────────────
@@ -322,7 +326,7 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
   }
 
   if (phase === "results" && summary) {
-    return <SprintResults summary={summary} onRetry={handleRetry} />;
+    return <SprintResults summary={summary} onRetry={handleRetry} signedIn={!!uid} />;
   }
 
   // Active sprint

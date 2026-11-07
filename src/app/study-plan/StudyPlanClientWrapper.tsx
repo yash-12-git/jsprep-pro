@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
+import { getRecentSprints } from "@/lib/sprintHistory";
 import PageGuard from "@/components/ui/PageGuard";
 import {
   Loader2,
@@ -55,7 +56,7 @@ export default function StudyPlanClientPage({
   const [interviewDate, setInterviewDate] = useState("");
 
   useEffect(() => {
-    if (!authLoading && !user) router.push("/auth");
+    if (!authLoading && !user) router.push("/auth?next=/study-plan");
   }, [user, authLoading, router]);
 
   const catStats = categories?.map((cat) => {
@@ -73,18 +74,48 @@ export default function StudyPlanClientPage({
     .filter((c) => c.pct >= 70)
     .map((c) => c.cat);
 
+  // A few unmastered questions per category, weakest categories first, so the
+  // AI chooses from real IDs without being sent the whole question bank.
+  const focusCandidates = [
+    ...weakCategories,
+    ...categories.filter((cat) => !weakCategories.includes(cat)),
+  ]
+    .flatMap((cat) =>
+      questions
+        .filter((q) => q.category === cat && !masteredIds.includes(q.id))
+        .slice(0, 4),
+    )
+    .slice(0, 40)
+    .map(({ id, title, category }) => ({ id, title, category }));
+
   async function generatePlan() {
     setGenerating(true);
     setPlanError(null);
     try {
+      // A plan without sprint history is still useful.
+      const sprints = await getRecentSprints(user!.uid, 3).catch((err) => {
+        console.error("[StudyPlan] could not load sprints", err);
+        return [];
+      });
       const data = await postAI({
         type: "studyplan",
         messages: [{ role: "user", content: "Generate my study plan." }],
         context: {
-          masteredCount: masteredIds.length,
+          // Only questions in this list, so it stays comparable to the total.
+          masteredCount: catStats.reduce((sum, c) => sum + c.mastered, 0),
           totalQuestions: questions.length,
           weakCategories,
           strongCategories,
+          sprintHistory: sprints.map(
+            ({ score, maxScore, accuracy, weakAreas, completedAt }) => ({
+              score,
+              maxScore,
+              accuracy,
+              weakAreas,
+              completedAt,
+            }),
+          ),
+          focusCandidates,
           catStats,
           interviewDate: interviewDate || null,
           streakDays: progress?.streakDays,
@@ -393,7 +424,7 @@ export default function StudyPlanClientPage({
                 {focusQs.map((q) => (
                   <button
                     key={q.id}
-                    onClick={() => router.push("/dashboard")}
+                    onClick={() => router.push(`/q/${q.slug}`)}
                     css={{
                       display: "block",
                       width: "100%",

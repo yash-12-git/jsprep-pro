@@ -62,7 +62,7 @@ export default function TheoryCard({
   function requirePro(reason: string, action: () => void) {
     if (authLoading) return;
     if (!isLoggedIn) {
-      window.location.href = "/auth";
+      window.location.href = `/auth?next=${encodeURIComponent(window.location.pathname)}`;
       return;
     }
     if (!isPro) {

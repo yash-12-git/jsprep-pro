@@ -4,7 +4,7 @@
 
 import { aiErrorMessage, postAI } from "@/lib/aiClient";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import PageGuard from "@/components/ui/PageGuard";
@@ -30,7 +30,7 @@ export interface Message {
   content: string;
   lockedAt?: number;
 }
-type Phase = "setup" | "interview" | "result";
+type Phase = "setup" | "interview" | "result" | "ended";
 
 export type { SetupConfig };
 
@@ -453,12 +453,15 @@ function tryParse(raw: string): ScoreBreakdown | null {
   try {
     const d = JSON.parse(raw);
     if (d.type !== "scorecard") return null;
+    // A missing score must not be shown as a real 0.
+    const scores = [d.overall, d.concepts, d.problemSolving, d.communication, d.depth];
+    if (!scores.every((s) => typeof s === "number")) return null;
     return {
-      overall: d.overall ?? 0,
-      concepts: d.concepts ?? 0,
-      problemSolving: d.problemSolving ?? 0,
-      communication: d.communication ?? 0,
-      depth: d.depth ?? 0,
+      overall: d.overall,
+      concepts: d.concepts,
+      problemSolving: d.problemSolving,
+      communication: d.communication,
+      depth: d.depth,
       verdict: d.verdict ?? "Not Ready",
       strengths: d.strengths ?? [],
       weaknesses: d.weaknesses ?? [],
@@ -505,54 +508,54 @@ export default function MockInterviewClient({ topics }: Props) {
   const [aiError, setAiError] = useState<string | null>(null);
   const [turns, setTurns] = useState(0);
   const [timeLeft, setTimeLeft] = useState(INTERVIEW_SECS);
+  const [timedOut, setTimedOut] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [scorecard, setScorecard] = useState<ScoreBreakdown | null>(null);
   const [saving, setSaving] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (!loading && !user) router.push("/auth");
+    if (!loading && !user) router.push("/auth?next=/mock-interview");
   }, [user, loading, router]);
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const endInterview = useCallback(() => {
-    setPhase("result");
-    setScorecard(
-      (current) =>
-        current ?? {
-          overall: 0,
-          concepts: 0,
-          problemSolving: 0,
-          communication: 0,
-          depth: 0,
-          verdict: "Not Ready",
-          strengths: [],
-          weaknesses: ["Interview timed out"],
-          suggestions: ["Complete within 25 minutes"],
-          rawFeedback: "Interview was not completed within the allotted time.",
-        },
-    );
-  }, []);
+  const isFinalStep = timedOut || turns >= TOTAL_TURNS;
+
+  // The clock only runs while it's the candidate's turn, so waiting on the AI
+  // or an AI failure never uses up their time.
+  const clockRunning =
+    phase === "interview" && !isTyping && !aiLoading && !aiError && !timedOut;
 
   useEffect(() => {
-    if (phase !== "interview") return;
-    timerRef.current = setInterval(() => {
-      setTimeLeft((t) => {
-        if (t <= 1) {
-          clearInterval(timerRef.current!);
-          endInterview();
-          return 0;
-        }
-        return t - 1;
-      });
+    if (!clockRunning) return;
+    const timer = setInterval(() => {
+      setTimeLeft((t) => Math.max(t - 1, 0));
     }, 1000);
-    return () => clearInterval(timerRef.current!);
-  }, [phase, endInterview]);
+    return () => clearInterval(timer);
+  }, [clockRunning]);
+
+  useEffect(() => {
+    if (clockRunning && timeLeft === 0) handleTimeUp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clockRunning, timeLeft]);
+
+  // Score what was answered, counting any unsent draft as the last answer.
+  // With nothing to score, end without inventing a result.
+  function handleTimeUp() {
+    setTimedOut(true);
+    const draft = input.trim();
+    const finalMsgs: Message[] = draft
+      ? [...messages, { role: "user", content: draft, lockedAt: Date.now() }]
+      : messages;
+    setMessages(finalMsgs);
+    setInput("");
+    if (finalMsgs.some((m) => m.role === "user")) requestReply(finalMsgs, true);
+    else setPhase("ended");
+  }
 
   function handleTA(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
@@ -609,7 +612,6 @@ export default function MockInterviewClient({ topics }: Props) {
       if (card) {
         setEvaluating(false);
         setScorecard(card);
-        clearInterval(timerRef.current!);
         await saveHistory(msgs, card);
         setPhase("result");
       } else if (isFinal) {
@@ -633,11 +635,11 @@ export default function MockInterviewClient({ topics }: Props) {
 
   function retryLastRequest() {
     if (messages.length === 0) requestOpening();
-    else requestReply(messages, turns >= TOTAL_TURNS);
+    else requestReply(messages, isFinalStep);
   }
 
   function sendAnswer() {
-    if (!input.trim() || aiLoading || isTyping || aiError) return;
+    if (!input.trim() || aiLoading || isTyping || aiError || timedOut) return;
     const userMsg: Message = {
       role: "user",
       content: input.trim(),
@@ -671,11 +673,11 @@ export default function MockInterviewClient({ topics }: Props) {
   }
 
   function reset() {
-    clearInterval(timerRef.current!);
     setPhase("setup");
     setMessages([]);
     setTurns(0);
     setTimeLeft(INTERVIEW_SECS);
+    setTimedOut(false);
     setScorecard(null);
     setInput("");
     setIsTyping(false);
@@ -685,7 +687,9 @@ export default function MockInterviewClient({ topics }: Props) {
   }
 
   const isWarn = timeLeft <= 5 * 60 && phase === "interview";
-  const canSend = !!input.trim() && !aiLoading && !isTyping && !aiError;
+  const canSend =
+    !!input.trim() && !aiLoading && !isTyping && !aiError && !timedOut;
+  const answered = messages.filter((m) => m.role === "user").length;
 
   return (
     <PageGuard
@@ -833,12 +837,17 @@ export default function MockInterviewClient({ topics }: Props) {
               {aiError && (
                 <AIErrorNotice message={aiError} onRetry={retryLastRequest} />
               )}
+              {aiError && isFinalStep && (
+                <button css={backBtn} onClick={() => setPhase("ended")}>
+                  End without a score
+                </button>
+              )}
               <div css={inputRow}>
                 <textarea
                   ref={taRef}
                   value={input}
                   onChange={handleTA}
-                  disabled={aiLoading || isTyping}
+                  disabled={aiLoading || isTyping || timedOut}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
@@ -847,11 +856,13 @@ export default function MockInterviewClient({ topics }: Props) {
                   }}
                   rows={2}
                   placeholder={
-                    isTyping
-                      ? "Interviewer is typing…"
-                      : "Type your answer… (Enter to send, Shift+Enter for new line)"
+                    timedOut
+                      ? "Time's up"
+                      : isTyping
+                        ? "Interviewer is typing…"
+                        : "Type your answer… (Enter to send, Shift+Enter for new line)"
                   }
-                  css={inputBox(aiLoading || isTyping)}
+                  css={inputBox(aiLoading || isTyping || timedOut)}
                 />
                 <button
                   css={sendBtn(canSend)}
@@ -886,7 +897,27 @@ export default function MockInterviewClient({ topics }: Props) {
             topics={topics}
             saving={saving}
             onRetake={reset}
+            note={
+              timedOut
+                ? `Time ran out, so this score is based on ${answered} of ${TOTAL_TURNS} answers.`
+                : undefined
+            }
           />
+        )}
+
+        {/* ── ENDED without a score ── */}
+        {phase === "ended" && (
+          <div css={setupWrap}>
+            <h1 css={setupTitle}>Interview ended</h1>
+            <p css={setupSub}>
+              {answered === 0
+                ? "Time ran out before you answered a question, so there's nothing to score."
+                : "We couldn't score your answers, so this interview has no result."}
+            </p>
+            <button css={startBtn} onClick={reset}>
+              Start a new interview
+            </button>
+          </div>
         )}
       </div>
     </PageGuard>

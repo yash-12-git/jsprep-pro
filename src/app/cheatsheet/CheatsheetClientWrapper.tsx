@@ -320,7 +320,7 @@ export default function CheatSheetClientPage({
   const [openTopics, setOpenTopics] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!loading && !user) router.push("/auth");
+    if (!loading && !user) router.push("/auth?next=/cheatsheet");
   }, [user, loading, router]);
 
   if (loading || !user || !progress)

@@ -353,9 +353,10 @@ function AccuracyArc({ pct, color }: { pct: number; color: string }) {
 interface Props {
   summary: SprintSummary;
   onRetry: () => void;
+  signedIn: boolean;
 }
 
-export default function SprintResults({ summary, onRetry }: Props) {
+export default function SprintResults({ summary, onRetry, signedIn }: Props) {
   const {
     score,
     maxScore,
@@ -1035,6 +1036,17 @@ export default function SprintResults({ summary, onRetry }: Props) {
             </button>
           </div>
         </div>
+
+        {!signedIn && (
+          <div css={S.panel} style={{ padding: "1rem 1.125rem" }}>
+            <p style={{ margin: "0 0 0.75rem", fontSize: "0.875rem", color: C.text }}>
+              Sign in to keep this result and see it on your dashboard.
+            </p>
+            <a href="/auth?next=/dashboard" className="btn btn--primary">
+              Save my result
+            </a>
+          </div>
+        )}
 
         {/* Bottom actions */}
         <div css={S.ctaRow}>

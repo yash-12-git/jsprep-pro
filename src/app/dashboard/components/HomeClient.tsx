@@ -19,6 +19,7 @@
  * and lets marketing traffic land without a forced login wall.
  */
 
+import LastSprint from "./LastSprint";
 import { useMemo } from "react";
 import { css } from "@emotion/react";
 import { BarChart2 } from "lucide-react";
@@ -360,6 +361,7 @@ export default function HomeClient({
       </div>
 
       {/* ── Subscription management (renders only for Pro subscribers) ── */}
+      <LastSprint />
       <ManageSubscription />
 
       {/* ── Mode progress cards ── */}

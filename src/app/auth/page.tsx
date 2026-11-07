@@ -10,7 +10,12 @@ import * as S from './styles'
 export default function AuthPage() {
   const { user, loading, signInWithGoogle } = useAuth()
   const router = useRouter()
-  useEffect(() => { if (!loading && user) router.push('/dashboard') }, [user, loading, router])
+  useEffect(() => {
+    if (loading || !user) return
+    // Only follow same-site paths, so this can't redirect to another website.
+    const next = new URLSearchParams(window.location.search).get('next')
+    router.push(next && /^\/(?!\/)/.test(next) ? next : '/dashboard')
+  }, [user, loading, router])
 
   return (
     <main css={S.page}>

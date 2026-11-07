@@ -1,4 +1,5 @@
 "use client";
+import { savePendingSprint } from "@/lib/sprintHistory";
 import {
   createContext,
   useContext,
@@ -61,7 +62,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
-      if (u) await loadProgress(u);
+      if (u) {
+        await loadProgress(u);
+        savePendingSprint(u.uid);
+      }
       else setProgress(null);
       setLoading(false);
     });
