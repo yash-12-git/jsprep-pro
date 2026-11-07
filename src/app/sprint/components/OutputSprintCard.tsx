@@ -3,6 +3,7 @@
 
 import { css, keyframes } from "@emotion/react";
 import { useState } from "react";
+import { useDesktopAutoFocus } from "@/hooks/useDesktopAutoFocus";
 import { CheckCircle, XCircle, Eye } from "lucide-react";
 import { C, RADIUS } from "@/styles/tokens";
 import type { Question } from "@/types/question";
@@ -218,7 +219,9 @@ interface Props {
   onComplete: (outcome: SprintOutcome) => void;
 }
 
+
 export default function OutputSprintCard({ q, onComplete }: Props) {
+  const answerRef = useDesktopAutoFocus<HTMLTextAreaElement>();
   const [userAnswer, setUserAnswer] = useState("");
   const [checked, setChecked] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -263,7 +266,7 @@ export default function OutputSprintCard({ q, onComplete }: Props) {
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               placeholder="Type the expected output..."
-              autoFocus
+              ref={answerRef}
             />
             <button
               css={checkBtn(!!userAnswer.trim())}

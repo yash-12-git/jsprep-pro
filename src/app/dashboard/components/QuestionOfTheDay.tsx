@@ -143,7 +143,7 @@ const qText = css`
 const diffBadge = (color: string, bg: string, border: string) => css`
   display: inline-flex;
   align-items: center;
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: ${color};
   background: ${bg};

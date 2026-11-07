@@ -543,6 +543,14 @@ export default function Navbar() {
             >
               Start free
             </Link>
+            <Link
+              href="/auth"
+              className="btn"
+              style={{ width: "100%", marginTop: "var(--space-xs)" }}
+              onClick={() => setMobileOpen(false)}
+            >
+              Log in
+            </Link>
           </div>
         </div>
       )}

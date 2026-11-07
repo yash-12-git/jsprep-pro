@@ -162,7 +162,7 @@ export default function SEOPredictionCard({
           <span
             style={{
               fontFamily: "monospace",
-              fontSize: "0.625rem",
+              fontSize: "0.75rem",
               fontWeight: 600,
               color: C.accentText,
               background: C.accentSubtle,
@@ -206,7 +206,7 @@ export default function SEOPredictionCard({
             {q.difficulty && (
               <span
                 style={{
-                  fontSize: "0.625rem",
+                  fontSize: "0.75rem",
                   fontWeight: 600,
                   padding: "0.125rem 0.5rem",
                   borderRadius: "9999px",
@@ -221,7 +221,7 @@ export default function SEOPredictionCard({
             {q.category && (
               <span
                 style={{
-                  fontSize: "0.625rem",
+                  fontSize: "0.75rem",
                   fontWeight: 500,
                   padding: "0.125rem 0.5rem",
                   borderRadius: "9999px",
@@ -237,7 +237,7 @@ export default function SEOPredictionCard({
               <span
                 key={tag}
                 style={{
-                  fontSize: "0.625rem",
+                  fontSize: "0.75rem",
                   color: C.muted,
                   background: C.bgSubtle,
                   border: `1px solid ${C.border}`,
@@ -274,7 +274,7 @@ export default function SEOPredictionCard({
             <div style={{ padding: "1rem 1rem 0" }}>
               <p
                 style={{
-                  fontSize: "0.6875rem",
+                  fontSize: "0.75rem",
                   fontWeight: 700,
                   color: C.muted,
                   margin: "0 0 0.5rem",
@@ -370,7 +370,7 @@ export default function SEOPredictionCard({
             >
               <p
                 style={{
-                  fontSize: "0.6875rem",
+                  fontSize: "0.75rem",
                   fontWeight: 700,
                   color: C.muted,
                   margin: "0.875rem 0 0.5rem",
@@ -575,7 +575,7 @@ export default function SEOPredictionCard({
                   >
                     <p
                       style={{
-                        fontSize: "0.6875rem",
+                        fontSize: "0.75rem",
                         fontWeight: 700,
                         color: state === "correct" ? C.green : C.muted,
                         margin: "0 0 0.5rem",

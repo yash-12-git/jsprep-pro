@@ -4,6 +4,7 @@
 import { AIRequestError, postAI } from "@/lib/aiClient";
 import { css, keyframes } from "@emotion/react";
 import { useState } from "react";
+import { useDesktopAutoFocus } from "@/hooks/useDesktopAutoFocus";
 import {
   Loader2,
   CheckCircle,
@@ -78,7 +79,7 @@ const metaRow = css`
 const diffBadge = (color: string, bg: string, border: string) => css`
   display: inline-flex;
   align-items: center;
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: ${color};
   background: ${bg};
@@ -383,7 +384,9 @@ const DIFF_META: Record<
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
+
 export default function TheorySprintCard({ q, onComplete }: Props) {
+  const answerRef = useDesktopAutoFocus<HTMLTextAreaElement>();
   const [phase, setPhase] = useState<
     "read" | "answering" | "evaluating" | "failed" | "done"
   >("read");
@@ -465,7 +468,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                 value={userAnswer}
                 onChange={(e) => setUserAnswer(e.target.value)}
                 placeholder="Type your answer here..."
-                autoFocus
+                ref={answerRef}
                 disabled={phase === "evaluating"}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && e.metaKey) evaluate();

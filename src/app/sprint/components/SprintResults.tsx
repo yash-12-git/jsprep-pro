@@ -340,7 +340,7 @@ function AccuracyArc({ pct, color }: { pct: number; color: string }) {
       </div>
       <div
         style={{
-          fontSize: "0.55rem",
+          fontSize: "0.75rem",
           color: C.muted,
         }}
       >
@@ -495,7 +495,7 @@ export default function SprintResults({ summary, onRetry, signedIn }: Props) {
         letter-spacing: -0.02em;
       }
       .lbl {
-        font-size: 0.6rem;
+        font-size: 0.75rem;
         font-weight: 500;
         color: ${C.muted};
         margin-top: 0.2rem;
@@ -510,7 +510,7 @@ export default function SprintResults({ summary, onRetry, signedIn }: Props) {
       padding: 1.25rem;
     `,
     panelHead: css`
-      font-size: 0.675rem;
+      font-size: 0.75rem;
       font-weight: 500;
       color: ${C.muted};
       margin-bottom: 1rem;
@@ -552,7 +552,7 @@ export default function SprintResults({ summary, onRetry, signedIn }: Props) {
       padding: 1rem;
     `,
     insightHead: (col: string) => css`
-      font-size: 0.6rem;
+      font-size: 0.75rem;
       font-weight: 500;
       color: ${col};
       margin-bottom: 0.625rem;
@@ -592,7 +592,7 @@ export default function SprintResults({ summary, onRetry, signedIn }: Props) {
       ${o === "correct" ? `background:${C.greenSubtle};` : ""}
     `,
     typeChip: (t: string) => css`
-      font-size: 0.5rem;
+      font-size: 0.75rem;
       font-weight: 500;
       padding: 2px 6px;
       border-radius: 6px;
@@ -907,7 +907,7 @@ export default function SprintResults({ summary, onRetry, signedIn }: Props) {
             <div key={r.questionId} css={S.bkRow(r.outcome)}>
               <span
                 style={{
-                  fontSize: "0.6rem",
+                  fontSize: "0.75rem",
                   color: C.muted,
                   width: 18,
                   flexShrink: 0,

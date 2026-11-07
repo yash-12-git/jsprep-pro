@@ -31,7 +31,7 @@ function StatCard({
         {subtext && <span style={styles.statSuffix}>{subtext}</span>}
       </div>
       <div style={styles.miniBar}>
-        <div style={{ ...styles.miniBarFill, width: `${pct}%` }} />
+        <div style={{ ...styles.miniBarFill, transform: `scaleX(${pct / 100})` }} />
       </div>
     </div>
   );

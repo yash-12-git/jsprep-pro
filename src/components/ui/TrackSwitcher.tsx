@@ -116,9 +116,6 @@ export default function TrackSwitcher() {
             </button>
           ))}
 
-          <div css={dropdownFooter}>
-            More tracks coming, React, TypeScript, System Design
-          </div>
         </div>
       )}
     </div>
@@ -167,6 +164,14 @@ const triggerLabel = css`
   font-size: 0.8125rem;
   font-weight: 500;
   color: ${C.text};
+  white-space: nowrap;
+  /* "System Design" is the longest label; on phones it trims instead of
+     pushing the menu button off-screen. */
+  @media (max-width: 30rem) {
+    max-width: 5.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 const badgePill = (color: string) => css`
@@ -177,6 +182,9 @@ const badgePill = (color: string) => css`
   background: color-mix(in oklab, ${color} 13%, transparent);
   color: ${color};
   border: 1px solid color-mix(in oklab, ${color} 20%, transparent);
+  @media (max-width: 30rem) {
+    display: none;
+  }
 `;
 
 const chevron = (open: boolean) => css`
@@ -195,6 +203,15 @@ const dropdown = css`
   border-radius: ${RADIUS.lg};
   overflow: hidden;
   z-index: 200;
+  /* On phones the switcher sits mid-row, so a 280px panel under it runs off
+     the screen. Pin the panel to the page gutters instead, just below the nav. */
+  @media (max-width: 30rem) {
+    position: fixed;
+    top: calc(var(--nav-offset) + 6px);
+    left: var(--gutter);
+    right: var(--gutter);
+    min-width: 0;
+  }
 `;
 
 const dropdownLabel = css`
@@ -272,11 +289,3 @@ const activeDot = css`
   flex-shrink: 0;
 `;
 
-const dropdownFooter = css`
-  padding: 0.625rem 1rem;
-  font-size: 0.75rem;
-  color: ${C.muted};
-  border-top: 1px solid ${C.border};
-  background: ${C.bgSubtle};
-  text-align: center;
-`;

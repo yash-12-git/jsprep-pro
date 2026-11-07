@@ -11,8 +11,9 @@ const scoreFlash = keyframes`0%{transform:scale(1)}30%{transform:scale(1.18)}100
 
 const hud = css`
   position: sticky;
-  top: 0;
-  z-index: 50;
+  /* Below the site nav, which is also sticky and sits above it. */
+  top: var(--nav-offset);
+  z-index: var(--z-sticky);
   background: ${C.bgSubtle};
   border-bottom: 1px solid ${C.border};
   padding: 0.625rem 1.375rem;

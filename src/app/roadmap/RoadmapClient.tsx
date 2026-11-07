@@ -182,7 +182,7 @@ export function RoadmapClient() {
               {activeMonth.timeCommitment && (
                 <p
                   style={{
-                    fontSize: "11px",
+                    fontSize: "0.75rem",
                     color: accent.bannerMeta,
                     marginTop: "8px",
                     marginBottom: 0,
@@ -207,7 +207,7 @@ export function RoadmapClient() {
             >
               <span
                 style={{
-                  fontSize: "11px",
+                  fontSize: "0.75rem",
                   color: "var(--color-muted)",
                   fontFamily: "var(--font-outlier)",
                   whiteSpace: "nowrap",
@@ -236,7 +236,7 @@ export function RoadmapClient() {
               </div>
               <span
                 style={{
-                  fontSize: "11px",
+                  fontSize: "0.75rem",
                   fontFamily: "var(--font-outlier)",
                   color: accent.text,
                   minWidth: "36px",
@@ -284,15 +284,15 @@ export function RoadmapClient() {
         <button
           onClick={handleReset}
           style={{
-            fontSize: "12px",
+            fontSize: "0.8125rem",
             padding: "6px 14px",
             borderRadius: "8px",
             border: "1px solid var(--color-border)",
             background: "transparent",
             color: "var(--color-muted)",
             cursor: "pointer",
-            fontFamily: "var(--font-outlier)",
-            transition: "all 0.15s",
+            whiteSpace: "nowrap",
+            transition: "border-color 0.15s, color 0.15s",
           }}
           onMouseEnter={(e) => {
             (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-red)";
@@ -303,7 +303,7 @@ export function RoadmapClient() {
             (e.currentTarget as HTMLButtonElement).style.color = "var(--color-muted)";
           }}
         >
-          Reset all progress
+          Reset progress
         </button>
       </div>
 

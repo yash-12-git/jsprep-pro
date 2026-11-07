@@ -257,7 +257,7 @@ export default function CheatsheetPage() {
             <>
               <DownloadPDFButton />
               <Link href="/auth" className="btn">
-                Or practice these concepts interactively
+                Practice these concepts
               </Link>
             </>
           }

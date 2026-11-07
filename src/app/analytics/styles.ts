@@ -201,7 +201,7 @@ export const sprintTagRow = css`
 `;
 
 export const sprintTag = (variant: "strength" | "weak") => css`
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 500;
   padding: 1px 7px;
   border-radius: 10px;
@@ -229,7 +229,7 @@ export const sprintSummaryItem = css`
 `;
 
 export const sprintSummaryLabel = css`
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: ${C.muted};
 `;

@@ -166,7 +166,7 @@ const catName = css`
 `;
 
 const catCount = css`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${C.muted};
   font-weight: 500;
   background: ${C.bgSubtle};
@@ -217,7 +217,7 @@ const topicKeyword = css`
 `;
 
 const diffPill = (color: string, bg: string) => css`
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: ${color};
   background: ${bg};
@@ -251,7 +251,7 @@ const sectionLabel = (color: string) => css`
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: ${color};
   margin-bottom: 0.5rem;
@@ -268,7 +268,7 @@ const bullet = css`
 `;
 
 const bulletDot = (color: string) => css`
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: ${color};
   flex-shrink: 0;
   margin-top: 0.25rem;

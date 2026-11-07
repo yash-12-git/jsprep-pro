@@ -9,7 +9,8 @@ export const styles = {
   // ─── Stats Grid ─────────────────────────────────────────────────────────────
   statsGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
+    // Four across on wide screens, two on phones, without a media query.
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 9rem), 1fr))",
     gap: "10px",
     marginBottom: "1.5rem",
   } as CSSProperties,
@@ -22,11 +23,9 @@ export const styles = {
   } as CSSProperties,
 
   statLabel: {
-    fontSize: "0.75rem",
-    textTransform: "uppercase" as const,
+    fontSize: "0.8125rem",
     color: "var(--color-muted)",
     marginBottom: "8px",
-    fontFamily: "var(--font-outlier)",
   } as CSSProperties,
 
   statValue: {
@@ -51,11 +50,14 @@ export const styles = {
     overflow: "hidden",
   } as CSSProperties,
 
+  // Sized with scaleX, set per bar, so the change animates without layout work.
   miniBarFill: {
+    width: "100%",
     height: "100%",
     borderRadius: "2px",
     background: "var(--color-green)",
-    transition: "width 0.4s ease",
+    transformOrigin: "left",
+    transition: "transform 0.4s ease",
   } as CSSProperties,
 
   // ─── Week Card ──────────────────────────────────────────────────────────────

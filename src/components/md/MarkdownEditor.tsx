@@ -26,7 +26,7 @@ const S = {
   `,
 
   labelText: css`
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.07em;
@@ -44,7 +44,7 @@ const S = {
     gap: 0.25rem;
     padding: 0.25rem 0.625rem;
     border-radius: ${RADIUS.sm};
-    font-size: 0.625rem;
+    font-size: 0.75rem;
     font-weight: 600;
     border: 1px solid ${active ? C.accent : C.border};
     background: ${active ? C.accentSubtle : "transparent"};
@@ -92,7 +92,7 @@ const S = {
   `,
 
   hint: css`
-    font-size: 0.625rem;
+    font-size: 0.75rem;
     color: ${C.muted};
     margin-top: 0.25rem;
     display: flex;

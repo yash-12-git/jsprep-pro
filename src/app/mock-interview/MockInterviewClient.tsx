@@ -178,7 +178,8 @@ const ivWrap = css`
   padding: 0 1.25rem 1rem;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 3.5rem);
+  /* dvh follows the phone browser's bars, so the answer box stays in view. */
+  height: calc(100dvh - var(--nav-offset));
 `;
 const topBar = css`
   display: flex;

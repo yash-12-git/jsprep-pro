@@ -86,7 +86,7 @@ export const readinessPct = css`
 `;
 
 export const readinessLabel = css`
-  font-size: 0.5rem;
+  font-size: 0.75rem;
   color: ${C.muted};
 `;
 

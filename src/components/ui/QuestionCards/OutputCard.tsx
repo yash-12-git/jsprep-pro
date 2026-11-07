@@ -593,7 +593,7 @@ const tbBtn = css`
   border-radius: 5px;
   background: transparent;
   color: ${C.muted};
-  font-size: 11.5px;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;

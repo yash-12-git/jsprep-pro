@@ -194,6 +194,8 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
     setCurrentIdx(0);
     startTimeRef.current = Date.now();
     setPhase("active");
+    // On a phone the start button is below the fold; begin at the question.
+    window.scrollTo(0, 0);
   }
 
   // ── Finish sprint ───────────────────────────────────────────────────────────
@@ -230,6 +232,7 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
       };
       setSummary(s);
       setPhase("results");
+      window.scrollTo(0, 0);
 
       const saved: SavedSprint = {
         score: finalScore,
@@ -288,6 +291,7 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
   // ── Retry ───────────────────────────────────────────────────────────────────
 
   function handleRetry() {
+    window.scrollTo(0, 0);
     setPhase("lobby");
     setSummary(null);
     setQuestions([]);

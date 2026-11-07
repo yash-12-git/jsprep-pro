@@ -593,7 +593,7 @@ const runBtn = css`
   border-radius: 5px;
   background: ${C.greenSubtle};
   color: ${C.green};
-  font-size: 11.5px;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
@@ -614,7 +614,7 @@ const actionBtn = css`
   border-radius: 5px;
   background: transparent;
   color: ${C.muted};
-  font-size: 11.5px;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;

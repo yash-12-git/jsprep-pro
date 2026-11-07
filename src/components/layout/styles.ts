@@ -22,6 +22,9 @@ export const navInner = css`
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  @media (max-width: 30rem) {
+    gap: 0.5rem;
+  }
 
   /* On mobile, we have bottom nav — give content some room */
   @media (max-width: 767px) {
@@ -536,8 +539,13 @@ export const signInBtn = css`
   padding: 0.375rem 0.75rem;
   border-radius: ${RADIUS.md};
   text-decoration: none;
+  white-space: nowrap;
   border: 1px solid ${C.border};
   transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+  /* Too narrow for the whole row: Log in moves into the menu. */
+  @media (max-width: 25rem) {
+    display: none;
+  }
   &:hover {
     color: ${C.text};
     border-color: ${C.borderStrong};
@@ -570,7 +578,8 @@ export const getStartedBtn = css`
 
 export const mobileSheet = css`
   position: fixed;
-  inset: 3.25rem 0 0 0;
+  /* Starts below the nav bar, so its first row isn't hidden behind it. */
+  inset: var(--nav-offset) 0 0 0;
   z-index: 40;
   background: ${C.bg};
   overflow-y: auto;

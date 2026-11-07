@@ -130,7 +130,7 @@ const countNum = (active: boolean) => css`
 `;
 
 const countSub = css`
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: ${C.muted};
   margin-top: 0.25rem;
@@ -144,7 +144,7 @@ const lockIcon = css`
 `;
 
 const proBadge = css`
-  font-size: 0.55rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: ${C.amber};
   margin-top: 0.125rem;
@@ -337,7 +337,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
                 <div css={countSub}>Qs</div>
                 <div
                   style={{
-                    fontSize: "0.6rem",
+                    fontSize: "0.75rem",
                     fontWeight: 500,
                     color: active ? C.accentText : C.muted,
                     marginTop: "0.125rem",

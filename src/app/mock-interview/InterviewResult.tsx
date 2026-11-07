@@ -364,7 +364,7 @@ const miniCell = (s: number) => css`
     color: ${scoreHex(s)};
   }
   .l {
-    font-size: 0.5rem;
+    font-size: 0.75rem;
     font-weight: 500;
     color: color-mix(in oklab, var(--color-ink) 30%, transparent);
     margin-top: 3px;
@@ -403,7 +403,7 @@ const sharePanelWrap = css`
   margin-bottom: 0.75rem;
 `;
 const sharePanelHead = css`
-  font-size: 0.675rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: ${C.muted};
   margin-bottom: 1rem;

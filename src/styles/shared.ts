@@ -123,7 +123,7 @@ export const diffBadge = (level: "easy" | "medium" | "hard") => {
 };
 
 export const proBadgeSmall = css`
-  font-size: 0.5rem;
+  font-size: 0.75rem;
   font-weight: 500;
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;

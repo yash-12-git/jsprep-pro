@@ -493,8 +493,8 @@ export default function StudyPlanClientPage({
                   {/* Day badge */}
                   <div
                     css={{
-                      width: "2.5rem",
-                      height: "2.5rem",
+                      width: "2.75rem",
+                      height: "2.75rem",
                       borderRadius: RADIUS.md,
                       background: C.amberSubtle,
                       border: `1px solid ${C.amberBorder}`,
@@ -507,7 +507,7 @@ export default function StudyPlanClientPage({
                   >
                     <span
                       css={{
-                        fontSize: "0.5rem",
+                        fontSize: "0.75rem",
                         color: C.muted,
                       }}
                     >
