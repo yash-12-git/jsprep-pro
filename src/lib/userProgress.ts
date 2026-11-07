@@ -7,6 +7,7 @@ import {
   increment,
 } from "firebase/firestore";
 import { db } from "./firebase";
+import type { RoadmapProgress } from "@/data/roadmap/types";
 
 export interface UserProgress {
   uid: string;
@@ -44,6 +45,8 @@ export interface UserProgress {
   // Counter field — incremented when mastering, decremented when un-mastering.
   // Replaces the deprecated masteredIds array for leaderboard counts.
   masteredCount?: number;
+  // Roadmap days completed, synced from the browser's copy
+  roadmapProgress?: RoadmapProgress;
 }
 
 const DEFAULT_PROGRESS: Omit<UserProgress, "uid"> = {
@@ -54,7 +57,7 @@ const DEFAULT_PROGRESS: Omit<UserProgress, "uid"> = {
   lastActiveDate: "",
   totalSessions: 0,
   quizScores: [],
-  joinedAt: new Date().toISOString(),
+  joinedAt: "", // set when the doc is created, not when this module loads
   solvedOutputIds: [],
   revealedOutputIds: [],
   solvedDebugIds: [],
@@ -80,6 +83,7 @@ export async function getUserProgressAndStreak(
     const data = {
       uid,
       ...DEFAULT_PROGRESS,
+      joinedAt: new Date().toISOString(),
       lastActiveDate: new Date().toDateString(),
     };
     await setDoc(ref, data);

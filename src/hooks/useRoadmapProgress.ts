@@ -1,6 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useAuth } from "@/hooks/useAuth";
 import type {
   GlobalStats,
   MonthStats,
@@ -29,6 +32,13 @@ function saveToStorage(progress: RoadmapProgress): void {
   } catch {
     // Storage full or unavailable — fail silently
   }
+}
+
+/** Signed-in users keep a copy on their user doc, so progress follows them. */
+function saveToAccount(uid: string, progress: RoadmapProgress): void {
+  updateDoc(doc(db, "users", uid), { roadmapProgress: progress }).catch((err) =>
+    console.error("[roadmap] could not sync progress", err),
+  );
 }
 
 function calcStreak(progress: RoadmapProgress): number {
@@ -114,8 +124,11 @@ function calcGlobalStats(progress: RoadmapProgress): GlobalStats {
 // ─── hook ─────────────────────────────────────────────────────────────────────
 
 export function useRoadmapProgress() {
+  const { user, progress: account } = useAuth();
+  const uid = user?.uid ?? null;
   const [progress, setProgress] = useState<RoadmapProgress>({});
   const [mounted, setMounted] = useState(false);
+  const mergedFor = useRef<string | null>(null);
 
   // Hydrate from localStorage once on the client
   useEffect(() => {
@@ -123,23 +136,52 @@ export function useRoadmapProgress() {
     setMounted(true);
   }, []);
 
-  const toggleDay = useCallback((day: number) => {
-    setProgress((prev) => {
-      const next = { ...prev };
-      if (next[day]) {
-        delete next[day];
-      } else {
-        next[day] = Date.now();
+  // Once per sign-in, combine this browser's days with the account's, so
+  // progress made signed out or on another device isn't lost.
+  useEffect(() => {
+    // Signed out: forget this account's days, so the next person to sign in on
+    // this browser doesn't inherit them.
+    if (mounted && !uid && mergedFor.current) {
+      mergedFor.current = null;
+      setProgress({});
+      saveToStorage({});
+      return;
+    }
+    if (!mounted || !uid || !account || mergedFor.current === uid) return;
+    mergedFor.current = uid;
+    const saved = account.roadmapProgress ?? {};
+    setProgress((local) => {
+      const merged = { ...local, ...saved };
+      saveToStorage(merged);
+      if (Object.keys(merged).length !== Object.keys(saved).length) {
+        saveToAccount(uid, merged);
       }
-      saveToStorage(next);
-      return next;
+      return merged;
     });
-  }, []);
+  }, [mounted, uid, account]);
+
+  const toggleDay = useCallback(
+    (day: number) => {
+      setProgress((prev) => {
+        const next = { ...prev };
+        if (next[day]) {
+          delete next[day];
+        } else {
+          next[day] = Date.now();
+        }
+        saveToStorage(next);
+        if (uid) saveToAccount(uid, next);
+        return next;
+      });
+    },
+    [uid],
+  );
 
   const resetAll = useCallback(() => {
     setProgress({});
     saveToStorage({});
-  }, []);
+    if (uid) saveToAccount(uid, {});
+  }, [uid]);
 
   const isDayDone = useCallback(
     (day: number) => Boolean(progress[day]),

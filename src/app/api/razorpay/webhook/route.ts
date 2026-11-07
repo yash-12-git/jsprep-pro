@@ -22,6 +22,31 @@ function safeEqual(a: string, b: string): boolean {
   return crypto.timingSafeEqual(bufA, bufB);
 }
 
+/**
+ * Razorpay doesn't guarantee delivery order, so a late subscription.charged
+ * must not undo a later cancellation. Writes `data` only if no newer event for
+ * this subscription has been applied. The marker lives in a server-only
+ * collection, because users can edit their own users/{uid} doc.
+ */
+async function applyInOrder(
+  db: FirebaseFirestore.Firestore,
+  subscriptionId: string,
+  eventAt: number | undefined,
+  ref: FirebaseFirestore.DocumentReference,
+  data: Record<string, unknown>,
+): Promise<boolean> {
+  const marker = db.collection("subscriptionEvents").doc(subscriptionId);
+  return db.runTransaction(async (tx) => {
+    const last = (await tx.get(marker)).get("lastEventAt");
+    if (typeof eventAt === "number" && typeof last === "number" && last > eventAt) {
+      return false;
+    }
+    tx.set(ref, data, { merge: true });
+    if (typeof eventAt === "number") tx.set(marker, { lastEventAt: eventAt });
+    return true;
+  });
+}
+
 async function findUserBySubscription(
   db: FirebaseFirestore.Firestore,
   subscriptionId: string,
@@ -60,6 +85,8 @@ export async function POST(req: NextRequest) {
     const event = JSON.parse(body);
     const db = getAdminDb();
     const now = new Date().toISOString();
+    // Unix seconds when Razorpay created the event.
+    const eventAt: number | undefined = event.created_at;
 
     console.log("Razorpay webhook event:", event.event);
 
@@ -80,17 +107,18 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        await ref.set(
-          {
-            isPro: true,
-            razorpaySubscriptionId: sub.id,
-            proExpiresAt: proExpiryFrom(sub.current_end),
-            subscriptionStatus: "active",
-            lastRenewedAt: now,
-          },
-          { merge: true },
+        const applied = await applyInOrder(db, sub.id, eventAt, ref, {
+          isPro: true,
+          razorpaySubscriptionId: sub.id,
+          proExpiresAt: proExpiryFrom(sub.current_end),
+          subscriptionStatus: "active",
+          lastRenewedAt: now,
+        });
+        console.log(
+          applied
+            ? `🔄 Pro extended for ${ref.id} until ${proExpiryFrom(sub.current_end)}`
+            : `webhook: skipped stale charge for ${sub.id}`,
         );
-        console.log(`🔄 Pro extended for ${ref.id} until ${proExpiryFrom(sub.current_end)}`);
         break;
       }
 
@@ -106,20 +134,24 @@ export async function POST(req: NextRequest) {
 
         // set+merge, not update: update() throws NOT_FOUND if the user doc
         // hasn't been created yet, which Razorpay would retry forever.
-        await db
-          .collection("users")
-          .doc(userId)
-          .set(
-            {
-              isPro: true,
-              razorpaySubscriptionId: sub.id,
-              proActivatedAt: now,
-              proExpiresAt: proExpiryFrom(sub.current_end),
-              subscriptionStatus: "active",
-            },
-            { merge: true },
-          );
-        console.log(`✅ Subscription activated for user ${userId}`);
+        const applied = await applyInOrder(
+          db,
+          sub.id,
+          eventAt,
+          db.collection("users").doc(userId),
+          {
+            isPro: true,
+            razorpaySubscriptionId: sub.id,
+            proActivatedAt: now,
+            proExpiresAt: proExpiryFrom(sub.current_end),
+            subscriptionStatus: "active",
+          },
+        );
+        console.log(
+          applied
+            ? `✅ Subscription activated for user ${userId}`
+            : `webhook: skipped stale activation for ${sub.id}`,
+        );
         break;
       }
 
@@ -130,7 +162,7 @@ export async function POST(req: NextRequest) {
         if (userDoc) {
           // Short grace window, then Pro lapses on its own. Never extend
           // beyond a date the user has actually paid for.
-          await userDoc.ref.update({
+          await applyInOrder(db, sub.id, eventAt, userDoc.ref, {
             proExpiresAt: graceExpiry(),
             subscriptionStatus: "halted",
           });
@@ -145,7 +177,7 @@ export async function POST(req: NextRequest) {
         const userDoc = await findUserBySubscription(db, sub.id);
         if (userDoc) {
           const expiresAt = proExpiryFrom(sub.current_end);
-          await userDoc.ref.update({
+          await applyInOrder(db, sub.id, eventAt, userDoc.ref, {
             proExpiresAt: expiresAt,
             subscriptionStatus: "cancelled",
           });
@@ -160,7 +192,7 @@ export async function POST(req: NextRequest) {
         const sub = event.payload.subscription.entity;
         const userDoc = await findUserBySubscription(db, sub.id);
         if (userDoc) {
-          await userDoc.ref.update({
+          await applyInOrder(db, sub.id, eventAt, userDoc.ref, {
             isPro: false,
             proExpiresAt: now,
             subscriptionStatus: event.event.split(".")[1],

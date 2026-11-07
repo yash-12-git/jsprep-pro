@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { CheckCircle, Flame } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTrack } from "@/contexts/TrackContext";
 import type { ReactNode } from "react";
 
 import * as S from "./page.styles";
@@ -145,8 +146,7 @@ const SPRINT_CLAIMS = [
   },
 ];
 
-interface HomePageClientProps {
-  track: Track;
+export interface HomeTrackData {
   theory: number;
   debug: number;
   output: number;
@@ -154,17 +154,30 @@ interface HomePageClientProps {
   topics: Pick<Topic, "slug" | "title" | "difficulty" | "questionCount">[];
 }
 
+interface HomePageClientProps {
+  /** Every track's summary, so the page can be cached and still follow the visitor's track. */
+  tracks: Partial<Record<Track, HomeTrackData>>;
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function HomePageClient({
-  track,
-  theory: theoryCt,
-  debug: debugCt,
-  output: outputCt,
-  polyfill: polyfillCt,
-  topics,
-}: HomePageClientProps) {
+export default function HomePageClient({ tracks }: HomePageClientProps) {
   const { user } = useAuth();
+  const { track: chosen } = useTrack();
+  const track: Track = tracks[chosen] ? chosen : "javascript";
+  const {
+    theory: theoryCt,
+    debug: debugCt,
+    output: outputCt,
+    polyfill: polyfillCt,
+    topics,
+  } = tracks[track] ?? {
+    theory: 0,
+    debug: 0,
+    output: 0,
+    polyfill: 0,
+    topics: [],
+  };
   const pricing = usePricing();
 
   const trackCfg = TRACK_MAP[track];

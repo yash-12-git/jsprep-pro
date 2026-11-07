@@ -8,7 +8,7 @@
 import { CONTENT_COUNTS } from "@/lib/contentCounts";
 import type { Metadata } from "next";
 import { courseSchema, faqSchema, pageMeta } from "@/lib/seo/seo";
-import HomePageClient from "./HomePageClient";
+import HomePageClient, { type HomeTrackData } from "./HomePageClient";
 
 export const metadata: Metadata = pageMeta({
   title: "JavaScript Interview Questions & React Interview Prep — JSPrep Pro",
@@ -26,13 +26,12 @@ export const metadata: Metadata = pageMeta({
     "frontend developer interview india",
   ],
 });
-import { getServerTrack } from "@/lib/getServerTrack";
 import {
   getPublishedTopics,
   getQuestions,
 } from "@/lib/cachedQueries";
 import type { FAQItem } from "@/lib/seo/seo";
-import { Track } from "@/lib/tracks";
+import { AVAILABLE_TRACKS, Track } from "@/lib/tracks";
 
 // ─── Track-aware FAQ builder ──────────────────────────────────────────────────
 
@@ -150,54 +149,59 @@ function buildFaq(): FAQItem[] {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function HomePage() {
-  const track = await getServerTrack();
+// Static, so the CDN can cache it. The visitor's saved track is applied in the
+// browser, which is why every track's summary is included.
+export const revalidate = 3600;
+
+async function getTrackData(track: Track): Promise<HomeTrackData> {
+  const count = (type: "theory" | "output" | "debug" | "polyfill") =>
+    getQuestions({
+      filters: { track, status: "published", type },
+      pageSize: 300,
+    })
+      .then((r) => r.questions?.length ?? 0)
+      .catch(() => 0);
 
   const [theory, output, debug, polyfill, topics] = await Promise.all([
-    getQuestions({
-      filters: { track, status: "published", type: "theory" },
-      pageSize: 300,
-    }).catch(() => ({ questions: [] })),
-    getQuestions({
-      filters: { track, status: "published", type: "output" },
-      pageSize: 300,
-    }).catch(() => ({ questions: [] })),
-    getQuestions({
-      filters: { track, status: "published", type: "debug" },
-      pageSize: 300,
-    }).catch(() => ({ questions: [] })),
-    getQuestions({
-      filters: { track, status: "published", type: "polyfill" },
-      pageSize: 300,
-    }).catch(() => ({ questions: [] })),
+    count("theory"),
+    count("output"),
+    count("debug"),
+    count("polyfill"),
     getPublishedTopics({ track }),
   ]);
+  return {
+    theory,
+    output,
+    debug,
+    polyfill,
+    // The full topic documents hold whole guides; this page lists six titles.
+    topics: topics.map(({ slug, title, difficulty, questionCount }) => ({
+      slug,
+      title,
+      difficulty,
+      questionCount,
+    })),
+  };
+}
+
+export default async function HomePage() {
+  const entries = await Promise.all(
+    AVAILABLE_TRACKS.map(async (t) => [t.id, await getTrackData(t.id)] as const),
+  );
+  const tracks = Object.fromEntries(entries) as Partial<Record<Track, HomeTrackData>>;
 
   return (
     <>
       {/* Schema injected server-side — crawlers see this immediately */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: courseSchema(track) }}
+        dangerouslySetInnerHTML={{ __html: courseSchema("javascript") }}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqSchema(buildFaq()) }}
       />
-      <HomePageClient
-        track={track}
-        theory={theory.questions?.length ?? 0}
-        debug={debug.questions?.length ?? 0}
-        output={output.questions?.length ?? 0}
-        polyfill={polyfill.questions?.length ?? 0}
-        // The full topic documents hold whole guides; this page lists six titles.
-        topics={topics.map(({ slug, title, difficulty, questionCount }) => ({
-          slug,
-          title,
-          difficulty,
-          questionCount,
-        }))}
-      />
+      <HomePageClient tracks={tracks} />
     </>
   );
 }

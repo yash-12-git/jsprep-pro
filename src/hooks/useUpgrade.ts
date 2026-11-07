@@ -29,6 +29,9 @@ async function loadRazorpay(): Promise<void> {
   });
 }
 
+/** The server refused to start a checkout, with a reason to show as-is. */
+class CheckoutRefused extends Error {}
+
 interface SubscriptionResponse {
   subscriptionId: string;
   currency: string;
@@ -50,6 +53,7 @@ async function createSubscription(user: User): Promise<SubscriptionResponse> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
+    if (res.status === 409 && err.error) throw new CheckoutRefused(err.error);
     throw new Error(err.error ?? `Subscription creation failed (${res.status})`);
   }
   return res.json();
@@ -112,8 +116,7 @@ export function useUpgrade({
     setError(null);
 
     try {
-      // Fresh subscription every time — a "created" subscription that was
-      // never paid is abandoned harmlessly.
+      // The server reuses an unpaid subscription from an earlier attempt.
       const [sub] = await Promise.all([
         createSubscription(user),
         loadRazorpay(),
@@ -164,6 +167,11 @@ export function useUpgrade({
 
       rzp.open();
     } catch (err) {
+      if (err instanceof CheckoutRefused) {
+        setError(err.message);
+        setLoading(false);
+        return;
+      }
       const message = err instanceof Error ? err.message : "Unknown error";
       const isOrderError =
         message.startsWith("Subscription creation failed") ||
