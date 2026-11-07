@@ -12,6 +12,7 @@
 import { useState } from "react";
 import { css } from "@emotion/react";
 import { useAuth } from "@/hooks/useAuth";
+import { track } from "@/lib/analytics";
 import { C, RADIUS } from "@/styles/tokens";
 
 function formatDate(iso?: string | null): string {
@@ -46,6 +47,7 @@ export default function ManageSubscription() {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error ?? "Cancellation failed");
       }
+      track("subscription_cancelled");
       await refreshProgress();
       setConfirming(false);
     } catch (err) {

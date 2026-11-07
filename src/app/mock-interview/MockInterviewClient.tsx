@@ -3,6 +3,7 @@
 "use client";
 
 import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import { track } from "@/lib/analytics";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -584,6 +585,7 @@ export default function MockInterviewClient({ topics }: Props) {
     setMessages([]);
     setTurns(0);
     setTimeLeft(INTERVIEW_SECS);
+    track("mock_interview_started");
     requestOpening();
   }
 
@@ -609,6 +611,7 @@ export default function MockInterviewClient({ topics }: Props) {
       if (card) {
         setEvaluating(false);
         setScorecard(card);
+        track("mock_interview_completed", { overall: card.overall });
         await saveHistory(msgs, card);
         setPhase("result");
       } else if (isFinal) {

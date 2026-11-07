@@ -21,6 +21,7 @@ import AnswerEvaluator from "@/components/ui/AnswerEvaluator/page";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import * as S from "./styles";
 import type { Question } from "@/types/question";
+import { track } from "@/lib/analytics";
 
 type ActivePanel = "chat" | "eval" | null;
 
@@ -77,7 +78,15 @@ export default function TheoryCard({
   function handleMastered() {
     requirePro(
       "Progress tracking is a Pro feature. Upgrade to mark questions as mastered.",
-      () => onMastered?.(),
+      () => {
+        if (!isMastered)
+          track("practice_answered", {
+            question_type: "theory",
+            track: q.track,
+            correct: true,
+          });
+        onMastered?.();
+      },
     );
   }
   function handleBookmark() {

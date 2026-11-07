@@ -14,6 +14,7 @@ import { getTopicFaqs, TOPIC_FAQS } from "@/data/seo/topicFaqs";
 import TopicQuestionList from "./TopicQuestionList";
 import { DocClose, DocHero, LinkGrid } from "@/components/seo/DocParts";
 import { trackFromSlug } from "@/lib/getServerTrack";
+import { escapeCodeTags } from "@/lib/escapeCodeTags";
 import type { Track } from "@/lib/tracks";
 
 export const revalidate = 3600;
@@ -172,7 +173,7 @@ export default async function TopicPage({ params }: Props) {
                 <h2 className="doc-h2">The Explanation</h2>
                 <div
                   className="concept-body"
-                  dangerouslySetInnerHTML={{ __html: topic.deepDive }}
+                  dangerouslySetInnerHTML={{ __html: escapeCodeTags(topic.deepDive) }}
                 />
               </section>
             )}

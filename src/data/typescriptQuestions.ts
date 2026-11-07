@@ -164,7 +164,9 @@ const p3: Point = { x: 1, y: 2, label: 'origin' }; // Error: 'label' not in Poin
 // All of these work — all have x and y:
 printPoint({ x: 1, y: 2 });
 printPoint(new Vector(1, 2));
-printPoint({ x: 1, y: 2, z: 3 }); // extra props OK in this context</code></pre>
+const p3d = { x: 1, y: 2, z: 3 };
+printPoint(p3d); // ✅ extra props OK — not a fresh literal
+// printPoint({ x: 1, y: 2, z: 3 }); // ❌ Error: excess property 'z' on a fresh literal</code></pre>
 <div class="tip">💡 Structural typing is why TypeScript feels flexible. You can define interfaces after the fact to describe shapes that already exist — great for working with third-party code.</div>`,
   },
 
@@ -304,7 +306,7 @@ type NonNullable&lt;T&gt; = T extends null | undefined ? never : T;</code></pre>
 <li>Use <strong>type</strong> for unions, computed types, tuples, and function signatures</li>
 <li>Be consistent within a codebase — consistency matters more than which one you pick</li>
 </ul>
-<div class="tip">💡 The React team recommends <code>interface</code> for component props and <code>type</code> for everything else. Both work for most cases — pick a style and stick to it.</div>`,
+<div class="tip">💡 A common convention is <code>interface</code> for component props and object shapes, <code>type</code> for everything else. Both work for most cases — pick a style and stick to it.</div>`,
   },
 
   {
@@ -332,11 +334,12 @@ function process(r: Result&lt;number&gt;) {
   else console.log(r.error);
 }</code></pre>
 <p><strong>const assertions</strong> — widen prevention:</p>
-<pre><code>// Without const — inferred as string
-const dir = 'north'; // type: string (widened)
+<pre><code>// let widens to string; const keeps the literal
+let dir = 'north';     // type: string (widened)
+const dir2 = 'north'; // type: "north"
 
-// With const — inferred as literal type
-const dir2 = 'north' as const; // type: "north"
+// as const stops widening where const alone can't
+let dir3 = 'north' as const; // type: "north"
 
 // Object with const — all properties become readonly literals
 const config = { host: 'localhost', port: 3000 } as const;
@@ -433,25 +436,24 @@ function copyFields&lt;T extends U, U&gt;(target: T, source: U): T {
     hint: 'Like default function parameters — a fallback type when the type argument is not specified',
     answer: `<p><strong>Default type parameters</strong> provide a fallback type when the caller doesn't explicitly provide one.</p>
 <pre><code>// Without default — must always specify T
-interface Event&lt;T&gt; {
+interface AppEvent&lt;T&gt; {
   type: string;
   payload: T;
 }
 
 // With default — T falls back to unknown when not specified
-interface Event&lt;T = unknown&gt; {
+interface AppEvent&lt;T = unknown&gt; {
   type: string;
   payload: T;
 }
 
-const genericEvent: Event = { type: 'click', payload: { x: 10 } };
+const genericEvent: AppEvent = { type: 'click', payload: { x: 10 } };
 // T inferred as unknown — must narrow payload before using
 
-const typedEvent: Event&lt;MouseData&gt; = { type: 'click', payload: mouseData };
+const typedEvent: AppEvent&lt;MouseData&gt; = { type: 'click', payload: mouseData };
 // T is MouseData — payload is fully typed</code></pre>
 <p><strong>Practical use cases:</strong></p>
-<pre><code>// Promise default is unknown in strict mode, any otherwise
-// Custom Result type with default error type
+<pre><code>// Custom Result type with default error type
 type Result&lt;T, E = Error&gt; = { ok: true; value: T } | { ok: false; error: E };
 
 function fetchUser(): Promise&lt;Result&lt;User&gt;&gt; {
@@ -537,7 +539,7 @@ class Queue&lt;T&gt; {
 const q = new Queue&lt;string&gt;();   // explicit
 const q2 = new Queue();           // T inferred as unknown without explicit arg
 q.enqueue('hello');
-q2.enqueue(42); // T inferred as number from first enqueue</code></pre>
+q2.enqueue(42); // T stays unknown — class type args aren't inferred from later calls</code></pre>
 <div class="tip">💡 Generic function inference is powerful because callers rarely need to write <code>&lt;T&gt;</code> explicitly — TypeScript figures it out. Only specify the type parameter when inference fails or you want to constrain the result type.</div>`,
   },
 
@@ -770,7 +772,9 @@ type FetchResult = ReturnType&lt;typeof fetchUser&gt;; // Promise&lt;User&gt;
 type User2 = Awaited&lt;ReturnType&lt;typeof fetchUser&gt;&gt;; // User (unwrapped)
 
 // Useful when the return type is complex and you don't want to duplicate it
-const config = { theme: 'dark', lang: 'en', debug: false };
+function createConfig() {
+  return { theme: 'dark', lang: 'en', debug: false };
+}
 type Config = ReturnType&lt;typeof createConfig&gt;; // mirrors the function output</code></pre>
 <p><strong>Parameters&lt;T&gt;</strong> — extracts the parameter types as a tuple:</p>
 <pre><code>function createUser(name: string, age: number, admin?: boolean): User { /* ... */ }
@@ -938,7 +942,7 @@ type OnlyStrings&lt;T&gt; = {
   readonly id: string;          // set once in constructor, never changed
   public owner: string;         // accessible everywhere (default)
   protected balance: number;    // accessible in this class and subclasses
-  private #internalRef: string; // true private (JS private field — runtime enforced)
+  #internalRef: string;         // true private (JS private field — runtime enforced)
 
   private log(msg: string) {    // TS private — compile-time only
     console.log(msg);

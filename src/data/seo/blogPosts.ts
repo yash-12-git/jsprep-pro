@@ -2508,7 +2508,7 @@ const useStore = create(set => ({
 const count = useStore(s => s.count)
 \`\`\`
 
-**Jotai / Recoil** — atomic state model. Components subscribe to individual atoms, not a global store. Each atom re-renders only its subscribers.
+**Jotai** — atomic state model. Components subscribe to individual atoms, not a global store. Each atom re-renders only its subscribers.
 
 ## Decision Matrix
 

@@ -19,6 +19,7 @@
 
 import { aiErrorMessage, postAI } from "@/lib/aiClient";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
+import { escapeCodeTags } from "@/lib/escapeCodeTags";
 import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 import {
@@ -718,7 +719,7 @@ export default function QOTDInteractive({
           {q.hint && <div css={hintBox}>{q.hint}</div>}
           <div
             css={answerBody}
-            dangerouslySetInnerHTML={{ __html: q.answer ?? "" }}
+            dangerouslySetInnerHTML={{ __html: escapeCodeTags(q.answer ?? "") }}
           />
         </div>
       )}

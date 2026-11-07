@@ -15,6 +15,7 @@ import {
   demoteH1,
 } from "@/lib/seo/seo";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
+import { escapeCodeTags } from "@/lib/escapeCodeTags";
 import { C } from "@/styles/tokens";
 
 interface Props {
@@ -90,7 +91,9 @@ export default async function QuestionPage({ params }: Props) {
     .filter((q) => q.id !== question.id && q.category === question.category)
     .slice(0, 4);
 
-  const answerHtml = demoteH1(markdownToHtml(question.answer ?? ""));
+  const answerHtml = escapeCodeTags(
+    demoteH1(markdownToHtml(question.answer ?? "")),
+  );
   const plainAnswer = (question.answer ?? "")
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")

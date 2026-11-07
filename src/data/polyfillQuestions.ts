@@ -167,8 +167,6 @@ function resetCursor() { cursor = 0; }`,
     console.log(state3.count === 9 ? 'PASS: dec works' : 'FAIL: dec works — got ' + state3.count);
 
     hooks = []; cursor = 0;
-    const [ls] = useReducer((s,a) => s, null, (init) => ({ value: init * 2 }), 5);
-    resetCursor();
     const [ls2] = useReducer((s,a) => s, 5, (init) => ({ value: init * 2 }));
     console.log(ls2.value === 10 ? 'PASS: lazy init' : 'FAIL: lazy init — got ' + JSON.stringify(ls2));
   } catch(e) { console.log('FAIL: threw — ' + e.message); }

@@ -6,6 +6,8 @@ import { Zap, X, CheckCircle } from "lucide-react";
 import * as S from "./styles";
 import { C } from "@/styles/tokens";
 import { proFeatures } from "@/data/homepageStaticData";
+import { useEffect } from "react";
+import { track } from "@/lib/analytics";
 
 interface Props {
   onClose?: () => void;
@@ -16,6 +18,10 @@ export default function PaywallBanner({ onClose, reason }: Props) {
   const pricing = usePricing();
   // Checkout lives entirely in useUpgrade — this component only renders it.
   const { handleUpgrade, loading, error } = useUpgrade({ onSuccess: onClose });
+
+  useEffect(() => {
+    track("paywall_shown", { reason, path: window.location.pathname });
+  }, [reason]);
 
   return (
     <div css={S.overlay}>

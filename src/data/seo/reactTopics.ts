@@ -1534,7 +1534,7 @@ function NavLink() {
     ],
 
     realWorldExamples: [
-      "Multi-page SPAs: React Router apps split each page route into its own chunk — the /checkout page code isn't downloaded until the user navigates to it, cutting initial bundle size by 60-80% for large apps.",
+      "Multi-page SPAs: React Router apps split each page route into its own chunk — the /checkout page code isn't downloaded until the user navigates to it, cutting the initial bundle substantially for large apps.",
       "Heavy feature modules: a rich text editor (TipTap, Quill) or data visualisation library (D3, Recharts) is only loaded when the user opens the feature that needs it, not on every page load.",
       "Admin panels: admin features are lazily loaded because most users never access them — splitting /admin routes means regular users never pay the download cost for admin-only code.",
       "Internationalisation: instead of bundling all locale files upfront, lazy-load the specific locale module when the user selects their language.",

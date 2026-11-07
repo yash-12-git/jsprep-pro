@@ -55,6 +55,47 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // ─── Lightweight Markdown → HTML ─────────────────────────────────────────────
+// A text block can hold a pipe table or a numbered list, sometimes straight
+// after a lead-in line ("**Interview answer flow:**\n1. …"), so it is read line
+// by line; anything else stays one paragraph.
+function mdBlock(block: string): string {
+  const out: string[] = [];
+  let para: string[] = [];
+  const flush = () => {
+    if (para.length) out.push(`<p>${para.join(" ")}</p>`);
+    para = [];
+  };
+  const cells = (row: string) =>
+    row.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+  const lines = block.split("\n");
+  for (let i = 0; i < lines.length; ) {
+    if (lines[i].trim().startsWith("|")) {
+      flush();
+      const rows: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith("|")) rows.push(lines[i++]);
+      const [head, ...body] = rows.filter((r) => !/^\|[\s:|-]+\|?$/.test(r.trim()));
+      out.push(
+        `<table><thead><tr>${cells(head).map((c) => `<th>${c}</th>`).join("")}</tr></thead>` +
+          `<tbody>${body.map((r) => `<tr>${cells(r).map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`,
+      );
+    } else if (/^-{3,}$/.test(lines[i].trim())) {
+      flush();
+      out.push("<hr />");
+      i++;
+    } else if (/^\d+\.\s/.test(lines[i])) {
+      flush();
+      const items: string[] = [];
+      while (i < lines.length && /^\d+\.\s/.test(lines[i]))
+        items.push(lines[i++].replace(/^\d+\.\s+/, ""));
+      out.push(`<ol>${items.map((li) => `<li>${li}</li>`).join("")}</ol>`);
+    } else {
+      para.push(lines[i++]);
+    }
+  }
+  flush();
+  return out.join("\n");
+}
+
 function md(content: string): string {
   // Code is set aside first, so that `# comments`, blank lines and asterisks
   // inside it aren't treated as Markdown. The page hero already shows the title,
@@ -71,7 +112,12 @@ function md(content: string): string {
         ) +
         "\n\n",
     )
-    .replace(/`([^`]+)`/g, (_, inline) => stash(`<code>${inline}</code>`))
+    .replace(/`([^`]+)`/g, (_, inline) =>
+      stash(`<code>${inline.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`),
+    )
+    // Posts are Markdown with no raw HTML, so a bare `<` in prose is a generic
+    // like Partial<T>; escaped, it shows instead of parsing as a <t> element.
+    .replace(/</g, "&lt;")
     .replace(/^\s*# .+\n?/, "")
     .replace(/^### (.+)$/gm, "<h3>$1</h3>")
     .replace(/^##? (.+)$/gm, "<h2>$1</h2>")
@@ -85,7 +131,7 @@ function md(content: string): string {
       const t = b.trim();
       if (!t) return "";
       if (/^(<(h[2-3]|ul|blockquote)|@@CODE\d+@@$)/.test(t)) return t;
-      return `<p>${t.replace(/\n/g, " ")}</p>`;
+      return mdBlock(t);
     })
     .join("\n")
     .replace(/@@CODE(\d+)@@/g, (_, i) => code[Number(i)]);

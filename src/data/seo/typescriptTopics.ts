@@ -1233,7 +1233,7 @@ const c: A = new C(); // OK — C is structurally compatible with A</code></pre>
       "Repository pattern: abstract Repository<T> with abstract CRUD methods is a standard architecture pattern in NestJS, TypeORM, and Prisma-based backends — concrete repositories implement the abstract methods per entity.",
       "Event emitter encapsulation: private listeners map in an EventEmitter class prevents external code from directly manipulating the listener registry, while protected methods let subclasses hook into the emit lifecycle.",
       "React class components (legacy): public render(), private handleClick(), protected shouldRenderSidebar() map directly to the mental model of what API surface should be part of the contract vs internal implementation.",
-      "NestJS providers: TypeScript classes with @Injectable(), private readonly dependencies injected via constructor parameter properties, and public methods forming the service API — parameter properties save 30–50% of boilerplate in medium-size services.",
+      "NestJS providers: TypeScript classes with @Injectable(), private readonly dependencies injected via constructor parameter properties, and public methods forming the service API — parameter properties save a lot of boilerplate in medium-size services.",
       "Sensitive data holders: # hard private fields for token storage in auth utilities, ensuring that even injected runtime code or serialization libraries cannot accidentally expose the field — TypeScript private would not provide this guarantee.",
     ],
 

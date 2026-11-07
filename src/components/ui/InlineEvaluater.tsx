@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import { track } from "@/lib/analytics";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { css } from "@emotion/react";
 import { useState } from "react";
@@ -340,7 +341,11 @@ export default function InlineEvaluator({
         messages: [{ role: "user", content: answer }],
         context: { question, idealAnswer },
       });
-      setResult(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
+      const parsed: EvalResult = JSON.parse(
+        data.text.replace(/```json|```/g, "").trim(),
+      );
+      setResult(parsed);
+      track("ai_evaluation_shown", { kind: "theory", score: parsed.score });
     } catch (err) {
       console.error("[InlineEvaluator] evaluation failed", err);
       setAiError(aiErrorMessage(err));

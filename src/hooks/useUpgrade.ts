@@ -11,6 +11,7 @@ import { useState, useCallback } from "react";
 import { User } from "firebase/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { C } from "@/styles/tokens";
+import { track } from "@/lib/analytics";
 
 declare global {
   interface Window {
@@ -121,6 +122,8 @@ export function useUpgrade({
         createSubscription(user),
         loadRazorpay(),
       ]);
+      // Amounts are in the smallest currency unit (paise, cents).
+      const value = sub.amount / 100;
 
       const rzp = new window.Razorpay({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -135,11 +138,19 @@ export function useUpgrade({
         },
         theme: { color: C.accent },
         modal: {
-          ondismiss: () => setLoading(false),
+          ondismiss: () => {
+            track("checkout_failed", { stage: "dismissed" });
+            setLoading(false);
+          },
         },
         handler: async (response: RazorpaySuccess) => {
           try {
             await verifyPayment(user, response);
+            track("purchase", {
+              transaction_id: response.razorpay_payment_id,
+              currency: sub.currency,
+              value,
+            });
             await refreshProgress();
             onSuccess?.();
           } catch (err) {
@@ -158,6 +169,7 @@ export function useUpgrade({
       rzp.on(
         "payment.failed",
         (response: { error: { description: string } }) => {
+          track("checkout_failed", { stage: "payment" });
           setError(
             response.error?.description ?? "Payment failed. Please try again.",
           );
@@ -166,7 +178,11 @@ export function useUpgrade({
       );
 
       rzp.open();
+      track("begin_checkout", { currency: sub.currency, value });
     } catch (err) {
+      track("checkout_failed", {
+        stage: err instanceof CheckoutRefused ? "refused" : "start",
+      });
       if (err instanceof CheckoutRefused) {
         setError(err.message);
         setLoading(false);

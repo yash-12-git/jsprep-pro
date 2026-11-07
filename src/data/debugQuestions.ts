@@ -182,7 +182,9 @@ formValue = 'Alice'; // user types
 handleSubmit();       // still reads ''
 
 formValue = 'Bob';
-handleSubmit();`,
+handleSubmit();
+
+log.forEach(line => console.log(line));`,
     bugDescription:
       "capturedValue is '' because createSubmitHandler was called before formValue was updated. Empty deps ([]) means the handler is never recreated.",
     fixedCode: `let formValue = '';
@@ -205,7 +207,9 @@ handleSubmit();
 
 formValue = 'Bob';
 handleSubmit = createSubmitHandler(formValue);
-handleSubmit();`,
+handleSubmit();
+
+log.forEach(line => console.log(line));`,
     expectedOutput: "valid: Alice\nvalid: Bob",
     explanation:
       "Recreating the handler with the current value as a parameter breaks the stale closure. In React, this means adding formValue to useCallback's dep array.",

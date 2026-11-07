@@ -247,7 +247,7 @@ function List({ items }) {
 <tr><td>componentWillUnmount</td><td>useEffect(() => { return () => cleanup() }, [])</td></tr>
 <tr><td>shouldComponentUpdate</td><td>React.memo + useMemo</td></tr>
 <tr><td>getDerivedStateFromProps</td><td>Compute during render (no hook needed)</td></tr>
-<tr><td>getSnapshotBeforeUpdate</td><td>useLayoutEffect return value (rare)</td></tr>
+<tr><td>getSnapshotBeforeUpdate</td><td>No hook equivalent (rare — use a class component)</td></tr>
 </table>
 <pre><code>useEffect(() => {
   // componentDidMount — runs after first render
@@ -696,7 +696,7 @@ const FancyInput = forwardRef(function FancyInput(props, ref) {
 const ref = useRef();
 ref.current.focus(); // ✅
 ref.current.value;   // ❌ undefined — not exposed</code></pre>
-<div class="tip">💡 Use forwardRef sparingly — it tightly couples parent to child internals. Most of the time you can solve the problem with a controlled component pattern instead. Use it mainly for UI library components (inputs, modals).</div>`
+<div class="tip">💡 Use forwardRef sparingly — it tightly couples parent to child internals. Most of the time you can solve the problem with a controlled component pattern instead. Use it mainly for UI library components (inputs, modals). In React 19, function components receive <code>ref</code> as a regular prop, so new code rarely needs forwardRef.</div>`
   },
 
   // ─── STATE MANAGEMENT ─────────────────────────────────────────────────────
@@ -710,12 +710,12 @@ ref.current.value;   // ❌ undefined — not exposed</code></pre>
 <li><strong>useState / useReducer</strong> — component-local state. First choice always.</li>
 <li><strong>Lifting state up</strong> — share between sibling components via common ancestor.</li>
 <li><strong>Context + useReducer</strong> — low-frequency global state (theme, auth, locale). Don't put rapidly-changing state here.</li>
-<li><strong>Zustand / Jotai / Recoil</strong> — global state with fine-grained subscriptions. Components only re-render when their slice changes.</li>
+<li><strong>Zustand / Jotai</strong> — global state with fine-grained subscriptions. Components only re-render when their slice changes.</li>
 <li><strong>Redux Toolkit</strong> — large teams, complex state, need time-travel debugging, strict patterns.</li>
 <li><strong>React Query / SWR</strong> — server state (fetched data). Cache, invalidation, background refresh. NOT the same as UI state.</li>
 </ul>
 <pre><code>// Server state — always React Query or SWR, not useState
-const { data, loading, error } = useQuery(['user', id], () => fetchUser(id));
+const { data, isLoading, error } = useQuery({ queryKey: ['user', id], queryFn: () => fetchUser(id) });
 
 // Global UI state (e.g. sidebar open) — Zustand
 const useSidebar = create(set => ({
@@ -724,7 +724,7 @@ const useSidebar = create(set => ({
 }));
 
 // Form state — react-hook-form or local useState</code></pre>
-<div class="tip">💡 80% of "state management" problems are actually server state problems. React Query eliminates huge amounts of boilerplate (loading, error, refetch, caching) that people used to put in Redux.</div>`
+<div class="tip">💡 Many "state management" problems are actually server state problems. React Query eliminates huge amounts of boilerplate (loading, error, refetch, caching) that people used to put in Redux.</div>`
   },
 
   {
@@ -911,7 +911,7 @@ function UserList({ users }) {
 
 // ✅ Modern way — custom hook achieves the same separation
 function useUsers() {
-  return useQuery(['users'], fetchUsers);
+  return useQuery({ queryKey: ['users'], queryFn: fetchUsers });
 }
 
 // Presentational component stays the same
@@ -949,8 +949,8 @@ function Parent() {
   const [count, setCount] = useState(0);
 
   // ❌ New array reference every render → memo useless
-  const items = [{ id: 1 }, { id: 2 }];
-  const onSelect = (id) => console.log(id);
+  // const items = [{ id: 1 }, { id: 2 }];
+  // const onSelect = (id) => console.log(id);
 
   // ✅ Stable references
   const items = useMemo(() => [{ id: 1 }, { id: 2 }], []);
@@ -1724,7 +1724,7 @@ function UpdateUser() {
     </button>
   );
 }</code></pre>
-<div class="tip">💡 React Query eliminates ~80% of what people used Redux for — loading states, error states, cached server data, and refetch logic. Use Redux or Zustand only for genuine UI state (modals, sidebars, form wizards).</div>`
+<div class="tip">💡 React Query replaces much of what people used Redux for — loading states, error states, cached server data, and refetch logic. Use Redux or Zustand only for genuine UI state (modals, sidebars, form wizards).</div>`
   },
 
   {
@@ -1783,7 +1783,7 @@ function CartTotal() {
 <tr><th></th><th>Create React App</th><th>Vite</th></tr>
 <tr><td>Dev server start</td><td>30-60s (bundles everything)</td><td>&lt;300ms (no bundling)</td></tr>
 <tr><td>HMR (hot reload)</td><td>Slow (rebundles)</td><td>Instant (native ESM)</td></tr>
-<tr><td>Build tool</td><td>webpack</td><td>Rollup (prod), esbuild (dev)</td></tr>
+<tr><td>Build tool</td><td>webpack</td><td>Rollup + esbuild (Rolldown from Vite 8)</td></tr>
 <tr><td>Config</td><td>Ejection required</td><td>vite.config.ts</td></tr>
 <tr><td>Maintenance</td><td>Unmaintained</td><td>Actively maintained</td></tr>
 </table>
@@ -1800,10 +1800,10 @@ npx create-react-app my-app --template typescript  # avoid</code></pre>
 <p><strong>Alternatives for production apps:</strong></p>
 <ul>
 <li><strong>Next.js</strong> — SSR, SSG, RSC, file-based routing</li>
-<li><strong>Remix</strong> — full-stack, nested routing, web standards</li>
+<li><strong>React Router v7</strong> (formerly Remix) — full-stack, nested routing, web standards</li>
 <li><strong>Vite + React Router</strong> — SPA with full control</li>
 </ul>
-<div class="tip">💡 The React team no longer recommends CRA. Their official docs point to Next.js, Remix, or Vite as starting points depending on your needs.</div>`
+<div class="tip">💡 The React team no longer recommends CRA. Their official docs point to Next.js, React Router v7 (formerly Remix), or Vite as starting points depending on your needs.</div>`
   },
 
   {

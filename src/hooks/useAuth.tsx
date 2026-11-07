@@ -9,11 +9,13 @@ import {
 } from "react";
 import {
   User,
+  getAdditionalUserInfo,
   onAuthStateChanged,
   signInWithPopup,
   signOut,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
+import { track } from "@/lib/analytics";
 import { getUserProgressAndStreak, UserProgress } from "@/lib/userProgress";
 
 interface AuthContextType {
@@ -73,7 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function signInWithGoogle() {
-    await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    const isNew = getAdditionalUserInfo(result)?.isNewUser ?? false;
+    track(isNew ? "sign_up" : "login", { method: "google" });
   }
 
   async function logout() {

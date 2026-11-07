@@ -12,6 +12,7 @@
  */
 
 import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import { track } from "@/lib/analytics";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
@@ -199,6 +200,12 @@ export default function DebugCard({
 
       const fb = normalizeAIResponse(raw);
       setFeedback(fb);
+      track("practice_answered", {
+        question_type: "debug",
+        track: q.track,
+        correct: fb.correct,
+      });
+      track("ai_evaluation_shown", { kind: "debug", score: fb.score });
       if (fb.correct && isPro && !persistedSolved)
         recordSolved(q.id).catch(() => {});
       setUiPhase("feedback");

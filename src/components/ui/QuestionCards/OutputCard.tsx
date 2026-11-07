@@ -22,6 +22,7 @@ import { C } from "@/styles/tokens";
 import * as S from "./styles";
 import type { Question } from "@/types/question";
 import type { RunResult } from "@/lib/codeRunner";
+import { track } from "@/lib/analytics";
 
 const CodeEditor = dynamic(
   () => import("@/components/ui/CodeEditor/CodeEditor"),
@@ -174,6 +175,11 @@ export default function OutputCard({
       ua === correct ||
       ua.split("\n").join(",") === correct.split("\n").join(",") ||
       (isErrorQuestion && conceptMatches(answer));
+    track("practice_answered", {
+      question_type: "output",
+      track: q.track,
+      correct: match,
+    });
     if (match) {
       !isSolved(q.id) && isPro && (await recordSolved(q.id));
       setLocalWrong(false);

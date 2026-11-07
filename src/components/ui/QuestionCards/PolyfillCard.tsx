@@ -20,6 +20,7 @@ import * as Shared from "@/styles/shared";
 import * as S from "./styles";
 import { C } from "@/styles/tokens";
 import type { RunResult } from "@/lib/codeRunner";
+import { track } from "@/lib/analytics";
 import { Question } from "@/types/question";
 
 const CodeEditor = dynamic(
@@ -126,6 +127,11 @@ export default function PolyfillCard({
         !result.timed_out &&
         results.length > 0 &&
         results.every((r) => r.passed);
+      track("practice_answered", {
+        question_type: "polyfill",
+        track: q.track,
+        correct: allTestsPassed,
+      });
       if (
         allTestsPassed &&
         !isSolved(q.id) &&
@@ -139,7 +145,7 @@ export default function PolyfillCard({
     } finally {
       setRunning(false);
     }
-  }, [userCode, q.id, q.testCode, isSolved, isPro, recordSolved]);
+  }, [userCode, q.id, q.testCode, q.track, isSolved, isPro, recordSolved]);
 
   function handleReset() {
     setUserCode(q.code ?? "");

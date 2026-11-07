@@ -10,6 +10,7 @@ import {
   type SavedSprint,
 } from "@/lib/sprintHistory";
 import type { Question } from "@/types/question";
+import { track } from "@/lib/analytics";
 import type {
   SprintConfig,
   QuestionResult,
@@ -194,6 +195,7 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
     setCurrentIdx(0);
     startTimeRef.current = Date.now();
     setPhase("active");
+    track("sprint_started", { question_count: mixed.length });
     // On a phone the start button is below the fold; begin at the question.
     window.scrollTo(0, 0);
   }
@@ -232,6 +234,11 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
       };
       setSummary(s);
       setPhase("results");
+      track("sprint_completed", {
+        question_count: finalResults.length,
+        accuracy,
+        signed_in: Boolean(uid),
+      });
       window.scrollTo(0, 0);
 
       const saved: SavedSprint = {

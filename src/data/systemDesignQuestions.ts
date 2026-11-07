@@ -131,7 +131,7 @@ import Counter from './Counter.tsx'; // React component
     hint: 'Googlebot can render JS but it is deferred and unreliable; SSR guarantees crawlers get full HTML immediately',
     answer: `<p><strong>CSR SEO concerns:</strong></p>
 <ul>
-<li>Googlebot does render JavaScript but via a second wave deferred by days or weeks — content may not be indexed promptly.</li>
+<li>Googlebot does render JavaScript, but pages wait in a rendering queue first, so content can be indexed later than server-rendered HTML.</li>
 <li>Other crawlers (Bing, social previews, Slack unfurls) do <em>not</em> execute JavaScript — they see an empty shell.</li>
 <li>Meta tags for OG / Twitter cards are missing on CSR pages without SSR or a pre-rendering service.</li>
 </ul>
@@ -139,12 +139,12 @@ import Counter from './Counter.tsx'; // React component
 <ul>
 <li>Full HTML is available on first byte — crawlers index it immediately.</li>
 <li>Title, description, canonical, structured data are all present in the initial response.</li>
-<li>Faster TTFB and FCP improve Google's page experience signals (LCP, CLS).</li>
+<li>HTML that arrives ready to paint usually improves LCP, one of the Core Web Vitals in Google's page experience signals.</li>
 </ul>
 <p><strong>Mitigation options for CSR:</strong></p>
 <ul>
 <li>Use a pre-rendering service (Prerender.io) for non-Google crawlers.</li>
-<li>Dynamic rendering — detect crawler user-agents and serve SSR HTML.</li>
+<li>Dynamic rendering (serving crawlers pre-rendered HTML) — Google now calls this a workaround, not a long-term solution.</li>
 <li>Migrate high-priority landing pages to SSR or SSG.</li>
 </ul>`,
   },
@@ -269,7 +269,7 @@ start();</code></pre>
 <table>
 <tr><th></th><th>Single-SPA</th><th>Module Federation</th></tr>
 <tr><td>What it solves</td><td>Routing & lifecycle</td><td>Module sharing</td></tr>
-<tr><td>Framework-agnostic</td><td>Yes</td><td>Webpack-only</td></tr>
+<tr><td>Framework-agnostic</td><td>Yes</td><td>Bundler-based (webpack, Rspack; Vite via plugins)</td></tr>
 <tr><td>Dependency sharing</td><td>No</td><td>Yes (singleton)</td></tr>
 <tr><td>Partial page embedding</td><td>Hard</td><td>Easy</td></tr>
 </table>
@@ -312,7 +312,7 @@ start();</code></pre>
 </ol>
 <pre><code>// turbo.json
 {
-  "pipeline": {
+  "tasks": {               // called "pipeline" before Turborepo 2.0
     "build": {
       "dependsOn": ["^build"],  // build deps first
       "outputs": ["dist/**"],
@@ -350,7 +350,7 @@ start();</code></pre>
   {
     id: 6016, cat: 'Monorepo', tags: ['core'],
     q: 'What are pnpm workspaces and why are they preferred in monorepos?',
-    hint: 'pnpm hoists deps once via hard links — saves disk space and prevents phantom dependencies vs npm/yarn workspaces',
+    hint: 'pnpm stores each package version once and hard-links it into projects; its strict, non-hoisted node_modules prevents phantom dependencies',
     answer: `<p><strong>pnpm workspaces</strong> link all packages in a monorepo together so they can import each other as if they were published packages, while sharing a single <code>node_modules</code> store.</p>
 <pre><code># pnpm-workspace.yaml
 packages:
@@ -520,7 +520,7 @@ function App() {
   ) : &lt;button onClick={() => setOpen(true)}&gt;Open&lt;/button&gt;;
 }</code></pre>
 <p>The Modal bundle is only downloaded when the user clicks "Open" — not on initial page load.</p>
-<p><strong>Impact:</strong> route-level lazy loading is typically the highest-ROI optimization — initial bundle can shrink 40–70% for content-rich apps.</p>`,
+<p><strong>Impact:</strong> route-level lazy loading is often the highest-ROI optimization, because the initial bundle only carries what the first screen needs.</p>`,
   },
 
   // ─── CACHING STRATEGIES (6024–6029) ──────────────────────────────────────
@@ -536,7 +536,7 @@ function App() {
 <li><code>s-maxage=N</code> — like max-age but only for shared caches (CDNs). Overrides max-age for CDNs.</li>
 <li><code>no-cache</code> — don't serve from cache without revalidating with the server first (304 check). Despite the name, it <em>does</em> cache.</li>
 <li><code>no-store</code> — never cache. Used for sensitive data (banking, personal health).</li>
-<li><code>immutable</code> — tells the browser the resource will never change; don't revalidate even if max-age expires. Used with content-hashed filenames.</li>
+<li><code>immutable</code> — tells the browser the file won't change while it's fresh, so it skips revalidation even when the user reloads. Pair it with a long max-age. Used with content-hashed filenames.</li>
 <li><code>stale-while-revalidate=N</code> — serve stale for up to N seconds while fetching a fresh copy in the background.</li>
 <li><code>public</code> — CDNs are allowed to cache. <code>private</code> — only the browser may cache (not CDNs).</li>
 </ul>
@@ -643,7 +643,7 @@ Content-Type: text/html</code></pre>
 </ul>
 <p><strong>Common patterns to manage it:</strong></p>
 <ul>
-<li>Content-hashed URLs — invalides automatically when content changes (no explicit purge needed).</li>
+<li>Content-hashed URLs — invalidates automatically when content changes (no explicit purge needed).</li>
 <li>Short TTLs — accept stale windows rather than trying to purge proactively.</li>
 <li>CDN purge API — Cloudflare, Fastly provide tag-based purging (purge all edges caching a given tag).</li>
 <li>Cache-Control: <code>no-cache</code> + ETag — always revalidate but serve from cache on 304.</li>
@@ -658,7 +658,7 @@ Content-Type: text/html</code></pre>
     hint: 'localStorage is XSS-vulnerable; HttpOnly cookies are inaccessible to JS but need CSRF protection',
     answer: `<p><strong>localStorage</strong></p>
 <ul>
-<li>Accessible via JavaScript — any XSS vulnerability can steal the token: <code>document.cookie</code> — wait, actually <code>localStorage.getItem('token')</code>.</li>
+<li>Accessible via JavaScript — any XSS vulnerability can steal the token with <code>localStorage.getItem('token')</code>.</li>
 <li>Token theft = account takeover. Attacker can make authenticated API calls from anywhere.</li>
 <li>Not automatically sent to the server — must manually attach: <code>Authorization: Bearer &lt;token&gt;</code>.</li>
 </ul>
@@ -666,7 +666,7 @@ Content-Type: text/html</code></pre>
 <ul>
 <li><code>HttpOnly</code> flag prevents JavaScript from reading the cookie — XSS cannot steal it.</li>
 <li><code>Secure</code> flag ensures it only travels over HTTPS.</li>
-<li><code>SameSite=Strict/Lax</code> prevents CSRF — cookie not sent on cross-origin requests.</li>
+<li><code>SameSite=Strict/Lax</code> prevents CSRF — cookie not sent on cross-site requests (Lax still sends it on top-level navigations).</li>
 <li>Automatically included by the browser on every same-origin request — no manual header attachment.</li>
 </ul>
 <pre><code>Set-Cookie: token=&lt;jwt&gt;; HttpOnly; Secure; SameSite=Strict; Path=/</code></pre>
@@ -1141,7 +1141,7 @@ const name = useContextSelector(UserContext, (ctx) => ctx.user.name);</code></pr
     q: 'What is image optimization and what techniques does Next.js Image component apply?',
     hint: 'Modern format (WebP/AVIF), correct sizing, lazy loading, blur placeholder, priority flag for LCP images',
     answer: `<p>Images are the largest contributor to page weight in most apps. Key optimization techniques:</p>
-<p><strong>1. Modern formats</strong> — WebP is 25–35% smaller than JPEG; AVIF is 50% smaller. Next.js <code>&lt;Image&gt;</code> automatically serves WebP/AVIF via the <code>/api/_next/image</code> optimizer.</p>
+<p><strong>1. Modern formats</strong> — WebP is 25–35% smaller than JPEG; AVIF is 50% smaller. Next.js <code>&lt;Image&gt;</code> serves WebP automatically (and AVIF once you add it to <code>images.formats</code>) via the <code>/_next/image</code> optimizer.</p>
 <p><strong>2. Correct sizing (srcset)</strong> — serve a 300px image on mobile, not a 2000px image scaled down in CSS. Wastes bandwidth otherwise. Next.js generates srcset automatically from the <code>sizes</code> prop.</p>
 <p><strong>3. Lazy loading</strong> — images below the fold get <code>loading="lazy"</code> — browser only fetches when they enter the viewport.</p>
 <p><strong>4. Blur placeholder</strong> — while the image loads, a tiny blurred version (base64 inline) fills the space, preventing layout shift and improving perceived performance.</p>
@@ -1185,7 +1185,7 @@ const name = useContextSelector(UserContext, (ctx) => ctx.user.name);</code></pr
     id: 6053, cat: 'Network Optimization', tags: ['mid'],
     q: 'What is TTFB (Time to First Byte) and what factors affect it?',
     hint: 'Time between the browser sending a request and receiving the first byte of the response — affected by DNS, TCP, TLS, server processing, CDN',
-    answer: `<p><strong>TTFB</strong> measures the time from when the browser sends an HTTP request to when it receives the first byte of the response. Google's Core Web Vitals recommend TTFB under 800ms.</p>
+    answer: `<p><strong>TTFB</strong> measures the time from when the browser sends an HTTP request to when it receives the first byte of the response. TTFB isn't a Core Web Vital itself, but Google's guidance is to keep it under 800ms because it delays FCP and LCP.</p>
 <p><strong>What TTFB includes:</strong></p>
 <ol>
 <li>DNS resolution time.</li>
@@ -1328,11 +1328,19 @@ onINP(console.log);
 onCLS(console.log);</code></pre>
 <p>Call your analytics endpoint inside these callbacks to collect real-user data.</p>
 <p><strong>2. Next.js built-in</strong></p>
-<pre><code>// pages/_app.tsx or app/layout.tsx
-export function reportWebVitals(metric: NextWebVitalsMetric) {
-  console.log(metric); // { name: 'LCP', value: 1234, ... }
-  // send to your analytics
-}</code></pre>
+<pre><code>// app/_components/web-vitals.tsx
+'use client';
+import { useReportWebVitals } from 'next/web-vitals';
+
+export function WebVitals() {
+  useReportWebVitals((metric) => {
+    console.log(metric); // { name: 'LCP', value: 1234, ... }
+    // send to your analytics
+  });
+  return null;
+}
+
+// Render &lt;WebVitals /&gt; once in app/layout.tsx</code></pre>
 <p><strong>3. Chrome User Experience Report (CrUX)</strong> — real-field data from Chrome users, aggregated by URL. Accessible via PageSpeed Insights API or Google Search Console's Core Web Vitals report.</p>
 <p><strong>4. Lab tools for debugging</strong></p>
 <ul>

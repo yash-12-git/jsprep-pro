@@ -920,7 +920,7 @@ Turborepo wraps your existing package.json scripts. Minimal config, low learning
 // turbo.json
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "tasks": {      // called "pipeline" before Turborepo 2.0
     "build": {
       "dependsOn": ["^build"],   // build all dependencies first (^)
       "outputs": ["dist/**", ".next/**"]
@@ -1064,7 +1064,7 @@ Nx's \`affected\` is smarter than Turborepo's filter — it uses your actual imp
 - You need code generators for consistent scaffolding across teams
 - You're using Angular or deep Next.js integration
 
-**For a new project starting today:** Turborepo with pnpm workspaces is faster to adopt and covers 90% of monorepo needs. Add Nx if you later need generators or strict boundary enforcement.
+**For a new project starting today:** Turborepo with pnpm workspaces is faster to adopt and covers most monorepo needs. Add Nx if you later need generators or strict boundary enforcement.
 
 ---
 

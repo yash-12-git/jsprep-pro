@@ -3,6 +3,7 @@
 
 import { css } from "@emotion/react";
 import { C, RADIUS } from "@/styles/tokens";
+import { escapeCodeTags } from "@/lib/escapeCodeTags";
 
 interface Props {
   content: string;
@@ -247,7 +248,12 @@ export default function MarkdownRenderer({
   className,
   compact = false,
 }: Props) {
-  const html = parseMarkdown(content);
+  // Stored answers are already HTML; running the Markdown regexes over them
+  // turns `a * b * c` and snake_case inside code into <em>, and template
+  // literals into <code>. Only Markdown gets parsed.
+  const html = escapeCodeTags(
+    content.trimStart().startsWith("<") ? content : parseMarkdown(content),
+  );
   return (
     <div
       css={styles(compact)}

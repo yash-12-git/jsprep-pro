@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import { track } from "@/lib/analytics";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -121,7 +122,14 @@ export default function StudyPlanClientPage({
           streakDays: progress?.streakDays,
         },
       });
-      setPlan(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
+      const parsed: StudyPlan = JSON.parse(
+        data.text.replace(/```json|```/g, "").trim(),
+      );
+      setPlan(parsed);
+      track("study_plan_generated", {
+        readiness_score: parsed.readinessScore,
+        has_interview_date: Boolean(interviewDate),
+      });
     } catch (err) {
       console.error("[StudyPlan] generation failed", err);
       setPlanError(aiErrorMessage(err));

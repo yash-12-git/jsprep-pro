@@ -335,7 +335,7 @@ window.addEventListener('cart:updated', (e) =&gt; setCount(e.detail.count));</co
 <p>Turborepo (by Vercel) is a high-performance build system that wraps your existing package.json scripts. It adds a task graph layer on top of npm/pnpm/yarn workspaces.</p>
 <pre><code>// turbo.json
 {
-  "pipeline": {
+  "tasks": {               // called "pipeline" before Turborepo 2.0
     "build": {
       "dependsOn": ["^build"], // build dependencies first
       "outputs": ["dist/**"]   // cache these outputs
