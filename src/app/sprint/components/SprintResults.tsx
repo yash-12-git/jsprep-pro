@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
+import Link from "next/link";
 import { css, keyframes } from "@emotion/react";
 import { useState, useEffect } from "react";
 import {
@@ -1042,9 +1043,9 @@ export default function SprintResults({ summary, onRetry, signedIn }: Props) {
             <p style={{ margin: "0 0 0.75rem", fontSize: "0.875rem", color: C.text }}>
               Sign in to keep this result and see it on your dashboard.
             </p>
-            <a href="/auth?next=/dashboard" className="btn btn--primary">
+            <Link href="/auth?next=/dashboard" className="btn btn--primary">
               Save my result
-            </a>
+            </Link>
           </div>
         )}
 
@@ -1053,9 +1054,9 @@ export default function SprintResults({ summary, onRetry, signedIn }: Props) {
           <button css={S.retryBtn} onClick={onRetry}>
             <RotateCcw size={14} /> New Sprint
           </button>
-          <a href="/dashboard" css={S.practiceBtn}>
+          <Link href="/dashboard" css={S.practiceBtn}>
             Practice Weak Areas <ArrowRight size={14} />
-          </a>
+          </Link>
         </div>
       </div>
     </div>

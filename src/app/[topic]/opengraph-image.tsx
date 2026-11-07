@@ -26,8 +26,9 @@ const T = {
   amberBorder: "#f5ddb0",
 } as const;
 
-export default async function Image({ params }: { params: { topic: string } }) {
-  const topic = await getTopicBySlug(params.topic).catch(() => null);
+export default async function Image({ params }: { params: Promise<{ topic: string }> }) {
+  const { topic: slug } = await params;
+  const topic = await getTopicBySlug(slug).catch(() => null);
 
   const title = topic?.title ?? "JavaScript Interview Questions";
   const desc = topic?.description ?? "Practice questions with AI feedback";

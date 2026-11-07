@@ -19,7 +19,7 @@ import type { Track } from "@/lib/tracks";
 export const revalidate = 3600;
 
 interface Props {
-  params: { topic: string };
+  params: Promise<{ topic: string }>;
 }
 
 export async function generateStaticParams() {
@@ -32,7 +32,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const topic = await getTopicBySlug(params.topic);
+  const { topic: slug } = await params;
+  const topic = await getTopicBySlug(slug);
   if (!topic) return {};
   const hasConceptHub = !!(topic.mentalModel || topic.deepDive);
   return pageMeta({
@@ -53,9 +54,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TopicPage({ params }: Props) {
-  const topic = await getTopicBySlug(params.topic);
+  const { topic: slug } = await params;
+  const topic = await getTopicBySlug(slug);
   if (!topic) notFound();
-  const track: Track = (topic.track as Track | undefined) ?? trackFromSlug(params.topic);
+  const track: Track = (topic.track as Track | undefined) ?? trackFromSlug(slug);
   const { questions } = await getQuestions({
     filters: { track, status: "published", topicSlug: topic.slug },
     pageSize: 50,

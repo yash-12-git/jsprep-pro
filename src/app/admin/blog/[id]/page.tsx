@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getBlogPost, updateBlogPost, deleteBlogPost } from "@/lib/blogPosts";
@@ -12,28 +12,29 @@ import { ArrowLeft } from "lucide-react";
 export default function EditBlogPostPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = use(params);
   const router = useRouter();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getBlogPost(params.id).then((p) => {
+    getBlogPost(id).then((p) => {
       setPost(p);
       setLoading(false);
     });
-  }, [params.id]);
+  }, [id]);
 
   async function handleSubmit(data: BlogPostInput) {
-    await updateBlogPost(params.id, data);
+    await updateBlogPost(id, data);
     // Granular: only bust this post's cache, not all blog posts
     await revalidateBlogPost(data.slug);
     router.push("/admin/blog");
   }
 
   async function handleDelete() {
-    await deleteBlogPost(params.id);
+    await deleteBlogPost(id);
     router.push("/admin/blog");
   }
 

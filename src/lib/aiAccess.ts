@@ -52,8 +52,8 @@ function hasActivePro(user: FirebaseFirestore.DocumentData | undefined) {
 // Keyed so stored counters can't be reversed into IP addresses by hashing the
 // small IPv4 space. The admin private key is already a required server secret.
 function anonymousKey(req: NextRequest) {
-  const ip =
-    req.ip ?? req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  // Vercel overwrites this header, so clients can't choose their own IP here.
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
   const hash = crypto
     .createHmac("sha256", process.env.FIREBASE_ADMIN_PRIVATE_KEY ?? "")
     .update(ip)

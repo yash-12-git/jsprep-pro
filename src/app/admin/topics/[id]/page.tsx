@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,28 +10,29 @@ import type { Topic, TopicInput } from "@/types/topic";
 import { C } from "@/styles/tokens";
 import { ArrowLeft } from "lucide-react";
 
-export default function EditTopicPage({ params }: { params: { id: string } }) {
+export default function EditTopicPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const { user } = useAuth();
   const router = useRouter();
   const [topic, setTopic] = useState<Topic | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTopic(params.id).then((t) => {
+    getTopic(id).then((t) => {
       setTopic(t);
       setLoading(false);
     });
-  }, [params.id]);
+  }, [id]);
 
   async function handleSubmit(data: TopicInput) {
-    await updateTopic(params.id, data);
+    await updateTopic(id, data);
     // Granular: only bust this topic's cache, not all 35
     await revalidateTopic(data.slug);
     router.push("/admin/topics");
   }
 
   async function handleDelete() {
-    await deleteTopic(params.id);
+    await deleteTopic(id);
     // Bust the specific topic cache + topics list
     if (topic) await revalidateTopic(topic.slug);
     router.push("/admin/topics");

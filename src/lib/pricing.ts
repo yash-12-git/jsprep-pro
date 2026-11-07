@@ -70,3 +70,17 @@ export function getPlanForCountry(
     pricing: billedInr ? getPricingForCountry('IN') : pricing,
   }
 }
+
+/**
+ * The price this visitor will actually be charged, for anywhere a price is
+ * shown. Keeps the displayed price and the checkout in step.
+ *
+ * Server-only, for the same reason as getPlanForCountry.
+ */
+export function getBilledPricing(country: string | null): PricingInfo {
+  try {
+    return getPlanForCountry(country).pricing
+  } catch {
+    return getPricingForCountry('IN')
+  }
+}

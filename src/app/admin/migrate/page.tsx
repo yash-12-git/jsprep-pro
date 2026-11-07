@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { css } from "@emotion/react";
 import {
@@ -698,9 +699,9 @@ export default function MigratePage() {
         <div css={S.successBox}>
           <CheckCircle2 size={18} />
           React topics seeded! Verify at{" "}
-          <a href="/topics/react" style={{ color: C.accent3 }}>
+          <Link href="/topics/react" style={{ color: C.accent3 }}>
             /topics/react
-          </a>
+          </Link>
         </div>
       )}
 
@@ -769,7 +770,7 @@ export default function MigratePage() {
         <div css={S.successBox}>
           <CheckCircle2 size={18} />
           React blog posts seeded! Verify at{" "}
-          <a href="/blog/react" style={{ color: C.accent3 }}>/blog/react</a>
+          <Link href="/blog/react" style={{ color: C.accent3 }}>/blog/react</Link>
         </div>
       )}
 
@@ -841,7 +842,7 @@ export default function MigratePage() {
         <div css={S.successBox}>
           <CheckCircle2 size={18} />
           TypeScript topics seeded! Verify at{" "}
-          <a href="/topics/typescript" style={{ color: C.accent3 }}>/topics/typescript</a>
+          <Link href="/topics/typescript" style={{ color: C.accent3 }}>/topics/typescript</Link>
         </div>
       )}
 
@@ -910,7 +911,7 @@ export default function MigratePage() {
         <div css={S.successBox}>
           <CheckCircle2 size={18} />
           TypeScript blog posts seeded! Verify at{" "}
-          <a href="/blog/typescript" style={{ color: C.accent3 }}>/blog/typescript</a>
+          <Link href="/blog/typescript" style={{ color: C.accent3 }}>/blog/typescript</Link>
         </div>
       )}
 
@@ -1076,14 +1077,14 @@ export default function MigratePage() {
       <ol style={{ paddingLeft: "1.25rem", fontSize: "0.875rem", lineHeight: 2.2, color: C.text }}>
         <li>
           Visit{" "}
-          <a href="/react-useeffect-interview-questions" style={{ color: C.accent }}>
+          <Link href="/react-useeffect-interview-questions" style={{ color: C.accent }}>
             /react-useeffect-interview-questions
-          </a>{" "}
+          </Link>{" "}
           to verify the Mental Model, Deep Explanation, Cheat Sheet, and all sections render correctly.
         </li>
         <li>
           Go to{" "}
-          <a href="/admin/topics" style={{ color: C.accent }}>Admin → Topics</a>{" "}
+          <Link href="/admin/topics" style={{ color: C.accent }}>Admin → Topics</Link>{" "}
           and confirm the new topic appears. If an old shell exists for the same slug, delete it.
         </li>
         <li>

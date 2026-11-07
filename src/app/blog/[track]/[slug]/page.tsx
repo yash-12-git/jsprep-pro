@@ -19,7 +19,7 @@ import { Track } from "@/lib/tracks";
 export const revalidate = 3600;
 
 interface Props {
-  params: { track: Track; slug: string };
+  params: Promise<{ track: Track; slug: string }>;
 }
 
 export async function generateStaticParams() {
@@ -34,7 +34,7 @@ export async function generateStaticParams() {
   }
 }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
 
   const post = await getBlogPostBySlug(slug);
   if (!post) return {};
@@ -93,7 +93,8 @@ function md(content: string): string {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: Props) {
-  const post = await getBlogPostBySlug(params.slug);
+  const { track: urlTrack, slug } = await params;
+  const post = await getBlogPostBySlug(slug);
   if (!post) notFound();
 
   // The post is looked up by slug alone, so every post used to resolve at all
@@ -101,7 +102,7 @@ export default async function BlogPostPage({ params }: Props) {
   // crawlable URLs for one article. Send the mismatched ones to the canonical
   // path with a 308 instead of serving duplicate content.
   const track = post.track ?? "javascript";
-  if (params.track !== track) permanentRedirect(`/blog/${track}/${post.slug}`);
+  if (urlTrack !== track) permanentRedirect(`/blog/${track}/${post.slug}`);
 
   const [relatedTopics, allPosts] = await Promise.all([
     post.relatedTopicSlugs?.length

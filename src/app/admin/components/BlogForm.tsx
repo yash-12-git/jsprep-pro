@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 import { Save, Loader2, Trash2, CheckCircle, X, Plus } from "lucide-react";
@@ -677,9 +678,9 @@ export default function BlogForm({
         {topics.length === 0 ? (
           <p style={{ fontSize: "0.8125rem", color: C.muted }}>
             No topics found.{" "}
-            <a href="/admin/migrate" style={{ color: C.accent }}>
+            <Link href="/admin/migrate" style={{ color: C.accent }}>
               Run migration
-            </a>{" "}
+            </Link>{" "}
             first.
           </p>
         ) : (

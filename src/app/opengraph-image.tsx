@@ -149,7 +149,7 @@ export default function Image() {
                 lineHeight: 1.55,
               }}
             >
-              {CONTENT_COUNTS.total} questions · Theory, Output & Debug · 6 AI tools
+              {`${CONTENT_COUNTS.total} questions · Theory, Output & Debug · 6 AI tools`}
             </div>
 
             {/* Stat pills */}

@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: { domains: ['lh3.googleusercontent.com'] },
+  // The only image is a small Google avatar, so the optimizer isn't worth exposing.
+  images: { unoptimized: true },
   async headers() {
     return [
       {

@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -354,7 +355,7 @@ export default function AnalyticsClientPage({
                 </p>
               </div>
               {sprintCount > 0 && (
-                <a
+                <Link
                   href="/sprint"
                   style={{
                     fontSize: "0.8125rem",
@@ -368,7 +369,7 @@ export default function AnalyticsClientPage({
                   }}
                 >
                   Run another sprint
-                </a>
+                </Link>
               )}
             </div>
 
@@ -441,12 +442,12 @@ export default function AnalyticsClientPage({
             ) : (
               <div css={S.emptyState}>
                 No sprint history yet.{" "}
-                <a
+                <Link
                   href="/sprint"
                   css={{ color: C.accent, textDecoration: "underline" }}
                 >
                   Start your first sprint
-                </a>{" "}
+                </Link>{" "}
                , it takes 5 minutes and shows exactly where you stand.
               </div>
             )}

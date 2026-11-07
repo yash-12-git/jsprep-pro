@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -11,10 +11,11 @@ import type { Question, QuestionInput } from "@/types/question";
 import QuestionForm from "../../components/QuestionForm";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function EditQuestionPage({ params }: Props) {
+  const { id } = use(params);
   const { user } = useAuth();
   const router = useRouter();
   const [question, setQuestion] = useState<Question | null>(null);
@@ -22,21 +23,21 @@ export default function EditQuestionPage({ params }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getQuestion(params.id)
+    getQuestion(id)
       .then((q) => {
         if (!q) setNotFound(true);
         else setQuestion(q);
       })
       .finally(() => setLoading(false));
-  }, [params.id]);
+  }, [id]);
 
   async function handleSubmit(data: QuestionInput) {
-    await updateQuestion(params.id, data);
+    await updateQuestion(id, data);
     // Stay on the page — user may want to keep editing
   }
 
   async function handleDelete() {
-    await deleteQuestion(params.id);
+    await deleteQuestion(id);
     router.push("/admin/questions");
   }
 

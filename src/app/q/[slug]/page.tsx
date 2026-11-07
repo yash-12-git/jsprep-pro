@@ -18,7 +18,7 @@ import InlineEvaluator from "@/components/ui/InlineEvaluater";
 import { C } from "@/styles/tokens";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export const revalidate = 3600;
@@ -29,7 +29,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const q = await getQuestionBySlug(params.slug);
+  const { slug } = await params;
+  const q = await getQuestionBySlug(slug);
   if (!q) return {};
   const track = q.track;
   const diff = DIFF_LABEL[q.difficulty] ?? "Core";
@@ -42,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMeta({
     title: `${q.title} — ${track} ${typeLabel}`,
     description: `${diff} ${track} ${typeLabel.toLowerCase()}: ${q.title.slice(0, 70)} — answer with code examples.`,
-    path: `/q/${params.slug}`,
+    path: `/q/${slug}`,
     // Every answer here is also on its category page, so that page is the one
     // to rank. Links stay followed so they still pass equity (see sitemap.ts).
     noindex: true,
@@ -50,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       q.title.toLowerCase(),
       `${q.category.toLowerCase()} ${track}`,
       `${track.toLowerCase()} interview question`,
-      `${params.slug.replace(/-/g, " ")}`,
+      `${slug.replace(/-/g, " ")}`,
     ],
   });
 }
@@ -72,7 +73,8 @@ function markdownToHtml(text: string): string {
 }
 
 export default async function QuestionPage({ params }: Props) {
-  const question = await getQuestionBySlug(params.slug);
+  const { slug } = await params;
+  const question = await getQuestionBySlug(slug);
   if (!question) notFound();
   const track = question.track;
   const catSlug = catToSlug(question.category);
@@ -127,7 +129,7 @@ export default async function QuestionPage({ params }: Props) {
             { name: categoryLabel, path: categoryPath },
             {
               name: question.title.slice(0, 40) + "…",
-              path: `/q/${params.slug}`,
+              path: `/q/${slug}`,
             },
           ]),
         }}

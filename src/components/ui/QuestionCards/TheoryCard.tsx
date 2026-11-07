@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   ChevronDown,
@@ -202,12 +203,12 @@ export default function TheoryCard({
                 Evaluate Me
               </button>
               {!isLoggedIn && !authLoading && (
-                <a
+                <Link
                   href="/auth"
                   css={[S.actionChip(C.amber, false), S.noUnderline]}
                 >
                   <Zap size={11} /> Sign in for AI features
-                </a>
+                </Link>
               )}
             </div>
 

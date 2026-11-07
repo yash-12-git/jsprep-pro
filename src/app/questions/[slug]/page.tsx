@@ -16,7 +16,7 @@ import InlineEvaluator from "@/components/ui/InlineEvaluater";
 import { C, RADIUS } from "@/styles/tokens";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 function toSlug(text: string): string {
@@ -39,18 +39,19 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const { questions: qs } = await getQuestions({
     filters: { status: "published", type: "theory" },
     pageSize: 300,
   });
   const cats = [...new Set(qs.map((q: any) => q.category))];
-  const cat = cats.find((c: string) => catToSlug(c) === params.slug);
+  const cat = cats.find((c: string) => catToSlug(c) === slug);
   if (!cat) return {};
   const track = (qs.find((q: any) => q.category === cat)?.track as string) ?? "javascript";
   return pageMeta({
     title: `${cat} Interview Questions (With Answers)`,
     description: `${cat} interview questions with detailed answers and code examples. Master ${cat} concepts for your frontend interview.`,
-    path: `/questions/${params.slug}`,
+    path: `/questions/${slug}`,
     keywords: [
       `${cat.toLowerCase()} interview questions`,
       `${cat.toLowerCase()} ${track} interview`,
@@ -59,13 +60,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryQuestionsPage({ params }: Props) {
+  const { slug } = await params;
   const { questions: allTheory } = await getQuestions({
     filters: { status: "published", type: "theory" },
     pageSize: 300,
   });
 
   const theoryCats = [...new Set(allTheory.map((q: any) => q.category))];
-  const cat = theoryCats.find((c: string) => catToSlug(c) === params.slug);
+  const cat = theoryCats.find((c: string) => catToSlug(c) === slug);
   if (!cat) notFound();
 
   const catQuestions = allTheory.filter((q: any) => q.category === cat);
@@ -123,7 +125,7 @@ export default async function CategoryQuestionsPage({ params }: Props) {
               name: `${track} Interview Questions`,
               path: `/${track}-interview-questions`,
             },
-            { name: `${cat} Questions`, path: `/questions/${params.slug}` },
+            { name: `${cat} Questions`, path: `/questions/${slug}` },
           ]),
         }}
       />

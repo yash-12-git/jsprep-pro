@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { css } from "@emotion/react";
 import {
@@ -1027,9 +1028,9 @@ export default function SeedPage() {
       >
         <li>
           Go to{" "}
-          <a href="/admin/questions" style={{ color: C.accent }}>
+          <Link href="/admin/questions" style={{ color: C.accent }}>
             Admin → All Questions
-          </a>{" "}
+          </Link>{" "}
           to verify all rows appear.
         </li>
         <li>
@@ -1055,9 +1056,9 @@ Index 4:  status ASC + category ASC + order ASC`}
         </li>
         <li>
           Open your{" "}
-          <a href="/dashboard" style={{ color: C.accent }}>
+          <Link href="/dashboard" style={{ color: C.accent }}>
             dashboard
-          </a>{" "}
+          </Link>{" "}
          , questions now load from Firestore.
         </li>
         <li>

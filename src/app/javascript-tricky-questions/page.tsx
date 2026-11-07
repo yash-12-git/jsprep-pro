@@ -19,7 +19,7 @@ import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
 import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
 import { C } from "@/styles/tokens";
 import { headers } from "next/headers";
-import { getPricingForCountry } from "@/lib/pricing";
+import { getBilledPricing } from "@/lib/pricing";
 
 export const revalidate = 3600;
 
@@ -103,7 +103,7 @@ function EmptyState() {
 
 export default async function JavaScriptTrickyQuestionsPage() {
   const country = (await headers()).get("x-vercel-ip-country");
-  const pricing = getPricingForCountry(country);
+  const pricing = getBilledPricing(country);
   const { questions } = await getQuestions({
     filters: { track: "javascript", isTricky: true, status: "published" },
     pageSize: 300,
