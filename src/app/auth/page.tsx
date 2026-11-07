@@ -24,7 +24,7 @@ export default function AuthPage() {
         <div css={S.box}>
           <div css={S.logo}>JS</div>
           <h1 css={S.title}>Welcome to JSPrep Pro</h1>
-          <p css={S.subtitle}>Sign in to track your progress, save bookmarks, and access quiz mode.</p>
+          <p css={S.subtitle}>Sign in free to save your progress, keep a streak and get AI feedback on your answers.</p>
           <button css={S.googleBtn} onClick={signInWithGoogle}>
             <Chrome size={18} /> Continue with Google
           </button>

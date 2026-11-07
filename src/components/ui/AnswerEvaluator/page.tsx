@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import { track } from "@/lib/analytics";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useState } from "react";
 import { Loader2, Target, X, ChevronDown, ChevronUp } from "lucide-react";
@@ -46,7 +47,11 @@ export default function AnswerEvaluator({
           idealAnswer: idealAnswer.replace(/<[^>]*>/g, ""),
         },
       });
-      setResult(JSON.parse(data.text.replace(/```json|```/g, "").trim()));
+      const parsed: EvalResult = JSON.parse(
+        data.text.replace(/```json|```/g, "").trim(),
+      );
+      setResult(parsed);
+      track("ai_evaluation_shown", { kind: "theory", score: parsed.score });
     } catch (err) {
       console.error("[AnswerEvaluator] evaluation failed", err);
       setAiError(aiErrorMessage(err));

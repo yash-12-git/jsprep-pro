@@ -228,29 +228,44 @@ interface Props {
   uid?: string | null;
 }
 
+// Who can pick each size: anyone, a free account, or Pro.
 const OPTIONS: Array<{
   count: SprintConfig["questionCount"];
   label: string;
-  requiresPro: boolean;
+  needs: "none" | "account" | "pro";
 }> = [
-  { count: 5, label: "Warmup", requiresPro: false },
-  { count: 10, label: "Sprint", requiresPro: true },
-  { count: 15, label: "Challenge", requiresPro: true },
-  { count: 20, label: "Marathon", requiresPro: true },
+  { count: 5, label: "Warmup", needs: "none" },
+  { count: 10, label: "Sprint", needs: "account" },
+  { count: 15, label: "Challenge", needs: "pro" },
+  { count: 20, label: "Marathon", needs: "pro" },
 ];
 
 export default function SprintLobby({ isPro, onStart, uid }: Props) {
   const [selected, setSelected] = useState<SprintConfig["questionCount"]>(
-    isPro ? 10 : 5,
+    uid ? 10 : 5,
   );
   const [showPaywall, setShowPaywall] = useState(false);
 
-  const selectedOption = OPTIONS.find((o) => o.count === selected)!;
   const durationMins =
     selected <= 5 ? 5 : selected === 10 ? 10 : selected === 15 ? 15 : 20;
 
+  const lockedBy = (o: (typeof OPTIONS)[0]) =>
+    o.needs === "account" && !uid
+      ? "Sign in"
+      : o.needs === "pro" && !isPro
+        ? "Pro"
+        : null;
+
   function handleSelect(o: (typeof OPTIONS)[0]) {
-    if (o.requiresPro && !isPro) return;
+    const lock = lockedBy(o);
+    if (lock === "Sign in") {
+      window.location.href = "/auth?next=/sprint";
+      return;
+    }
+    if (lock === "Pro") {
+      setShowPaywall(true);
+      return;
+    }
     setSelected(o.count);
   }
 
@@ -258,7 +273,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
     <div css={page}>
       {showPaywall && (
         <PaywallBanner
-          reason="Free users can attempt 5-question warmup. Upgrade for all!"
+          reason="15- and 20-question sprints are part of Pro."
           onClose={() => setShowPaywall(false)}
         />
       )}
@@ -324,7 +339,8 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
         <div css={sectionLabel}>Choose your challenge</div>
         <div css={countGrid}>
           {OPTIONS.map((o) => {
-            const locked = o.requiresPro && !isPro;
+            const lock = lockedBy(o);
+            const locked = lock !== null;
             const active = selected === o.count;
             return (
               <div
@@ -345,7 +361,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
                 >
                   {o.label}
                 </div>
-                {locked && <div css={proBadge}>Pro</div>}
+                {lock && <div css={proBadge}>{lock}</div>}
               </div>
             );
           })}
@@ -378,18 +394,18 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
           Start {selected}-Question Sprint
         </button>
 
-        {!isPro && (
+        {!uid ? (
           <div css={upgradeNote}>
-            Free accounts get a 5-question preview.{" "}
-            <a
-              onClick={() => {
-                !uid ? (window.location.href = "/auth") : setShowPaywall(true);
-              }}
-            >
-              Upgrade to Pro
-            </a>{" "}
-            for full sprints.
+            <a href="/auth?next=/sprint">Sign in free</a> for 10-question
+            sprints and to save your results.
           </div>
+        ) : (
+          !isPro && (
+            <div css={upgradeNote}>
+              <a onClick={() => setShowPaywall(true)}>Pro</a> adds 15- and
+              20-question sprints.
+            </div>
+          )
         )}
       </div>
     </div>

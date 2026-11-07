@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 "use client";
-import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import { AIRequestError, aiErrorMessage, postAI } from "@/lib/aiClient";
+import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import { track } from "@/lib/analytics";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useEffect, useState } from "react";
@@ -8,6 +9,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
 import { getRecentSprints } from "@/lib/sprintHistory";
+import { getRecentInterviews, isUnscored } from "@/lib/interviewHistory";
+import { getInterviewLogs } from "@/lib/interviewLog";
+import { saveReadiness } from "@/lib/readinessHistory";
 import PageGuard from "@/components/ui/PageGuard";
 import {
   Loader2,
@@ -54,6 +58,7 @@ export default function StudyPlanClientPage({
   const [plan, setPlan] = useState<StudyPlan | null>(null);
   const [generating, setGenerating] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
+  const [paywallReason, setPaywallReason] = useState<string | null>(null);
   const [interviewDate, setInterviewDate] = useState("");
 
   useEffect(() => {
@@ -93,11 +98,21 @@ export default function StudyPlanClientPage({
     setGenerating(true);
     setPlanError(null);
     try {
-      // A plan without sprint history is still useful.
-      const sprints = await getRecentSprints(user!.uid, 3).catch((err) => {
-        console.error("[StudyPlan] could not load sprints", err);
-        return [];
-      });
+      // A plan without sprint or interview history is still useful.
+      const [sprints, interviews, realInterviews] = await Promise.all([
+        getRecentSprints(user!.uid, 3).catch((err) => {
+          console.error("[StudyPlan] could not load sprints", err);
+          return [];
+        }),
+        getRecentInterviews(user!.uid, 3).catch((err) => {
+          console.error("[StudyPlan] could not load interviews", err);
+          return [];
+        }),
+        getInterviewLogs(user!.uid, 3).catch((err) => {
+          console.error("[StudyPlan] could not load interview log", err);
+          return [];
+        }),
+      ]);
       const data = await postAI({
         type: "studyplan",
         messages: [{ role: "user", content: "Generate my study plan." }],
@@ -116,6 +131,25 @@ export default function StudyPlanClientPage({
               completedAt,
             }),
           ),
+          interviewHistory: interviews
+            .filter(({ scorecard }) => !isUnscored(scorecard))
+            .map(({ config, scorecard, createdAt }) => ({
+            focus: config.focus,
+            overall: scorecard.overall,
+            verdict: scorecard.verdict,
+            weaknesses: scorecard.weaknesses,
+            createdAt,
+          })),
+          // The company name stays private and is not sent.
+          realInterviews: realInterviews.map(
+            ({ roundType, outcome, topics, stuckOn, date }) => ({
+              roundType,
+              outcome,
+              topics,
+              stuckOn,
+              date,
+            }),
+          ),
           focusCandidates,
           catStats,
           interviewDate: interviewDate || null,
@@ -126,12 +160,23 @@ export default function StudyPlanClientPage({
         data.text.replace(/```json|```/g, "").trim(),
       );
       setPlan(parsed);
+      // Kept for the dashboard's readiness trend; the plan still shows if this fails.
+      saveReadiness(user!.uid, {
+        score: Number(parsed.readinessScore) || 0,
+        label: String(parsed.readinessLabel ?? ""),
+        weakSpots: (parsed.weakSpots ?? []).map((w) => w.category).slice(0, 5),
+        createdAt: new Date().toISOString(),
+      }).catch((err) => console.error("[StudyPlan] could not save readiness", err));
       track("study_plan_generated", {
         readiness_score: parsed.readinessScore,
         has_interview_date: Boolean(interviewDate),
       });
     } catch (err) {
       console.error("[StudyPlan] generation failed", err);
+      if (err instanceof AIRequestError && err.status === 402) {
+        setPaywallReason(aiErrorMessage(err));
+        return;
+      }
       setPlanError(aiErrorMessage(err));
     } finally {
       setGenerating(false);
@@ -142,17 +187,29 @@ export default function StudyPlanClientPage({
   const readColor = (s: number) =>
     s >= 80 ? C.green : s >= 60 ? C.accent : s >= 40 ? C.amber : C.red;
 
+  // Free accounts see the readiness score, weak spots and the first days of
+  // the plan; the rest of the schedule is Pro.
+  const isPro = !!progress?.isPro;
+  const FREE_PLAN_DAYS = 2;
+  const visibleDays = plan
+    ? isPro
+      ? plan.dailyPlan
+      : plan.dailyPlan.slice(0, FREE_PLAN_DAYS)
+    : [];
+  const hiddenDays = plan ? plan.dailyPlan.length - visibleDays.length : 0;
+
   const focusQs: Question[] = (plan?.focusQuestions ?? [])
     .map((id) => questions.find((q) => q.id === id))
     .filter((q): q is Question => !!q);
 
   return (
-    <PageGuard
-      loading={authLoading || !user || !progress}
-      ready={!!progress}
-      isPro={progress?.isPro}
-      proReason="AI Study Plan is a Pro feature. Upgrade to get a personalized roadmap!"
-    >
+    <PageGuard loading={authLoading || !user || !progress} ready={!!progress}>
+      {paywallReason && (
+        <PaywallBanner
+          reason={paywallReason}
+          onClose={() => setPaywallReason(null)}
+        />
+      )}
       <div css={Shared.pageWrapper}>
         {/* Back button */}
         <button
@@ -180,7 +237,9 @@ export default function StudyPlanClientPage({
         <div css={S.header}>
           <h1 css={S.title}>AI Study Plan</h1>
           <p css={S.subtitle}>
-            Personalized based on your mastery, quiz history, and weak areas.
+            Built from your mastered questions, sprints, mock interviews and the
+            real interviews you log.
+            {!isPro && " Free accounts get a new plan once a week."}
           </p>
         </div>
 
@@ -485,7 +544,7 @@ export default function StudyPlanClientPage({
                   Daily Study Plan
                 </h2>
               </div>
-              {plan.dailyPlan.map((day) => (
+              {visibleDays.map((day) => (
                 <div
                   key={day.day}
                   css={{
@@ -579,6 +638,24 @@ export default function StudyPlanClientPage({
                   </div>
                 </div>
               ))}
+              {hiddenDays > 0 && (
+                <div css={S.inputCard}>
+                  <p css={{ fontSize: "0.875rem", color: C.text, marginBottom: "0.75rem" }}>
+                    {hiddenDays} more {hiddenDays === 1 ? "day" : "days"} in
+                    your plan. Pro shows the full schedule and rebuilds it any
+                    time as you improve.
+                  </p>
+                  <button
+                    css={Shared.primaryBtn(C.accent)}
+                    style={{ width: "auto", padding: "0.5rem 1.25rem" }}
+                    onClick={() =>
+                      setPaywallReason("See your full study plan and update it any time.")
+                    }
+                  >
+                    See the full plan
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

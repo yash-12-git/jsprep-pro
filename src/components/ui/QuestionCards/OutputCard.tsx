@@ -181,7 +181,7 @@ export default function OutputCard({
       correct: match,
     });
     if (match) {
-      !isSolved(q.id) && isPro && (await recordSolved(q.id));
+      !isSolved(q.id) && (await recordSolved(q.id));
       setLocalWrong(false);
       setManuallyReset(false);
       setAnswerState("correct");
@@ -194,7 +194,7 @@ export default function OutputCard({
   function reveal() {
     setLocalRevealed(true);
     setLocalWrong(false);
-    if (!isSolved(q.id) && !isRevealed(q.id) && isPro)
+    if (!isSolved(q.id) && !isRevealed(q.id))
       recordRevealed(q.id).catch(() => {});
   }
   function hideAnswer() {

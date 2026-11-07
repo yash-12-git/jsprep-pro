@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import * as Shared from "@/styles/shared";
 import { C, RADIUS } from "@/styles/tokens";
-import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import { useTrack } from "@/contexts/TrackContext";
 
 // ─── Group topics by category ─────────────────────────────────────────────────
@@ -280,33 +279,6 @@ const divider = css`
   margin: 0.75rem 0;
 `;
 
-// Pro gate
-const proGate = css`
-  text-align: center;
-  padding: 5rem 2rem;
-`;
-
-const proGateIcon = css`
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-`;
-
-const proGateTitle = css`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: ${C.text};
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
-`;
-
-const proGateText = css`
-  font-size: 0.875rem;
-  color: ${C.muted};
-  max-width: 28rem;
-  margin: 0 auto 1.5rem;
-  line-height: 1.7;
-`;
-
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function CheatSheetClientPage({
   topics
@@ -315,7 +287,6 @@ export default function CheatSheetClientPage({
 }) {
   const { user, progress, loading } = useAuth();
   const router = useRouter();
-  const [showPaywall, setShowPaywall] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
   const [openTopics, setOpenTopics] = useState<Set<string>>(new Set());
 
@@ -327,37 +298,6 @@ export default function CheatSheetClientPage({
     return (
       <div css={Shared.spinner}>
         <div css={Shared.spinnerDot} />
-      </div>
-    );
-
-  if (!progress.isPro)
-    return (
-      <div css={[pageWrap, proGate]}>
-        {showPaywall && (
-          <PaywallBanner
-            reason={`Get instant access to crisp topic-by-topic revision cards covering
-          every concept you need to know before your JavaScript interview`}
-            onClose={() => setShowPaywall(false)}
-          />
-        )}
-        
-        <h2 css={proGateTitle}>Cheat Sheet is Pro</h2>
-        <p css={proGateText}>
-          Get instant access to crisp topic-by-topic revision cards covering
-          every concept you need to know before your JavaScript interview.
-        </p>
-        <button
-          css={Shared.primaryBtn(C.accent)}
-          style={{
-            width: "auto",
-            padding: "0.625rem 1.625rem",
-            margin: "0 auto",
-            display: "inline-flex",
-          }}
-          onClick={() => setShowPaywall(true)}
-        >
-          Upgrade to Pro
-        </button>
       </div>
     );
 

@@ -21,6 +21,9 @@ export function aiErrorMessage(err: unknown): string {
   switch (err instanceof AIRequestError ? err.status : null) {
     case 401:
       return "Please sign in again to use this.";
+    case 402:
+      // The free allowance is used up; the server says which one.
+      return (err as AIRequestError).message;
     case 403:
       return "This needs an active Pro plan.";
     case 429:

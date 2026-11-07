@@ -31,6 +31,7 @@ import {
   BarChart2,
   User,
   Route,
+  ClipboardList,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import * as S from "./styles";
@@ -84,6 +85,12 @@ const AI_LINKS = [
     label: "Study Plan",
     icon: Map,
     desc: "Personalized roadmap",
+  },
+  {
+    href: "/interview-log",
+    label: "Interview Log",
+    icon: ClipboardList,
+    desc: "Track real interviews",
   },
   {
     href: "/cheatsheet",
@@ -306,12 +313,11 @@ export default function Navbar() {
                 >
                   <Sparkles size={12} />
                   AI Coach
-                  {!progress?.isPro && <span css={S.proBadge}>Pro</span>}
                   <ChevronDown size={10} css={S.chevron(open === "ai")} />
                 </button>
                 {open === "ai" && (
                   <div css={S.aiDropdownMenu}>
-                    <p css={S.dropdownSectionLabel}>AI-Powered Tools</p>
+                    <p css={S.dropdownSectionLabel}>Prepare and improve</p>
                     {AI_LINKS.map(({ href, label, icon: Icon, desc }) => (
                       <Link
                         key={href}

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
 import PageGuard from "@/components/ui/PageGuard";
+import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import { Flame, Brain, Code2, Bug, Zap } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
@@ -52,6 +53,7 @@ export default function AnalyticsClientPage({
 
   const [sprints, setSprints] = useState<SprintDoc[]>([]);
   const [sprintsLoading, setSprintsLoading] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -201,13 +203,14 @@ export default function AnalyticsClientPage({
   ];
 
   return (
-    <PageGuard
-      loading={authLoading || !user || !progress}
-      ready={!!progress}
-      isPro={progress?.isPro}
-      proReason="Analytics is a Pro feature. Upgrade to see your full progress breakdown!"
-    >
+    <PageGuard loading={authLoading || !user || !progress} ready={!!progress}>
       <>
+        {showPaywall && (
+          <PaywallBanner
+            reason="See which concepts you've mastered and where you're weakest, category by category."
+            onClose={() => setShowPaywall(false)}
+          />
+        )}
         <div css={Shared.pageWrapper}>
           <h1 css={S.title}>Your Analytics</h1>
 
@@ -289,8 +292,24 @@ export default function AnalyticsClientPage({
             </div>
           </div>
 
-          {/* ── Category breakdowns ── */}
-          {[
+          {/* ── Category breakdowns (Pro) ── */}
+          {!progress?.isPro && (
+            <div css={S.section}>
+              <h2 css={S.sectionTitle}>Category Breakdown</h2>
+              <p css={S.sectionSub}>
+                Pro shows how you&apos;re doing in every category of every mode,
+                so you know exactly what to practise next.
+              </p>
+              <button
+                css={Shared.primaryBtn(C.accent)}
+                style={{ width: "auto", padding: "0.5rem 1.25rem" }}
+                onClick={() => setShowPaywall(true)}
+              >
+                See my breakdown
+              </button>
+            </div>
+          )}
+          {progress?.isPro && [
             {
               title: "Theory — Category Breakdown",
               sub: "Which JS concepts you've mastered",

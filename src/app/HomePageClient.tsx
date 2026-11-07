@@ -194,8 +194,8 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
   const totalQs = theoryCt + outputCt + debugCt + polyfillCt;
   const topicsCt = topics?.length ?? 0;
 
-  // Theory questions are free to read for anyone with an account.
-  const freeCount = theoryCt;
+  // Every question is free to read and practise.
+  const freeCount = totalQs;
 
   return (
     <main css={S.page} id="main">
@@ -298,7 +298,7 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
                   <Link href={m.href} css={S.modeRow}>
                     <span css={S.modeName}>
                       {m.label}
-                      {m.free && <span css={S.chipOk}>Free</span>}
+                      <span css={S.chipOk}>Free</span>
                     </span>
                     <span css={S.modeCount}>{displayCount} questions</span>
                     <span css={S.modeDesc}>{m.desc}</span>
@@ -424,7 +424,7 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
               Start Your Sprint
             </Link>
             <span css={S.sprintCTASub}>
-              Free 5-question warmup, no card needed
+              Free 5-question warmup, 10 with a free account
             </span>
           </div>
         </div>
@@ -543,8 +543,8 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
           <div css={S.headBlock}>
             <h2 css={S.sh2}>Pricing</h2>
             <p css={S.ssub}>
-              Simple. Transparent. Start free with {freeCount} questions and a
-              daily AI-scored question.
+              Practise all {freeCount} questions free. Pro adds unlimited AI
+              mock interviews and your full study plan.
             </p>
           </div>
           <div css={S.priceG}>
@@ -599,8 +599,7 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
           <h2 css={S.sh2}>Ready to prep smarter?</h2>
           <div>
             <p css={S.btmD}>
-              {freeCount} questions free, plus a daily AI-scored question. No card
-              needed.
+              All {freeCount} questions free, with AI scoring. No card needed.
             </p>
             <Link href={ctaHref} css={S.btnP}>
               {ctaLabel}

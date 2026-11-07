@@ -17,7 +17,7 @@ export default function PricingPage() {
   return (
     <LegalPage
       title="Pricing"
-      lede="Start free with no card. Upgrade if you want every question and the AI tools."
+      lede="Every question is free, no card needed. Upgrade for unlimited mock interviews and your full study plan."
       showUpdated={false}
     >
       <h2>Free: {PRO.isFree}</h2>

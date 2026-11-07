@@ -19,7 +19,6 @@ import CategoryFilter, {
 } from "@/app/theory/CategoryFilter";
 import { Question } from "@/types/question";
 
-const FREE_DEBUG_LIMIT = 5;
 const PAGE_SIZE = 10;
 
 export default function DebugLabClientPage({
@@ -90,7 +89,7 @@ export default function DebugLabClientPage({
       <>
         {showPaywall && (
           <PaywallBanner
-            reason={`Free users get ${FREE_DEBUG_LIMIT} debug challenges. Upgrade for all + AI checking!`}
+            reason="You've used today's 5 free AI code checks. Pro has no daily cap."
             onClose={() => setShowPaywall(false)}
           />
         )}
@@ -118,7 +117,7 @@ export default function DebugLabClientPage({
             </div>
           </div>
 
-          <SignInPrompt message="Your first 5 debug challenges are free. Sign in to save your progress." />
+          <SignInPrompt message="Every debug challenge is free. Sign in to get AI checks on your fixes and save your progress." />
 
           <CategoryFilter
             categories={categories}
@@ -157,28 +156,12 @@ export default function DebugLabClientPage({
                     isRevealed={isRevealed}
                     recordSolved={recordSolved}
                     recordRevealed={recordRevealed}
-                    isLocked={!progress?.isPro && globalIdx >= FREE_DEBUG_LIMIT}
                     onPaywall={() => setShowPaywall(true)}
                   />
                 );
               })}
             </div>
           </PaginationControls>
-
-          {!progress?.isPro && (
-            <div css={Shared.proNudge}>
-              <span>
-                First {FREE_DEBUG_LIMIT} challenges free,{" "}
-                {questions.length - FREE_DEBUG_LIMIT} more with Pro
-              </span>
-              <button
-                css={Shared.upgradeBtn}
-                onClick={() => setShowPaywall(true)}
-              >
-                Get all {questions.length}
-              </button>
-            </div>
-          )}
         </div>
       </>
     </PageGuard>

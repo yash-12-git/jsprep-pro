@@ -16,7 +16,7 @@ export const TRACK_HERO: Record<
     title: "JavaScript Interview",
     accent: "Questions & Practice.",
     sub: "Practice real JavaScript interview questions, take timed Interview Sprint and know exactly if you're ready.",
-    freeLine: "core JavaScript questions free.",
+    freeLine: "JavaScript questions, all free to practise.",
   },
   react: {
     badge: "Train for Real React Interviews",
@@ -140,7 +140,6 @@ export const TRACK_MODES: Record<
   Array<{
     label: string;
     href: string;
-    free?: boolean;
     desc: string;
     tags: string[];
   }>
@@ -149,14 +148,12 @@ export const TRACK_MODES: Record<
     {
       label: "Concepts",
       href: "/theory",
-      free: true,
       desc: "Core JS theory with AI-graded written answers. Not MCQ, you explain it.",
       tags: ["Closures", "Scope", "Prototypes", "Event Loop"],
     },
     {
       label: "Output Quiz",
       href: "/output-quiz",
-      free: true,
       desc: "Predict what the console prints. The most common real interview format.",
       tags: ["Coercion", "Hoisting", "Async", "this"],
     },
@@ -177,14 +174,12 @@ export const TRACK_MODES: Record<
     {
       label: "Concepts",
       href: "/theory",
-      free: true,
       desc: "React theory with AI-graded written answers. Explain hooks, lifecycle, and patterns.",
       tags: ["Hooks", "Lifecycle", "Context", "Rendering"],
     },
     {
       label: "Output Quiz",
       href: "/output-quiz",
-      free: false,
       desc: "Predict what renders. Re-render traps, stale closures, batching, all covered.",
       tags: ["Re-renders", "Batching", "Stale state", "Refs"],
     },
@@ -205,14 +200,12 @@ export const TRACK_MODES: Record<
     {
       label: "Concepts",
       href: "/theory",
-      free: true,
       desc: "TypeScript theory: explain types, interfaces, generics and type narrowing in your own words.",
       tags: ["Types", "Generics", "Narrowing", "Inference"],
     },
     {
       label: "Output Quiz",
       href: "/output-quiz",
-      free: true,
       desc: "Predict TypeScript's compile-time output. What type does this expression produce?",
       tags: ["Type inference", "Conditional types", "Mapped types"],
     },
@@ -233,14 +226,12 @@ export const TRACK_MODES: Record<
     {
       label: "Concepts",
       href: "/theory",
-      free: true,
       desc: "Explain frontend architecture decisions (CDNs, caching, MFEs) like a senior engineer.",
       tags: ["Architecture", "Scalability", "Trade-offs"],
     },
     {
       label: "Output Quiz",
       href: "/output-quiz",
-      free: true,
       desc: "Identify bottlenecks and failure points in given system diagrams.",
       tags: ["Bottlenecks", "SPOFs", "Load patterns"],
     },
@@ -292,28 +283,25 @@ export const AI_TOOLS = [
   },
 ];
 
+// Free covers practice and coming back; Pro pays for AI depth and readiness
+// insight. Each line must match the code: client gates on isPro, and the free
+// AI allowances in FREE_DAILY_FEATURE_LIMITS / consumeAIQuota (lib/aiAccess).
 export const proFeatures = [
   "Everything in Free",
-  "Interview Sprint, unlimited",
-  "Interactive practice on all output, debug and polyfill questions",
-  "Unlimited mastery tracking",
-  "Bookmarks + cloud sync",
-  "Timed quiz / flashcard mode",
-  "AI Tutor on every question",
-  "AI Answer Evaluator",
-  "AI Code Checker",
-  "AI Mock Interviewer",
-  "AI Study Plan generator",
-  "Daily streak tracking",
-  "All future content",
+  "Unlimited AI mock interviews with saved scorecards",
+  "Your full study plan, rebuilt any time as you improve",
+  "AI tutor and AI code checker with no daily cap",
+  "15- and 20-question Interview Sprints",
+  "Category-by-category analytics",
 ];
 
 export const FREE_F = [
-  "All theory questions",
-  "Interview Sprint, 5-question warmup",
-  "Daily Question of the Day + AI eval",
-  "Interactive practice on the first 5 output + 5 debug questions",
-  "Interactive practice on the first 5 polyfill challenges",
-  "JavaScript and React cheat sheets",
-  "Deep Dives (in-depth concept explanations)",
+  "Every theory, output, debug and polyfill question",
+  "Progress tracking, bookmarks and a daily streak",
+  "Interview Sprints of 5 or 10 questions",
+  "AI scoring of your written answers",
+  "AI tutor and AI code checker, 5 a day each",
+  "One full AI mock interview with a scorecard",
+  "Weekly readiness score and the first days of your study plan",
+  "Revision cards, cheat sheets and deep dives",
 ];

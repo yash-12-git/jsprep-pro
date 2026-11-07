@@ -10,7 +10,6 @@ import { Code2 } from "lucide-react";
 import { OutputCard } from "@/components/ui/QuestionCards";
 import * as Shared from "@/styles/shared";
 import { C } from "@/styles/tokens";
-import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import { usePagination } from "@/hooks/usePagination";
 import PaginationControls from "@/components/ui/PaginationControls";
 import CategoryFilter, {
@@ -20,7 +19,6 @@ import CategoryFilter, {
 import { useTrack } from "@/contexts/TrackContext";
 import { Question } from "@/types/question";
 
-const FREE_OUTPUT_LIMIT = 5;
 const PAGE_SIZE = 10;
 
 export default function OutputQuizClientPage({
@@ -42,8 +40,6 @@ export default function OutputQuizClientPage({
   } = useUserProgress({ uid: user?.uid ?? null });
 
   const [filters, setFilters] = useState<FilterState>(defaultFilters());
-  const [showPaywall, setShowPaywall] = useState(false);
-
 
   const bookmarkedSet = useMemo(
     () => new Set(bookmarkIds ?? []),
@@ -91,13 +87,6 @@ export default function OutputQuizClientPage({
   return (
     <PageGuard loading={authLoading || (!!user && !progress)} ready>
       <>
-        {showPaywall && (
-          <PaywallBanner
-            reason={`Free users can attempt the first ${FREE_OUTPUT_LIMIT} output questions. Upgrade for all!`}
-            onClose={() => setShowPaywall(false)}
-          />
-        )}
-
         <div css={Shared.pageWrapper}>
           <div css={Shared.pageHeader}>
             <div css={Shared.pageHeaderTop}>
@@ -123,7 +112,7 @@ export default function OutputQuizClientPage({
           </div>
 
           {/* Full filter — same component as theory page */}
-          <SignInPrompt message="Your first 5 output questions are free. Sign in to save your progress." />
+          <SignInPrompt message="Every output question is free. Sign in to save your progress and keep a streak." />
 
           <CategoryFilter
             categories={categories}
@@ -162,31 +151,12 @@ export default function OutputQuizClientPage({
                     isRevealed={isRevealed}
                     recordSolved={recordSolved}
                     recordRevealed={recordRevealed}
-                    isLocked={
-                      !progress?.isPro && globalIdx >= FREE_OUTPUT_LIMIT
-                    }
                     isPro={!!progress?.isPro}
-                    onPaywall={() => setShowPaywall(true)}
                   />
                 );
               })}
             </div>
           </PaginationControls>
-
-          {!progress?.isPro && (
-            <div css={Shared.proNudge}>
-              <span>
-                First {FREE_OUTPUT_LIMIT} challenges free,{" "}
-                {questions.length - FREE_OUTPUT_LIMIT} more with Pro
-              </span>
-              <button
-                css={Shared.upgradeBtn}
-                onClick={() => setShowPaywall(true)}
-              >
-                Get all {questions.length}
-              </button>
-            </div>
-          )}
         </div>
       </>
     </PageGuard>

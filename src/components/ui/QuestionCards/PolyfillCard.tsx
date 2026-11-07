@@ -132,11 +132,7 @@ export default function PolyfillCard({
         track: q.track,
         correct: allTestsPassed,
       });
-      if (
-        allTestsPassed &&
-        !isSolved(q.id) &&
-        isPro
-      ) {
+      if (allTestsPassed && !isSolved(q.id)) {
         setManuallyReset(false);
         recordSolved(q.id).catch(() => {});
       }
@@ -145,7 +141,7 @@ export default function PolyfillCard({
     } finally {
       setRunning(false);
     }
-  }, [userCode, q.id, q.testCode, q.track, isSolved, isPro, recordSolved]);
+  }, [userCode, q.id, q.testCode, q.track, isSolved, recordSolved]);
 
   function handleReset() {
     setUserCode(q.code ?? "");

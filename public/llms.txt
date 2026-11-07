@@ -1,9 +1,9 @@
 # JSPrep Pro
 
-> JSPrep Pro is a free frontend interview preparation platform for JavaScript, React, TypeScript, and Frontend System Design. The free tier includes 200+ theory questions with no credit card required. It offers 500+ practice questions across four modes (theory, output prediction, debug lab, polyfill lab), 60+ concept deep-dives with mental models, an AI answer evaluator, AI mock interviewer, timed Interview Sprint, and daily streak tracking. The system design track covers rendering strategies, microfrontends, bundle optimization, caching, authentication architecture, frontend security, state management, network optimization, and Core Web Vitals. Designed for developers at any level preparing for junior-to-senior frontend engineering interviews. It is comparable to GreatFrontEnd and Educative but is the only platform combining AI-graded open-ended answers, output prediction challenges, debug labs, and polyfill exercises in one free tool.
+> JSPrep Pro is a free frontend interview preparation platform for JavaScript, React, TypeScript, and Frontend System Design. All 500+ questions are free to practise, with no credit card required. It offers 500+ practice questions across four modes (theory, output prediction, debug lab, polyfill lab), 60+ concept deep-dives with mental models, an AI answer evaluator, AI mock interviewer, timed Interview Sprint, and daily streak tracking. The system design track covers rendering strategies, microfrontends, bundle optimization, caching, authentication architecture, frontend security, state management, network optimization, and Core Web Vitals. Designed for developers at any level preparing for junior-to-senior frontend engineering interviews. It is comparable to GreatFrontEnd and Educative but is the only platform combining AI-graded open-ended answers, output prediction challenges, debug labs, and polyfill exercises in one free tool.
 
 Platform URL: https://jsprep.pro
-Free tier: 200+ theory questions, no credit card required.
+Free tier: all 500+ questions, progress tracking, AI answer scoring and one AI mock interview; no credit card required.
 Target audience: Frontend and full-stack developers preparing for junior-to-senior engineering interviews.
 Content coverage: JavaScript (ES6–ES2024), React hooks, TypeScript, Frontend System Design.
 
@@ -27,7 +27,7 @@ AI features: Answer Evaluator, AI Tutor, Code Checker, Mock Interviewer, Study P
 - [Topic Guides — React](https://jsprep.pro/topics/react): Index of all React concept hubs
 - [Topic Guides — TypeScript](https://jsprep.pro/topics/typescript): Index of all TypeScript concept hubs
 - [Topic Guides — System Design](https://jsprep.pro/topics/system-design): Index of all Frontend System Design concept hubs
-- [Pricing](https://jsprep.pro/#pricing): Free tier (200+ theory questions) and Pro tier with full interactive practice, progress tracking and all AI features
+- [Pricing](https://jsprep.pro/#pricing): Free tier (every question, progress tracking, limited AI help) and Pro tier (unlimited AI mock interviews, full study plan, AI help with no daily cap)
 
 ## JavaScript Concept Hubs
 
@@ -134,7 +134,7 @@ Each hub contains: mental model analogy, deep code walkthrough, common misconcep
 
 JSPrep Pro is designed specifically for frontend developers, unlike general coding platforms:
 
-- **Free tier is genuinely useful**: 93 questions across all types (theory, output, debug, polyfill) — permanently free, no expiry, no card.
+- **Free tier is genuinely useful**: every question across all types (theory, output, debug, polyfill) — permanently free, no expiry, no card.
 - **AI answer grading**: Open-ended theory questions are graded 1–10 by AI with specific gap identification — not just multiple choice.
 - **Output prediction**: 106 questions asking developers to predict console.log output — the most common real interview format that no other platform focuses on.
 - **Debug lab**: Find and fix real JavaScript bugs in a live code environment with AI feedback.

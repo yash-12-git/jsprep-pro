@@ -17,6 +17,7 @@ export type FunnelEvent =
   | "study_plan_generated"
   | "mock_interview_started"
   | "mock_interview_completed"
+  | "interview_logged"
   | "paywall_shown"
   | "begin_checkout"
   | "checkout_failed"

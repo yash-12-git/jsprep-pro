@@ -9,7 +9,6 @@ import {
   Sparkles,
   Target,
   Bookmark,
-  Lock,
   Zap,
   Star,
 } from "lucide-react";
@@ -18,7 +17,6 @@ import { useAuth } from "@/hooks/useAuth";
 import MarkdownRenderer from "@/components/md/MarkdownRenderer";
 import AIChat from "@/components/ui/AIChat/page";
 import AnswerEvaluator from "@/components/ui/AnswerEvaluator/page";
-import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import * as S from "./styles";
 import type { Question } from "@/types/question";
 import { track } from "@/lib/analytics";
@@ -48,71 +46,49 @@ export default function TheoryCard({
   onMastered,
   onBookmark,
 }: Props) {
-  const { user, progress, loading: authLoading } = useAuth();
-  const isPro = progress?.isPro ?? false;
+  const { user, loading: authLoading } = useAuth();
   const isLoggedIn = !!user;
 
   const [internalOpen, setInternalOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
-  const [paywallReason, setPaywallReason] = useState("");
-  const [showPaywall, setShowPaywall] = useState(false);
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const toggle = onToggle ?? (() => setInternalOpen((o) => !o));
   const ds = S.DIFF_STYLE[q.difficulty] ?? S.DIFF_STYLE.core;
 
-  function requirePro(reason: string, action: () => void) {
+  // Everything on the card is free with an account. The AI tutor's daily
+  // allowance is enforced by /api/ai, which explains it when it runs out.
+  function requireSignIn(action: () => void) {
     if (authLoading) return;
     if (!isLoggedIn) {
       window.location.href = `/auth?next=${encodeURIComponent(window.location.pathname)}`;
-      return;
-    }
-    if (!isPro) {
-      setPaywallReason(reason);
-      setShowPaywall(true);
       return;
     }
     action();
   }
 
   function handleMastered() {
-    requirePro(
-      "Progress tracking is a Pro feature. Upgrade to mark questions as mastered.",
-      () => {
-        if (!isMastered)
-          track("practice_answered", {
-            question_type: "theory",
-            track: q.track,
-            correct: true,
-          });
-        onMastered?.();
-      },
-    );
+    requireSignIn(() => {
+      if (!isMastered)
+        track("practice_answered", {
+          question_type: "theory",
+          track: q.track,
+          correct: true,
+        });
+      onMastered?.();
+    });
   }
   function handleBookmark() {
-    requirePro(
-      "Bookmarks are a Pro feature. Upgrade to save questions for quick review.",
-      () => onBookmark?.(),
-    );
+    requireSignIn(() => onBookmark?.());
   }
   function handleAIPanel(panel: "chat" | "eval") {
-    requirePro(
-      panel === "chat"
-        ? "AI Tutor is a Pro feature. Upgrade for AI-powered follow-up on any question."
-        : "Evaluate Me is a Pro feature. Upgrade to get AI-scored feedback on your answers.",
-      () => setActivePanel((prev) => (prev === panel ? null : panel)),
+    requireSignIn(() =>
+      setActivePanel((prev) => (prev === panel ? null : panel)),
     );
   }
 
   return (
     <>
-      {showPaywall && (
-        <PaywallBanner
-          reason={paywallReason}
-          onClose={() => setShowPaywall(false)}
-        />
-      )}
-
       <div css={S.questionCard(isMastered ? "correct" : "idle", C.accent)}>
         {/* Header */}
         <div css={S.cardHeader} onClick={toggle}>
@@ -162,11 +138,7 @@ export default function TheoryCard({
                   onClick={handleMastered}
                   disabled={authLoading}
                 >
-                  {!authLoading && !isPro && isLoggedIn ? (
-                    <Lock size={10} />
-                  ) : (
-                    <CheckCircle size={12} />
-                  )}
+                  <CheckCircle size={12} />
                   {isMastered ? "Mastered" : "Mark mastered"}
                 </button>
               )}
@@ -179,11 +151,7 @@ export default function TheoryCard({
                   onClick={handleBookmark}
                   disabled={authLoading}
                 >
-                  {!authLoading && !isPro && isLoggedIn ? (
-                    <Lock size={10} />
-                  ) : (
-                    <Bookmark size={12} />
-                  )}
+                  <Bookmark size={12} />
                   {isBookmarked ? "Saved" : "Bookmark"}
                 </button>
               )}
@@ -196,7 +164,6 @@ export default function TheoryCard({
                 disabled={authLoading}
               >
                 <Sparkles size={12} />
-                {!authLoading && !isPro && isLoggedIn && <Lock size={10} />}
                 AI Tutor
               </button>
               <button
@@ -208,7 +175,6 @@ export default function TheoryCard({
                 disabled={authLoading}
               >
                 <Target size={12} />
-                {!authLoading && !isPro && isLoggedIn && <Lock size={10} />}
                 Evaluate Me
               </button>
               {!isLoggedIn && !authLoading && (

@@ -9,7 +9,6 @@ import { C, RADIUS } from "@/styles/tokens";
 import * as Shared from "@/styles/shared";
 import { useAuth } from "@/hooks/useAuth";
 import PolyfillCard from "@/components/ui/QuestionCards/PolyfillCard";
-import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import { useUserProgress } from "@/hooks/useQuestions";
 import PageGuard from "@/components/ui/PageGuard";
 import { usePagination } from "@/hooks/usePagination";
@@ -20,7 +19,6 @@ import CategoryFilter, {
 } from "@/app/theory/CategoryFilter";
 import { Question } from "@/types/question";
 
-const FREE_LIMIT = 5;
 const PAGE_SIZE = 10;
 
 export default function PolyfillLabClientPage({
@@ -42,8 +40,6 @@ export default function PolyfillLabClientPage({
   } = useUserProgress({ uid: user?.uid ?? null });
 
   const [filters, setFilters] = useState<FilterState>(defaultFilters());
-  const [showPaywall, setShowPaywall] = useState(false);
-
 
   const bookmarkedSet = useMemo(
     () => new Set(bookmarkIds ?? []),
@@ -91,13 +87,6 @@ export default function PolyfillLabClientPage({
   return (
     <PageGuard loading={authLoading || (!!user && !progress)} ready>
       <>
-        {showPaywall && (
-          <PaywallBanner
-            reason={`Free users can attempt the first ${FREE_LIMIT} polyfill questions. Upgrade for all!`}
-            onClose={() => setShowPaywall(false)}
-          />
-        )}
-
         <div css={Shared.pageWrapper}>
           <div css={Shared.pageHeader}>
             <div css={Shared.pageHeaderTop}>
@@ -123,7 +112,7 @@ export default function PolyfillLabClientPage({
             </div>
           </div>
 
-          <SignInPrompt message="Your first 5 polyfill challenges are free. Sign in to save your progress." />
+          <SignInPrompt message="Every polyfill challenge is free. Sign in to save your progress and keep a streak." />
 
           <CategoryFilter
             categories={categories}
@@ -160,29 +149,12 @@ export default function PolyfillLabClientPage({
                     isRevealed={isRevealed}
                     recordSolved={recordSolved}
                     recordRevealed={recordRevealed}
-                    isLocked={!isPro && globalIdx >= FREE_LIMIT}
                     isPro={isPro}
-                    onPaywall={() => setShowPaywall(true)}
                   />
                 );
               })}
             </div>
           </PaginationControls>
-
-          {!isPro && (
-            <div css={Shared.proNudge}>
-              <span>
-                First {FREE_LIMIT} challenges free,{" "}
-                {questions.length - FREE_LIMIT} more with Pro
-              </span>
-              <button
-                css={Shared.upgradeBtn}
-                onClick={() => setShowPaywall(true)}
-              >
-                Get all {questions.length}
-              </button>
-            </div>
-          )}
         </div>
       </>
     </PageGuard>

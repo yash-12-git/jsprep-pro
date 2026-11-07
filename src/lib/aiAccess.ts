@@ -79,25 +79,84 @@ export async function resolveAICaller(req: NextRequest): Promise<AICaller | null
   return { tier: hasActivePro(snap.data()) ? "pro" : "free", key };
 }
 
+// What a free account gets of each Pro-level feature, on top of the daily
+// total above. Pro has no per-feature limit.
+export const FREE_DAILY_FEATURE_LIMITS: Partial<Record<string, number>> = {
+  qa: 5, // AI tutor
+  debugcheck: 5, // AI code checker
+};
+const FREE_STUDY_PLAN_EVERY_MS = 7 * DAY_MS;
+
 /**
- * Counts one request against today's limit (UTC) and returns false once it's
- * used up. Runs in a transaction so parallel requests can't overshoot.
- * `expiresAt` lets a Firestore TTL policy clean up old counters.
+ * - `ok`: counted.
+ * - `daily`: today's total is used up.
+ * - `upgrade`: the free allowance for this feature is used up.
  */
-export async function consumeAIQuota(caller: AICaller): Promise<boolean> {
+export type QuotaResult = "ok" | "daily" | "upgrade";
+
+/**
+ * Counts one request against today's limit (UTC) and, for free accounts, the
+ * feature's own allowance. Runs in a transaction so parallel requests can't
+ * overshoot. `expiresAt` lets a Firestore TTL policy clean up daily counters;
+ * the `_allowances` doc (study plan week, mock trial) is kept.
+ *
+ * `opensMockInterview` marks the first request of a mock interview: a free
+ * account gets one interview, and later turns are only allowed once it began.
+ */
+export async function consumeAIQuota(
+  caller: AICaller,
+  type: string,
+  opensMockInterview = false,
+): Promise<QuotaResult> {
   const now = new Date();
   const day = now.toISOString().slice(0, 10);
   const db = getAdminDb();
-  const ref = db.collection(USAGE_COL).doc(`${caller.key}_${day}`);
+  const dayRef = db.collection(USAGE_COL).doc(`${caller.key}_${day}`);
+  const allowRef = db.collection(USAGE_COL).doc(`${caller.key}_allowances`);
+  const metered = caller.tier === "free";
 
   return db.runTransaction(async (tx) => {
-    const snap = await tx.get(ref);
-    const count: number = snap.data()?.count ?? 0;
-    if (count >= DAILY_AI_LIMITS[caller.tier]) return false;
-    tx.set(ref, {
+    const [daySnap, allowSnap] = await Promise.all([
+      tx.get(dayRef),
+      metered ? tx.get(allowRef) : Promise.resolve(null),
+    ]);
+    const used = daySnap.data() ?? {};
+    const count: number = used.count ?? 0;
+    if (count >= DAILY_AI_LIMITS[caller.tier]) return "daily";
+
+    const dayUpdate: Record<string, unknown> = {
       count: count + 1,
       expiresAt: new Date(now.getTime() + 2 * DAY_MS),
-    });
-    return true;
+    };
+    let allowUpdate: Record<string, unknown> | null = null;
+
+    if (metered) {
+      const allow = allowSnap?.data() ?? {};
+      const featureLimit = FREE_DAILY_FEATURE_LIMITS[type];
+      if (featureLimit !== undefined) {
+        const featureCount: number = used[type] ?? 0;
+        if (featureCount >= featureLimit) return "upgrade";
+        dayUpdate[type] = featureCount + 1;
+      }
+      if (type === "studyplan") {
+        const last = allow.studyPlanAt ? Date.parse(allow.studyPlanAt) : 0;
+        if (now.getTime() - last < FREE_STUDY_PLAN_EVERY_MS) return "upgrade";
+        allowUpdate = { studyPlanAt: now.toISOString() };
+      }
+      if (type === "mock") {
+        if (opensMockInterview) {
+          if (allow.mockTrialAt) return "upgrade";
+          allowUpdate = { mockTrialAt: now.toISOString() };
+        } else {
+          // Turns of the one trial interview, which lasts well under a day.
+          const began = allow.mockTrialAt ? Date.parse(allow.mockTrialAt) : 0;
+          if (now.getTime() - began > DAY_MS) return "upgrade";
+        }
+      }
+    }
+
+    tx.set(dayRef, dayUpdate, { merge: true });
+    if (allowUpdate) tx.set(allowRef, allowUpdate, { merge: true });
+    return "ok";
   });
 }

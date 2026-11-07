@@ -11,7 +11,7 @@
  * 3. Shows the correct AI score and verdict, never "0/10 Evaluation failed".
  */
 
-import { aiErrorMessage, postAI } from "@/lib/aiClient";
+import { AIRequestError, aiErrorMessage, postAI } from "@/lib/aiClient";
 import { track } from "@/lib/analytics";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useState, useCallback } from "react";
@@ -161,8 +161,8 @@ export default function DebugCard({
   }, [userCode]);
 
   async function submitFix() {
-    if (!isPro || !isLoggedIn) {
-      onPaywall?.();
+    if (!isLoggedIn) {
+      window.location.href = `/auth?next=${encodeURIComponent(window.location.pathname)}`;
       return;
     }
     if (!hasEdited) return;
@@ -206,13 +206,15 @@ export default function DebugCard({
         correct: fb.correct,
       });
       track("ai_evaluation_shown", { kind: "debug", score: fb.score });
-      if (fb.correct && isPro && !persistedSolved)
+      if (fb.correct && !persistedSolved)
         recordSolved(q.id).catch(() => {});
       setUiPhase("feedback");
     } catch (err) {
       // A failed check says nothing about the code, so it must not look like a
       // wrong answer. Keep the user's code and let them try again.
       console.error("[DebugCard] AI check failed", err);
+      // The free daily allowance is used up: offer Pro rather than an error.
+      if (err instanceof AIRequestError && err.status === 402) onPaywall?.();
       setAiError(aiErrorMessage(err));
       setUiPhase("editing");
     }
@@ -220,7 +222,7 @@ export default function DebugCard({
 
   function revealAnswer() {
     setShowReveal(true);
-    if (!persistedSolved && !isRevealed(q.id) && isPro)
+    if (!persistedSolved && !isRevealed(q.id))
       recordRevealed(q.id).catch(() => {});
   }
 
@@ -292,7 +294,6 @@ export default function DebugCard({
                 >
                   {q.category}
                 </span>
-                {!isPro && <span css={S.proBadge}>PRO</span>}
               </div>
               <p
                 css={{
@@ -433,7 +434,7 @@ export default function DebugCard({
 
               <div css={S.inputSection} style={{ paddingTop: "0.75rem" }}>
                 <div css={S.actionRow}>
-                  {isPro ? (
+                  {isLoggedIn ? (
                     <button
                       css={Shared.primaryBtn(isSolvedQ ? C.green : C.red)}
                       onClick={submitFix}
@@ -456,9 +457,9 @@ export default function DebugCard({
                   ) : (
                     <button
                       css={Shared.primaryBtn(C.accent)}
-                      onClick={onPaywall}
+                      onClick={submitFix}
                     >
-                      <Zap size={12} /> Upgrade to Submit Fix
+                      <Send size={12} /> Sign in to check your fix
                     </button>
                   )}
                   {!showReveal ? (

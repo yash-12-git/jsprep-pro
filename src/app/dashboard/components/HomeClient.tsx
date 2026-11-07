@@ -20,6 +20,7 @@
  */
 
 import LastSprint from "./LastSprint";
+import ReadinessSummary from "./ReadinessSummary";
 import { useMemo } from "react";
 import { css } from "@emotion/react";
 import { BarChart2 } from "lucide-react";
@@ -361,6 +362,7 @@ export default function HomeClient({
       </div>
 
       {/* ── Subscription management (renders only for Pro subscribers) ── */}
+      <ReadinessSummary />
       <LastSprint />
       <ManageSubscription />
 

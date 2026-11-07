@@ -29,13 +29,23 @@ import { buildStudyPlanPrompt } from "@/lib/studyPlanPrompt";
 
 // evaluate stays open to everyone because the free sprint warmup and Question
 // of the Day use it without an account. Daily limits bound what that can cost.
-const ACCESS: Record<string, "any" | "pro" | "internal"> = {
+// "account" features need sign-in; free accounts get a limited allowance of
+// each (see FREE_DAILY_FEATURE_LIMITS in aiAccess) and Pro gets fair use.
+const ACCESS: Record<string, "any" | "account" | "internal"> = {
   evaluate: "any",
-  qa: "pro",
-  debugcheck: "pro",
-  studyplan: "pro",
-  mock: "pro",
+  qa: "account",
+  debugcheck: "account",
+  studyplan: "account",
+  mock: "account",
   generate: "internal",
+};
+
+// Shown when a free account has used its allowance of a feature.
+const UPGRADE_MESSAGES: Record<string, string> = {
+  qa: "You've used today's 5 free AI tutor questions. Pro has no daily cap.",
+  debugcheck: "You've used today's 5 free AI code checks. Pro has no daily cap.",
+  studyplan: "Free accounts get a new study plan once a week. Pro updates it any time.",
+  mock: "Your free mock interview is used. Pro has unlimited mock interviews.",
 };
 
 const MAX_MESSAGES = 40;
@@ -86,9 +96,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
     } else {
-      // If Firestore can't answer, Pro can't be confirmed, so paid features
-      // stop. Free evaluation carries on unmetered: Groq's own rate limits still
-      // cap the cost, and a database problem shouldn't break the free sprint.
+      // If Firestore can't answer, allowances can't be checked, so account
+      // features stop. Free evaluation carries on unmetered: Groq's own rate
+      // limits still cap the cost, and a database problem shouldn't break the
+      // free sprint.
       const firestoreDown = (err: unknown) => {
         console.error("[ai] access check unavailable:", err);
         return null;
@@ -100,38 +111,44 @@ export async function POST(req: NextRequest) {
           return firestoreDown(err);
         },
       );
-      if (checksFailed && access === "pro") {
+      if (checksFailed && access === "account") {
         return NextResponse.json(
           { error: "AI is busy, try again shortly" },
           { status: 503 },
         );
       }
       if (!checksFailed) {
-        if (!caller || (access === "pro" && caller.tier === "anon")) {
+        if (!caller || (access === "account" && caller.tier === "anon")) {
           return NextResponse.json(
             { error: "Sign in required" },
             { status: 401 },
           );
         }
-        if (access === "pro" && caller.tier !== "pro") {
-          return NextResponse.json({ error: "Pro required" }, { status: 403 });
-        }
-        const allowed = await withFirestoreTimeout(consumeAIQuota(caller)).catch(
-          (err) => {
-            firestoreDown(err);
-            return access !== "pro" ? true : null;
-          },
-        );
-        if (allowed === null) {
+        // The mock interview client opens with a single "Begin" message.
+        const opensMock =
+          type === "mock" && messages.length === 1 && !context.isFinal;
+        const result = await withFirestoreTimeout(
+          consumeAIQuota(caller, type, opensMock),
+        ).catch((err) => {
+          firestoreDown(err);
+          return access === "account" ? null : ("ok" as const);
+        });
+        if (result === null) {
           return NextResponse.json(
             { error: "AI is busy, try again shortly" },
             { status: 503 },
           );
         }
-        if (!allowed) {
+        if (result === "daily") {
           return NextResponse.json(
             { error: "Daily AI limit reached" },
             { status: 429 },
+          );
+        }
+        if (result === "upgrade") {
+          return NextResponse.json(
+            { error: UPGRADE_MESSAGES[type] ?? "Upgrade to Pro to keep going." },
+            { status: 402 },
           );
         }
       }

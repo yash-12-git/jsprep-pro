@@ -11,12 +11,10 @@ import {
   Loader2,
   ChevronDown,
   ChevronUp,
-  Lock,
   Zap,
   CheckCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import PaywallBanner from "./PaywallBanner/page";
 import { C, RADIUS } from "@/styles/tokens";
 
 interface EvalResult {
@@ -120,36 +118,6 @@ const signInLink = css`
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: opacity 0.12s ease;
-  &:hover {
-    opacity: 0.88;
-  }
-`;
-
-const proGateBox = css`
-  padding: 1rem;
-  border: 1px solid ${C.border};
-  border-radius: ${RADIUS.lg};
-  background: ${C.bgSubtle};
-`;
-const proGateText = css`
-  font-size: 0.8125rem;
-  color: ${C.muted};
-  margin-bottom: 0.875rem;
-  line-height: 1.55;
-`;
-const proUpgradeBtn = css`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.4375rem 0.875rem;
-  background: ${C.accent};
-  color: ${C.accentInk};
-  border-radius: ${RADIUS.md};
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
   transition: opacity 0.12s ease;
   &:hover {
     opacity: 0.88;
@@ -321,13 +289,12 @@ export default function InlineEvaluator({
   idealAnswer,
   label,
 }: Props) {
-  const { user, progress } = useAuth();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<EvalResult | null>(null);
   const [showBetter, setShowBetter] = useState(false);
-  const [showPaywall, setShowPaywall] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
   async function evaluate() {
@@ -362,26 +329,11 @@ export default function InlineEvaluator({
 
   return (
     <>
-      {showPaywall && (
-        <PaywallBanner
-          reason="AI Answer Evaluator is a Pro feature. Upgrade to get scored on your answers!"
-          onClose={() => setShowPaywall(false)}
-        />
-      )}
-
       <div css={wrap}>
         {/* Trigger */}
         <button
           css={triggerBtn}
           onClick={() => {
-            if (!user) {
-              setOpen((o) => !o);
-              return;
-            }
-            if (!progress?.isPro) {
-              setShowPaywall(true);
-              return;
-            }
             setOpen((o) => !o);
           }}
         >
@@ -393,18 +345,12 @@ export default function InlineEvaluator({
             <div css={triggerSub}>
               {!user
                 ? "Sign in to test your answer"
-                : !progress?.isPro
-                  ? "Pro feature, upgrade to unlock"
-                  : "Type your answer, get scored 1–10"}
+                : "Type your answer, get scored 1–10"}
             </div>
           </div>
-          {!user || progress?.isPro ? (
-            <div css={chevronStyle(open)}>
-              <ChevronDown size={15} />
-            </div>
-          ) : (
-            <Lock size={14} style={{ color: C.muted, flexShrink: 0 }} />
-          )}
+          <div css={chevronStyle(open)}>
+            <ChevronDown size={15} />
+          </div>
         </button>
 
         {/* Body */}
@@ -422,28 +368,8 @@ export default function InlineEvaluator({
               </div>
             )}
 
-            {/* Signed in, free */}
-            {user && !progress?.isPro && (
-              <div css={proGateBox}>
-                <p css={proGateText}>
-                  AI Answer Evaluator is a Pro feature. Type your answer and get
-                  a 1 to 10 score, see exactly what you got right, what you missed,
-                  and a better answer.
-                </p>
-                <button
-                  css={proUpgradeBtn}
-                  onClick={() => {
-                    setOpen(false);
-                    setShowPaywall(true);
-                  }}
-                >
-                  <Zap size={12} /> Upgrade to Pro
-                </button>
-              </div>
-            )}
-
-            {/* Pro — full evaluator */}
-            {user && progress?.isPro && !result && (
+            {/* Signed in — full evaluator */}
+            {user && !result && (
               <>
                 <p
                   css={{
@@ -487,7 +413,7 @@ export default function InlineEvaluator({
             )}
 
             {/* Results */}
-            {user && progress?.isPro && result && (
+            {user && result && (
               <div css={resultWrap}>
                 <div css={scoreRow}>
                   <div style={{ flexShrink: 0 }}>

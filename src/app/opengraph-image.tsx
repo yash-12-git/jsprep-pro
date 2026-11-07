@@ -6,21 +6,18 @@ export const alt = "JSPrep Pro — JavaScript Interview Preparation";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// ─── Design tokens (mirrors tokens.ts — hardcoded for edge runtime) ───────────
+// ─── Design tokens: the dark theme in tokens.css, as hex for the edge runtime ─
 const T = {
-  bg: "#ffffff",
-  bgSubtle: "#f7f7f5",
-  bgActive: "#ebebea",
-  border: "#e9e9e7",
-  text: "#37352f",
-  muted: "#787774",
-  accent: "#2383e2",
-  accentSubtle: "#e8f1fb",
-  green: "#0f7b6c",
-  greenSubtle: "#edf6f4",
-  amber: "#c9750c",
-  codeBg: "#f7f7f5",
-  codeText: "#37352f",
+  bg: "#0d1013",
+  bgSubtle: "#15191c",
+  border: "#2d3135",
+  text: "#eceff2",
+  muted: "#9da2a8",
+  accent: "#f7b83d",
+  accentInk: "#1c0e00",
+  green: "#5fd3a4",
+  greenSubtle: "#12261f",
+  amber: "#f7b83d",
 } as const;
 
 export default function Image() {
@@ -47,7 +44,7 @@ export default function Image() {
         }}
       />
 
-      {/* Top accent line — clean Notion blue */}
+      {/* Top accent line */}
       <div
         style={{
           position: "absolute",
@@ -89,7 +86,7 @@ export default function Image() {
               justifyContent: "center",
               fontSize: 20,
               fontWeight: 800,
-              color: "#ffffff",
+              color: T.accentInk,
             }}
           >
             JS
@@ -149,16 +146,15 @@ export default function Image() {
                 lineHeight: 1.55,
               }}
             >
-              {`${CONTENT_COUNTS.total} questions · Theory, Output & Debug · 6 AI tools`}
+              Theory, output, debug and polyfill questions, with AI feedback.
             </div>
 
             {/* Stat pills */}
             <div style={{ display: "flex", gap: 10 }}>
               {[
                 [CONTENT_COUNTS.total, "Questions"],
-                ["3", "Modes"],
-                [CONTENT_COUNTS.topics, "Topics"],
-                ["6", "AI Tools"],
+                ["4", "Practice modes"],
+                [CONTENT_COUNTS.topics, "Topic guides"],
               ].map(([n, l]) => (
                 <div
                   key={l}
@@ -251,6 +247,7 @@ export default function Image() {
                   color: color || T.text,
                   lineHeight: 1.7,
                   fontFamily: "monospace",
+                  whiteSpace: "pre",
                 }}
               >
                 {line || "\u00A0"}

@@ -84,7 +84,7 @@ export default function TopicQuestionList({ questions, topicSlug }: Props) {
                 recordRevealed={recordRevealed}
                 onPaywall={() =>
                   openPaywall(
-                    "AI fix checking is a Pro feature. Upgrade for instant AI feedback.",
+                    "You've used today's 5 free AI code checks. Pro has no daily cap.",
                   )
                 }
               />
