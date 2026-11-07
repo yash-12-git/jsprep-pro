@@ -22,7 +22,8 @@ import { proExpiryFrom } from "@/lib/subscription";
 
 export const runtime = "nodejs";
 
-const ACTIVE_STATUSES = ["active", "authenticated", "pending"];
+// Not "pending": that means an auto-charge failed, so it can't grant more time.
+const ACTIVE_STATUSES = ["active", "authenticated"];
 
 function safeEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(a, "utf8");

@@ -244,8 +244,8 @@ async function generateAndSavePending(
 
 export async function GET(req: NextRequest) {
   // Vercel cron sends Authorization header with CRON_SECRET
-  const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

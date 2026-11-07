@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyAdmin } from "@/lib/firebaseAdmin";
+
+// IndexNow's own limit per request.
+const MAX_URLS = 10_000;
 
 export async function POST(req: NextRequest) {
+  if (!(await verifyAdmin(req.headers.get("authorization")))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { urls } = await req.json();
 
-  if (!Array.isArray(urls) || urls.length === 0) {
+  if (!Array.isArray(urls) || urls.length === 0 || urls.length > MAX_URLS) {
     return NextResponse.json({ error: "urls required" }, { status: 400 });
   }
 

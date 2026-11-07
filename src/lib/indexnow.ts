@@ -1,9 +1,15 @@
+import { auth } from "@/lib/firebase";
+
 export async function submitToIndexNow(urls: string[]) {
   try {
+    const token = await auth.currentUser?.getIdToken();
     // Proxy through /api/indexnow — IndexNow API blocks direct browser fetches (CORS)
     const res = await fetch("/api/indexnow", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ urls }),
     });
 

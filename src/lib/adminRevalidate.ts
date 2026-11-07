@@ -10,49 +10,57 @@
  * → only that one topic's cache clears → other 34 topics unaffected.
  *
  * Broad tags (revalidateTopics, revalidateBlogPosts) kept for bulk ops like seeding.
+ *
+ * Browser side: adds the signed-in admin's token, which the server actions check.
  */
 
-"use server";
+import { auth } from "@/lib/firebase";
+import {
+  revalidateBlogPostAction,
+  revalidateTagsAction,
+  revalidateTopicAction,
+} from "@/lib/adminRevalidateActions";
 
-import { revalidateTag } from "next/cache";
-import { CACHE_TAGS } from "@/lib/cachedQueries";
+async function adminToken(): Promise<string> {
+  const token = await auth.currentUser?.getIdToken();
+  if (!token) throw new Error("Sign in as an admin to clear the cache");
+  return token;
+}
 
 // ─── Granular — use these in admin save handlers ──────────────────────────────
 
 /** Clears only the cache for a single topic slug. Use after editing one topic. */
 export async function revalidateTopic(slug: string) {
-  revalidateTag(`topic-${slug}`);
-  // Also clear the topics list (for /topics page and sitemaps)
-  revalidateTag(CACHE_TAGS.topics);
+  await revalidateTopicAction(await adminToken(), slug);
 }
 
 /** Clears only the cache for a single blog post slug. Use after editing one post. */
 export async function revalidateBlogPost(slug: string) {
-  revalidateTag(`blog-${slug}`);
-  // Also clear the posts list (for /blog page and sitemaps)
-  revalidateTag(CACHE_TAGS.blogPosts);
+  await revalidateBlogPostAction(await adminToken(), slug);
 }
 
 /** Clears question caches — questions don't have individual slugs in cache yet */
 export async function revalidateQuestions() {
-  revalidateTag(CACHE_TAGS.questions);
+  await revalidateTagsAction(await adminToken(), ["questions"]);
 }
 
 // ─── Broad — only for bulk operations (seeding, migrations) ──────────────────
 
 /** Clears ALL topic caches. Use only after bulk topic migrations. */
 export async function revalidateTopics() {
-  revalidateTag(CACHE_TAGS.topics);
+  await revalidateTagsAction(await adminToken(), ["topics"]);
 }
 
 /** Clears ALL blog post caches. Use only after bulk blog migrations. */
 export async function revalidateBlogPosts() {
-  revalidateTag(CACHE_TAGS.blogPosts);
+  await revalidateTagsAction(await adminToken(), ["blogPosts"]);
 }
 
 /** Nuclear: clears everything. Use after bulk data migrations only. */
 export async function revalidateAll() {
-  revalidateTag(CACHE_TAGS.topics);
-  revalidateTag(CACHE_TAGS.blogPosts);
-  revalidateTag(CACHE_TAGS.questions);
+  await revalidateTagsAction(await adminToken(), [
+    "topics",
+    "blogPosts",
+    "questions",
+  ]);
 }
