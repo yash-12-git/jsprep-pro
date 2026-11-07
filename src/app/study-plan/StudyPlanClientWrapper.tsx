@@ -6,12 +6,14 @@ import { track } from "@/lib/analytics";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useQuestions";
 import { getRecentSprints } from "@/lib/sprintHistory";
 import { getRecentInterviews, isUnscored } from "@/lib/interviewHistory";
 import { getInterviewLogs } from "@/lib/interviewLog";
-import { saveReadiness } from "@/lib/readinessHistory";
+import { useReadiness } from "@/hooks/useReadiness";
+import type { QuestionTotals } from "@/lib/readiness";
 import PageGuard from "@/components/ui/PageGuard";
 import {
   Loader2,
@@ -46,14 +48,28 @@ interface StudyPlan {
 export default function StudyPlanClientPage({
   questions,
   categories,
+  totals,
 }: {
   questions: Question[];
   categories: string[];
+  totals: QuestionTotals;
 }) {
   const { user, progress, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const { masteredIds } = useUserProgress({ uid: user?.uid ?? null });
+  const {
+    masteredIds,
+    solvedIds,
+    loading: progressLoading,
+  } = useUserProgress({ uid: user?.uid ?? null });
+  // Calculated from activity, the same number the dashboard shows.
+  const { readiness } = useReadiness({
+    uid: user?.uid ?? null,
+    totals,
+    masteredIds,
+    solvedIds,
+    progressLoading,
+  });
 
   const [plan, setPlan] = useState<StudyPlan | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -150,6 +166,11 @@ export default function StudyPlanClientPage({
               date,
             }),
           ),
+          readiness: readiness && {
+            score: readiness.score,
+            label: readiness.label,
+            parts: readiness.parts.map(({ label, value }) => ({ label, value })),
+          },
           focusCandidates,
           catStats,
           interviewDate: interviewDate || null,
@@ -159,14 +180,12 @@ export default function StudyPlanClientPage({
       const parsed: StudyPlan = JSON.parse(
         data.text.replace(/```json|```/g, "").trim(),
       );
+      // The score is calculated, not the AI's to choose.
+      if (readiness) {
+        parsed.readinessScore = readiness.score;
+        parsed.readinessLabel = readiness.label;
+      }
       setPlan(parsed);
-      // Kept for the dashboard's readiness trend; the plan still shows if this fails.
-      saveReadiness(user!.uid, {
-        score: Number(parsed.readinessScore) || 0,
-        label: String(parsed.readinessLabel ?? ""),
-        weakSpots: (parsed.weakSpots ?? []).map((w) => w.category).slice(0, 5),
-        createdAt: new Date().toISOString(),
-      }).catch((err) => console.error("[StudyPlan] could not save readiness", err));
       track("study_plan_generated", {
         readiness_score: parsed.readinessScore,
         has_interview_date: Boolean(interviewDate),
@@ -316,7 +335,7 @@ export default function StudyPlanClientPage({
           <button
             css={Shared.primaryBtn(C.amber)}
             onClick={generatePlan}
-            disabled={generating}
+            disabled={generating || !readiness}
           >
             {generating ? (
               <>
@@ -372,6 +391,12 @@ export default function StudyPlanClientPage({
                 }}
               >
                 {plan.summary}
+              </p>
+              <p css={{ fontSize: "0.8125rem", color: C.muted, marginTop: "0.5rem" }}>
+                Calculated from your coverage, sprints and interviews.{" "}
+                <Link href="/dashboard" css={{ color: C.text, textDecoration: "underline" }}>
+                  See the breakdown
+                </Link>
               </p>
             </div>
 

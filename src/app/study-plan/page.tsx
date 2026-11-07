@@ -1,4 +1,5 @@
 import { getQuestions } from "@/lib/cachedQueries";
+import { getQuestionTotals } from "@/lib/questionTotals";
 import { getServerTrack } from "@/lib/getServerTrack";
 import StudyPlanClientPage from "./StudyPlanClientWrapper";
 import { pageMeta } from "@/lib/seo/seo";
@@ -13,16 +14,23 @@ export const metadata: Metadata = pageMeta({
 
 export default async function StudyPlanPage() {
   const track = await getServerTrack();
-  const { questions } = await getQuestions({
-    filters: { track, status: "published", type: "theory" },
-    pageSize: 300,
-  });
+  const [{ questions }, totals] = await Promise.all([
+    getQuestions({
+      filters: { track, status: "published", type: "theory" },
+      pageSize: 300,
+    }),
+    getQuestionTotals(),
+  ]);
 
   const categories = Array.from(
     new Set(questions.map((q) => q.category)),
   ).sort();
 
   return (
-    <StudyPlanClientPage questions={questions} categories={categories ?? []} />
+    <StudyPlanClientPage
+      questions={questions}
+      categories={categories ?? []}
+      totals={totals}
+    />
   );
 }

@@ -3,6 +3,7 @@
 
 import { css, keyframes } from "@emotion/react";
 import { useState } from "react";
+import Link from "next/link";
 import { Zap, Timer, Shuffle, Brain, Code2, Bug, Lock } from "lucide-react";
 import { C, RADIUS } from "@/styles/tokens";
 import type { SprintConfig } from "../types";
@@ -211,11 +212,21 @@ const upgradeNote = css`
   margin-top: 1rem;
   font-size: 0.8125rem;
   color: ${C.muted};
-  a {
+  a,
+  button {
     color: ${C.accent};
     text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
     &:hover {
       text-decoration: underline;
+    }
+    &:focus-visible {
+      outline: 2px solid ${C.accent};
+      outline-offset: 2px;
     }
   }
 `;
@@ -396,13 +407,16 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
 
         {!uid ? (
           <div css={upgradeNote}>
-            <a href="/auth?next=/sprint">Sign in free</a> for 10-question
+            <Link href="/auth?next=/sprint">Sign in free</Link> for 10-question
             sprints and to save your results.
           </div>
         ) : (
           !isPro && (
             <div css={upgradeNote}>
-              <a onClick={() => setShowPaywall(true)}>Pro</a> adds 15- and
+              <button type="button" onClick={() => setShowPaywall(true)}>
+                Pro
+              </button>{" "}
+              adds 15- and
               20-question sprints.
             </div>
           )

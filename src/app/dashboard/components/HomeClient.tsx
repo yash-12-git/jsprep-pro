@@ -265,9 +265,27 @@ export default function HomeClient({
   polyfillIds,
 }: Props) {
   const { user, progress } = useAuth();
-  const { masteredIds, solvedIds } = useUserProgress({
+  const {
+    masteredIds,
+    solvedIds,
+    loading: progressLoading,
+  } = useUserProgress({
     uid: user?.uid ?? null,
   });
+
+  // Stable, so readiness only recalculates when the data changes.
+  const totals = useMemo(
+    () => ({
+      theoryTotal,
+      outputTotal,
+      debugTotal,
+      polyfillTotal,
+      outputIds,
+      debugIds,
+      polyfillIds,
+    }),
+    [theoryTotal, outputTotal, debugTotal, polyfillTotal, outputIds, debugIds, polyfillIds],
+  );
 
   // Compute per-mode "done" counts by cross-referencing solvedIds against
   // the question ID sets passed from the server.
@@ -362,7 +380,13 @@ export default function HomeClient({
       </div>
 
       {/* ── Subscription management (renders only for Pro subscribers) ── */}
-      <ReadinessSummary />
+      <ReadinessSummary
+        uid={user?.uid ?? null}
+        totals={totals}
+        masteredIds={masteredIds}
+        solvedIds={solvedIds}
+        progressLoading={progressLoading}
+      />
       <LastSprint />
       <ManageSubscription />
 

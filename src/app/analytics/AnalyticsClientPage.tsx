@@ -9,24 +9,11 @@ import PageGuard from "@/components/ui/PageGuard";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import { Flame, Brain, Code2, Bug, Zap } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { getRecentSprints, type SavedSprint } from "@/lib/sprintHistory";
 import * as S from "./styles";
 import * as Shared from "@/styles/shared";
 import { C, RADIUS } from "@/styles/tokens";
 import { Question } from "@/types/question";
-
-// ─── Sprint doc shape ─────────────────────────────────────────────────────────
-interface SprintDoc {
-  score: number;
-  maxScore: number;
-  accuracy: number;
-  timeUsedSecs: number;
-  questionCount: number;
-  strengths: string[];
-  weakAreas: string[];
-  completedAt: string;
-}
 
 export default function AnalyticsClientPage({
   allQuestions,
@@ -51,21 +38,16 @@ export default function AnalyticsClientPage({
     uid: user?.uid ?? null,
   });
 
-  const [sprints, setSprints] = useState<SprintDoc[]>([]);
+  const [sprints, setSprints] = useState<SavedSprint[]>([]);
   const [sprintsLoading, setSprintsLoading] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     setSprintsLoading(true);
-    getDocs(
-      query(
-        collection(db, "users", user.uid, "sprints"),
-        orderBy("completedAt", "desc"),
-        limit(10),
-      ),
-    )
-      .then((snap) => setSprints(snap.docs.map((d) => d.data() as SprintDoc)))
+    // Only sprints where something was answered.
+    getRecentSprints(user.uid, 10)
+      .then(setSprints)
       .catch(() => setSprints([]))
       .finally(() => setSprintsLoading(false));
   }, [user]);

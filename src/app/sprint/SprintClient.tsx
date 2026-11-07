@@ -247,10 +247,13 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
         accuracy,
         timeUsedSecs,
         questionCount: finalResults.length,
+        attempted: attempted.length,
         strengths,
         weakAreas,
         completedAt: s.completedAt,
       };
+      // Nothing answered is not a result, so it isn't kept as a 0% sprint.
+      if (attempted.length === 0) return;
       if (uid) {
         saveSprint(uid, saved).catch((err) =>
           console.error("[sprint] could not save result", err),

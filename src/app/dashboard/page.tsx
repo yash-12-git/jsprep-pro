@@ -22,36 +22,10 @@ import { pageMeta } from "@/lib/seo/seo";
 import { C } from "@/styles/tokens";
 import { Suspense } from "react";
 import Link from "next/link";
-import { getQuestions } from "@/lib/cachedQueries";
+import { getQuestionTotals } from "@/lib/questionTotals";
 import HomeClient from "./components/HomeClient";
 import LearnSection from "./components/LearnSection";
 import QuestionOfTheDay from "./components/QuestionOfTheDayWrapper";
-import { getServerTrack } from "@/lib/getServerTrack";
-
-// ─── Data fetching ────────────────────────────────────────────────────────────
-// All four reads are parallelised with Promise.all.
-// Each is served from Next.js Data Cache — Firestore is not hit on repeated visits.
-
-async function getQuestionTotals() {
-  const track = await getServerTrack();
-  const [theory, output, debug, polyfill] = await Promise.all([
-    getQuestions({ filters: { track, status: "published", type: "theory"   }, pageSize: 300 }).catch(() => ({ questions: [] })),
-    getQuestions({ filters: { track, status: "published", type: "output"   }, pageSize: 300 }).catch(() => ({ questions: [] })),
-    getQuestions({ filters: { track, status: "published", type: "debug"    }, pageSize: 300 }).catch(() => ({ questions: [] })),
-    getQuestions({ filters: { track, status: "published", type: "polyfill" }, pageSize: 300 }).catch(() => ({ questions: [] })),
-  ]);
-
-  return {
-    theoryTotal:   theory.questions.length,
-    outputTotal:   output.questions.length,
-    debugTotal:    debug.questions.length,
-    polyfillTotal: polyfill.questions.length,
-    // Pass question IDs so client can cross-reference against solvedIds
-    outputIds:    output.questions.map(q => q.id),
-    debugIds:     debug.questions.map(q => q.id),
-    polyfillIds:  polyfill.questions.map(q => q.id),
-  };
-}
 
 // ─── Sprint CTA — server-rendered static section ─────────────────────────────
 // Pure HTML/CSS — no interactivity, no reason to hydrate.
