@@ -5,7 +5,6 @@ import { ROADMAP } from "@/data/roadmap/roadmapData";
 import { useRoadmapProgress } from "@/hooks/useRoadmapProgress";
 import { StatsGrid } from "@/components/ui/Roadmap/StatsGrid";
 import { WeekCard } from "@/components/ui/Roadmap/WeekCard";
-import { CompanyGuide } from "@/components/ui/Roadmap/CompanyGuide";
 import type { RoadmapMonth } from "@/data/roadmap/types";
 
 // ─── Month accent colour maps (→ CSS vars) ────────────────────────────────────
@@ -73,13 +72,11 @@ export function RoadmapClient() {
   const { mounted, globalStats, toggleDay, resetAll, isDayDone, getWeekStats, getMonthStats } =
     useRoadmapProgress();
 
-  // "companies" is a special tab outside the ROADMAP months
-  const [activeTab, setActiveTab] = useState<number | "companies">(1);
+  const [activeTab, setActiveTab] = useState<number>(1);
   const { msg: toastMsg, show: showToast } = useToast();
 
-  const isCompaniesTab = activeTab === "companies";
-  const activeMonth = isCompaniesTab ? null : ROADMAP[activeTab - 1];
-  const monthStats = isCompaniesTab ? null : getMonthStats(activeTab as number);
+  const activeMonth = ROADMAP[activeTab - 1];
+  const monthStats = getMonthStats(activeTab);
 
   function handleToggleDay(day: number) {
     const wasDone = isDayDone(day);
@@ -146,33 +143,10 @@ export function RoadmapClient() {
           );
         })}
 
-        {/* Company guide tab */}
-        <button
-          onClick={() => setActiveTab("companies")}
-          style={{
-            padding: "7px 14px",
-            borderRadius: "8px",
-            border: `1px solid ${isCompaniesTab ? "color-mix(in srgb, var(--color-accent) 30%, transparent)" : "var(--color-border)"}`,
-            fontSize: "12px",
-            fontFamily: "var(--font-outlier)",
-            cursor: "pointer",
-            background: isCompaniesTab
-              ? "color-mix(in srgb, var(--color-accent) 12%, transparent)"
-              : "var(--color-bg-subtle)",
-            color: isCompaniesTab ? "var(--color-accent)" : "var(--color-muted)",
-            transition: "all 0.15s",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Company guide
-        </button>
       </div>
 
-      {/* Company guide panel */}
-      {isCompaniesTab && <CompanyGuide />}
-
       {/* Month phase panel */}
-      {!isCompaniesTab && activeMonth && accent && (
+      {activeMonth && accent && (
         <>
           {/* Phase description banner */}
           {activeMonth.description && (
@@ -305,7 +279,7 @@ export function RoadmapClient() {
             fontFamily: "var(--font-outlier)",
           }}
         >
-          Progress auto-saved to browser, works offline
+          Progress saves in your browser, and to your account when signed in
         </span>
         <button
           onClick={handleReset}

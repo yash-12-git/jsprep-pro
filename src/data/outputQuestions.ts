@@ -30,7 +30,6 @@ export interface OutputQuestion {
   explanation: string;
   keyInsight: string;
   tags: string[];
-  companies: string[];
 }
 
 export const OUTPUT_CATEGORIES = [
@@ -53,7 +52,6 @@ export const outputQuestions: OutputQuestion[] = [
     difficulty: "medium",
     title: "Stale closure in setInterval — count never updates",
     tags: ["stale-closure", "useState", "setInterval", "hooks"],
-    companies: ["Meta", "Flipkart", "Razorpay", "Atlassian"],
     code: `// Simulates the stale closure bug in useEffect + setInterval
 let count = 0;
 
@@ -85,7 +83,6 @@ startInterval();`,
     difficulty: "medium",
     title: "Functional update reads latest state — closure does not",
     tags: ["useState", "functional-update", "stale-closure", "hooks"],
-    companies: ["Meta", "Razorpay", "Google", "CRED"],
     code: `// Simulates useState functional update vs direct update
 let state = 0;
 
@@ -122,7 +119,6 @@ console.log(fState);`,
     difficulty: "hard",
     title: "useEffect deps — effect runs only on relevant changes",
     tags: ["useEffect", "deps", "closure", "hooks"],
-    companies: ["Meta", "Atlassian", "Razorpay", "Google"],
     code: `// Simulates useEffect dependency tracking
 function useEffect(effect, deps) {
   let prevDeps = null;
@@ -157,7 +153,6 @@ effectRunner([2]);     // same again`,
     difficulty: "medium",
     title: "Custom hook returns fresh state each call — no sharing",
     tags: ["custom-hook", "closure", "encapsulation", "hooks"],
-    companies: ["Meta", "Flipkart", "Swiggy"],
     code: `// Custom hooks share LOGIC, not STATE
 function useCounter(initial = 0) {
   let count = initial;
@@ -191,7 +186,6 @@ console.log(compA.get() === compB.get());`,
     difficulty: "hard",
     title: "useCallback identity — same deps, same reference",
     tags: ["useCallback", "identity", "memoization", "deps"],
-    companies: ["Meta", "Google", "Atlassian", "CRED"],
     code: `function useCallback(fn, deps) {
   let saved = { fn: null, deps: null };
   return function get(newDeps) {
@@ -223,7 +217,6 @@ console.log(ref2 === ref3);`,
     difficulty: "medium",
     title: "usePrevious — ref holds last render's value",
     tags: ["usePrevious", "useRef", "closure", "hooks"],
-    companies: ["Flipkart", "Swiggy", "CRED", "Razorpay"],
     code: `// Simulates usePrevious hook
 function usePrevious(getValue) {
   let ref = { current: undefined };
@@ -257,7 +250,6 @@ console.log(r3.current);`,
     difficulty: "hard",
     title: "Stale closure in event handler vs ref solution",
     tags: ["stale-closure", "useRef", "event-handler", "hooks"],
-    companies: ["Meta", "Razorpay", "Google"],
     code: `// Stale approach — closes over initial value
 function makeStaleHandler(initialCount) {
   let count = initialCount;
@@ -292,7 +284,6 @@ console.log(fresh());`,
     difficulty: "medium",
     title: "useState initializer runs only once",
     tags: ["useState", "lazy-init", "closure", "hooks"],
-    companies: ["Meta", "Flipkart", "Razorpay"],
     code: `// Simulates useState lazy initialization
 function useState(init) {
   let state = typeof init === 'function' ? init() : init;
@@ -330,7 +321,6 @@ console.log(initCallCount);  // still 1 — init not re-run`,
     difficulty: "hard",
     title: "useReducer — dispatch queues actions, reducer is pure",
     tags: ["useReducer", "reducer", "dispatch", "pure"],
-    companies: ["Meta", "Google", "Atlassian"],
     code: `function reducer(state, action) {
   switch (action.type) {
     case 'ADD':  return { ...state, items: [...state.items, action.payload] };
@@ -364,7 +354,6 @@ console.log(state.items[0]);`,
     difficulty: "medium",
     title: "Hook call order must be stable — cursor-based tracking",
     tags: ["hooks", "call-order", "cursor", "rules-of-hooks"],
-    companies: ["Meta", "Razorpay", "Google"],
     code: `// Simulates React's hook tracking by call order
 const hooks = [];
 let cursor = 0;
@@ -405,7 +394,6 @@ console.log(a2, b2);`,
     difficulty: "hard",
     title: "useEffect cleanup runs before next effect",
     tags: ["useEffect", "cleanup", "lifecycle", "hooks"],
-    companies: ["Meta", "Flipkart", "Atlassian"],
     code: `const log = [];
 
 function simulateEffect(deps, effectFn) {
@@ -446,7 +434,6 @@ console.log(log.join(','));`,
     difficulty: "hard",
     title: "Closure in setInterval — solution with ref pattern",
     tags: ["useEffect", "setInterval", "stale-closure", "ref"],
-    companies: ["Meta", "Google", "Razorpay", "CRED"],
     code: `// Stale closure: setInterval always reads count=0
 let count = 0;
 let staleLog = [];
@@ -490,7 +477,6 @@ setTimeout(() => {
     difficulty: "easy",
     title: "Object spread creates new reference — mutation does not",
     tags: ["immutability", "spread", "state", "reference"],
-    companies: ["Meta", "Razorpay", "Flipkart", "Google"],
     code: `const state1 = { count: 0, name: 'app' };
 
 // Direct mutation — same reference
@@ -517,7 +503,6 @@ console.log(state3.count);`,
     difficulty: "medium",
     title: "Nested state requires full spread chain",
     tags: ["immutability", "nested-state", "spread", "state"],
-    companies: ["Meta", "Flipkart", "Atlassian", "CRED"],
     code: `const state = {
   user: { name: 'Alice', prefs: { theme: 'light' } }
 };
@@ -552,7 +537,6 @@ console.log(state.user.prefs === correctUpdate.user.prefs);`,
     difficulty: "medium",
     title: "Array state — push mutates, spread does not",
     tags: ["array", "immutability", "push", "spread", "state"],
-    companies: ["Meta", "Razorpay", "Flipkart"],
     code: `const items = ['a', 'b'];
 
 // Wrong — mutates original
@@ -579,7 +563,6 @@ console.log(items === correct);`,
     difficulty: "medium",
     title: "Updating array items immutably with map",
     tags: ["array", "immutability", "map", "state-update"],
-    companies: ["Meta", "Flipkart", "Swiggy", "Razorpay"],
     code: `const todos = [
   { id: 1, text: 'Buy milk', done: false },
   { id: 2, text: 'Write code', done: false },
@@ -608,7 +591,6 @@ console.log(todos[0] === updated[0]);`,
     difficulty: "medium",
     title: "Removing from array state with filter",
     tags: ["array", "filter", "immutability", "state"],
-    companies: ["Meta", "Flipkart", "Swiggy"],
     code: `const items = [1, 2, 3, 4, 5];
 
 // Remove item at index 2
@@ -634,7 +616,6 @@ console.log(removed === items);`,
     difficulty: "hard",
     title: "Object.is comparison — what React uses for state bail-out",
     tags: ["Object.is", "state", "bail-out", "equality"],
-    companies: ["Meta", "Google", "Atlassian"],
     code: `// React uses Object.is() to decide if state changed
 const results = [
   Object.is(0, -0),
@@ -670,7 +651,6 @@ setState({x:1}, {x:1});`,
     difficulty: "medium",
     title: "Batched state — multiple setStates, one render",
     tags: ["batching", "state", "render", "react-18"],
-    companies: ["Meta", "Razorpay", "Google"],
     code: `// Simulates React 18 automatic batching
 let renderCount = 0;
 let state = { count: 0, name: '' };
@@ -709,7 +689,6 @@ console.log(state.name);`,
     difficulty: "hard",
     title: "Derived state — compute during render, not in effect",
     tags: ["derived-state", "computed", "state", "render"],
-    companies: ["Meta", "Flipkart", "CRED", "Atlassian"],
     code: `// Anti-pattern: derived state stored redundantly
 let items = ['a', 'b', 'c'];
 let count = 0; // duplicated derived state
@@ -745,7 +724,6 @@ console.log(view2.isEmpty);`,
     difficulty: "medium",
     title: "Shallow merge vs replace in state updates",
     tags: ["state", "merge", "replace", "spread"],
-    companies: ["Meta", "Razorpay", "Flipkart"],
     code: `// Class component setState merges (shallow)
 let classState = { x: 1, y: 2, z: 3 };
 function classSetState(update) {
@@ -776,7 +754,6 @@ console.log(hookState.y); // still has y?`,
     difficulty: "hard",
     title: "structuredClone vs spread for deep state copy",
     tags: ["structuredClone", "deep-copy", "state", "immutability"],
-    companies: ["Meta", "Google", "Atlassian"],
     code: `const state = {
   user: { name: 'Alice', tags: ['admin', 'user'] }
 };
@@ -808,7 +785,6 @@ console.log(state.user.tags === shallow.user.tags);`,
     difficulty: "medium",
     title: "useEffect fires after render — not during",
     tags: ["useEffect", "event-loop", "render-order", "hooks"],
-    companies: ["Meta", "Flipkart", "Razorpay"],
     code: `const log = [];
 
 // Simulates synchronous render then async effects
@@ -841,7 +817,6 @@ setTimeout(() => console.log(log.join(' → ')), 0);`,
     difficulty: "medium",
     title: "Multiple state updates — renders before and after",
     tags: ["batching", "state", "render", "event-loop"],
-    companies: ["Meta", "Google", "Razorpay"],
     code: `let renders = 0;
 const schedule = [];
 
@@ -890,7 +865,6 @@ console.log(renders);`,
     difficulty: "hard",
     title: "startTransition marks updates as non-urgent",
     tags: ["startTransition", "concurrent", "urgent", "non-urgent"],
-    companies: ["Meta", "Google", "Atlassian"],
     code: `const log = [];
 
 // Simulates React's startTransition
@@ -938,7 +912,6 @@ console.log(log[2]);`,
     difficulty: "medium",
     title: "Promise chain order inside useEffect",
     tags: ["useEffect", "promise", "async", "order"],
-    companies: ["Meta", "Razorpay", "Swiggy"],
     code: `const log = [];
 
 // Simulates an async useEffect
@@ -975,7 +948,6 @@ setTimeout(() => console.log(log.join(' | ')), 10);`,
     difficulty: "hard",
     title: "Race condition — last request wins with cancelled flag",
     tags: ["race-condition", "async", "cancel", "useEffect"],
-    companies: ["Meta", "Google", "Razorpay", "Atlassian"],
     code: `function fetchWithCancel(id, delay) {
   let cancelled = false;
   const promise = new Promise(resolve =>
@@ -1020,7 +992,6 @@ setTimeout(() => console.log(activeResult), 100);`,
     difficulty: "medium",
     title: "useLayoutEffect vs useEffect timing",
     tags: ["useLayoutEffect", "useEffect", "timing", "synchronous"],
-    companies: ["Meta", "Flipkart", "Google"],
     code: `const log = [];
 
 // useLayoutEffect fires synchronously after DOM mutations but before paint
@@ -1060,7 +1031,6 @@ setTimeout(() => console.log(log.join(' | ')), 10);`,
     difficulty: "hard",
     title: "Suspense — component throws Promise, boundary catches it",
     tags: ["Suspense", "promise", "throw", "concurrent"],
-    companies: ["Meta", "Google", "Atlassian"],
     code: `// Simplified Suspense simulation
 const cache = new Map();
 
@@ -1101,7 +1071,6 @@ setTimeout(() => {
     difficulty: "medium",
     title: "Concurrent rendering — work can be interrupted",
     tags: ["concurrent", "startTransition", "interruptible", "rendering"],
-    companies: ["Meta", "Google"],
     code: `const log = [];
 let interrupted = false;
 
@@ -1151,7 +1120,6 @@ console.log(log.join(' | '));`,
     difficulty: "medium",
     title: "React.memo — skips when props shallowly equal",
     tags: ["React.memo", "shallow-equal", "re-render", "identity"],
-    companies: ["Meta", "Flipkart", "Razorpay", "Google"],
     code: `function shallowEqual(a, b) {
   const keysA = Object.keys(a), keysB = Object.keys(b);
   if (keysA.length !== keysB.length) return false;
@@ -1189,7 +1157,6 @@ console.log(renderCount);`,
     difficulty: "medium",
     title: "useMemo — recomputes only on dep change",
     tags: ["useMemo", "computation", "deps", "memoization"],
-    companies: ["Meta", "Flipkart", "Atlassian"],
     code: `let computeCount = 0;
 
 function useMemo(factory, deps) {
@@ -1232,7 +1199,6 @@ console.log(r3.join(','));`,
     difficulty: "hard",
     title: "New object prop bypasses React.memo",
     tags: ["React.memo", "identity", "object-prop", "re-render"],
-    companies: ["Meta", "Flipkart", "Razorpay", "CRED"],
     code: `function shallowEqual(a, b) {
   return Object.keys(a).every(k => a[k] === b[k]) &&
          Object.keys(b).every(k => b[k] === a[k]);
@@ -1271,7 +1237,6 @@ console.log(renders);`,
     difficulty: "medium",
     title: "useCallback vs inline function — identity difference",
     tags: ["useCallback", "identity", "function", "memo"],
-    companies: ["Meta", "Flipkart", "Razorpay"],
     code: `function useCallback(fn, deps) {
   let saved = null;
   return function get(newDeps) {
@@ -1306,7 +1271,6 @@ console.log(typeof ref1);`,
     difficulty: "hard",
     title: "Context re-render — every consumer re-renders on value change",
     tags: ["context", "re-render", "value-reference", "optimization"],
-    companies: ["Meta", "Google", "Razorpay", "Atlassian"],
     code: `let renders = { A: 0, B: 0, C: 0 };
 
 // Simulates context provider with value
@@ -1354,7 +1318,6 @@ console.log(renders.C);`,
     difficulty: "hard",
     title: "Stable context value with useMemo prevents cascading re-renders",
     tags: ["context", "useMemo", "stable-reference", "optimization"],
-    companies: ["Meta", "Google", "Atlassian", "CRED"],
     code: `let ctxRenders = 0;
 
 function simulate(getContextValue, numRenders) {
@@ -1394,7 +1357,6 @@ console.log(ctxRenders); // 1 (only first render)`,
     difficulty: "medium",
     title: "Children prop — components as data",
     tags: ["children", "composition", "props", "patterns"],
-    companies: ["Meta", "Flipkart", "Atlassian"],
     code: `// Simulates React's children prop pattern
 function Card({ title, children }) {
   return [Card: \${title}] \${children};
@@ -1433,7 +1395,6 @@ console.log(BorderedCard({ title: 'Box', children: 'content' }));`,
     difficulty: "hard",
     title: "Render props — caller controls rendering",
     tags: ["render-props", "children", "patterns", "inversion"],
-    companies: ["Meta", "Atlassian", "CRED", "Google"],
     code: `// DataFetcher exposes data via render prop
 function DataFetcher(url, render) {
   // Simulated data
@@ -1470,7 +1431,6 @@ console.log(table);`,
     difficulty: "medium",
     title: "Controlled vs uncontrolled — who owns the value?",
     tags: ["controlled", "uncontrolled", "state", "patterns"],
-    companies: ["Meta", "Flipkart", "Razorpay"],
     code: `// Controlled: parent owns value, child just displays
 function ControlledInput(value, onChange) {
   // The value comes from outside — child can't change it directly
@@ -1518,7 +1478,6 @@ console.log(controlled.type);`,
     difficulty: "hard",
     title: "Compound components — shared context without props",
     tags: ["compound-components", "context", "composition", "patterns"],
-    companies: ["Meta", "Atlassian", "CRED", "Google"],
     code: `// Simulates compound component pattern
 function createTabs() {
   let activeTab = null;
@@ -1567,7 +1526,6 @@ console.log(tab2.isActive());`,
     difficulty: "hard",
     title: "AbortController — cancel fetch on unmount",
     tags: ["AbortController", "cleanup", "useEffect", "cancel"],
-    companies: ["Meta", "Razorpay", "Atlassian", "Google"],
     code: `// Simulates useEffect cleanup with AbortController
 function makeFetch(signal) {
   return new Promise((resolve, reject) => {
@@ -1609,7 +1567,6 @@ setTimeout(() => console.log(result), 20);`,
     difficulty: "medium",
     title: "Promise.all in useEffect — parallel fetch, single state update",
     tags: ["Promise.all", "parallel", "useEffect", "data-fetching"],
-    companies: ["Meta", "Razorpay", "Swiggy", "Flipkart"],
     code: `const log = [];
 
 async function fetchDashboard() {
@@ -1643,7 +1600,6 @@ fetchDashboard().then(() => console.log(log.join(' | ')));`,
     difficulty: "hard",
     title: "Optimistic update — immediate UI, rollback on failure",
     tags: ["optimistic-update", "rollback", "state", "async"],
-    companies: ["Meta", "Flipkart", "Swiggy", "Razorpay"],
     code: `async function toggleLike(id, liked, updateUI, revertUI, saveToServer) {
   // Optimistic: update UI immediately
   updateUI(!liked);
@@ -1682,7 +1638,6 @@ toggleLike(
     difficulty: "medium",
     title: "Debounced search — only fires after typing stops",
     tags: ["debounce", "search", "performance", "async"],
-    companies: ["Flipkart", "Swiggy", "Razorpay", "CRED"],
     code: `function debounce(fn, delay) {
   let timer = null;
   return (...args) => {
@@ -1724,7 +1679,6 @@ setTimeout(() => {
     difficulty: "medium",
     title: "Ref vs state — ref doesn't cause re-render",
     tags: ["useRef", "state", "re-render", "mutable"],
-    companies: ["Meta", "Flipkart", "Razorpay"],
     code: `let stateRenders = 0;
 let refRenders = 0;
 
@@ -1771,7 +1725,6 @@ console.log(r.getRef());`,
     difficulty: "medium",
     title: "forwardRef — parent accesses child's DOM node",
     tags: ["forwardRef", "ref", "DOM", "imperative"],
-    companies: ["Meta", "Atlassian", "Flipkart"],
     code: `// Simulates forwardRef pattern
 function FancyInput(props, ref) {
   const input = {
@@ -1812,7 +1765,6 @@ console.log(inputRef.current.value);`,
     difficulty: "hard",
     title: "useImperativeHandle — expose limited API via ref",
     tags: ["useImperativeHandle", "forwardRef", "ref", "encapsulation"],
-    companies: ["Meta", "Google", "Atlassian"],
     code: `// Simulates useImperativeHandle
 function createImperativeHandle(ref, factory) {
   ref.current = factory();
@@ -1854,7 +1806,6 @@ console.log(playerRef.current.play());`,
     difficulty: "hard",
     title: "Ref callback — fires on mount and unmount",
     tags: ["ref-callback", "DOM", "lifecycle", "mount"],
-    companies: ["Meta", "Google", "Flipkart"],
     code: `const log = [];
 
 // Ref callback: called with element on mount, null on unmount

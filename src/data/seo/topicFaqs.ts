@@ -2025,7 +2025,7 @@ export const SYSTEM_DESIGN_TOPIC_FAQS: Record<string, FAQItem[]> = {
     {
       question: "What is the difference between monorepo and polyrepo?",
       answer:
-        "A polyrepo stores each project in its own git repository, published to npm independently. It provides clear team ownership and isolated CI pipelines. A monorepo stores everything together, enabling easier code sharing and atomic refactors but requiring more sophisticated tooling. Most large-scale frontend organizations (Google, Meta, Vercel) prefer monorepos for core products; smaller teams with independent services often prefer polyrepos.",
+        "A polyrepo stores each project in its own git repository, published to npm independently. It provides clear team ownership and isolated CI pipelines. A monorepo stores everything together, enabling easier code sharing and atomic refactors but requiring more sophisticated tooling. Many large frontend organizations prefer monorepos for core products; smaller teams with independent services often prefer polyrepos.",
     },
   ],
 

@@ -10,7 +10,6 @@ import {
   Loader2,
   Trash2,
   CheckCircle,
-  Building2,
 } from "lucide-react";
 import { C, RADIUS } from "@/styles/tokens";
 import MarkdownEditor from "@/components/md/MarkdownEditor";
@@ -35,23 +34,6 @@ interface Props {
   onDelete?: () => Promise<void>;
 }
 
-const ALL_COMPANIES = [
-  "Razorpay",
-  "Flipkart",
-  "Swiggy",
-  "Zomato",
-  "CRED",
-  "PhonePe",
-  "Google",
-  "Atlassian",
-  "Amazon",
-  "Microsoft",
-  "Meesho",
-  "Paytm",
-  "ShareChat",
-  "Uber",
-];
-
 const EMPTY: QuestionInput = {
   slug: "",
   type: "theory",
@@ -65,7 +47,6 @@ const EMPTY: QuestionInput = {
   code: "",
   category: "",
   tags: [],
-  companies: [],
   difficulty: "core",
   expectedOutput: "",
   brokenCode: "",
@@ -227,27 +208,6 @@ const S = {
     min-width: 8rem;
     font-family: inherit;
   `,
-  companiesGrid: css`
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 0.5rem;
-  `,
-  companyBtn: (active: boolean) => css`
-    padding: 0.375rem 0.625rem;
-    border-radius: ${RADIUS.md};
-    border: 1px solid ${active ? C.accent : C.border};
-    background: ${active ? C.accent + "14" : C.surface};
-    color: ${active ? C.accent : C.muted};
-    font-size: 0.75rem;
-    font-weight: ${active ? "600" : "400"};
-    cursor: pointer;
-    text-align: left;
-    transition: background-color 0.1s, border-color 0.1s, color 0.1s, opacity 0.1s, transform 0.1s;
-    &:hover {
-      border-color: ${C.accent};
-      color: ${C.accent};
-    }
-  `,
   sandboxNote: css`
     padding: 0.75rem 1rem;
     background: ${C.amberSubtle};
@@ -391,14 +351,6 @@ export default function QuestionForm({
     );
   }
 
-  const selectedCompanies: string[] = (form as any).companies ?? [];
-  function toggleCompany(c: string) {
-    const next = selectedCompanies.includes(c)
-      ? selectedCompanies.filter((x) => x !== c)
-      : [...selectedCompanies, c];
-    set("companies" as any, next);
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.title.trim()) {
@@ -448,7 +400,6 @@ export default function QuestionForm({
 
   const isOutputOrDebug = form.type === "output" || form.type === "debug";
   const isPolyfill = form.type === "polyfill";
-  const needsCompanies = isOutputOrDebug || isPolyfill;
 
   return (
     <form onSubmit={handleSubmit} css={S.wrap}>
@@ -609,45 +560,6 @@ export default function QuestionForm({
         </span>
       </div>
 
-      {/* ── Companies (output + debug only) ── */}
-      {needsCompanies && (
-        <div css={S.field}>
-          <label css={S.label}>
-            <Building2
-              size={13}
-              style={{
-                display: "inline",
-                marginRight: 5,
-                verticalAlign: "middle",
-              }}
-            />
-            Companies that ask this in interviews
-            {selectedCompanies.length > 0 && (
-              <span
-                css={S.labelHint}
-                style={{ marginLeft: 8, display: "inline" }}
-              >
-               , {selectedCompanies.join(", ")}
-              </span>
-            )}
-          </label>
-          <div css={S.companiesGrid}>
-            {ALL_COMPANIES.map((c) => (
-              <button
-                key={c}
-                type="button"
-                css={S.companyBtn(selectedCompanies.includes(c))}
-                onClick={() => toggleCompany(c)}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-          <span css={S.labelHint}>
-            Select companies known to ask questions on this JS concept.
-          </span>
-        </div>
-      )}
 
       <hr css={S.divider} />
 

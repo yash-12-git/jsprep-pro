@@ -249,7 +249,7 @@ export default function CheatsheetPage() {
             <>
               JavaScript Interview
               <br />
-              Cheat Sheet 2025
+              Cheat Sheet
             </>
           }
           lede="A complete quick-reference for every JavaScript concept you need to know before your frontend interview. Printable, bookmarkable, shareable."
@@ -418,7 +418,7 @@ export default function CheatsheetPage() {
           }
 
           body::after {
-            content: "jsprep.pro — JavaScript Interview Cheat Sheet 2025";
+            content: "jsprep.pro — JavaScript Interview Cheat Sheet";
             display: block; text-align: center;
             font-size: 7pt; color: #787774;
             margin-top: 1rem; border-top: 1px solid #e9e9e7; padding-top: 0.5rem;

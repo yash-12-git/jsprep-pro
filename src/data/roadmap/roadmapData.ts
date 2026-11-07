@@ -863,7 +863,7 @@ export const ROADMAP: RoadmapMonth[] = [
     month: 3,
     title: "Machine Coding + Projects",
     accent: "amber",
-    description: "This is the biggest differentiator at 25 LPA+. Build 15+ UI components under time pressure. Zepto gives you 1h to build a working UI — these weeks give you the reps to build anything confidently.",
+    description: "This is the biggest differentiator at 25 LPA+. Build 15+ UI components under time pressure. Machine coding rounds often give you about an hour to build a working UI. These weeks give you the reps to build anything confidently.",
     timeCommitment: "1 component/day · timed builds · 45-min sessions",
     weeks: [
       {
@@ -1194,7 +1194,7 @@ export const ROADMAP: RoadmapMonth[] = [
     month: 4,
     title: "Interview Mode",
     accent: "coral",
-    description: "Company-specific calibration. Mock interviews, STAR behavioral stories, system design rounds, and salary negotiation. The 'why do you want to join' answer at 25 LPA companies matters more than you think.",
+    description: "Interview calibration. Mock interviews, STAR behavioral stories, system design rounds, and salary negotiation. The 'why do you want to join' answer at 25 LPA companies matters more than you think.",
     timeCommitment: "2 full mock rounds/week · company research · offer prep",
     weeks: [
       {
@@ -1285,7 +1285,7 @@ export const ROADMAP: RoadmapMonth[] = [
             day: 90,
             tasks: [
               {
-                text: "Apply to 20 companies — target: Zepto, Meesho, PhonePe, Razorpay, CRED, Groww, Flipkart, Swiggy",
+                text: "Apply to 20 companies that match your target role and level",
               },
               {
                 text: "Craft tailored cover note for each (3 sentences max)",

@@ -133,6 +133,13 @@ const wrapper = css`
 `;
 
 const trigger = (color: string) => css`
+  /* Bigger tap area on phones without changing the look. */
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -5px 0;
+  }
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;

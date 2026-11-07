@@ -23,7 +23,6 @@ export interface PolyfillQuestion {
   expectedOutput: string;
   explanation: string;
   keyInsight: string;
-  companies: string[];
   tags: string[];
   answer?: string;
 }
@@ -46,7 +45,6 @@ export const polyfillQuestions: PolyfillQuestion[] = [
     difficulty: "medium",
     title: "Implement useState",
     tags: ["useState", "hooks", "closure", "state"],
-    companies: ["Meta", "Google", "Razorpay", "Flipkart", "Microsoft"],
     description:
       "Implement a standalone useState(initialValue) that returns [value, setter]. The setter should accept either a new value or an updater function. Simulate React's hook call-order tracking using a module-level cursor.",
     stubCode:
@@ -112,7 +110,6 @@ function resetCursor() { cursor = 0; }`,
     difficulty: "hard",
     title: "Implement useReducer",
     tags: ["useReducer", "hooks", "reducer", "dispatch"],
-    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
     description:
       "Implement useReducer(reducer, initialState). Returns [state, dispatch]. dispatch(action) should call reducer(currentState, action) and store the result. Support lazy initializer (third argument: initFn).",
     stubCode:
@@ -189,7 +186,6 @@ function resetCursor() { cursor = 0; }`,
     difficulty: "medium",
     title: "Implement useRef",
     tags: ["useRef", "hooks", "mutable", "ref"],
-    companies: ["Meta", "Flipkart", "Swiggy", "Microsoft"],
     description:
       "Implement useRef(initialValue). Returns a stable object { current: initialValue }. The SAME object must be returned on every call (same cursor slot). Mutating .current must NOT re-render (just store the value).",
     stubCode:
@@ -250,7 +246,6 @@ function resetCursor() { cursor = 0; }`,
     difficulty: "hard",
     title: "Implement useMemo",
     tags: ["useMemo", "hooks", "memoization", "deps"],
-    companies: ["Meta", "Google", "Atlassian", "CRED"],
     description:
       "Implement useMemo(factory, deps). Recomputes only when deps change (shallow comparison). Returns cached value otherwise. On first call always compute.",
     stubCode:
@@ -318,7 +313,6 @@ function resetCursor() { cursor = 0; }`,
     difficulty: "hard",
     title: "Implement useCallback",
     tags: ["useCallback", "hooks", "memoization", "function"],
-    companies: ["Meta", "Google", "Flipkart", "Razorpay"],
     description:
       "Implement useCallback(fn, deps). Returns the same function reference if deps haven't changed. This is identical to useMemo(() => fn, deps) under the hood.",
     stubCode:
@@ -388,7 +382,6 @@ function resetCursor() { cursor = 0; }`,
     difficulty: "hard",
     title: "Implement useEffect with cleanup",
     tags: ["useEffect", "hooks", "lifecycle", "cleanup", "deps"],
-    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
     description:
       "Implement useEffect(effect, deps). Run the effect when deps change. If the effect returns a function, call it as cleanup BEFORE the next effect runs. Support three modes: no deps array (every run), empty array (once), and dep array.",
     stubCode:
@@ -483,7 +476,6 @@ function resetCursor() { cursor = 0; }`,
     difficulty: "medium",
     title: "Implement usePrevious custom hook",
     tags: ["usePrevious", "useRef", "custom-hook", "hooks"],
-    companies: ["Flipkart", "Swiggy", "CRED", "Razorpay"],
     description:
       "Implement usePrevious(value) using useRef. Returns the value from the PREVIOUS call. On first call returns undefined. The ref should update AFTER returning the previous value (simulating useEffect timing).",
     stubCode:
@@ -555,7 +547,6 @@ function resetCursor() { cursor = 0; }`,
     difficulty: "medium",
     title: "Implement a Redux-like createStore",
     tags: ["redux", "createStore", "store", "subscribe"],
-    companies: ["Meta", "Google", "Flipkart", "Amazon", "Razorpay"],
     description:
       "Implement createStore(reducer, initialState). The store must have: getState(), dispatch(action), and subscribe(listener). subscribe returns an unsubscribe function. Listeners are called after every dispatch.",
     stubCode:
@@ -631,7 +622,6 @@ function resetCursor() { cursor = 0; }`,
     difficulty: "hard",
     title: "Implement Redux applyMiddleware",
     tags: ["redux", "middleware", "applyMiddleware", "compose"],
-    companies: ["Meta", "Google", "Atlassian", "CRED"],
     description:
       "Implement applyMiddleware(...middlewares). Each middleware receives { getState, dispatch } and returns next => action => result. The middleware chain wraps the store's dispatch. Implement compose helper too.",
     stubCode:
@@ -718,7 +708,6 @@ function applyMiddleware(...middlewares) {
     difficulty: "medium",
     title: "Implement a Zustand-like createStore",
     tags: ["zustand", "createStore", "subscribe", "selector"],
-    companies: ["Vercel", "Atlassian", "CRED", "Razorpay"],
     description:
       "Implement create(setupFn) where setupFn receives set and get. Returns a hook-like function that accepts an optional selector. Subscriptions only fire when the selected value changes.",
     stubCode:
@@ -808,7 +797,6 @@ function applyMiddleware(...middlewares) {
     difficulty: "medium",
     title: "Implement createContext and useContext",
     tags: ["createContext", "useContext", "context", "provider"],
-    companies: ["Meta", "Google", "Flipkart", "Razorpay"],
     description:
       "Implement createContext(defaultValue) and useContext(context). The context object should have a Provider function that sets a value accessible by useContext within that scope. Use a stack to support nested providers.",
     stubCode:
@@ -873,7 +861,6 @@ function useContext(context) {
     difficulty: "medium",
     title: "Implement a Higher-Order Component (HOC)",
     tags: ["HOC", "higher-order-component", "withLoading", "patterns"],
-    companies: ["Meta", "Flipkart", "Swiggy", "Amazon"],
     description:
       "Implement withLoading(Component). Returns a new function that, when called with { isLoading, ...rest }, renders a loading indicator if isLoading is true, otherwise calls Component with the remaining props.",
     stubCode:
@@ -928,7 +915,6 @@ function useContext(context) {
     difficulty: "hard",
     title: "Implement withErrorBoundary HOC",
     tags: ["error-boundary", "HOC", "try-catch", "patterns"],
-    companies: ["Meta", "Atlassian", "CRED", "Google"],
     description:
       "Implement withErrorBoundary(Component, FallbackComponent). The wrapper should catch any errors thrown by Component during render. If an error is caught, render FallbackComponent with the error as a prop instead.",
     stubCode:
@@ -989,7 +975,6 @@ function useContext(context) {
     difficulty: "medium",
     title: "Implement memoize for components (React.memo equivalent)",
     tags: ["React.memo", "memo", "shallow-equal", "performance"],
-    companies: ["Meta", "Google", "Flipkart", "Razorpay"],
     description:
       "Implement memo(Component, areEqual?). Returns a new component that only re-renders (re-calls) when props change. Default comparison is shallow equality. Accept an optional custom areEqual(prevProps, nextProps) function.",
     stubCode:
@@ -1069,7 +1054,6 @@ function memo(Component, areEqual = shallowEqual) {
     difficulty: "medium",
     title: "Implement cloneElement",
     tags: ["cloneElement", "React", "props", "children"],
-    companies: ["Meta", "Atlassian", "Flipkart", "Google"],
     description:
       "Implement cloneElement(element, newProps, ...children). Clone a React-like element object, merging newProps over the element's existing props. If children are provided as arguments, override element.props.children.",
     stubCode:
@@ -1118,7 +1102,6 @@ function memo(Component, areEqual = shallowEqual) {
     difficulty: "easy",
     title: "Implement createElement (JSX transform)",
     tags: ["createElement", "JSX", "virtual-dom", "React"],
-    companies: ["Meta", "Google", "Atlassian", "Flipkart"],
     description:
       "Implement createElement(type, props, ...children). Returns a React element object: { type, props: { ...props, children } }. Single child is stored directly; multiple children as an array. Null/undefined children are filtered out.",
     stubCode:
@@ -1174,7 +1157,6 @@ function memo(Component, areEqual = shallowEqual) {
     difficulty: "medium",
     title: "Implement a useDebounce hook",
     tags: ["useDebounce", "debounce", "custom-hook", "hooks"],
-    companies: ["Flipkart", "Swiggy", "Razorpay", "CRED"],
     description:
       "Implement useDebounce(value, delay). Returns a debounced version of the value that only updates after the value has stopped changing for 'delay' milliseconds. Simulate with a clock you control.",
     stubCode:
@@ -1252,7 +1234,6 @@ function memo(Component, areEqual = shallowEqual) {
     difficulty: "hard",
     title: "Implement batch updates",
     tags: ["batch", "unstable_batchedUpdates", "performance", "state"],
-    companies: ["Meta", "Google", "Atlassian"],
     description:
       "Implement batch(fn). All state setter calls inside fn should be collected and applied together, triggering only ONE notification to subscribers — not one per setState call.",
     stubCode:
@@ -1358,7 +1339,6 @@ function batch(fn) {
     difficulty: "hard",
     title: "Implement a Virtual DOM differ (basic reconciler)",
     tags: ["virtual-dom", "reconciler", "diff", "patch"],
-    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
     description:
       "Implement diff(oldVNode, newVNode) that returns a patch array describing changes. Patches types: REPLACE, UPDATE_PROPS, REMOVE, ADD. VNodes are { type, props, children? } objects or string primitives.",
     stubCode:
@@ -1456,7 +1436,6 @@ function diff(oldNode, newNode, patches = [], path = '0') {
     difficulty: "hard",
     title: "Implement a simple reconciler render function",
     tags: ["reconciler", "render", "virtual-dom", "DOM"],
-    companies: ["Meta", "Google", "Atlassian"],
     description:
       "Implement render(vnode, container). Takes a virtual DOM node { type, props, children } and returns a real DOM-like node (plain objects simulating DOM: { tag, attrs, children, text }). Handle text nodes, element nodes, and null children.",
     stubCode:
@@ -1523,7 +1502,6 @@ function diff(oldNode, newNode, patches = [], path = '0') {
     difficulty: "medium",
     title: "Implement a simple React Query-like useFetch",
     tags: ["useFetch", "react-query", "cache", "async", "hooks"],
-    companies: ["Vercel", "Atlassian", "Razorpay", "Flipkart"],
     description:
       "Implement a cache-backed fetchResource(url, fetcher) function. First call fetches and caches the result. Subsequent calls with the same URL return the cached value immediately. Expose invalidate(url) to clear a cache entry.",
     stubCode:
@@ -1591,7 +1569,6 @@ function invalidate(url) {
     difficulty: "medium",
     title: "Implement useLocalStorage hook",
     tags: ["useLocalStorage", "localStorage", "custom-hook", "persistence"],
-    companies: ["Flipkart", "Swiggy", "CRED", "Razorpay"],
     description:
       "Implement useLocalStorage(key, initialValue, storage). Returns [value, setValue, removeValue]. setValue persists to storage. Reading initializes from storage if the key exists. Use storage.getItem/setItem/removeItem for testability.",
     stubCode:
@@ -1675,7 +1652,6 @@ function invalidate(url) {
     difficulty: "hard",
     title: "Implement a simple pub/sub (useSubscription pattern)",
     tags: ["pub-sub", "subscription", "observer", "hooks"],
-    companies: ["Meta", "Google", "Flipkart", "Atlassian"],
     description:
       "Implement createSubscription() returning a { publish, subscribe, getSnapshot } object. subscribe(listener) calls listener whenever publish(value) is called. getSnapshot() returns the last published value. Listeners receive the new value and previous value.",
     stubCode:
@@ -1745,7 +1721,6 @@ function invalidate(url) {
     difficulty: "hard",
     title: "Implement a render prop pattern (renderChildren)",
     tags: ["render-props", "children-as-function", "patterns", "compound"],
-    companies: ["Meta", "Flipkart", "Atlassian", "Google"],
     description:
       "Implement DataProvider(data, children). children is a function: (data, { filter, sort }) => result. The provider exposes filter(fn) and sort(fn) utilities that operate on data and pass the processed result to children.",
     stubCode:
@@ -1806,7 +1781,6 @@ function invalidate(url) {
     difficulty: "medium",
     title: "Implement pipe for React component transforms",
     tags: ["pipe", "HOC", "composition", "patterns"],
-    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
     description:
       "Implement pipeHOCs(...hocs). Returns a function that applies multiple HOCs left-to-right to a component. pipeHOCs(withLogging, withAuth, withTheme)(MyComponent) should be equivalent to withTheme(withAuth(withLogging(MyComponent))).",
     stubCode:

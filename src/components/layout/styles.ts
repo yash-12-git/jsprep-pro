@@ -50,6 +50,8 @@ export const rightSide = css`
 export const logoLink = css`
   display: flex;
   align-items: center;
+  min-width: 44px;
+  min-height: 44px;
   gap: 0.5rem;
   font-weight: 500;
   font-size: 1rem;
@@ -333,6 +335,13 @@ export const streakChip = css`
 // ─── Theme Button ─────────────────────────────────────────────────────────────
 
 export const themeBtn = (isDark: boolean) => css`
+  /* Bigger tap area on phones without changing the look. */
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
   display: flex;
   align-items: center;
   justify-content: center;
@@ -358,6 +367,13 @@ export const themeBtn = (isDark: boolean) => css`
 // ─── Hamburger ────────────────────────────────────────────────────────────────
 
 export const hamburgerBtn = css`
+  /* Bigger tap area on phones without changing the look. */
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
   display: flex;
   align-items: center;
   justify-content: center;
@@ -506,6 +522,13 @@ export const authCtas = css`
 `;
 
 export const signInBtn = css`
+  /* Bigger tap area on phones without changing the look. */
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -5px 0;
+  }
   background: transparent;
   color: ${C.muted};
   font-size: 0.8125rem;

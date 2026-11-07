@@ -68,12 +68,6 @@ export const KEYWORDS = {
     // TS concepts
     "typescript generics interview",
     "typescript utility types",
-    // Companies
-    "javascript interview questions razorpay",
-    "javascript interview questions atlassian",
-    "javascript interview questions flipkart",
-    "react interview questions swiggy",
-    "frontend interview questions zepto",
   ],
   platform: [
     "frontend interview platform",
@@ -247,7 +241,7 @@ export function articleSchema(opts: {
     publisher: {
       "@type": "Organization",
       name: SITE.name,
-      logo: { "@type": "ImageObject", url: `${SITE.domain}/og-default.png` },
+      logo: { "@type": "ImageObject", url: `${SITE.domain}/icon.png` },
     },
     image: opts.image ?? `${SITE.domain}/og-default.png`,
     mainEntityOfPage: {
@@ -280,7 +274,12 @@ export function softwareSchema(pricing: PricingInfo = DEFAULT_PRICING): string {
         price: parseFloat(pricing.display),
         priceCurrency: pricing.currency,
         name: "Pro Plan",
-        billingDuration: "P1M",
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          price: parseFloat(pricing.display),
+          priceCurrency: pricing.currency,
+          billingDuration: "P1M",
+        },
       },
     ],
     featureList: proFeatures,
@@ -407,15 +406,13 @@ export function organizationSchema(): string {
     "@type": "Organization",
     name: SITE.name,
     url: SITE.domain,
+    // A square logo: Google wants at least 112x112. Add `sameAs` once the
+    // brand has real social profiles.
     logo: {
       "@type": "ImageObject",
-      url: `${SITE.domain}/og-default.png`,
+      url: `${SITE.domain}/icon.png`,
     },
     description: SITE.description,
-    sameAs: [
-      "https://twitter.com/jspreppro",
-      "https://www.linkedin.com/company/jspreppro",
-    ],
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
@@ -424,7 +421,8 @@ export function organizationSchema(): string {
   });
 }
 
-// ─── Website schema — enables Google Sitelinks search ────────────────────────
+// ─── Website schema ───────────────────────────────────────────────────────────
+// No SearchAction: the site has no search results page for it to point at.
 
 export function websiteSchema(): string {
   return JSON.stringify({
@@ -433,14 +431,6 @@ export function websiteSchema(): string {
     name: SITE.name,
     url: SITE.domain,
     description: SITE.description,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${SITE.domain}/topics/javascript?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
   });
 }
 

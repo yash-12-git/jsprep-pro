@@ -3,12 +3,14 @@
  *
  * Safe client-side JS execution in a sandboxed iframe.
  *
- * Fixes applied:
- * 1. Uses `srcdoc` attribute — never accesses iframe.contentDocument, which
- *    is blocked when sandbox="allow-scripts" (no allow-same-origin).
- * 2. Sends 'done' after a 200ms delay so Promise microtasks and
- *    setTimeout(fn,0) macrotasks have time to fire before the iframe is removed.
- * 3. 3-second hard timeout kills infinite loops.
+ * - Uses `srcdoc`, never iframe.contentDocument, which is blocked when
+ *   sandbox="allow-scripts" (no allow-same-origin).
+ * - The user's code runs in its own <script>, after a setup script that
+ *   listens for errors, so a syntax error is reported instead of timing out.
+ *   It stays a classic script, so top-level `var` and `this` behave as in a
+ *   browser console, which output questions rely on.
+ * - Finishes once every pending timer has fired, so delayed logs aren't lost.
+ * - 3-second hard timeout stops infinite loops and very long timers.
  */
 
 export interface RunResult {
@@ -91,11 +93,14 @@ export async function runCode(code: string): Promise<RunResult> {
 
     window.addEventListener("message", handler);
 
-    // Inject via srcdoc — never reads iframe.contentDocument
-    // 200ms delay before 'done' so microtasks (Promise.then) and
-    // one round of macrotasks (setTimeout 0) can fire first.
+    // The user's code can't close its own <script> early.
+    const userCode = code.replace(/<\/script/gi, "<\\/script");
+
     iframe.srcdoc = `<!DOCTYPE html><html><body><script>
 (function(){
+  var post = function(type, value){
+    window.parent.postMessage({__src:'jsprep',type:type,value:value},'*')
+  }
   var _log = function(){
     var value = Array.prototype.slice.call(arguments).map(function(a){
       if(a===undefined) return 'undefined'
@@ -104,20 +109,58 @@ export async function runCode(code: string): Promise<RunResult> {
       if(typeof a==='object'){ try{ return JSON.stringify(a,null,2) }catch(e){ return '[object]' } }
       return String(a)
     }).join(' ')
-    window.parent.postMessage({__src:'jsprep',type:'log',value:value},'*')
+    post('log', value)
   }
   console.log=_log; console.warn=_log; console.info=_log; console.error=_log
 
-  try{
-    ${code}
-    // Wait 200ms for Promise microtasks + setTimeout(0) macrotasks
-    setTimeout(function(){
-      window.parent.postMessage({__src:'jsprep',type:'done'},'*')
-    }, 200)
-  } catch(e){
-    window.parent.postMessage({__src:'jsprep',type:'error',value:e.message},'*')
+  // Errors while the code first runs, syntax errors included, end the run.
+  // Errors inside later timer callbacks are ignored, as before.
+  var syncPhase = true
+  window.addEventListener('error', function(ev){
+    if (!syncPhase) return
+    syncPhase = false
+    post('error', ev.error && ev.error.message ? ev.error.message : String(ev.message).replace(/^Uncaught /, ''))
+  })
+
+  // Track pending timers so the run ends when the last one has fired.
+  var _setTimeout = window.setTimeout, _clearTimeout = window.clearTimeout
+  var _setInterval = window.setInterval, _clearInterval = window.clearInterval
+  var pending = {}, count = 0
+  var check = function(){
+    _setTimeout(function(){ if (count === 0) post('done') }, 0)
+  }
+  window.setTimeout = function(fn, ms){
+    var args = Array.prototype.slice.call(arguments, 2)
+    var id = _setTimeout(function(){
+      delete pending[id]; count--
+      try { typeof fn === 'function' ? fn.apply(null, args) : eval(fn) } finally { check() }
+    }, ms)
+    pending[id] = true; count++
+    return id
+  }
+  window.clearTimeout = function(id){
+    if (pending[id]) { delete pending[id]; count--; check() }
+    _clearTimeout(id)
+  }
+  window.setInterval = function(){
+    var id = _setInterval.apply(null, arguments)
+    pending[id] = true; count++
+    return id
+  }
+  window.clearInterval = function(id){
+    if (pending[id]) { delete pending[id]; count--; check() }
+    _clearInterval(id)
+  }
+  window.__jsprepFinish = function(){
+    if (!syncPhase) return
+    syncPhase = false
+    check()
   }
 })()
+<\/script><script>
+${userCode}
+<\/script><script>
+window.__jsprepFinish()
 <\/script></body></html>`;
   });
 }

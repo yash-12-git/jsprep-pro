@@ -442,16 +442,6 @@ export default function PolyfillCard({
                     ]}
                     onClick={() => {
                       setShowSolution((s) => !s);
-                      console.log(
-                        !isSolved(q.id),
-                        !isRevealed(q.id),
-                        isPro,
-                        "line227",
-                      );
-
-                      if (!isSolved(q.id) && !isRevealed(q.id) && isPro)
-                        console.log("recored reverald firebase");
-
                       recordRevealed(q.id).catch(() => {});
                     }}
                   >

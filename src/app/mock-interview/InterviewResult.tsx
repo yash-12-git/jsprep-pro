@@ -196,7 +196,7 @@ function buildCanvasCard(
   ctx.font = "600 15px system-ui";
   ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 75%, transparent)";
   ctx.fillText(
-    `${config.company}  ·  ${config.role}  ·  ${config.experience}`,
+    `${config.role}  ·  ${config.experience}`,
     RX,
     124,
   );
@@ -647,7 +647,7 @@ export default function InterviewResult({
   const shareStr = useMemo(
     () =>
       `🎯 Mock Interview Result — jsprep.pro\n` +
-      `${config.company} · ${config.role} · ${config.experience}\n\n` +
+      `${config.role} · ${config.experience}\n\n` +
       `Score: ${scorecard.overall}/100, ${scorecard.verdict}\n\n` +
       `Concepts: ${scorecard.concepts}   Problem Solving: ${scorecard.problemSolving}\n` +
       `Communication: ${scorecard.communication}   Depth: ${scorecard.depth}\n\n` +
@@ -729,8 +729,6 @@ export default function InterviewResult({
         </div>
         <div css={cardFooter}>
           <div css={cardConfig}>
-            <span>{config.company}</span>
-            <span css={configDot}>·</span>
             <span>{config.role}</span>
             <span css={configDot}>·</span>
             <span>{config.experience}</span>

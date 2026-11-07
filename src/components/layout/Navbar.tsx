@@ -189,10 +189,10 @@ export default function Navbar() {
         <div css={S.navInner}>
           {/* LEFT: Logo + Track */}
           <div css={S.leftGroup}>
-            <Link href="/" css={S.logoLink}>
-              <div css={S.logoBadge}>JS</div>
+            <Link href="/" css={S.logoLink} aria-label="JSPrep Pro home">
+              <div css={S.logoBadge} aria-hidden="true">JS</div>
               <span css={S.logoText}>
-                Prep<span css={S.logoAccent}>Pro</span>
+                JSPrep <span css={S.logoAccent}>Pro</span>
               </span>
             </Link>
             <TrackSwitcher />

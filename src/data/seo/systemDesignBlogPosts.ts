@@ -21,7 +21,7 @@ export const SYSTEM_DESIGN_BLOG_POSTS: SystemDesignBlogPost[] = [
   {
     slug: "rendering-strategies-ssr-csr-ssg-isr",
     track: "system-design",
-    title: "Rendering Strategies Explained: SSR vs CSR vs SSG vs ISR (2025)",
+    title: "Rendering Strategies Explained: SSR vs CSR vs SSG vs ISR",
     excerpt: "A clear, visual breakdown of all four rendering strategies — when to use each, how they affect SEO and performance, and the exact questions interviewers ask about them.",
     category: "Deep Dive",
     accentColor: "#6366f1",
@@ -837,7 +837,7 @@ Always mention the \`httpOnly\` cookie as the connection between XSS and token s
   {
     slug: "monorepo-turborepo-vs-nx",
     track: "system-design",
-    title: "Monorepo with Turborepo vs Nx: The Complete Comparison (2025)",
+    title: "Monorepo with Turborepo vs Nx: The Complete Comparison",
     excerpt: "A practical comparison of Turborepo and Nx — when to use each, how remote caching works, and how to design a monorepo architecture for large frontend teams.",
     category: "Build Systems",
     accentColor: "#06b6d4",

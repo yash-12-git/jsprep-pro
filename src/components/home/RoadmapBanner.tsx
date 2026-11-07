@@ -112,6 +112,8 @@ const actions = css`
 `;
 
 const link = css`
+  display: inline-block;
+  padding: 0.625rem 0;
   font-size: var(--text-md);
   font-weight: 500;
   color: ${C.text};
@@ -135,7 +137,7 @@ export function RoadmapBanner() {
         </h2>
         <p css={ssub}>
           Stop wondering what to learn next. 112 daily tasks: JS, React, machine
-          coding, DSA, interviews. Progress saved to browser.
+          coding, DSA, interviews. Sign in to keep progress across devices.
         </p>
       </div>
 
@@ -179,7 +181,7 @@ export function RoadmapBanner() {
               Start the roadmap
             </Link>
             <span css={sprintCTASub}>
-              Free, works offline, progress synced to browser
+              Free. Progress saves in your browser, and to your account when signed in
             </span>
           </div>
         </div>

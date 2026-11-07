@@ -721,7 +721,7 @@ Practice 90+ output questions at [JSPrep Pro Output Quiz](/output-quiz).
   {
     slug: 'top-50-javascript-interview-questions',
     track: 'javascript',
-    title: 'Top 50 JavaScript Interview Questions (2025 Edition)',
+    title: 'Top 50 JavaScript Interview Questions',
     excerpt: 'The definitive list of the 50 most common JavaScript interview questions for frontend developers, with concise answers covering basics to advanced topics.',
     category: 'Interview Prep',
     accentColor: '#f7c76a',
@@ -1183,7 +1183,7 @@ export const REACT_BLOG_POSTS: BlogPost[] = [
   {
     slug: 'top-50-react-interview-questions',
     track: 'react',
-    title: 'Top 50 React Interview Questions (2025 Edition)',
+    title: 'Top 50 React Interview Questions',
     excerpt: 'The definitive list of the 50 most common React interview questions for frontend developers, with concise answers covering hooks, state, performance, and advanced patterns.',
     category: 'Interview Prep',
     accentColor: '#61dafb',
@@ -2062,7 +2062,7 @@ Practice lifecycle questions at [JSPrep Pro](/auth).
   {
     slug: 'react-state-management-2025',
     track: 'react',
-    title: 'React State Management in 2025: useState, useReducer, Context & Beyond',
+    title: 'React State Management: useState, useReducer, Context & Beyond',
     excerpt: 'A practical breakdown of every React state management option — when to use useState, when useReducer wins, how Context scales, and when to reach for an external store.',
     category: 'Deep Dive',
     accentColor: '#7c6af7',
@@ -2387,7 +2387,7 @@ Practice Virtual DOM and reconciliation questions at [JSPrep Pro](/auth).
   {
     slug: 'react-context-api-vs-redux',
     track: 'react',
-    title: 'React Context API vs Redux: When to Use Which in 2025',
+    title: 'React Context API vs Redux: When to Use Which',
     excerpt: "Context API is built in. Redux has devtools and middleware. Understanding when each is the right tool is one of the most common senior React interview questions.",
     category: 'Best Practices',
     accentColor: '#f76a6a',
@@ -3022,7 +3022,7 @@ export const TYPESCRIPT_BLOG_POSTS: BlogPost[] = [
   {
     slug: 'top-50-typescript-interview-questions',
     track: 'typescript',
-    title: 'Top 50 TypeScript Interview Questions (2025)',
+    title: 'Top 50 TypeScript Interview Questions',
     excerpt: 'The definitive list of the 50 most common TypeScript interview questions for frontend developers, with concise answers covering types, generics, utility types, and advanced patterns.',
     category: 'Interview Prep',
     accentColor: '#3178c6',
@@ -3847,7 +3847,7 @@ Practice TypeScript narrowing questions at [JSPrep Pro](/auth).
   {
     slug: 'typescript-with-react-best-practices',
     track: 'typescript',
-    title: 'TypeScript with React: Best Practices for 2025',
+    title: 'TypeScript with React: Best Practices',
     excerpt: 'How to use TypeScript effectively in React projects — typing props, hooks, events, context, and refs correctly, with common mistakes and how to avoid them.',
     category: 'Best Practices',
     accentColor: '#f59e0b',

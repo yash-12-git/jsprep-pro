@@ -7,3 +7,6 @@ scripts/serviceAccountKey.json
 .yarn/*
 !.yarn/patches
 .pnp.*
+
+# TypeScript incremental build cache
+*.tsbuildinfo

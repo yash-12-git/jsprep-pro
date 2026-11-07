@@ -12,7 +12,7 @@ const CANONICAL = "https://jsprep.pro/roadmap";
 
 // ─── SEO Metadata ─────────────────────────────────────────────────────────────
 export const metadata: Metadata = {
-  title: "Frontend Developer Roadmap 2026 — JavaScript, React & DSA | JSPrep",
+  title: "Frontend Developer Roadmap 2026 — JavaScript, React & DSA",
   description:
     "The complete frontend developer roadmap for 2026. A 16-week, 112-day structured plan covering JavaScript, React, system design, machine coding, and DSA to prepare for product-company interviews.",
   keywords: [
@@ -36,14 +36,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     url: CANONICAL,
-    title: "Frontend Developer Roadmap 2026 — JavaScript, React & DSA | JSPrep",
+    title: "Frontend Developer Roadmap 2026 — JavaScript, React & DSA — JSPrep Pro",
     description:
       "16-week structured roadmap: JavaScript internals → React deep dive → machine coding → DSA → system design. 112 daily tasks with progress tracking. Used by 5,000+ frontend developers.",
     siteName: "JSPrep Pro",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Frontend Developer Roadmap 2026 | JSPrep",
+    title: "Frontend Developer Roadmap 2026 — JSPrep Pro",
     description:
       "16-week plan: JS → React → Machine Coding → DSA → System Design. 112 daily tasks, progress tracked in browser.",
   },
@@ -69,49 +69,14 @@ function articleSchema() {
       "@type": "Organization",
       name: "JSPrep Pro",
       url: "https://jsprep.pro",
-      logo: { "@type": "ImageObject", url: "https://jsprep.pro/og-image.png" },
+      logo: { "@type": "ImageObject", url: "https://jsprep.pro/icon.png" },
     },
-    datePublished: "2025-01-01",
-    dateModified: new Date().toISOString().split("T")[0],
+    // When the roadmap was first published; no dateModified, which used to be
+    // set to every build's date.
+    datePublished: "2026-04-25",
     keywords:
       "frontend roadmap, javascript roadmap, react roadmap, frontend developer 2026",
     mainEntityOfPage: { "@type": "WebPage", "@id": CANONICAL },
-  });
-}
-
-function howToSchema() {
-  // Build steps from roadmap months
-  const steps = ROADMAP.map((month) => ({
-    "@type": "HowToStep",
-    name: `Month ${month.month}: ${month.title}`,
-    text: month.weeks
-      .map(
-        (w) =>
-          `Week ${w.week} — ${w.title}: ${w.days
-            .flatMap((d) => d.tasks.map((t) => t.text))
-            .slice(0, 3)
-            .join("; ")}.`,
-      )
-      .join(" "),
-    url: `${CANONICAL}#month-${month.month}`,
-  }));
-
-  return JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "How to Become a Frontend Developer in 16 Weeks (2026 Roadmap)",
-    description:
-      "A step-by-step 16-week roadmap for frontend developers to go from fundamentals to interview-ready, covering JavaScript, React, machine coding, DSA, and system design.",
-    totalTime: "P112D",
-    estimatedCost: { "@type": "MonetaryAmount", currency: "INR", value: "0" },
-    url: CANONICAL,
-    step: steps,
-    tool: [
-      { "@type": "HowToTool", name: "JavaScript (ES6+)" },
-      { "@type": "HowToTool", name: "React 18" },
-      { "@type": "HowToTool", name: "Next.js" },
-      { "@type": "HowToTool", name: "TypeScript" },
-    ],
   });
 }
 
@@ -136,10 +101,6 @@ function faqSchema() {
     {
       q: "What is machine coding in frontend interviews?",
       a: "Machine coding rounds ask you to build a complete UI component (like an autocomplete, infinite scroll, drag-and-drop kanban, or data table) from scratch within 45–60 minutes. They test component design, state management, edge-case handling, and accessibility. Month 3 of this roadmap dedicates two full weeks to machine coding practice.",
-    },
-    {
-      q: "What are the best companies to target for frontend developer roles in India?",
-      a: "Top frontend companies in India include Zepto, Meesho, PhonePe, Razorpay, CRED, Groww, Flipkart, Swiggy, and Atlassian. This roadmap specifically prepares you for interviews at these companies by covering the topics they most commonly test.",
     },
     {
       q: "What is the JavaScript roadmap for frontend developers?",
@@ -306,10 +267,6 @@ export default function RoadmapPage() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: howToSchema() }}
-      />
-      <script
-        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqSchema() }}
       />
       <script
@@ -329,7 +286,7 @@ export default function RoadmapPage() {
             <>
               <span>2 to 3 hrs weekdays</span>
               <span>5 to 6 hrs weekends</span>
-              <span>Progress auto-saved to browser</span>
+              <span>Progress saves to your account when signed in</span>
             </>
           }
         />

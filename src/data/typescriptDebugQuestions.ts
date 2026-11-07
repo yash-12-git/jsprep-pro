@@ -32,7 +32,6 @@ export const typescriptDebugQuestions: DebugQuestion[] = [
     description:
       'The function expects a number but receives a string — produces NaN instead of a calculation result. Fix the type mismatch.',
     tags: ['type-assignment', 'coercion', 'NaN', 'string-vs-number'],
-    companies: ['Microsoft', 'Google', 'Razorpay', 'Flipkart'],
     brokenCode: `// TypeScript would flag: Argument of type 'string' is not assignable to parameter of type 'number'
 // But at runtime the bug is silent — NaN is produced instead of an error
 
@@ -79,7 +78,6 @@ console.log(typeof total);`,
     description:
       'The code assumes find() always returns a value but it can return undefined — causing a silent wrong result. Fix with proper null check.',
     tags: ['undefined', 'optional-chaining', 'null-check', 'find'],
-    companies: ['Microsoft', 'Atlassian', 'Meta', 'Razorpay'],
     brokenCode: `// TypeScript: Object is possibly 'undefined' — accessing .name on User | undefined
 const users = [
   { id: 1, name: 'Alice', role: 'admin' },
@@ -134,7 +132,6 @@ console.log(getUserName(99));`,
     description:
       'The function should return a full user object but returns only the name string — callers get wrong type and wrong data.',
     tags: ['return-type', 'type-mismatch', 'object', 'function'],
-    companies: ['Microsoft', 'Google', 'Flipkart', 'CRED'],
     brokenCode: `// TypeScript: Type 'string' is not assignable to type 'User'
 // At runtime: callers get a string instead of an object
 
@@ -196,7 +193,6 @@ console.log(email);`,
     description:
       'The pluck function accepts any string key instead of only keys that exist on the object — returns undefined for invalid keys. Fix with keyof constraint.',
     tags: ['keyof', 'constraint', 'generic', 'property-access'],
-    companies: ['Microsoft', 'Atlassian', 'Google', 'Razorpay'],
     brokenCode: `// TypeScript without constraint: pluck<T>(items: T[], key: string): any[]
 // Bug: accepts ANY string as key — invalid keys return undefined silently
 
@@ -252,7 +248,6 @@ console.log(ages.join(','));`,
     description:
       'The merge function receives a primitive instead of an object and produces wrong output. Fix by validating the input type.',
     tags: ['extends-object', 'constraint', 'primitive', 'generic'],
-    companies: ['Microsoft', 'Google', 'Meta', 'Flipkart'],
     brokenCode: `// TypeScript without constraint: merge<T, U>(a: T, b: U): T & U
 // Bug: works at type level but no constraint prevents primitives
 
@@ -306,7 +301,6 @@ console.log(full.name + ':' + full.role);`,
     description:
       'The filter function loses type information by returning any[] instead of T[]. Fix to preserve the generic type.',
     tags: ['generic', 'return-type', 'any', 'type-preservation'],
-    companies: ['Microsoft', 'Atlassian', 'Google', 'Razorpay'],
     brokenCode: `// Bug: returns any[] — TypeScript loses type information
 // Should be: function filterDefined<T>(arr: (T | null | undefined)[]): T[]
 
@@ -366,7 +360,6 @@ console.log(result.length);`,
     description:
       'The createUser function uses Partial<User> for its input but all fields are actually required — missing fields cause undefined values. Fix with proper typing.',
     tags: ['Partial', 'utility-types', 'required', 'create-function'],
-    companies: ['Microsoft', 'Atlassian', 'Razorpay', 'Flipkart'],
     brokenCode: `// Bug: Partial<User> used for creation — all fields optional
 // But name and email are required to create a valid user
 
@@ -424,7 +417,6 @@ console.log(alice.role);`,
     description:
       'The formatUser function picks only name but needs email too — the formatted string is incomplete. Fix the Pick selection.',
     tags: ['Pick', 'utility-types', 'subset', 'missing-fields'],
-    companies: ['Microsoft', 'Google', 'Meta', 'CRED'],
     brokenCode: `// TypeScript: Pick<User, 'name'> — only name is selected, email missing
 
 function formatUserCard(user) {
@@ -470,7 +462,6 @@ console.log(card.includes('undefined'));`,
     description:
       'Omit is used to remove "password" but the field name has a typo — password still appears in the output. Fix the Omit key.',
     tags: ['Omit', 'utility-types', 'sensitive-data', 'typo'],
-    companies: ['Microsoft', 'Atlassian', 'Razorpay', 'Flipkart'],
     brokenCode: `// Bug: Omit<User, 'pasword'> — typo! 'pasword' not 'password'
 // TypeScript: Omit with wrong key silently creates a type that still has 'password'
 
@@ -531,7 +522,6 @@ console.log(Object.keys(publicUser).sort().join(','));`,
     description:
       'The balance field should be private but is directly mutated from outside the class, bypassing business logic. Fix with a proper accessor method.',
     tags: ['private', 'encapsulation', 'access-modifier', 'class'],
-    companies: ['Microsoft', 'Google', 'Atlassian', 'Razorpay'],
     brokenCode: `// TypeScript: 'balance' is private — direct access is a compile error
 // But at runtime, JS has no enforcement without # syntax
 
@@ -610,7 +600,6 @@ console.log(account.owner);`,
     description:
       'The base Repository class should be abstract but is instantiated directly — findAll returns undefined because the base method has no implementation. Fix by making it abstract or overriding correctly.',
     tags: ['abstract', 'class', 'inheritance', 'instantiation'],
-    companies: ['Microsoft', 'Atlassian', 'Google', 'Meta'],
     brokenCode: `// TypeScript: Cannot create an instance of an abstract class
 // Bug: Base class without concrete implementation is used directly
 
@@ -693,7 +682,6 @@ console.log(all[0].name);`,
     description:
       'The class claims to implement an interface but is missing required methods — callers get undefined when calling methods. Fix by implementing all interface methods.',
     tags: ['implements', 'interface', 'class', 'contract'],
-    companies: ['Microsoft', 'Google', 'Atlassian', 'Razorpay'],
     brokenCode: `// TypeScript: Class 'SimpleLogger' incorrectly implements interface 'Logger'.
 // Property 'warn' is missing in type 'SimpleLogger' but required in type 'Logger'.
 

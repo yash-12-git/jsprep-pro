@@ -31,7 +31,6 @@ export interface DebugQuestion {
   explanation: string;
   keyInsight: string;
   tags: string[];
-  companies?: string[];
 }
 
 export const DEBUG_CATEGORIES = [
@@ -56,7 +55,6 @@ export const debugQuestions: DebugQuestion[] = [
     description:
       "The interval should log increasing count but always logs 0. Fix the stale closure.",
     tags: ["stale-closure", "setInterval", "useState", "ref"],
-    companies: ["Meta", "Razorpay", "Google", "Atlassian"],
     brokenCode: `let count = 0;
 const log = [];
 
@@ -104,7 +102,6 @@ setTimeout(() => console.log(log[0]), 10);`,
     description:
       "Clicking multiple times logs 1 every time instead of increasing. Fix it.",
     tags: ["stale-closure", "event-handler", "functional-update", "useState"],
-    companies: ["Meta", "Flipkart", "Razorpay", "CRED"],
     brokenCode: `let count = 0;
 const clicks = [];
 
@@ -163,7 +160,6 @@ console.log(clicks.join(','));`,
     description:
       "The submit handler should validate using the latest formValue but always validates the initial empty string.",
     tags: ["useCallback", "stale-closure", "deps", "validation"],
-    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
     brokenCode: `let formValue = '';
 const log = [];
 
@@ -225,7 +221,6 @@ handleSubmit();`,
     description:
       "The callback should read the latest user name but reads the initial empty name.",
     tags: ["closure", "object-reference", "mutation", "hooks"],
-    companies: ["Meta", "Atlassian", "CRED"],
     brokenCode: `const log = [];
 
 // Wrong: spreading creates new object — closure reference is lost
@@ -281,7 +276,6 @@ console.log(log[0]);`,
     description:
       "Toggling done should log the new value but logs the old one because state is mutated.",
     tags: ["immutability", "mutation", "state", "reference"],
-    companies: ["Meta", "Flipkart", "Razorpay"],
     brokenCode: `// Simulates React state update detection via Object.is
 let state = { todos: [{ id: 1, text: 'Buy milk', done: false }] };
 
@@ -336,7 +330,6 @@ setStateFixed(prev => ({
     description:
       "Updating the theme resets the username to undefined. Fix the update.",
     tags: ["nested-state", "spread", "state", "immutability"],
-    companies: ["Meta", "Flipkart", "Razorpay", "Atlassian"],
     brokenCode: `let state = {
   user: { name: 'Alice', age: 30 },
   settings: { theme: 'light', notifications: true },
@@ -384,7 +377,6 @@ console.log(state.user.name);`,
     description:
       "getSortedNames should return a sorted copy but the original names array gets sorted too.",
     tags: ["array", "sort", "mutation", "state"],
-    companies: ["Meta", "Flipkart", "Amazon", "Razorpay"],
     brokenCode: `let names = ['Charlie', 'Alice', 'Bob'];
 
 function getSortedNames() {
@@ -420,7 +412,6 @@ console.log(sorted.join(','));`,
     description:
       "Setting name resets email to undefined. Fix to preserve all fields.",
     tags: ["useState", "state-merge", "spread", "hooks"],
-    companies: ["Meta", "Flipkart", "Razorpay", "CRED"],
     brokenCode: `// Simulates useState with full replacement (not merge)
 let formState = { name: '', email: '', age: 0 };
 
@@ -468,7 +459,6 @@ console.log(formState.age);`,
     description:
       "The subscription is added on every render but never removed. Fix with cleanup.",
     tags: ["useEffect", "cleanup", "subscription", "memory-leak"],
-    companies: ["Meta", "Flipkart", "Razorpay", "Atlassian"],
     brokenCode: `const subscribers = new Set();
 const log = [];
 
@@ -535,7 +525,6 @@ console.log(log[0]);`,
     description:
       "The effect runs every render instead of once. Fix the dependency.",
     tags: ["useEffect", "deps", "infinite-loop", "object-identity"],
-    companies: ["Meta", "Google", "Razorpay", "Flipkart"],
     brokenCode: `let effectCount = 0;
 
 function simulateRender(getOptions, effect) {
@@ -599,7 +588,6 @@ console.log(effectCount);`,
     description:
       "The computation runs every time instead of caching. Fix the comparison.",
     tags: ["useMemo", "deps", "shallow-equal", "caching"],
-    companies: ["Meta", "Flipkart", "Razorpay"],
     brokenCode: `let computeCount = 0;
 
 function useMemo(factory, deps) {
@@ -663,7 +651,6 @@ console.log(computeCount);`,
     description:
       "Two counters share state because the cache is outside the hook. Fix it.",
     tags: ["custom-hook", "closure", "shared-state", "encapsulation"],
-    companies: ["Meta", "Flipkart", "Razorpay", "CRED"],
     brokenCode: `// Bug: state is shared across all instances of the hook
 const sharedCache = { count: 0, label: '' };
 
@@ -724,7 +711,6 @@ console.log(a.label());`,
     description:
       "MemoChild still re-renders 3 times even with React.memo. Fix the parent.",
     tags: ["React.memo", "useCallback", "identity", "re-render"],
-    companies: ["Meta", "Flipkart", "Google", "Razorpay"],
     brokenCode: `function shallowEqual(a, b) {
   return Object.keys(a).every(k => a[k] === b[k]);
 }
@@ -787,7 +773,6 @@ console.log(childRenders);`,
     description:
       "Filtered list doesn't update when the filter query changes. Fix the deps.",
     tags: ["useMemo", "stale-deps", "filter", "hooks"],
-    companies: ["Meta", "Flipkart", "Atlassian", "CRED"],
     brokenCode: `let query = '';
 let computeCount = 0;
 
@@ -865,7 +850,6 @@ console.log(computeCount);`,
     description:
       "The async callback updates state after unmount — causing 'can't update unmounted component'. Fix with cancelled flag.",
     tags: ["useEffect", "cleanup", "async", "unmount"],
-    companies: ["Meta", "Flipkart", "Razorpay", "Atlassian"],
     brokenCode: `const log = [];
 let mounted = true;
 
@@ -941,7 +925,6 @@ setTimeout(() => console.log(log.join(' | ')), 0);`,
     description:
       "Searching 'react' then immediately 'react hooks' shows the wrong results. Fix with request ID.",
     tags: ["race-condition", "async", "useEffect", "cancel"],
-    companies: ["Meta", "Google", "Razorpay", "Atlassian"],
     brokenCode: `const log = [];
 let currentResult = null;
 
@@ -1009,7 +992,6 @@ setTimeout(() => console.log(currentResult), 100);`,
     description:
       "The component renders before data is loaded, showing undefined. Fix with proper await.",
     tags: ["async", "await", "useEffect", "data-fetching"],
-    companies: ["Meta", "Flipkart", "Razorpay"],
     brokenCode: `const log = [];
 let data = null;
 
@@ -1057,7 +1039,6 @@ init().then(() => console.log(log[0]));`,
     description:
       "Components can't return early before hooks. The hook's state is misaligned. Fix it.",
     tags: ["rules-of-hooks", "early-return", "conditional", "cursor"],
-    companies: ["Meta", "Flipkart", "Razorpay", "Google"],
     brokenCode: `const hooks = [];
 let cursor = 0;
 
@@ -1141,7 +1122,6 @@ console.log(r3);`,
     description:
       "fullName is set in useEffect, causing an extra render. Derive it directly during render.",
     tags: ["derived-state", "useEffect", "extra-render", "optimization"],
-    companies: ["Meta", "Flipkart", "Razorpay", "Atlassian"],
     brokenCode: `let renders = 0;
 const log = [];
 
@@ -1202,7 +1182,6 @@ setTimeout(() => {
     description:
       "All context consumers re-render on every parent render even when user didn't change. Fix with stable value.",
     tags: ["context", "useMemo", "re-render", "performance"],
-    companies: ["Meta", "Google", "Atlassian", "Razorpay"],
     brokenCode: `let contextRenders = 0;
 
 // Simulates Provider re-rendering
@@ -1273,7 +1252,6 @@ console.log(contextRenders);`,
     description:
       "MemoChild should skip rendering when items content hasn't changed but always re-renders.",
     tags: ["React.memo", "useMemo", "array-prop", "performance"],
-    companies: ["Meta", "Flipkart", "Google", "Razorpay"],
     brokenCode: `function shallowEqual(a, b) {
   return Object.keys(a).every(k => a[k] === b[k]);
 }
@@ -1331,7 +1309,6 @@ console.log(childRenders);`,
     description:
       "sortedList is recomputed on every render even when items didn't change. Optimize with memoization.",
     tags: ["useMemo", "performance", "computation", "render"],
-    companies: ["Meta", "Google", "Atlassian", "CRED"],
     brokenCode: `let computeCount = 0;
 
 function expensiveSort(items) {

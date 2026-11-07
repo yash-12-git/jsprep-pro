@@ -112,7 +112,6 @@ function buildOutputQuestions(): QuestionInput[] {
     brokenCode: "",
     fixedCode: "",
     bugDescription: "",
-    companies: q.companies ?? [],
   }));
 }
 
@@ -141,7 +140,6 @@ function buildDebugQuestions(): QuestionInput[] {
     brokenCode: q.brokenCode,
     fixedCode: q.fixedCode,
     bugDescription: q.bugDescription,
-    companies: q.companies ?? [],
   }));
 }
 
@@ -162,7 +160,6 @@ function buildPolyfillQuestions(): QuestionInput[] {
     code: q.stubCode,
     category: q.cat,
     tags: [q.cat.toLowerCase().replace(/[^a-z0-9]+/g, "-"), q.difficulty],
-    companies: q.companies,
     difficulty: diffMap(q.difficulty),
     status: "published" as const,
     isPro: i >= 5,
@@ -232,7 +229,6 @@ function buildTypescriptOutputQuestions(): QuestionInput[] {
     brokenCode: "",
     fixedCode: "",
     bugDescription: "",
-    companies: q.companies ?? [],
   }));
 }
 
@@ -261,7 +257,6 @@ function buildTypescriptDebugQuestions(): QuestionInput[] {
     brokenCode: q.brokenCode,
     fixedCode: q.fixedCode,
     bugDescription: q.bugDescription,
-    companies: q.companies ?? [],
   }));
 }
 

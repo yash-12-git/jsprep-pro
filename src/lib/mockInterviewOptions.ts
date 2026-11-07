@@ -17,23 +17,6 @@ export const LEVELS = [
   { value: "senior", label: "Senior (4–7 yrs)" },
   { value: "lead", label: "Tech Lead (7+ yrs)" },
 ];
-export const COMPANIES = [
-  "Google",
-  "Amazon",
-  "Microsoft",
-  "Flipkart",
-  "Razorpay",
-  "Atlassian",
-  "Swiggy",
-  "CRED",
-  "Zepto",
-  "Meesho",
-  "Shopify",
-  "Stripe",
-  "Zomato",
-  "PhonePe",
-  "General",
-];
 export const FOCUS_AREAS = [
   "Core JavaScript",
   "Async & Promises",
@@ -49,7 +32,6 @@ export const FOCUS_AREAS = [
 export interface SetupConfig {
   role: string;
   experience: string;
-  company: string;
   focus: string;
 }
 
@@ -59,17 +41,14 @@ export function parseSetupConfig(value: unknown): SetupConfig | null {
   if (
     typeof c?.role === "string" &&
     typeof c?.experience === "string" &&
-    typeof c?.company === "string" &&
     typeof c?.focus === "string" &&
     ROLES.includes(c.role) &&
     LEVELS.some((l) => l.value === c.experience) &&
-    COMPANIES.includes(c.company) &&
     FOCUS_AREAS.includes(c.focus)
   ) {
     return {
       role: c.role,
       experience: c.experience,
-      company: c.company,
       focus: c.focus,
     };
   }

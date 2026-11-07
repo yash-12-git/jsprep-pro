@@ -30,7 +30,6 @@ export const typescriptOutputQuestions: OutputQuestion[] = [
     difficulty: 'easy',
     title: 'typeof narrowing determines which branch runs',
     tags: ['typeof', 'narrowing', 'inference', 'type-guard'],
-    companies: ['Microsoft', 'Atlassian', 'Google', 'Meta'],
     code: `// Simulate TypeScript's typeof narrowing at runtime
 function describe(val) {
   if (typeof val === 'string') {
@@ -61,7 +60,6 @@ describe(null);`,
     difficulty: 'medium',
     title: 'Const assertion — literal type vs widened type',
     tags: ['const-assertion', 'literal-type', 'widening', 'inference'],
-    companies: ['Microsoft', 'Google', 'Razorpay'],
     code: `// Simulate what TypeScript infers — const narrows to literal, let widens
 const direction = 'north';  // inferred: "north" (literal)
 let mutableDir = 'north';   // inferred: string (widened)
@@ -96,7 +94,6 @@ console.log(frozen.host);`,
     difficulty: 'medium',
     title: 'Discriminated union narrowing via switch',
     tags: ['discriminated-union', 'narrowing', 'switch', 'inference'],
-    companies: ['Microsoft', 'Meta', 'Atlassian', 'CRED'],
     code: `// Simulates TypeScript discriminated union narrowing
 function processShape(shape) {
   switch (shape.kind) {
@@ -130,7 +127,6 @@ processShape({ kind: 'rectangle', width: 3, height: 6 });`,
     difficulty: 'hard',
     title: 'ReturnType inference — function return shapes',
     tags: ['ReturnType', 'inference', 'return-type', 'generics'],
-    companies: ['Microsoft', 'Google', 'Razorpay', 'Atlassian'],
     code: `// Simulate what ReturnType<T> extracts at runtime
 function makeUser(name, age) {
   return { name, age, createdAt: new Date('2024-01-01').toISOString() };
@@ -168,7 +164,6 @@ console.log(typeof val);`,
     difficulty: 'medium',
     title: 'Generic identity — T resolves to the argument type',
     tags: ['generics', 'identity', 'inference', 'type-parameter'],
-    companies: ['Microsoft', 'Google', 'Meta'],
     code: `// Simulate generic type resolution
 function identity(value) {
   return value;
@@ -198,7 +193,6 @@ console.log(n + 1);  // safe — TypeScript knows it's number`,
     difficulty: 'medium',
     title: 'extends constraint — keyof and property access',
     tags: ['extends', 'keyof', 'constraint', 'property-access'],
-    companies: ['Microsoft', 'Atlassian', 'Google', 'Razorpay'],
     code: `// Simulate T extends keyof U — type-safe property access
 function getProperty(obj, key) {
   // TypeScript: T extends object, K extends keyof T, returns T[K]
@@ -229,7 +223,6 @@ console.log(typeof getProperty(user, 'name'));
     difficulty: 'hard',
     title: 'Generic Array utilities — map and filter type resolution',
     tags: ['generics', 'array', 'map', 'filter', 'type-resolution'],
-    companies: ['Microsoft', 'Meta', 'Google', 'Flipkart'],
     code: `// TypeScript generic type resolution for array utilities
 // map<T, U>(arr: T[], fn: (x: T) => U): U[]
 // filter<T>(arr: T[], pred: (x: T) => boolean): T[]
@@ -266,7 +259,6 @@ console.log(typeof evens[0]);`,
     difficulty: 'hard',
     title: 'Constrained generic with default — what type is inferred',
     tags: ['constraint', 'default', 'inference', 'generic-default'],
-    companies: ['Microsoft', 'Google', 'Atlassian'],
     code: `// Simulate generic with constraint and default
 // function wrap<T extends object = Record<string, unknown>>(val: T): { wrapped: T }
 
@@ -303,7 +295,6 @@ console.log(Object.keys(b.wrapped).sort().join(','));`,
     difficulty: 'medium',
     title: 'IsArray conditional — resolves based on type check',
     tags: ['conditional-type', 'extends', 'resolution', 'utility'],
-    companies: ['Microsoft', 'Google', 'Meta'],
     code: `// Simulate TypeScript conditional type resolution at runtime
 // type IsArray<T> = T extends any[] ? "yes" : "no"
 
@@ -335,7 +326,6 @@ console.log(isArray({}));          // object`,
     difficulty: 'medium',
     title: 'NonNullable conditional — null and undefined are removed',
     tags: ['NonNullable', 'conditional-type', 'null', 'undefined'],
-    companies: ['Microsoft', 'Atlassian', 'Razorpay'],
     code: `// Simulate NonNullable<T> = T extends null | undefined ? never : T
 // At runtime, demonstrate which values would survive NonNullable
 
@@ -370,7 +360,6 @@ console.log(nonNullable(false));`,
     difficulty: 'hard',
     title: 'infer extracts the wrapped type from a generic container',
     tags: ['infer', 'conditional-type', 'unwrap', 'extraction'],
-    companies: ['Microsoft', 'Google', 'Meta', 'Atlassian'],
     code: `// Simulate: type Unwrap<T> = T extends Array<infer E> ? E : T
 // and:         type Awaited<T> = T extends Promise<infer R> ? Awaited<R> : T
 
@@ -408,7 +397,6 @@ console.log(typeof unwrapArray([true, false])); // boolean`,
     difficulty: 'hard',
     title: 'Distributive conditional — union members resolved independently',
     tags: ['distributive', 'conditional-type', 'union', 'distribution'],
-    companies: ['Microsoft', 'Google', 'Atlassian'],
     code: `// Simulate TypeScript distributive conditional types
 // type ToArray<T> = T extends unknown ? T[] : never
 // Applied to union: distributes over each member
@@ -451,7 +439,6 @@ console.log(typeof singleNum[0]);`,
     difficulty: 'medium',
     title: 'Union type — in operator narrows to the correct variant',
     tags: ['union', 'in-operator', 'narrowing', 'discriminated'],
-    companies: ['Microsoft', 'Atlassian', 'Meta', 'Razorpay'],
     code: `// Simulate union type narrowing via 'in' operator
 // type Animal = Cat | Dog
 // Cat has meow(), Dog has bark()
@@ -486,7 +473,6 @@ makeSound(fish);`,
     difficulty: 'medium',
     title: 'Intersection type — must satisfy all merged properties',
     tags: ['intersection', 'merge', 'object-types', 'properties'],
-    companies: ['Microsoft', 'Google', 'Atlassian'],
     code: `// Simulate TypeScript intersection type A & B
 // An intersection must have ALL properties from both types
 
@@ -525,7 +511,6 @@ console.log(typeof conflicting.id);  // intersection: string & number = never (T
     difficulty: 'hard',
     title: 'Union narrowing exhaustion — never in the default case',
     tags: ['union', 'exhaustive-check', 'never', 'switch'],
-    companies: ['Microsoft', 'Meta', 'Google', 'Atlassian'],
     code: `// Simulate exhaustive union checking with never
 // type Status = 'active' | 'inactive' | 'pending'
 

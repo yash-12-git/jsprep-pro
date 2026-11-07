@@ -25,7 +25,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = pageMeta({
   title:
-    'JavaScript Tricky Questions: Coercion, Equality & "Wat" Moments (2025)',
+    'JavaScript Tricky Questions: Coercion, Equality & "Wat" Moments',
   description:
     "The most confusing JavaScript questions explained: [] == false, null == undefined, typeof null, NaN !== NaN. Understand the rules behind the quirks — asked in real interviews.",
   path: "/javascript-tricky-questions",

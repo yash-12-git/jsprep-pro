@@ -29,18 +29,24 @@ export default function CodeConsole({ result, running = false }: Props) {
       <div css={body}>
         {running ? (
           <span css={mutedLine}>Running…</span>
-        ) : result?.timed_out ? (
-          <span css={errorLine}>⏱ Execution timed out (infinite loop?)</span>
-        ) : result?.error ? (
-          <span css={errorLine}>{result.error}</span>
-        ) : result?.output.length === 0 ? (
-          <span css={mutedLine}>{"// no output"}</span>
         ) : (
-          result?.output.map((line, i) => (
-            <div key={i} css={outputLine}>
-              {line}
-            </div>
-          ))
+          <>
+            {/* Output logged before an error or timeout is still shown. */}
+            {result?.output.map((line, i) => (
+              <div key={i} css={outputLine}>
+                {line}
+              </div>
+            ))}
+            {result?.timed_out ? (
+              <span css={errorLine}>
+                ⏱ Stopped after 3 seconds (infinite loop or long timer?)
+              </span>
+            ) : result?.error ? (
+              <span css={errorLine}>{result.error}</span>
+            ) : result?.output.length === 0 ? (
+              <span css={mutedLine}>{"// no output"}</span>
+            ) : null}
+          </>
         )}
       </div>
     </div>

@@ -137,11 +137,8 @@ export default function Page() {
     ],
 
     realWorldExamples: [
-      "Next.js e-commerce (Vercel, Shopify): product pages use ISR with revalidate: 3600 — inventory updates hourly without full rebuilds, CDN serves static HTML instantly",
       "News sites (The Guardian, BBC): SSR for breaking news pages where freshness matters more than caching, CSR for comment sections that don't need SEO",
       "Documentation sites (Next.js docs, Tailwind CSS): pure SSG — content changes only on deploy, CDN delivery is near-instant globally",
-      "Authenticated SaaS dashboards (Vercel, Linear): CSR — content is user-specific, no SEO benefit from pre-rendering, full interactivity needed",
-      "React 18 streaming on large pages: Vercel uses Suspense streaming for their dashboard to show the shell immediately while data-heavy sections stream in",
     ],
 
     cheatSheet: [
@@ -269,9 +266,7 @@ window.addEventListener('cart:updated', (e) =&gt; setCount(e.detail.count));</co
     ],
 
     realWorldExamples: [
-      "Spotify: different teams own the music player, podcast section, and search — each deployed independently. The shell composes them at runtime.",
       "IKEA: product pages, cart, and checkout are separate deployable frontends that share a design system but are owned by different teams",
-      "Amazon: their product page is notoriously composed of hundreds of independent services rendering HTML that is assembled server-side — a server-driven MFE pattern",
       "Large enterprise portals: a financial services platform might have trading, analytics, and portfolio teams each owning their screen within one shell application",
     ],
 
@@ -778,7 +773,6 @@ localStorage     // empty — token not stored here</code></pre>
 
     realWorldExamples: [
       "GitHub: uses httpOnly session cookies for web authentication; separate API tokens for programmatic access — different token types for different threat models",
-      "Vercel dashboard: short-lived JWTs for API calls + refresh token rotation in httpOnly cookies — balance of statelessness and security",
       "Google Sign-In: Authorization Code + PKCE flow; Google issues an ID token (OpenID Connect); your backend validates the signature using Google's public keys",
       "Enterprise SSO (Okta, Azure AD): SAML or OIDC — user logs in once, identity provider issues assertions accepted by dozens of internal apps",
     ],
@@ -909,7 +903,6 @@ Permissions-Policy: camera=(), microphone=(), geolocation=()</code></pre>`,
       "GitHub: strict CSP prevents script injection; all user content (README, comments) rendered through a sanitization pipeline that strips dangerous HTML",
       "Banking apps: double-submit CSRF tokens on all state-changing requests; SameSite=Strict cookies; short session expiry",
       "Intercom, Zendesk widgets: loaded via script tags from CDN with SRI (Subresource Integrity) hash — browser verifies the file hasn't been tampered with",
-      "Large SaaS platforms (Notion, Figma): use nonce-based CSP — each page load generates a random nonce; only scripts with that nonce in the script tag are executed",
     ],
 
     cheatSheet: [
@@ -1045,16 +1038,13 @@ const { sidebarOpen, toggleSidebar } = useUIStore();</code></pre>
         Is it complex with many mutations? → Zustand (or Redux if team prefers)</code></pre>`,
 
     misconceptions: [
-      "Redux is required for large React apps — many large production apps (including parts of Facebook) use React Query + local state with no global store. Redux is one option, not a requirement.",
+      "Redux is required for large React apps — many large production apps use React Query + local state with no global store. Redux is one option, not a requirement.",
       "Context API is a state management solution — Context is a dependency injection mechanism, not a state manager. It doesn't handle caching, async, or performance optimization. Use it for stable, rarely-changing values.",
       "You should store API responses in Redux — this is the root cause of 'why is Redux so complicated'. Server state (API data) should live in React Query, which handles caching and synchronization natively.",
       "More state in global store = better — global state is harder to reason about, test, and colocate. Keep state as local as possible and only hoist when genuinely shared.",
     ],
 
     realWorldExamples: [
-      "GitHub.com: uses React Query for PR/issue data, local state for UI (selected files in diff), and minimal global state for user session",
-      "Notion: document state is server-synced with real-time updates (similar to React Query mutations) + local state for selection, cursor position, panel open/closed",
-      "Linear: uses Zustand-like patterns for UI state + a custom sync layer for server state — the issue list is always synced from the server, not stored in Redux",
     ],
 
     cheatSheet: [
@@ -1179,7 +1169,6 @@ const { sidebarOpen, toggleSidebar } = useUIStore();</code></pre>
 
     realWorldExamples: [
       "Next.js Image component: automatic WebP/AVIF conversion, srcset generation, lazy loading, blur placeholder — abstracts all image optimization into one component",
-      "Vercel edge network: preconnect headers injected automatically for common third-party origins (Google Fonts, etc.) on all Next.js deployments",
       "React Router future flag (preloadData): automatically prefetches route data for Link components in the viewport, not just the chunk",
       "E-commerce product pages: preload the hero product image (LCP), prefetch the cart page chunk, preconnect to the payments API origin",
     ],
@@ -1318,7 +1307,7 @@ onCLS(({ value, rating }) =&gt; analytics.track('CLS', { value, rating }));</cod
     realWorldExamples: [
       "Next.js Image component: sets width/height automatically (fixes CLS), serves WebP/AVIF (improves LCP), lazy-loads off-screen images (improves initial page weight)",
       "News sites after CWV rollout: BBC, Guardian significantly improved LCP by moving from CSR to SSR/SSG and preloading hero images — correlated with ranking improvements",
-      "E-commerce: product image CLS is a common issue — fixed by CSS aspect-ratio on image containers; Pinterest improved CLS by 50% this way",
+      "E-commerce: product image CLS is a common issue — fixed by CSS aspect-ratio on image containers",
       "web-vitals library used in production by large sites to collect real user metrics and alert on regressions before they affect rankings",
     ],
 

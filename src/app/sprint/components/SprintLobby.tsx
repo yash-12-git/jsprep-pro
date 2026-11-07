@@ -356,7 +356,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
           <div css={modeRow}>
             <div css={modeDot(C.accentText)} />
             <Brain size={12} color={C.accentText} />
-            Theory: AI evaluates your verbal answer +10 / +3 pts
+            Theory: AI scores your written answer +10 / +3 pts
           </div>
           <div css={modeRow}>
             <div css={modeDot(C.green)} />
@@ -366,7 +366,7 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
           <div css={modeRow}>
             <div css={modeDot(C.red)} />
             <Bug size={12} color={C.red} />
-            Debug: Spot the bug, self-mark your answer +10 / +3 pts
+            Debug: Fix the bug, then mark it yourself against the solution +10 / +3 pts
           </div>
         </div>
 

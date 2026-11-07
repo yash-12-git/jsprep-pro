@@ -43,7 +43,6 @@ export interface Question {
   // Classification
   category: string; // e.g. "Closures", "Event Loop", "Promises"
   tags: string[]; // ["core", "scope", "interview-favorite"]
-  companies?: string[]; // Companies that have asked this question
   difficulty: Difficulty;
 
   // Output quiz specific

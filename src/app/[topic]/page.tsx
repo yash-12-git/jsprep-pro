@@ -106,7 +106,7 @@ export default async function TopicPage({ params }: Props) {
         dangerouslySetInnerHTML={{
           __html: breadcrumbSchema([
             { name: "Home", path: "/" },
-            { name: "Topics", path: "/topics" },
+            { name: "Topics", path: `/topics/${track}` },
             { name: topic.title, path: `/${topic.slug}` },
           ]),
         }}
@@ -125,7 +125,7 @@ export default async function TopicPage({ params }: Props) {
             <>
               <Link href="/">Home</Link>
               <span>/</span>
-              <Link href="/topics">Topics</Link>
+              <Link href={`/topics/${track}`}>Topics</Link>
               <span>/</span>
               <span>{topic.title}</span>
             </>
