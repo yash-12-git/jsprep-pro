@@ -28,6 +28,8 @@ export interface UserProgress {
   joinedAt: string;
   proActivatedAt?: string;
   proExpiresAt?: string | null;
+  /** Free Pro earned through feedback or referrals; from entitlements/{uid}. */
+  promoProUntil?: string | null;
   subscriptionStatus?: string;
   lastRenewedAt?: string;
   // Output quiz progress

@@ -19,6 +19,7 @@ export default function PrivacyPage() {
       <ul>
         <li><strong>Account details:</strong> your name, email address, profile photo and account ID from Google when you sign in.</li>
         <li><strong>Learning activity:</strong> questions you mastered, solved, revealed or bookmarked, quiz and sprint scores, XP, streaks, study plan inputs, and saved mock interviews including your answers.</li>
+        <li><strong>Feedback and invites:</strong> the answers you give in the feedback form, your invite code, who invited you if you signed up through an invite link, and the free Pro you have earned. We use feedback to improve the service and don&apos;t publish it.</li>
         <li><strong>Interviews you log:</strong> the round, date, outcome, topics and notes you enter, and the company name if you add one. The company name is only shown to you and is not sent to the AI. If you tick the sharing box on an entry, we may use its round, topics and notes, without your name or contact details, to build interview guides for other candidates.</li>
         <li><strong>Subscription details:</strong> plan status, dates, and Razorpay payment and subscription IDs. Razorpay handles your card or UPI details, and we don&apos;t receive or store them.</li>
         <li><strong>Answers you submit to AI features:</strong> your written answers, code, and chat or interview messages, so they can be evaluated.</li>

@@ -18,6 +18,8 @@ export type FunnelEvent =
   | "mock_interview_started"
   | "mock_interview_completed"
   | "interview_logged"
+  | "feedback_submitted"
+  | "referral_shared"
   | "paywall_shown"
   | "begin_checkout"
   | "checkout_failed"

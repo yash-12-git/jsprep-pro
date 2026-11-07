@@ -24,6 +24,8 @@ import TheorySprintCard from "./components/TheorySprintCard";
 import OutputSprintCard from "./components/OutputSprintCard";
 import DebugSprintCard from "./components/DebugSprintCard";
 import SprintResults from "./components/SprintResults";
+import { completeReferral } from "@/lib/rewardsClient";
+import { useAuth } from "@/hooks/useAuth";
 import { C, RADIUS } from "@/styles/tokens";
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
@@ -162,6 +164,8 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
   const [config, setConfig] = useState<SprintConfig | null>(null);
   const [summary, setSummary] = useState<SprintSummary | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [referralRewarded, setReferralRewarded] = useState(false);
+  const { refreshProgress } = useAuth();
   const startTimeRef = useRef<number>(0);
 
   const {
@@ -255,14 +259,20 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
       // Nothing answered is not a result, so it isn't kept as a 0% sprint.
       if (attempted.length === 0) return;
       if (uid) {
-        saveSprint(uid, saved).catch((err) =>
-          console.error("[sprint] could not save result", err),
-        );
+        saveSprint(uid, saved)
+          // A referred account's first answered sprint pays out the invite.
+          .then(() => completeReferral())
+          .then((rewarded) => {
+            if (!rewarded) return;
+            setReferralRewarded(true);
+            refreshProgress().catch(() => {});
+          })
+          .catch((err) => console.error("[sprint] could not save result", err));
       } else {
         holdSprintForSignIn(saved);
       }
     },
-    [config, uid],
+    [config, uid, refreshProgress],
   );
 
   // ── Question complete ───────────────────────────────────────────────────────
@@ -340,7 +350,14 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
   }
 
   if (phase === "results" && summary) {
-    return <SprintResults summary={summary} onRetry={handleRetry} signedIn={!!uid} />;
+    return (
+      <SprintResults
+        summary={summary}
+        onRetry={handleRetry}
+        signedIn={!!uid}
+        referralRewarded={referralRewarded}
+      />
+    );
   }
 
   // Active sprint

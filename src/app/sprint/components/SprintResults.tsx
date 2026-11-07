@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { C, RADIUS } from "@/styles/tokens";
 import type { SprintSummary } from "../types";
+import EarnProOffer from "@/components/ui/EarnProOffer";
 
 // ─── Animations ───────────────────────────────────────────────────────────────
 const fadeUp = keyframes`from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}`;
@@ -355,9 +356,15 @@ interface Props {
   summary: SprintSummary;
   onRetry: () => void;
   signedIn: boolean;
+  referralRewarded?: boolean;
 }
 
-export default function SprintResults({ summary, onRetry, signedIn }: Props) {
+export default function SprintResults({
+  summary,
+  onRetry,
+  signedIn,
+  referralRewarded,
+}: Props) {
   const {
     score,
     maxScore,
@@ -1037,6 +1044,8 @@ export default function SprintResults({ summary, onRetry, signedIn }: Props) {
             </button>
           </div>
         </div>
+
+        {signedIn && <EarnProOffer referralRewarded={referralRewarded} />}
 
         {!signedIn && (
           <div css={S.panel} style={{ padding: "1rem 1.125rem" }}>

@@ -88,3 +88,24 @@ export const legal = css`
   margin-top: 1.5rem;
   line-height: 1.5;
 `
+export const inviteNote = css`
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-start;
+  text-align: left;
+  padding: 0.75rem 0.875rem;
+  margin-bottom: 1rem;
+  border-radius: ${RADIUS.lg};
+  background: ${C.accentSubtle};
+  color: ${C.accent};
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  svg {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+  p {
+    margin: 0;
+    color: ${C.text};
+  }
+`

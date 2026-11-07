@@ -4,6 +4,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { SITE, softwareSchema, websiteSchema, organizationSchema, KEYWORDS } from "@/lib/seo/seo";
 import Navbar from "@/components/layout/Navbar";
 import SiteFooter from "@/components/layout/SiteFooter";
+import InviteBanner from "@/components/ui/InviteBanner";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TrackProvider } from "@/contexts/TrackContext";
 import Script from "next/script";
@@ -118,6 +119,7 @@ export default function RootLayout({
           <ThemeProvider>
             <AuthProvider>
               <Navbar />
+              <InviteBanner />
               {children}
               <SiteFooter />
             </AuthProvider>

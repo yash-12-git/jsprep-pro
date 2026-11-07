@@ -2,12 +2,13 @@
 "use client";
 
 import { css, keyframes } from "@emotion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Zap, Timer, Shuffle, Brain, Code2, Bug, Lock } from "lucide-react";
+import { Zap, Timer, Shuffle, Brain, Code2, Bug, Lock, Gift } from "lucide-react";
 import { C, RADIUS } from "@/styles/tokens";
 import type { SprintConfig } from "../types";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
+import { isReferralPending } from "@/lib/rewardsClient";
 
 const fadeUp = keyframes`from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}`;
 
@@ -207,6 +208,24 @@ const startBtn = css`
   }
 `;
 
+const inviteNote = css`
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: ${RADIUS.lg};
+  background: ${C.accentSubtle};
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: ${C.text};
+  svg {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+    color: ${C.accent};
+  }
+`;
+
 const upgradeNote = css`
   text-align: center;
   margin-top: 1rem;
@@ -256,6 +275,8 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
     uid ? 10 : 5,
   );
   const [showPaywall, setShowPaywall] = useState(false);
+  const [referralPending, setReferralPending] = useState(false);
+  useEffect(() => setReferralPending(Boolean(uid) && isReferralPending()), [uid]);
 
   const durationMins =
     selected <= 5 ? 5 : selected === 10 ? 10 : selected === 15 ? 15 : 20;
@@ -396,6 +417,14 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
             Debug: Fix the bug, then mark it yourself against the solution +10 / +3 pts
           </div>
         </div>
+
+        {referralPending && (
+          <p css={inviteNote}>
+            <Gift size={16} aria-hidden="true" />
+            Answer at least one question in this sprint to unlock 2 weeks of Pro
+            for you and the friend who invited you.
+          </p>
+        )}
 
         <button
           css={startBtn}

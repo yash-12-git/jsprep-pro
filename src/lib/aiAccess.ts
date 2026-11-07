@@ -8,6 +8,7 @@
 import crypto from "crypto";
 import type { NextRequest } from "next/server";
 import { decodeIdToken, getAdminDb } from "@/lib/firebaseAdmin";
+import { hasActivePromo } from "@/lib/promoPro";
 
 export type AITier = "anon" | "free" | "pro";
 
@@ -44,7 +45,12 @@ export function withFirestoreTimeout<T>(work: Promise<T>): Promise<T> {
   return Promise.race([work, timeout]).finally(() => clearTimeout(timer));
 }
 
-function hasActivePro(user: FirebaseFirestore.DocumentData | undefined) {
+function hasActivePro(
+  user: FirebaseFirestore.DocumentData | undefined,
+  entitlements: FirebaseFirestore.DocumentData | undefined,
+) {
+  // Free Pro earned through feedback or referrals.
+  if (hasActivePromo(entitlements, user)) return true;
   if (user?.isPro !== true) return false;
   return !user.proExpiresAt || new Date(user.proExpiresAt) > new Date();
 }
@@ -75,8 +81,12 @@ export async function resolveAICaller(req: NextRequest): Promise<AICaller | null
   const key = `uid_${decoded.uid}`;
   if (decoded.isAdmin === true) return { tier: "pro", key };
 
-  const snap = await getAdminDb().collection("users").doc(decoded.uid).get();
-  return { tier: hasActivePro(snap.data()) ? "pro" : "free", key };
+  const db = getAdminDb();
+  const [snap, ent] = await Promise.all([
+    db.collection("users").doc(decoded.uid).get(),
+    db.collection("entitlements").doc(decoded.uid).get(),
+  ]);
+  return { tier: hasActivePro(snap.data(), ent.data()) ? "pro" : "free", key };
 }
 
 // What a free account gets of each Pro-level feature, on top of the daily
