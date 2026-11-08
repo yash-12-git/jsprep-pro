@@ -4,9 +4,11 @@
  *
  * Used on /javascript-output-questions and /javascript-tricky-questions.
  * Inline styles only — no Emotion, works inside RSC pages.
- * No auth / Firestore — public SEO pages don't track progress.
+ * No Firestore: public SEO pages don't track progress.
  *
- * Free limit: first `freeLimit` cards (by globalIndex) are interactive.
+ * Free limit, for signed-out visitors only: first `freeLimit` cards (by
+ * globalIndex) are interactive. Any account gets every question, so a
+ * signed-in visitor (free or Pro) sees no locks.
  * Beyond that: code stays visible (SEO), prediction input is locked.
  * Answers never appear in the DOM until the user checks or reveals.
  */
@@ -15,6 +17,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { CheckCircle, XCircle, EyeOff, RotateCcw, Lock } from "lucide-react";
 import { C, RADIUS } from "@/styles/tokens";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface SEOQuestion {
   id: string | number;
@@ -101,7 +104,8 @@ export default function SEOPredictionCard({
   const [prediction, setPrediction] = useState("");
   const [state, setState] = useState<State>("idle");
 
-  const isLocked = globalIndex >= freeLimit;
+  const { user } = useAuth();
+  const isLocked = !user && globalIndex >= freeLimit;
   const ds = q.difficulty
     ? (DIFF_STYLE[q.difficulty] ?? DIFF_STYLE.medium)
     : DIFF_STYLE.medium;

@@ -16,6 +16,7 @@ import { DocClose, DocHero, LinkGrid } from "@/components/seo/DocParts";
 import { trackFromSlug } from "@/lib/getServerTrack";
 import { escapeCodeTags } from "@/lib/escapeCodeTags";
 import type { Track } from "@/lib/tracks";
+import DocRailSpy from "@/components/content/DocRailSpy";
 
 export const revalidate = 3600;
 
@@ -156,6 +157,7 @@ export default async function TopicPage({ params }: Props) {
                   </li>
                 ))}
               </ol>
+              <DocRailSpy />
             </nav>
           )}
 

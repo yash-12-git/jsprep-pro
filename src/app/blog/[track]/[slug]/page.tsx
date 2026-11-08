@@ -221,7 +221,7 @@ export default async function BlogPostPage({ params }: Props) {
         />
 
         {/* Inline practice CTA banner */}
-        <div className="doc-panel doc-panel__head">
+        <div className="doc-panel doc-panel__head doc-panel--cta">
           <p className="doc-line">
             Practice these concepts interactively with AI feedback
           </p>

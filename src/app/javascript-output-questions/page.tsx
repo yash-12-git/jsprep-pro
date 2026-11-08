@@ -12,7 +12,6 @@ import {
   faqSchema,
   breadcrumbSchema,
   KEYWORDS,
-  SITE,
 } from "@/lib/seo/seo";
 import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
 import SEOHeroCTA from "../dashboard/components/SeoHeroCta";
@@ -251,9 +250,6 @@ export default async function JavaScriptOutputQuestionsPage() {
           />
         </DocSection>
 
-        <footer className="doc-foot">
-          © 2026 {SITE.name}, {SITE.domain}
-        </footer>
       </main>
     </>
   );

@@ -12,7 +12,6 @@ import {
   faqSchema,
   breadcrumbSchema,
   KEYWORDS,
-  SITE,
 } from "@/lib/seo/seo";
 import { getQuestions } from "@/lib/cachedQueries";
 import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
@@ -288,9 +287,6 @@ export default async function JavaScriptTrickyQuestionsPage() {
           />
         </DocSection>
 
-        <footer className="doc-foot">
-          © 2026 {SITE.name}, {SITE.domain}
-        </footer>
       </main>
     </>
   );
