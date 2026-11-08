@@ -241,7 +241,7 @@ export function articleSchema(opts: {
     publisher: {
       "@type": "Organization",
       name: SITE.name,
-      logo: { "@type": "ImageObject", url: `${SITE.domain}/icon.png` },
+      logo: { "@type": "ImageObject", url: `${SITE.domain}/apple-icon.png` },
     },
     image: opts.image ?? `${SITE.domain}/og-default.png`,
     mainEntityOfPage: {
@@ -410,14 +410,38 @@ export function organizationSchema(): string {
     // brand has real social profiles.
     logo: {
       "@type": "ImageObject",
-      url: `${SITE.domain}/icon.png`,
+      url: `${SITE.domain}/apple-icon.png`,
     },
     description: SITE.description,
+    founder: { "@type": "Person", name: FOUNDER.name, url: `${SITE.domain}/about` },
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
       email: LEGAL.contactEmail,
     },
+  });
+}
+
+// ─── Founder ──────────────────────────────────────────────────────────────────
+
+export const FOUNDER = {
+  name: LEGAL.operator,
+  jobTitle: "Software Development Engineer",
+  linkedin: "https://www.linkedin.com/in/yashmaheshwari12",
+  github: "https://github.com/yash-12-git",
+};
+
+/** The person behind the site, for the About page. */
+export function founderSchema(): string {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: FOUNDER.name,
+    url: `${SITE.domain}/about`,
+    jobTitle: FOUNDER.jobTitle,
+    alumniOf: { "@type": "CollegeOrUniversity", name: "Chitkara University" },
+    knowsAbout: ["JavaScript", "React", "Next.js", "TypeScript", "Frontend performance"],
+    sameAs: [FOUNDER.linkedin, FOUNDER.github],
   });
 }
 

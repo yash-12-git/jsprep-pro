@@ -69,7 +69,7 @@ function articleSchema() {
       "@type": "Organization",
       name: "JSPrep Pro",
       url: "https://jsprep.pro",
-      logo: { "@type": "ImageObject", url: "https://jsprep.pro/icon.png" },
+      logo: { "@type": "ImageObject", url: "https://jsprep.pro/apple-icon.png" },
     },
     // When the roadmap was first published; no dateModified, which used to be
     // set to every build's date.

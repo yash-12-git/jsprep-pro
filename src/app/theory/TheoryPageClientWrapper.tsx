@@ -94,7 +94,7 @@ export default function TheoryPageClientWrapper({
           <div>
             <h1 css={Shared.pageTitleText}>Theory Questions</h1>
             <p css={Shared.pageSubtitleText}>
-              Master JS concepts · answers + AI evaluation
+              Master JS concepts, with model answers and AI feedback
             </p>
           </div>
         </div>

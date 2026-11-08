@@ -14,6 +14,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { forget, remember } from "@/lib/sessionCache";
 import type { SetupConfig } from "@/lib/mockInterviewOptions";
 import type {
   Message,
@@ -41,17 +42,23 @@ export function isUnscored(card: ScoreBreakdown) {
   );
 }
 
-export function saveInterview(
+export async function saveInterview(
   uid: string,
   interview: Omit<SavedInterview, "id" | "createdAt">,
 ) {
-  return addDoc(collection(db, "users", uid, "interviews"), {
+  const ref = await addDoc(collection(db, "users", uid, "interviews"), {
     ...interview,
     createdAt: serverTimestamp(),
   });
+  forget(`interviews:${uid}:`);
+  return ref;
 }
 
-export async function getRecentInterviews(
+export function getRecentInterviews(uid: string, count: number): Promise<SavedInterview[]> {
+  return remember(`interviews:${uid}:${count}`, () => readRecentInterviews(uid, count));
+}
+
+async function readRecentInterviews(
   uid: string,
   count: number,
 ): Promise<SavedInterview[]> {

@@ -493,7 +493,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                           size={13}
                           style={{ animation: "spin 1s linear infinite" }}
                         />{" "}
-                        Evaluating...
+                        Evaluating…
                       </>
                     ) : phase === "failed" ? (
                       <>Try again</>

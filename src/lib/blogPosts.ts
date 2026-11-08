@@ -11,6 +11,7 @@ import {
   type QueryConstraint,
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import { clearContentCache } from "@/lib/contentCache"
 import type { BlogPost, BlogPostInput, BlogPostFilters } from '@/types/blogPost'
 
 const COL = 'blog_posts'
@@ -93,6 +94,7 @@ export async function createBlogPost(input: BlogPostInput, adminUid: string): Pr
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   })
+  await clearContentCache("blogPosts")
   return ref.id
 }
 
@@ -101,10 +103,12 @@ export async function updateBlogPost(id: string, updates: Partial<BlogPostInput>
     ...updates,
     updatedAt: new Date().toISOString(),
   })
+  await clearContentCache("blogPosts")
 }
 
 export async function deleteBlogPost(id: string): Promise<void> {
   await deleteDoc(doc(db, COL, id))
+  await clearContentCache("blogPosts")
 }
 
 export async function publishBlogPost(id: string): Promise<void> {
@@ -112,6 +116,7 @@ export async function publishBlogPost(id: string): Promise<void> {
     status: 'published',
     updatedAt: new Date().toISOString(),
   })
+  await clearContentCache("blogPosts")
 }
 
 export async function archiveBlogPost(id: string): Promise<void> {
@@ -119,6 +124,7 @@ export async function archiveBlogPost(id: string): Promise<void> {
     status: 'archived',
     updatedAt: new Date().toISOString(),
   })
+  await clearContentCache("blogPosts")
 }
 
 // ─── Seed helper ──────────────────────────────────────────────────────────────
@@ -153,5 +159,6 @@ export async function seedBlogPostsFromArray(
   }
 
   await batch.commit()
+  await clearContentCache("blogPosts")
   return { created, errors }
 }

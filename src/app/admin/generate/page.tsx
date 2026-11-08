@@ -26,6 +26,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { clearContentCache } from "@/lib/contentCache";
 import { useAuth } from "@/hooks/useAuth";
 import {
   CheckCircle,
@@ -629,6 +630,7 @@ export default function AdminGeneratePage() {
         solveCount: 0,
         track: track,
       });
+      await clearContentCache("questions");
       setCandidates((prev) => prev.filter((_, i) => i !== idx));
       setApprovedCount((n) => n + 1);
     } catch (err: any) {
@@ -679,6 +681,7 @@ export default function AdminGeneratePage() {
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     });
+    await clearContentCache("questions");
     await updateDoc(doc(db, "questions_pending", item.id), {
       status: "approved",
       reviewedAt: Timestamp.now(),

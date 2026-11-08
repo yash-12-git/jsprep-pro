@@ -421,8 +421,8 @@ export default function SprintLobby({ isPro, onStart, uid }: Props) {
         {referralPending && (
           <p css={inviteNote}>
             <Gift size={16} aria-hidden="true" />
-            Answer at least one question in this sprint to unlock 2 weeks of Pro
-            for you and the friend who invited you.
+            Answer at least one question in this sprint and you and the friend
+            who invited you each get 2 weeks of Pro.
           </p>
         )}
 

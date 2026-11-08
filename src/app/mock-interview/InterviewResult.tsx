@@ -196,7 +196,7 @@ function buildCanvasCard(
   ctx.font = "600 15px system-ui";
   ctx.fillStyle = "color-mix(in oklab, var(--color-ink) 75%, transparent)";
   ctx.fillText(
-    `${config.role}  ·  ${config.experience}`,
+    `${config.role}, ${config.experience}`,
     RX,
     124,
   );
@@ -382,11 +382,8 @@ const cardConfig = css`
   color: color-mix(in oklab, var(--color-ink) 30%, transparent);
   font-weight: 500;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem 1rem;
   flex-wrap: wrap;
-`;
-const configDot = css`
-  color: color-mix(in oklab, var(--color-ink) 15%, transparent);
 `;
 const watermark = css`
   font-size: 0.75rem;
@@ -456,6 +453,7 @@ const sBtn = (bg: string, col: string, border: string) => css`
 `;
 const copyFull = css`
   grid-column: 1/-1;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -730,7 +728,6 @@ export default function InterviewResult({
         <div css={cardFooter}>
           <div css={cardConfig}>
             <span>{config.role}</span>
-            <span css={configDot}>·</span>
             <span>{config.experience}</span>
           </div>
           <span css={watermark}>jsprep.pro</span>

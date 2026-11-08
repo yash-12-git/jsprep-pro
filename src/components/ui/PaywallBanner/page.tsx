@@ -74,7 +74,7 @@ export default function PaywallBanner({ onClose, reason }: Props) {
           )}
         </button>
 
-        <p css={S.legal}>Secure payment via Razorpay · Cancel anytime</p>
+        <p css={S.legal}>Secure payment via Razorpay. Cancel anytime.</p>
       </div>
     </div>
   );

@@ -56,7 +56,12 @@ export async function revalidateBlogPosts() {
   await revalidateTagsAction(await adminToken(), ["blogPosts"]);
 }
 
-/** Nuclear: clears everything. Use after bulk data migrations only. */
+/** Clears the given collections' caches. The admin layout registers this with lib/contentCache. */
+export async function revalidateContent(tags: ("topics" | "blogPosts" | "questions")[]) {
+  if (tags.length) await revalidateTagsAction(await adminToken(), tags);
+}
+
+/** Clears everything: after bulk migrations, or edits made outside the admin. */
 export async function revalidateAll() {
   await revalidateTagsAction(await adminToken(), [
     "topics",

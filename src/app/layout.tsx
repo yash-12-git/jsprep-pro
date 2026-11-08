@@ -118,10 +118,12 @@ export default function RootLayout({
         <TrackProvider>
           <ThemeProvider>
             <AuthProvider>
-              <Navbar />
-              <InviteBanner />
-              {children}
-              <SiteFooter />
+              <div className="site-shell">
+                <Navbar />
+                <InviteBanner />
+                <div className="site-main">{children}</div>
+                <SiteFooter />
+              </div>
             </AuthProvider>
           </ThemeProvider>
         </TrackProvider>

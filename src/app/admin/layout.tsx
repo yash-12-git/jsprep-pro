@@ -6,6 +6,8 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { isAdmin } from "@/lib/admin";
+import { revalidateContent } from "@/lib/adminRevalidate";
+import { registerContentCacheClearer } from "@/lib/contentCache";
 import { css } from "@emotion/react";
 import { C, RADIUS, BP } from "@/styles/tokens";
 import {
@@ -197,6 +199,10 @@ const NAV_ITEMS = [
     section: "Tools",
   }, // ADD THIS
 ];
+
+// Every admin write clears the public cache through lib/contentCache, which
+// can't import the server actions itself (see that file).
+registerContentCacheClearer(revalidateContent);
 
 export default function AdminLayout({
   children,

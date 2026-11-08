@@ -554,7 +554,7 @@ export default function QOTDInteractive({
         ) : (
           <>
             <button
-              css={[tryAiBtn, { flex: 1 }]}
+              css={tryAiBtn}
               onClick={() => {
                 setEvalOpen((e) => !e);
                 setAnswerOpen(false);
@@ -568,8 +568,8 @@ export default function QOTDInteractive({
               {answerOpen ? "Hide" : "Answer"}
             </button>
             {!evalOpen && (
-              <button css={doneBtn} onClick={markDone} title="I know this">
-                <CheckCircle size={13} />
+              <button css={doneBtn} onClick={markDone}>
+                <CheckCircle size={13} aria-hidden="true" /> I know this
               </button>
             )}
           </>

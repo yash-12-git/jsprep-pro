@@ -4,9 +4,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { css } from "@emotion/react";
-import { getDocs, collection, query, where } from "firebase/firestore";
+import { getCountFromServer, collection, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
+import { revalidateAll } from "@/lib/adminRevalidate";
 import { C, RADIUS } from "@/styles/tokens";
 import {
   PlusCircle,
@@ -31,7 +32,39 @@ const S = {
   sub: css`
     color: ${C.muted};
     font-size: 0.875rem;
+    margin-bottom: 1rem;
+  `,
+
+  refreshRow: css`
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
     margin-bottom: 2rem;
+  `,
+  refreshBtn: css`
+    padding: 0.5rem 0.875rem;
+    border: 1px solid ${C.border};
+    border-radius: ${RADIUS.lg};
+    background: ${C.card};
+    color: ${C.text};
+    font-size: 0.8125rem;
+    cursor: pointer;
+    &:hover:not(:disabled) {
+      border-color: ${C.accent};
+    }
+    &:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    &:focus-visible {
+      outline: 2px solid ${C.accent};
+      outline-offset: 2px;
+    }
+  `,
+  refreshNote: css`
+    font-size: 0.8125rem;
+    color: ${C.muted};
   `,
 
   statsGrid: css`
@@ -144,6 +177,18 @@ export default function AdminPage() {
     blogPosts: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState<"idle" | "working" | "done" | "failed">("idle");
+
+  async function refreshSiteContent() {
+    setRefresh("working");
+    try {
+      await revalidateAll();
+      setRefresh("done");
+    } catch (err) {
+      console.error("[admin] refresh site content failed", err);
+      setRefresh("failed");
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -159,12 +204,13 @@ export default function AdminPage() {
           const constraints = filters
             ? Object.entries(filters).map(([k, v]) => where(k, "==", v))
             : [];
-          const snap = await getDocs(
+          // A count query costs one read per 1,000 docs, not one per doc.
+          const snap = await getCountFromServer(
             constraints.length
               ? query(collection(db, col), ...constraints)
               : collection(db, col),
           );
-          return snap.docs.length;
+          return snap.data().count;
         } catch (e: any) {
           console.warn(`[admin stats] ${col}:`, e.message);
           return -1; // -1 = failed to load (shown as "—" in UI)
@@ -210,6 +256,25 @@ export default function AdminPage() {
     <div>
       <h1 css={S.heading}>Admin Overview</h1>
       <p css={S.sub}>Manage all questions, tracks, and content from here.</p>
+
+      {/* Edits made here clear the cache themselves; this is for anything
+          changed in the Firebase console or by a script. */}
+      <div css={S.refreshRow}>
+        <button
+          css={S.refreshBtn}
+          onClick={refreshSiteContent}
+          disabled={refresh === "working"}
+        >
+          {refresh === "working" ? "Refreshing…" : "Refresh site content"}
+        </button>
+        <span css={S.refreshNote} role="status">
+          {refresh === "done"
+            ? "Done. Pages load the latest questions, topics and posts on their next visit."
+            : refresh === "failed"
+              ? "Couldn't refresh. Check you're signed in as an admin and try again."
+              : "Use after editing content in the Firebase console or with a script."}
+        </span>
+      </div>
 
       {/* Stats */}
       <div css={S.statsGrid}>

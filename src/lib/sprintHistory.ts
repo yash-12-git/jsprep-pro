@@ -13,6 +13,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { forget, remember } from "@/lib/sessionCache";
 
 export interface SavedSprint {
   score: number;
@@ -45,9 +46,10 @@ export function isEmptySprint(s: SavedSprint) {
 
 const PENDING_KEY = "jsprep-pending-sprint";
 
-export function saveSprint(uid: string, sprint: SavedSprint) {
+export async function saveSprint(uid: string, sprint: SavedSprint) {
   const id = `${uid}_${new Date(sprint.completedAt).getTime()}`;
-  return setDoc(doc(db, "users", uid, "sprints", id), sprint);
+  await setDoc(doc(db, "users", uid, "sprints", id), sprint);
+  forget(`sprints:${uid}:`);
 }
 
 export function holdSprintForSignIn(sprint: SavedSprint) {
@@ -70,10 +72,11 @@ export async function savePendingSprint(uid: string) {
 }
 
 /** The latest sprints where something was answered, newest first. */
-export async function getRecentSprints(
-  uid: string,
-  count: number,
-): Promise<SavedSprint[]> {
+export function getRecentSprints(uid: string, count: number): Promise<SavedSprint[]> {
+  return remember(`sprints:${uid}:${count}`, () => readRecentSprints(uid, count));
+}
+
+async function readRecentSprints(uid: string, count: number): Promise<SavedSprint[]> {
   // Read extra so empty sprints saved by older versions don't crowd out real ones.
   const snap = await getDocs(
     query(

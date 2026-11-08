@@ -1,0 +1,50 @@
+src/app/sprint/components/SprintLobby.tsx
+  FAIL 19 :424 buzzword "unlock" | fix: Say what the product does, in its own nouns
+src/app/sprint/page.tsx
+  FAIL 19 :42 buzzword "unlocks"
+src/app/[topic]/opengraph-image.tsx
+  FAIL 30a :362 text opens with an emoji: "⚡ AI scored" | fix: One icon library, a custom SVG, or the word alone
+  FAIL 48 :147 inline-style colour literal #fff | fix: Lift the value into the token block
+  FAIL 48 :388 inline-style colour literal #ffffff
+src/app/opengraph-image.tsx
+  FAIL 48 :204 inline-style colour literal #f76a6a
+  FAIL 48 :212 inline-style colour literal #f7c76a
+  FAIL 48 :220 inline-style colour literal #6af7c0
+src/app/admin/generate/page.tsx
+  WARN 49 :847 long clickable label "Generating… Generate Questions" without nowrap | fix: Shorten the label or set nowrap
+src/app/admin/migrate/page.tsx
+  WARN 49 :633 long clickable label "Migrating JS… Migrate JS items" without nowrap
+  WARN 49 :708 long clickable label "Seeding React Topics… Seed React To…" without nowrap
+  WARN 49 :777 long clickable label "Seeding React Blogs… Seed React Blo…" without nowrap
+  WARN 49 :849 long clickable label "Seeding TypeScript Topics… Seed Typ…" without nowrap
+  WARN 49 :918 long clickable label "Seeding TypeScript Blogs… Seed Type…" without nowrap
+  WARN 49 :969 long clickable label "Seeding System Design Topics… Seed …" without nowrap
+  WARN 49 :1020 long clickable label "Seeding System Design Blogs… Seed S…" without nowrap
+  WARN 49 :1054 long clickable label "Submitting… Submit React + TypeScri…" without nowrap
+src/app/admin/seed/page.tsx
+  WARN 49 :940 long clickable label "Seed Questions + Embeddings" without nowrap
+  WARN 49 :956 long clickable label "Embedding… Re-Embed Missing" without nowrap
+  WARN 49 :976 long clickable label "Clearing… Clear All Questions" without nowrap
+  WARN 49 :1101 long clickable label "Seeding TypeScript… Seed TypeScript…" without nowrap
+  WARN 49 :1153 long clickable label "Seeding System Design… Seed System …" without nowrap
+src/app/mock-interview/InterviewResult.tsx
+  WARN 49 :791 long clickable label "Copied to clipboard! Copy share text" without nowrap
+src/app/sprint/components/SprintResults.tsx
+  WARN 49 :1032 long clickable label "Copied to clipboard! Copy share text" without nowrap
+src/app/sprint/components/TheorySprintCard.tsx
+  WARN 49 :485 long clickable label "Evaluating... Try again Submit Answ…" without nowrap
+  WARN F2 :496 three-period ellipsis in prose x1 | fix: Use a true ellipsis character (…)
+src/app/study-plan/StudyPlanClientWrapper.tsx
+  WARN 49 :335 long clickable label "Analyzing… Regenerate Plan Generate…" without nowrap
+src/components/ui/AnswerEvaluator/page.tsx
+  WARN 49 :115 long clickable label "Evaluating… Evaluate My Answer" without nowrap
+src/components/ui/QuestionCards/DebugCard.tsx
+  WARN 49 :458 long clickable label "Sign in to check your fix" without nowrap
+src/components/ui/QuestionCards/PolyfillCard.tsx
+  WARN 49 :436 long clickable label "Hide Solution Show Solution" without nowrap
+src/app/earn-pro/EarnProClient.tsx
+  WARN 70 :1 a script prints success ("Thanks for your feedback. You…") with no request behind it | fix: No success state until the form posts somewhere; an empty data-endpoint and a handoff note
+src/app/HomePageClient.tsx
+  DISMISSED 46a :404 metric "86% accuracy": verify the user supplied this number
+sloplint: 8 FAIL, 23 WARN, 1 DISMISSED across 141 file(s) and 14 URL(s).
+render tier not run: no puppeteer-core found locally, globally or via HALLMARK_PUPPETEER

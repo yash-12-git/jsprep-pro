@@ -359,7 +359,7 @@ export default async function Image({ params }: { params: Promise<{ topic: strin
             <span
               style={{ fontSize: 14, color: T.accentText, fontWeight: 700 }}
             >
-              ⚡ AI scored
+              AI scored
             </span>
           </div>
         </div>

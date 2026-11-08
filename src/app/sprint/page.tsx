@@ -15,7 +15,7 @@ export const metadata: Metadata = pageMeta({
 // visitors without JavaScript can read.
 function SprintGuide() {
   return (
-    <section className="doc doc--narrow" aria-label="About the Interview Sprint">
+    <section className="doc doc--narrow" aria-label="About the Interview Sprint" data-focus-hide>
       <div className="legal">
         <h2>What is the Interview Sprint?</h2>
         <p>
@@ -38,8 +38,9 @@ function SprintGuide() {
         </p>
         <h2>Is it free?</h2>
         <p>
-          Yes, the 5-question warmup takes 5 minutes and needs no account. Pro
-          unlocks sprints of 10, 15 and 20 questions.
+          Yes. The 5-question warmup takes 5 minutes and needs no account, a
+          free account adds 10-question sprints, and Pro adds sprints of 15
+          and 20 questions.
         </p>
       </div>
     </section>

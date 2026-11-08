@@ -215,7 +215,7 @@ export default function AnalyticsClientPage({
               <div>
                 <h2 css={S.sectionTitle}>Overall Progress</h2>
                 <p css={S.sectionSub}>
-                  Across all 4 modes · {totalSolved}/{totalQuestions} questions
+                  {totalSolved} of {totalQuestions} questions, across all 4 modes
                 </p>
               </div>
               <span css={S.overallPct}>{overallPct}%</span>
@@ -263,7 +263,7 @@ export default function AnalyticsClientPage({
                   <div css={S.categoryLabelRow}>
                     <span css={S.categoryName}>{label}</span>
                     <span css={S.categoryCount}>
-                      {solved}/{total} · {pct}%
+                      {solved}/{total} ({pct}%)
                     </span>
                   </div>
                   <div css={S.barTrack}>

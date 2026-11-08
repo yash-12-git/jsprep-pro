@@ -188,7 +188,7 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
   const modes = TRACK_MODES[track];
 
   const ctaHref = user ? "/dashboard" : "/auth";
-  const ctaLabel = user ? "Go to Dashboard" : "Start free, no card needed";
+  const ctaLabel = user ? "Go to Dashboard" : "Start free";
 
   // Real counts from server (fall back to 0 so UI doesn't break before data loads)
   const totalQs = theoryCt + outputCt + debugCt + polyfillCt;
@@ -262,7 +262,7 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
             { n: totalQs > 0 ? `${totalQs}+` : "250+", l: "Questions" },
             { n: "4", l: "Practice modes" },
             { n: topicsCt > 0 ? `${topicsCt}` : "40", l: "Topic guides" },
-            { n: "6", l: "AI tools" },
+            { n: "4", l: "Tracks" },
           ].map(({ n, l }) => (
             <div key={l} css={S.statCell}>
               <div css={S.statN}>{n}</div>
@@ -298,7 +298,6 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
                   <Link href={m.href} css={S.modeRow}>
                     <span css={S.modeName}>
                       {m.label}
-                      <span css={S.chipOk}>Free</span>
                     </span>
                     <span css={S.modeCount}>{displayCount} questions</span>
                     <span css={S.modeDesc}>{m.desc}</span>
@@ -553,7 +552,7 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
               <div css={S.pPrice}>
                 {pricing.symbol}0<span css={S.pPer}>/month</span>
               </div>
-              <div css={S.pNote}>No card needed</div>
+              <div css={S.pNote}>Every question included</div>
               <ul css={S.pFeats}>
                 {FREE_F.map((f) => (
                   <li key={f} css={S.pFeat}>
@@ -599,7 +598,7 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
           <h2 css={S.sh2}>Ready to prep smarter?</h2>
           <div>
             <p css={S.btmD}>
-              All {freeCount} questions free, with AI scoring. No card needed.
+              All {freeCount} questions free, with AI scoring.
             </p>
             <Link href={ctaHref} css={S.btnP}>
               {ctaLabel}

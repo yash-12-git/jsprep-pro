@@ -14,6 +14,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { clearContentCache } from "@/lib/contentCache";
 import { useAuth } from "@/hooks/useAuth";
 import { C, RADIUS } from "@/styles/tokens";
 // embeddings called via /api/embed (server-side) — COHERE_API_KEY not available client-side
@@ -548,6 +549,7 @@ export default function SeedPage() {
       );
     }
 
+    await clearContentCache("questions");
     addLog("success", `${label} done — ${created} questions added`);
     setDone((prev) => ({ ...prev, [label]: created }));
     return created;
@@ -741,6 +743,7 @@ export default function SeedPage() {
         addSdLog("success", `  Committed ${Math.min(i + BATCH_SIZE, sdTheoryQs.length)}/${sdTheoryQs.length}`);
       }
 
+      await clearContentCache("questions");
       addSdLog("success", `System Design seed complete! ${count} questions added.`);
       setDoneSd({ "SD-Theory": count });
     } catch (e: any) {
@@ -834,6 +837,7 @@ export default function SeedPage() {
         );
       }
 
+      await clearContentCache("questions");
       addLog("success", "All questions deleted. Ready for a fresh seed.");
       setDone({});
     } catch (e: any) {

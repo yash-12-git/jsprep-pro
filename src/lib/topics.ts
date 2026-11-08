@@ -14,6 +14,7 @@ import {
   type QueryConstraint,
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import { clearContentCache } from "@/lib/contentCache"
 import type { Topic, TopicInput, TopicFilters } from '@/types/topic'
 
 const COL = 'topics'
@@ -84,6 +85,7 @@ export async function createTopic(input: TopicInput, adminUid: string): Promise<
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   })
+  await clearContentCache("topics")
   return ref.id
 }
 
@@ -92,18 +94,22 @@ export async function updateTopic(id: string, updates: Partial<TopicInput>): Pro
     ...updates,
     updatedAt: new Date().toISOString(),
   })
+  await clearContentCache("topics")
 }
 
 export async function deleteTopic(id: string): Promise<void> {
   await deleteDoc(doc(db, COL, id))
+  await clearContentCache("topics")
 }
 
 export async function publishTopic(id: string): Promise<void> {
   await updateDoc(doc(db, COL, id), { status: 'published', updatedAt: new Date().toISOString() })
+  await clearContentCache("topics")
 }
 
 export async function archiveTopic(id: string): Promise<void> {
   await updateDoc(doc(db, COL, id), { status: 'archived', updatedAt: new Date().toISOString() })
+  await clearContentCache("topics")
 }
 
 // ─── Seed helper ──────────────────────────────────────────────────────────────
@@ -142,5 +148,6 @@ export async function seedTopicsFromArray(
   }
 
   await batch.commit()
+  await clearContentCache("topics")
   return { created, errors }
 }

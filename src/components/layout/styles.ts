@@ -8,6 +8,13 @@ export const nav = css`
   top: var(--space-xs);
   z-index: var(--z-sticky-nav);
   padding: var(--space-xs) var(--gutter) 0;
+  /* Phones: dock to the top on a solid strip, so scrolled content can't show
+     in the gap above the pill. */
+  @media (max-width: 40rem) {
+    top: 0;
+    padding-bottom: var(--space-xs);
+    background: ${C.bg};
+  }
 `;
 
 export const navInner = css`
@@ -24,11 +31,6 @@ export const navInner = css`
   gap: 0.75rem;
   @media (max-width: 30rem) {
     gap: 0.5rem;
-  }
-
-  /* On mobile, we have bottom nav — give content some room */
-  @media (max-width: 767px) {
-    padding-bottom: env(safe-area-inset-bottom);
   }
 `;
 

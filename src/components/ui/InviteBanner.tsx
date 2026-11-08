@@ -46,7 +46,7 @@ export default function InviteBanner() {
   if (!invited || loading || user || pathname === "/auth") return null;
 
   return (
-    <div css={bar} role="region" aria-label="Your invite">
+    <div css={bar} role="region" aria-label="Your invite" data-focus-hide>
       <div css={inner}>
         <Gift size={18} color={C.accent} css={{ flexShrink: 0 }} aria-hidden="true" />
         <p css={text}>

@@ -676,6 +676,7 @@ export default function SprintResults({
     `,
     copyFull: css`
       grid-column: 1/-1;
+      white-space: nowrap;
       display: inline-flex;
       align-items: center;
       justify-content: center;

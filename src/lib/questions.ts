@@ -30,6 +30,7 @@ import {
   type QueryConstraint,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { clearContentCache } from "@/lib/contentCache";
 import type {
   Question,
   QuestionInput,
@@ -201,6 +202,7 @@ export async function createQuestion(
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   });
+  await clearContentCache("questions");
   return ref.id;
 }
 
@@ -212,10 +214,12 @@ export async function updateQuestion(
     ...updates,
     updatedAt: new Date().toISOString(),
   });
+  await clearContentCache("questions");
 }
 
 export async function deleteQuestion(id: string): Promise<void> {
   await deleteDoc(doc(db, QUESTIONS_COL, id));
+  await clearContentCache("questions");
 }
 
 export async function publishQuestion(id: string): Promise<void> {
@@ -223,6 +227,7 @@ export async function publishQuestion(id: string): Promise<void> {
     status: "published",
     updatedAt: new Date().toISOString(),
   });
+  await clearContentCache("questions");
 }
 
 export async function archiveQuestion(id: string): Promise<void> {
@@ -230,6 +235,7 @@ export async function archiveQuestion(id: string): Promise<void> {
     status: "archived",
     updatedAt: new Date().toISOString(),
   });
+  await clearContentCache("questions");
 }
 
 /** Bulk update order field after drag-and-drop reordering */
@@ -244,6 +250,7 @@ export async function reorderQuestions(
     });
   });
   await batch.commit();
+  await clearContentCache("questions");
 }
 
 // ─── User Progress (subcollection) ───────────────────────────────────────────
@@ -258,27 +265,42 @@ export async function getQuestionProgress(
   return snap.data() as QuestionProgress;
 }
 
-// Session cache for getAllProgress — avoids re-reading entire subcollection on tab switches
+// Session cache for getAllProgress, so moving between pages doesn't re-read
+// the whole subcollection (one read per question the user has touched).
+// Writes from this tab update it in place; changes made on another device
+// show up after the TTL or a reload.
 const _progressCache = new Map<
   string,
   { data: QuestionProgress[]; fetchedAt: number }
 >();
-const PROGRESS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const PROGRESS_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+function freshProgress(uid: string) {
+  const cached = _progressCache.get(uid);
+  return cached && Date.now() - cached.fetchedAt < PROGRESS_CACHE_TTL_MS ? cached : null;
+}
 
 export async function getAllProgress(uid: string): Promise<QuestionProgress[]> {
-  const cached = _progressCache.get(uid);
-  if (cached && Date.now() - cached.fetchedAt < PROGRESS_CACHE_TTL_MS) {
-    return cached.data;
-  }
+  const cached = freshProgress(uid);
+  if (cached) return [...cached.data];
   const snap = await getDocs(collection(db, USERS_COL, uid, "progress"));
   const data = snap.docs.map((d) => d.data() as QuestionProgress);
   _progressCache.set(uid, { data, fetchedAt: Date.now() });
-  return data;
+  return [...data];
 }
 
-/** Call after any progress write to keep the local cache in sync */
+/** Drops the cached progress, so the next getAllProgress reads Firestore. */
 export function invalidateProgressCache(uid: string) {
   _progressCache.delete(uid);
+}
+
+/** Applies a write to the cached copy, the same way the merge applies it. */
+function patchProgressCache(uid: string, questionId: string, fields: Partial<QuestionProgress>) {
+  const cached = _progressCache.get(uid);
+  if (!cached) return;
+  const i = cached.data.findIndex((p) => p.questionId === questionId);
+  const next = { ...(i >= 0 ? cached.data[i] : { questionId }), ...fields } as QuestionProgress;
+  cached.data = i >= 0 ? cached.data.map((p, j) => (j === i ? next : p)) : [...cached.data, next];
 }
 
 // ─── Write debounce — avoid per-keystroke Firestore writes ────────────────────
@@ -294,6 +316,19 @@ const _pendingWrites = new Map<
 >();
 const DEBOUNCE_MS = 600;
 
+// Fields a progress doc starts with. Only sent for a doc that doesn't exist yet.
+const NEW_PROGRESS: Partial<QuestionProgress> = {
+  status: "attempted",
+  isBookmarked: false,
+  attempts: 1,
+};
+
+/** True only when the fresh cache shows this question has no progress doc. */
+function isNewProgress(uid: string, questionId: string) {
+  const cached = freshProgress(uid);
+  return cached !== null && !cached.data.some((p) => p.questionId === questionId);
+}
+
 export function scheduleProgressWrite(
   uid: string,
   questionId: string,
@@ -301,15 +336,20 @@ export function scheduleProgressWrite(
 ): void {
   const key = `${uid}:${questionId}`;
   const existing = _pendingWrites.get(key);
-  if (existing) {
-    clearTimeout(existing.timer);
-    existing.update = { ...existing.update, ...update }; // merge
-  }
+  if (existing) clearTimeout(existing.timer);
+  // Merge with any update still waiting, so quick successive changes all land.
+  const merged = {
+    ...(!existing && isNewProgress(uid, questionId) ? NEW_PROGRESS : {}),
+    ...existing?.update,
+    ...update,
+  };
+  // Show it straight away on other pages too, not only after the write lands.
+  patchProgressCache(uid, questionId, merged);
   const timer = setTimeout(async () => {
     _pendingWrites.delete(key);
-    await upsertProgress(uid, questionId, update).catch(() => {});
+    await upsertProgress(uid, questionId, merged).catch(() => {});
   }, DEBOUNCE_MS);
-  _pendingWrites.set(key, { uid, questionId, update, timer });
+  _pendingWrites.set(key, { uid, questionId, update: merged, timer });
 }
 
 export async function upsertProgress(
@@ -318,22 +358,18 @@ export async function upsertProgress(
   update: Partial<QuestionProgress>,
 ): Promise<void> {
   const ref = doc(db, USERS_COL, uid, "progress", questionId);
-  invalidateProgressCache(uid);
-  // setDoc with merge:true = upsert in one write op. No getDoc read needed.
-  // Safe defaults only apply when the doc does not yet exist (merge preserves existing fields).
+  // merge:true overwrites every field it is given, so defaults are only sent
+  // when the doc is known not to exist yet. Sending them always reset a
+  // mastered question to "attempted" when it was bookmarked.
+  const fields: Partial<QuestionProgress> = {
+    ...(isNewProgress(uid, questionId) ? NEW_PROGRESS : {}),
+    ...update,
+    questionId,
+    lastAttemptAt: new Date().toISOString(),
+  };
   const { setDoc } = await import("firebase/firestore");
-  await setDoc(
-    ref,
-    {
-      questionId,
-      status: "attempted",
-      isBookmarked: false,
-      attempts: 1,
-      ...update,
-      lastAttemptAt: new Date().toISOString(),
-    },
-    { merge: true },
-  );
+  await setDoc(ref, fields, { merge: true });
+  patchProgressCache(uid, questionId, fields);
 }
 
 export async function markMasteredV2(
@@ -417,5 +453,6 @@ export async function seedQuestionsFromArray(
   }
 
   await batch.commit();
+  await clearContentCache("questions");
   return { created, errors };
 }

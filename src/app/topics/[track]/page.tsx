@@ -74,7 +74,7 @@ export default async function TopicsPage({
         <DocHero
           crumbs={
             <>
-              <Link href="/">JSPrep Pro</Link>
+              <Link href="/">Home</Link>
               <span>/</span>
               <Link href={`/topics/${track}`}>Topics</Link>
             </>
@@ -83,7 +83,7 @@ export default async function TopicsPage({
           lede={`${topics.length} topics across every core ${meta.label} concept: ${meta.heroTagline}.`}
         />
 
-        <div className="doc-figures">
+        <div className="doc-figures doc-figures--3">
           {[
             { n: topics.length, label: "Topics" },
             { n: questions.length, label: "Questions" },

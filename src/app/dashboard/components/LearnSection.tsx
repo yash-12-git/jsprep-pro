@@ -76,13 +76,12 @@ export default async function LearnSection() {
                   <div
                     style={{
                       display: "flex",
-                      gap: "6px",
+                      gap: "10px",
                       fontSize: "0.75rem",
                       marginTop: "4px",
                     }}
                   >
                     <span style={{ color }}>{topic.difficulty}</span>
-                    <span>·</span>
                     <span style={{ color: C.muted }}>
                       {topic.questionCount} Qs
                     </span>
@@ -158,7 +157,7 @@ export default async function LearnSection() {
                       marginTop: "2px",
                     }}
                   >
-                    <Clock size={10} /> {post.readTime} · {post.category}
+                    <Clock size={10} /> {post.readTime}, {post.category}
                   </div>
                 </div>
 

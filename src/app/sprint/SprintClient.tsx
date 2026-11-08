@@ -27,6 +27,7 @@ import SprintResults from "./components/SprintResults";
 import { completeReferral } from "@/lib/rewardsClient";
 import { useAuth } from "@/hooks/useAuth";
 import { C, RADIUS } from "@/styles/tokens";
+import { useFocusMode } from "@/hooks/useFocusMode";
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -157,6 +158,8 @@ export default function SprintClient({ uid, isPro , allQuestions }: Props) {
   const [phase, setPhase] = useState<
     "lobby" | "loading" | "active" | "results"
   >("lobby");
+  // Past the lobby, the page is the test: no guide, footer or banners.
+  useFocusMode(phase !== "lobby");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [results, setResults] = useState<QuestionResult[]>([]);

@@ -14,6 +14,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { forget, remember } from "@/lib/sessionCache";
 
 export interface ReadinessSnapshot {
   score: number;
@@ -22,22 +23,22 @@ export interface ReadinessSnapshot {
   createdAt: string;
 }
 
-export function saveReadiness(uid: string, snapshot: ReadinessSnapshot) {
+export async function saveReadiness(uid: string, snapshot: ReadinessSnapshot) {
   const id = String(new Date(snapshot.createdAt).getTime());
-  return setDoc(doc(db, "users", uid, "readiness", id), snapshot);
+  await setDoc(doc(db, "users", uid, "readiness", id), snapshot);
+  forget(`readiness:${uid}:`);
 }
 
 /** Newest first. */
-export async function getRecentReadiness(
-  uid: string,
-  count: number,
-): Promise<ReadinessSnapshot[]> {
-  const snap = await getDocs(
-    query(
-      collection(db, "users", uid, "readiness"),
-      orderBy("createdAt", "desc"),
-      limit(count),
-    ),
-  );
-  return snap.docs.map((d) => d.data() as ReadinessSnapshot);
+export function getRecentReadiness(uid: string, count: number): Promise<ReadinessSnapshot[]> {
+  return remember(`readiness:${uid}:${count}`, async () => {
+    const snap = await getDocs(
+      query(
+        collection(db, "users", uid, "readiness"),
+        orderBy("createdAt", "desc"),
+        limit(count),
+      ),
+    );
+    return snap.docs.map((d) => d.data() as ReadinessSnapshot);
+  });
 }

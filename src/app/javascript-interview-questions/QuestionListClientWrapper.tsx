@@ -36,7 +36,7 @@ export default function QuestionListClientWrapper({
   return (
     <>
       {/* Live stats */}
-      <div className="doc-figures">
+      <div className="doc-figures doc-figures--3">
         {[
           { label: "Questions", value: `${questions.length}+` },
           { label: "Categories", value: `${categories.length}` },

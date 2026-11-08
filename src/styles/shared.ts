@@ -69,6 +69,9 @@ export const categoryScroll = css`
   &::-webkit-scrollbar {
     display: none;
   }
+  /* Fade the right edge so it's clear the row scrolls. A mask reads only
+     alpha, so any opaque token works. */
+  mask-image: linear-gradient(to right, ${C.text} calc(100% - 2.5rem), transparent);
 `;
 
 export const categoryChip = (

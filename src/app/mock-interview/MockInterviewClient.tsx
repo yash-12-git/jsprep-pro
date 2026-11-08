@@ -3,6 +3,7 @@
 "use client";
 
 import { AIRequestError, aiErrorMessage, postAI } from "@/lib/aiClient";
+import { useFocusMode } from "@/hooks/useFocusMode";
 import PaywallBanner from "@/components/ui/PaywallBanner/page";
 import { track } from "@/lib/analytics";
 import AIErrorNotice from "@/components/ui/AIErrorNotice";
@@ -487,6 +488,7 @@ export default function MockInterviewClient({ topics }: Props) {
     focus: "Mixed (all topics)",
   });
   const [phase, setPhase] = useState<Phase>("setup");
+  useFocusMode(phase === "interview");
 
   // Pre-fill from roadmap "Start mock interview" links (?focus=...)
   useEffect(() => {
