@@ -89,11 +89,13 @@ export async function resolveAICaller(req: NextRequest): Promise<AICaller | null
   return { tier: hasActivePro(snap.data(), ent.data()) ? "pro" : "free", key };
 }
 
-// What a free account gets of each Pro-level feature, on top of the daily
-// total above. Pro has no per-feature limit.
-export const FREE_DAILY_FEATURE_LIMITS: Partial<Record<string, number>> = {
-  qa: 5, // AI tutor
-  debugcheck: 5, // AI code checker
+// What a free account gets of each AI feature, once, ever: a taste before
+// paying, since each use is a paid model call. Counted in the `_allowances`
+// doc, which never expires. Pro has no per-feature limit.
+export const FREE_LIFETIME_LIMITS: Partial<Record<string, number>> = {
+  evaluate: 3, // AI scoring of written answers
+  qa: 3, // AI tutor
+  debugcheck: 3, // AI code checker
 };
 const FREE_STUDY_PLAN_EVERY_MS = 7 * DAY_MS;
 
@@ -106,9 +108,10 @@ export type QuotaResult = "ok" | "daily" | "upgrade";
 
 /**
  * Counts one request against today's limit (UTC) and, for free accounts, the
- * feature's own allowance. Runs in a transaction so parallel requests can't
+ * feature's lifetime allowance. Runs in a transaction so parallel requests can't
  * overshoot. `expiresAt` lets a Firestore TTL policy clean up daily counters;
- * the `_allowances` doc (study plan week, mock trial) is kept.
+ * the `_allowances` doc (lifetime feature uses, study plan week, mock trial)
+ * is kept.
  *
  * `opensMockInterview` marks the first request of a mock interview: a free
  * account gets one interview, and later turns are only allowed once it began.
@@ -142,11 +145,12 @@ export async function consumeAIQuota(
 
     if (metered) {
       const allow = allowSnap?.data() ?? {};
-      const featureLimit = FREE_DAILY_FEATURE_LIMITS[type];
+      const featureLimit = FREE_LIFETIME_LIMITS[type];
       if (featureLimit !== undefined) {
-        const featureCount: number = used[type] ?? 0;
+        const field = `used_${type}`;
+        const featureCount: number = allow[field] ?? 0;
         if (featureCount >= featureLimit) return "upgrade";
-        dayUpdate[type] = featureCount + 1;
+        allowUpdate = { [field]: featureCount + 1 };
       }
       if (type === "studyplan") {
         const last = allow.studyPlanAt ? Date.parse(allow.studyPlanAt) : 0;

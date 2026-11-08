@@ -27,12 +27,12 @@ import { parseSetupConfig } from "@/lib/mockInterviewOptions";
 import { buildPrompt } from "@/lib/mockInterviewPrompt";
 import { buildStudyPlanPrompt } from "@/lib/studyPlanPrompt";
 
-// evaluate stays open to everyone because the free sprint warmup and Question
-// of the Day use it without an account. Daily limits bound what that can cost.
-// "account" features need sign-in; free accounts get a limited allowance of
-// each (see FREE_DAILY_FEATURE_LIMITS in aiAccess) and Pro gets fair use.
+// Every AI feature needs an account, so each call is tied to someone who can
+// pay. Free accounts get a small lifetime allowance of each (see
+// FREE_LIFETIME_LIMITS in aiAccess) and Pro gets fair use. Signed-out visitors
+// can still take the warmup sprint; its theory answers just go unscored.
 const ACCESS: Record<string, "any" | "account" | "internal"> = {
-  evaluate: "any",
+  evaluate: "account",
   qa: "account",
   debugcheck: "account",
   studyplan: "account",
@@ -42,8 +42,9 @@ const ACCESS: Record<string, "any" | "account" | "internal"> = {
 
 // Shown when a free account has used its allowance of a feature.
 const UPGRADE_MESSAGES: Record<string, string> = {
-  qa: "You've used today's 5 free AI tutor questions. Pro has no daily cap.",
-  debugcheck: "You've used today's 5 free AI code checks. Pro has no daily cap.",
+  evaluate: "You've used your 3 free AI scorings. Pro scores every answer.",
+  qa: "You've used your 3 free AI tutor questions. Pro has no cap.",
+  debugcheck: "You've used your 3 free AI code checks. Pro has no cap.",
   studyplan: "Free accounts get a new study plan once a week. Pro updates it any time.",
   mock: "Your free mock interview is used. Pro has unlimited mock interviews.",
 };
@@ -97,9 +98,7 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // If Firestore can't answer, allowances can't be checked, so account
-      // features stop. Free evaluation carries on unmetered: Groq's own rate
-      // limits still cap the cost, and a database problem shouldn't break the
-      // free sprint.
+      // features stop rather than run unmetered.
       const firestoreDown = (err: unknown) => {
         console.error("[ai] access check unavailable:", err);
         return null;

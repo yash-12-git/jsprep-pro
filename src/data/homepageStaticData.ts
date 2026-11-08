@@ -285,12 +285,12 @@ export const AI_TOOLS = [
 
 // Free covers practice and coming back; Pro pays for AI depth and readiness
 // insight. Each line must match the code: client gates on isPro, and the free
-// AI allowances in FREE_DAILY_FEATURE_LIMITS / consumeAIQuota (lib/aiAccess).
+// AI allowances in FREE_LIFETIME_LIMITS / consumeAIQuota (lib/aiAccess).
 export const proFeatures = [
   "Everything in Free",
   "Unlimited AI mock interviews with saved scorecards",
   "Your full study plan, rebuilt any time as you improve",
-  "AI tutor and AI code checker with no daily cap",
+  "AI scoring, AI tutor and AI code checker on every question",
   "15- and 20-question Interview Sprints",
   "Category-by-category analytics",
 ];
@@ -299,8 +299,7 @@ export const FREE_F = [
   "Every theory, output, debug and polyfill question",
   "Progress tracking, bookmarks and a daily streak",
   "Interview Sprints of 5 or 10 questions",
-  "AI scoring of your written answers",
-  "AI tutor and AI code checker, 5 a day each",
+  "Try AI scoring, the AI tutor and the AI code checker, 3 times each",
   "One full AI mock interview with a scorecard",
   "Weekly readiness score and the first days of your study plan",
   "Revision cards, cheat sheets and deep dives",

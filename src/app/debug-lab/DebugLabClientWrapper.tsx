@@ -89,7 +89,7 @@ export default function DebugLabClientPage({
       <>
         {showPaywall && (
           <PaywallBanner
-            reason="You've used today's 5 free AI code checks. Pro has no daily cap."
+            reason="You've used your 3 free AI code checks. Pro has no cap."
             onClose={() => setShowPaywall(false)}
           />
         )}

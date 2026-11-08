@@ -117,7 +117,7 @@ const SHARED_FAQ: FAQItem[] = [
   {
     question: "Is JSPrep Pro free to use?",
     answer:
-      `Yes. All ${CONTENT_COUNTS.total} questions across JavaScript, React, TypeScript, and System Design are free to read and practise, with no credit card required. A free account adds progress tracking, a daily streak, AI scoring of your answers, a weekly readiness score and one AI mock interview. Pro adds unlimited mock interviews, your full study plan, longer sprints and AI help with no daily cap.`,
+      `Yes. All ${CONTENT_COUNTS.total} questions across JavaScript, React, TypeScript, and System Design are free to read and practise, with no credit card required. A free account adds progress tracking, a daily streak, a weekly readiness score, one AI mock interview and 3 tries each of AI scoring, the AI tutor and the AI code checker. Pro adds AI feedback on every answer, unlimited mock interviews, your full study plan and longer sprints.`,
   },
   {
     question: "What is the Interview Sprint?",

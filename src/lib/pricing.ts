@@ -9,27 +9,15 @@ export interface PricingInfo {
   isFree: string;   // "Free" tier display e.g. "$0"
 }
 
-export const CURRENCY_PRICES: Record<string, Omit<PricingInfo, 'label' | 'isFree'>> = {
-  INR: { currency: 'INR', amount: 19900,  symbol: '₹',    display: '199'   },
-  USD: { currency: 'USD', amount: 999,    symbol: '$',    display: '9.99'  },
-  EUR: { currency: 'EUR', amount: 899,    symbol: '€',    display: '8.99'  },
-  GBP: { currency: 'GBP', amount: 799,    symbol: '£',    display: '7.99'  },
-  SGD: { currency: 'SGD', amount: 1299,   symbol: 'S$',   display: '12.99' },
-  AED: { currency: 'AED', amount: 3699,   symbol: 'AED ', display: '36.99' },
-  AUD: { currency: 'AUD', amount: 1499,   symbol: 'A$',   display: '14.99' },
-  CAD: { currency: 'CAD', amount: 1299,   symbol: 'C$',   display: '12.99' },
+// Two prices: India pays in rupees, everyone else in US dollars.
+export const CURRENCY_PRICES: Record<'INR' | 'USD', Omit<PricingInfo, 'label' | 'isFree'>> = {
+  INR: { currency: 'INR', amount: 19900, symbol: '₹', display: '199'  },
+  USD: { currency: 'USD', amount: 999,   symbol: '$', display: '9.99' },
 }
 
-const COUNTRY_CURRENCY: Record<string, string> = {
-  IN: 'INR', US: 'USD', GB: 'GBP', SG: 'SGD',
-  AE: 'AED', AU: 'AUD', CA: 'CAD',
-  DE: 'EUR', FR: 'EUR', IT: 'EUR', ES: 'EUR', NL: 'EUR',
-  PT: 'EUR', BE: 'EUR', AT: 'EUR', CH: 'EUR', SE: 'EUR',
-}
-
+/** No country (local dev, or a request without the header) counts as India. */
 export function getPricingForCountry(country: string | null): PricingInfo {
-  const currency = COUNTRY_CURRENCY[(country ?? 'IN').toUpperCase()] ?? 'USD'
-  const base = CURRENCY_PRICES[currency] ?? CURRENCY_PRICES.USD
+  const base = (country ?? 'IN').toUpperCase() === 'IN' ? CURRENCY_PRICES.INR : CURRENCY_PRICES.USD
   return {
     ...base,
     label: `${base.symbol}${base.display}/mo`,
@@ -42,9 +30,9 @@ export function getPricingForCountry(country: string | null): PricingInfo {
  * single currency — so each currency you want to sell in needs its own plan
  * created in the Razorpay dashboard, exposed as RAZORPAY_PLAN_ID_<CURRENCY>.
  *
- * Only INR is required. Any currency without a configured plan falls back to
- * the INR plan, so international visitors are billed ₹199 rather than being
- * blocked at checkout. Add more plan ids to charge them local rates.
+ * Only INR is required. Until RAZORPAY_PLAN_ID_USD is set, visitors outside
+ * India fall back to the INR plan and are billed ₹199 rather than being
+ * blocked at checkout.
  *
  * Server-only: reads process.env, so never call this from a client component.
  */

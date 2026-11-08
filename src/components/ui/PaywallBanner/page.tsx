@@ -40,8 +40,8 @@ export default function PaywallBanner({ onClose, reason }: Props) {
         {reason && <p css={S.reasonText}>{reason}</p>}
 
         <p css={S.desc}>
-          Pro adds unlimited mock interviews, your full study plan, longer
-          sprints and AI help with no daily cap.
+          Pro adds AI feedback on every answer, unlimited mock interviews,
+          your full study plan and longer sprints.
         </p>
 
         <ul css={S.featureList}>

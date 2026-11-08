@@ -1,9 +1,10 @@
 /** @jsxImportSource @emotion/react */
 "use client";
 
-import { AIRequestError, postAI } from "@/lib/aiClient";
+import { AIRequestError, aiErrorMessage, postAI } from "@/lib/aiClient";
 import { css, keyframes } from "@emotion/react";
 import { useState } from "react";
+import Link from "next/link";
 import { useDesktopAutoFocus } from "@/hooks/useDesktopAutoFocus";
 import {
   Loader2,
@@ -392,7 +393,13 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
   >("read");
   const [userAnswer, setUserAnswer] = useState("");
   const [result, setResult] = useState<EvalResult | null>(null);
-  const [limitReached, setLimitReached] = useState(false);
+  // Set when the answer can't be scored for a reason retrying won't fix:
+  // signed out, free AI scorings used up, or today's limit reached.
+  const [blocked, setBlocked] = useState<{
+    message: string;
+    href?: string;
+    label?: string;
+  } | null>(null);
   const [showBetter, setShowBetter] = useState(false);
 
   const dm = DIFF_META[q.difficulty] ?? DIFF_META.core;
@@ -421,8 +428,18 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
       setResult(parsed);
       setPhase("done");
     } catch (err) {
-      console.error("[sprint] evaluation failed", err);
-      setLimitReached(err instanceof AIRequestError && err.status === 429);
+      const status = err instanceof AIRequestError ? err.status : 0;
+      const reason =
+        status === 401
+          ? { message: aiErrorMessage(err), href: "/auth?next=/sprint", label: "Create a free account" }
+          : status === 402
+            ? { message: aiErrorMessage(err), href: "/#pricing", label: "See Pro" }
+            : status === 429
+              ? { message: aiErrorMessage(err) }
+              : null;
+      // Signed out or out of free scorings is expected, not an error.
+      if (!reason) console.error("[sprint] evaluation failed", err);
+      setBlocked(reason);
       setPhase("failed");
     }
   }
@@ -458,9 +475,22 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
             <>
               {phase === "failed" && (
                 <div css={evalError} role="alert">
-                  {limitReached
-                    ? "You've used today's AI scoring limit, so this answer can't be scored. It won't count against your result."
-                    : "We couldn't score your answer. This is on our side, and your answer is still here. Try again, or continue and it won't count against your result."}
+                  {blocked ? (
+                    <>
+                      {blocked.message} This answer won&apos;t count against
+                      your result.
+                      {blocked.href && (
+                        <>
+                          {" "}
+                          <Link href={blocked.href} className="link">
+                            {blocked.label}
+                          </Link>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    "We couldn't score your answer. This is on our side, and your answer is still here. Try again, or continue and it won't count against your result."
+                  )}
                 </div>
               )}
               <textarea
@@ -474,7 +504,7 @@ export default function TheorySprintCard({ q, onComplete }: Props) {
                   if (e.key === "Enter" && e.metaKey) evaluate();
                 }}
               />
-              {!(phase === "failed" && limitReached) && (
+              {!(phase === "failed" && blocked) && (
                 <div
                   style={{
                     display: "flex",

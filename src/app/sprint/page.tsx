@@ -38,9 +38,10 @@ function SprintGuide() {
         </p>
         <h2>Is it free?</h2>
         <p>
-          Yes. The 5-question warmup takes 5 minutes and needs no account, a
-          free account adds 10-question sprints, and Pro adds sprints of 15
-          and 20 questions.
+          Yes. The 5-question warmup takes 5 minutes and needs no account. A
+          free account adds 10-question sprints and 3 AI scorings of your
+          written answers. Pro scores every answer and adds sprints of 15 and
+          20 questions.
         </p>
       </div>
     </section>

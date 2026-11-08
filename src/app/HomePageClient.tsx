@@ -542,8 +542,8 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
           <div css={S.headBlock}>
             <h2 css={S.sh2}>Pricing</h2>
             <p css={S.ssub}>
-              Practise all {freeCount} questions free. Pro adds unlimited AI
-              mock interviews and your full study plan.
+              Practise all {freeCount} questions free. Pro adds AI feedback on
+              every answer, unlimited mock interviews and your full study plan.
             </p>
           </div>
           <div css={S.priceG}>
@@ -598,7 +598,7 @@ export default function HomePageClient({ tracks }: HomePageClientProps) {
           <h2 css={S.sh2}>Ready to prep smarter?</h2>
           <div>
             <p css={S.btmD}>
-              All {freeCount} questions free, with AI scoring.
+              All {freeCount} questions free, and AI feedback to try.
             </p>
             <Link href={ctaHref} css={S.btnP}>
               {ctaLabel}

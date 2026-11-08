@@ -758,7 +758,7 @@ export default function SprintResults({
             <div css={S.h1}>{"We couldn't score this sprint"}</div>
             <div css={S.sub}>
               {
-                "AI scoring wasn't available, so there's no result to show. It's not a reflection of your answers. Please try again in a little while."
+                "None of these answers could be scored by AI, so there's no result to show. It's not a reflection of your answers."
               }
             </div>
           </div>

@@ -20,7 +20,11 @@ export class AIRequestError extends Error {
 export function aiErrorMessage(err: unknown): string {
   switch (err instanceof AIRequestError ? err.status : null) {
     case 401:
-      return "Please sign in again to use this.";
+      // Every AI feature needs an account. No user means a visitor, not an
+      // expired session.
+      return auth.currentUser
+        ? "Please sign in again to use this."
+        : "AI feedback needs a free account, which includes 3 free tries of each AI feature.";
     case 402:
       // The free allowance is used up; the server says which one.
       return (err as AIRequestError).message;
