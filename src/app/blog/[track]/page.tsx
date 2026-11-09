@@ -65,7 +65,7 @@ export default async function BlogIndexPage({
         <DocHero
           crumbs={
             <>
-              <Link href="/">JSPrep Pro</Link>
+              <Link href="/">Home</Link>
               <span>/</span>
               <Link href={`/blog/${track}`}>Blog</Link>
             </>

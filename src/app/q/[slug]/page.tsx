@@ -15,6 +15,7 @@ import {
   demoteH1,
 } from "@/lib/seo/seo";
 import InlineEvaluator from "@/components/ui/InlineEvaluater";
+import SEOPredictionCard from "@/components/seo/SEOPredictionCard";
 import { escapeCodeTags } from "@/lib/escapeCodeTags";
 import { C } from "@/styles/tokens";
 
@@ -142,7 +143,7 @@ export default async function QuestionPage({ params }: Props) {
         <DocHero
           crumbs={
             <>
-              <Link href="/">JSPrep Pro</Link>
+              <Link href="/">Home</Link>
               <span>/</span>
               <Link href={categoryPath}>{categoryLabel}</Link>
               <span>/</span>
@@ -168,8 +169,32 @@ export default async function QuestionPage({ params }: Props) {
           </div>
         )}
 
-        {/* Code block (output + debug) */}
-        {(isOutput || isDebug) && question.code && (
+        {/* Output questions are played here: predict, check, then reveal.
+            The code is server-rendered because the card starts open. */}
+        {isOutput && question.code && (
+          <section className="doc-block">
+            <SEOPredictionCard
+              q={{
+                id: question.id,
+                title: question.title,
+                code: question.code,
+                answer: question.expectedOutput || question.answer || "",
+                explanation: question.explanation,
+                keyInsight: question.keyInsight,
+                difficulty: question.difficulty,
+                category: question.category,
+              }}
+              globalIndex={0}
+              freeLimit={1}
+              quizHref={outputPath}
+              accent={C.accent}
+              defaultOpen
+            />
+          </section>
+        )}
+
+        {/* Code block (debug) */}
+        {isDebug && question.code && (
           <section className="doc-block doc-prose">
             <h2>
               {isDebug
@@ -179,14 +204,6 @@ export default async function QuestionPage({ params }: Props) {
             <pre>
               <code>{question.code}</code>
             </pre>
-          </section>
-        )}
-
-        {/* Expected output (output only) */}
-        {isOutput && question.expectedOutput && (
-          <section className="doc-block doc-prose">
-            <h2>Correct Output</h2>
-            <pre>{question.expectedOutput}</pre>
           </section>
         )}
 
@@ -200,19 +217,29 @@ export default async function QuestionPage({ params }: Props) {
           </section>
         )}
 
-        {/* Answer / Explanation */}
+        {/* Answer / Explanation. For output questions it's folded so it
+            doesn't give the answer away before you predict; it stays in the
+            HTML for search engines. */}
         <section className="doc-block">
-          <h2 className="doc-h2">
-            {isDebug
-              ? "Bug Explained"
-              : isOutput
-                ? "Why this output?"
-                : "Full Answer"}
-          </h2>
-          <div
-            className="answer-body"
-            dangerouslySetInnerHTML={{ __html: answerHtml }}
-          />
+          {isOutput ? (
+            <details className="answer-fold">
+              <summary className="doc-h2">Why this output?</summary>
+              <div
+                className="answer-body"
+                dangerouslySetInnerHTML={{ __html: answerHtml }}
+              />
+            </details>
+          ) : (
+            <>
+              <h2 className="doc-h2">
+                {isDebug ? "Bug Explained" : "Full Answer"}
+              </h2>
+              <div
+                className="answer-body"
+                dangerouslySetInnerHTML={{ __html: answerHtml }}
+              />
+            </>
+          )}
         </section>
 
         {/* Inline AI evaluator (theory only) */}

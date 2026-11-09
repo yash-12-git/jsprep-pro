@@ -202,7 +202,7 @@ export default async function BlogPostPage({ params }: Props) {
         <DocHero
           crumbs={
             <>
-              <Link href="/">JSPrep Pro</Link>
+              <Link href="/">Home</Link>
               <span>/</span>
               <Link href={`/blog/${track}`}>Blog</Link>
               <span>/</span>

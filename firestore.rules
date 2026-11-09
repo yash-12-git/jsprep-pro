@@ -82,6 +82,22 @@ service cloud.firestore {
       match /sprints/{sprintId} {
         allow read, write: if isOwner(uid);
       }
+      match /readiness/{snapshotId} {
+        allow read, write: if isOwner(uid);
+      }
+      match /interviewLogs/{logId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ─── entitlements/{uid} ──────────────────────────────────────────────────
+    // Free Pro earned through feedback or referrals. Written only by the
+    // server (Admin SDK). The owner may read it so the app can show Pro.
+    // feedback/{uid} and referralCodes/{code} have no rule on purpose: only
+    // the server reads or writes them.
+    match /entitlements/{uid} {
+      allow read: if isOwner(uid);
+      allow write: if false;
     }
 
     // ─── Public content ─────────────────────────────────────────────────────

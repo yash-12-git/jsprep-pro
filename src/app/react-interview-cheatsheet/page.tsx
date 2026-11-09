@@ -230,7 +230,7 @@ export default function CheatsheetPage() {
         <DocHero
           crumbs={
             <>
-              <Link href="/">JSPrep Pro</Link>
+              <Link href="/">Home</Link>
               <span>/</span>
               <span>React Interview Cheat Sheet</span>
             </>

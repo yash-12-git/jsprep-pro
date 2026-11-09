@@ -10,3 +10,11 @@ scripts/serviceAccountKey.json
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# Generated open-source repos (each has its own git)
+/oss/
+
+# Private reports, kept local
+*_AUDIT.md
+CONTENT_VERIFICATION.md
+GROWTH_POSITIONING_AND_BUSINESS_STRATEGY.md

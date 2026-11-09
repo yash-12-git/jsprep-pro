@@ -135,7 +135,7 @@ export default async function CategoryQuestionsPage({ params }: Props) {
         <DocHero
           crumbs={
             <>
-              <Link href="/">JSPrep Pro</Link>
+              <Link href="/">Home</Link>
               <span>/</span>
               <Link href={`/${track}-interview-questions`}>
                 {track.charAt(0).toUpperCase() + track.slice(1)} Interview Questions

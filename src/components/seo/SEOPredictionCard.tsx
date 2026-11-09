@@ -38,6 +38,8 @@ interface Props {
   quizHref: string;
   accent: string; // per-page accent (kept for external callers)
   badgeLabel?: string;
+  /** Start expanded, as on a single question's own page. */
+  defaultOpen?: boolean;
 }
 
 // ─── Normalize for comparison ─────────────────────────────────────────────────
@@ -99,8 +101,9 @@ export default function SEOPredictionCard({
   quizHref,
   accent,
   badgeLabel,
+  defaultOpen = false,
 }: Props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [prediction, setPrediction] = useState("");
   const [state, setState] = useState<State>("idle");
 

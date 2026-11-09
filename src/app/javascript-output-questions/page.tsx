@@ -116,7 +116,7 @@ export default async function JavaScriptOutputQuestionsPage() {
         <DocHero
           crumbs={
             <>
-              <Link href="/">JSPrep Pro</Link>
+              <Link href="/">Home</Link>
               <span>/</span>
               <span>JavaScript Output Questions</span>
             </>
