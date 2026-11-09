@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FOUNDER, founderSchema, pageMeta } from "@/lib/seo/seo";
+import { FOUNDER, SITE, founderSchema, pageMeta } from "@/lib/seo/seo";
 import { LEGAL } from "@/lib/legal";
 import { CONTENT_COUNTS } from "@/lib/contentCounts";
 import { ContactEmail, LegalPage } from "@/components/legal/LegalPage";
@@ -39,10 +39,6 @@ export default function AboutPage() {
         JSPrep Pro is my own project, built and run on my own time. I curate and
         review the questions, build the AI feedback and run the site. You can
         find me on{" "}
-        <a className="link" href={FOUNDER.linkedin} target="_blank" rel="noopener noreferrer">
-          LinkedIn
-        </a>{" "}
-        and{" "}
         <a className="link" href={FOUNDER.github} target="_blank" rel="noopener noreferrer">
           GitHub
         </a>
@@ -58,7 +54,12 @@ export default function AboutPage() {
 
       <h2>Get in touch</h2>
       <p>
-        See something wrong, or have an idea? Email <ContactEmail />. You can also
+        See something wrong, or have an idea? Email <ContactEmail /> or message
+        us on{" "}
+        <a className="link" href={SITE.linkedin} target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+        . You can also
         see <Link className="link" href="/pricing">pricing</Link> or start with
         the free <Link className="link" href="/sprint">Interview Sprint</Link>.
       </p>

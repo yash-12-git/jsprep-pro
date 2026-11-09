@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { pageMeta } from "@/lib/seo/seo";
+import { SITE, pageMeta } from "@/lib/seo/seo";
 import { LEGAL } from "@/lib/legal";
 import { ContactEmail, LegalPage } from "@/components/legal/LegalPage";
 
@@ -20,6 +20,16 @@ export default function ContactPage() {
       <p>
         <ContactEmail />. We aim to reply within 3 business days. For payment
         issues, please include your account email and the payment date.
+      </p>
+
+      <h2>LinkedIn</h2>
+      <p>
+        For quick questions, message the{" "}
+        <a className="link" href={SITE.linkedin} target="_blank" rel="noopener noreferrer">
+          JSPrep Pro page on LinkedIn
+        </a>
+        . For account or billing help, email us instead, so we can find your
+        account.
       </p>
 
       <h2>Who runs JSPrep Pro</h2>

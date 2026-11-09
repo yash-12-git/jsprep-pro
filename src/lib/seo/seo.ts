@@ -18,6 +18,7 @@ export const SITE = {
   name: "JSPrep Pro",
   domain: "https://jsprep.pro",
   twitterHandle: "@jspreppro",
+  linkedin: "https://www.linkedin.com/company/jsprep-pro",
   description:
     `Frontend interview prep with ${CONTENT_COUNTS.total} JavaScript, React, TypeScript, and System Design questions. AI-graded answers, output prediction, debug challenges, mock interviews, and concept deep-dives. Start free, no card required.`,
 };
@@ -406,13 +407,13 @@ export function organizationSchema(): string {
     "@type": "Organization",
     name: SITE.name,
     url: SITE.domain,
-    // A square logo: Google wants at least 112x112. Add `sameAs` once the
-    // brand has real social profiles.
+    // A square logo: Google wants at least 112x112.
     logo: {
       "@type": "ImageObject",
       url: `${SITE.domain}/apple-icon.png`,
     },
     description: SITE.description,
+    sameAs: [SITE.linkedin],
     founder: { "@type": "Person", name: FOUNDER.name, url: `${SITE.domain}/about` },
     contactPoint: {
       "@type": "ContactPoint",
@@ -427,7 +428,6 @@ export function organizationSchema(): string {
 export const FOUNDER = {
   name: LEGAL.operator,
   jobTitle: "Software Development Engineer",
-  linkedin: "https://www.linkedin.com/in/yashmaheshwari12",
   github: "https://github.com/yash-12-git",
 };
 
@@ -441,7 +441,7 @@ export function founderSchema(): string {
     jobTitle: FOUNDER.jobTitle,
     alumniOf: { "@type": "CollegeOrUniversity", name: "Chitkara University" },
     knowsAbout: ["JavaScript", "React", "Next.js", "TypeScript", "Frontend performance"],
-    sameAs: [FOUNDER.linkedin, FOUNDER.github],
+    sameAs: [FOUNDER.github],
   });
 }
 

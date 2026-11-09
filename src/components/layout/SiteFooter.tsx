@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SITE } from "@/lib/seo/seo";
 
 const LINKS = [
   { href: "/about", label: "About" },
@@ -20,6 +21,9 @@ export default function SiteFooter() {
               {l.label}
             </Link>
           ))}
+          <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer">
+            LinkedIn
+          </a>
         </nav>
       </div>
     </footer>
